@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Registration;
 using FCSCommon.Utilities;
@@ -19,7 +20,7 @@ namespace FCS_AlterraHub.API
         AssetBundle GetAssetBundleByName(string bundleName,string executingFolder);
         string GlobalBundleName { get;}
         Texture2D GetEncyclopediaTexture2D(string imageName, string globalBundle = "");
-        GameObject GetPrefabByName(string item, string bundle);
+        GameObject GetPrefabByName(string item, string bundle, bool applyShaders = true);
         string GetBundleByModID(string modID);
     }
 
@@ -33,6 +34,7 @@ namespace FCS_AlterraHub.API
         private static readonly Dictionary<string, AssetBundle> loadedAssetBundles = new();
         private static readonly Dictionary<string, Sprite> loadedIcons = new();
         private static readonly Dictionary<string, Texture2D> loadedImages = new();
+        private static readonly Dictionary<string, GameObject> loadedPrefabs = new();
         public string GlobalBundleName => Mod.AssetBundleName;
         public Texture2D GetEncyclopediaTexture2D(string imageName, string bundleName = "")
         {
@@ -72,11 +74,23 @@ namespace FCS_AlterraHub.API
             return loadedImages[imageName];
         }
 
-        public GameObject GetPrefabByName(string item, string bundleName)
+        public GameObject GetPrefabByName(string item, string bundleName, bool applyShaders = true)
         {
+            if (loadedPrefabs.ContainsKey(item))
+            {
+                return loadedPrefabs[item];
+            }
+
             var bundle = GetAssetBundleByName(bundleName);
             if (bundle == null) return null;
-            Buildables.AlterraHub.LoadAsset(item,bundle,out var go);
+            AlterraHub.LoadAsset(item, bundle, out var go);
+
+            if (applyShaders)
+            {
+                AlterraHub.ReplaceShadersV2(go);
+            }
+
+            loadedPrefabs.Add(item,go);
             return go;
         }
 

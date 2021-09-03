@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using FCS_AlterraHub.API;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
@@ -23,20 +24,29 @@ namespace FCS_HomeSolutions.Mods.Sofas.Buildable
     internal class Sofa1Buildable : SMLHelper.V2.Assets.Buildable
     {
         private readonly GameObject _bench;
+        private readonly GameObject _prefab;
         public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
         public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
         public override string AssetsFolder { get; } = Mod.GetAssetPath();
 
-        public Sofa1Buildable() : base(Mod.Sofa1ClassID, Mod.Sofa1Friendly, Mod.Sofa1Description)
+        internal const string Sofa1ClassID = "Sofa1";
+        internal const string Sofa1Friendly = "Sofa 1";
+        internal const string Sofa1Description = "N/A";
+        internal const string Sofa1PrefabName = "Sofia01";
+        internal const string Sofa1KitClassID = "Sofa1_Kit";
+
+        public Sofa1Buildable() : base(Sofa1ClassID, Sofa1Friendly, Sofa1Description)
         {
+            _prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName(Sofa1PrefabName, FCSAssetBundlesService.PublicAPI.GlobalBundleName);
+
             OnStartedPatching += () =>
             {
-                var kit = new FCSKit(Mod.Sofa1KitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
+                var kit = new FCSKit(Sofa1KitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 kit.Patch();
             };
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.Sofa1KitClassID.ToTechType(), 3000, StoreCategory.Home);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Sofa1KitClassID.ToTechType(), 9000, StoreCategory.Home);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
             };
 
@@ -49,7 +59,7 @@ namespace FCS_HomeSolutions.Mods.Sofas.Buildable
             {
                 var prefab = AddChair();
 
-                var mesh = GameObject.Instantiate(ModelPrefab.Sofa1Prefab);
+                var mesh = GameObject.Instantiate(_prefab);
                 mesh.SetActive(false);
 
                 prefab.name = this.PrefabFileName;
@@ -158,7 +168,7 @@ namespace FCS_HomeSolutions.Mods.Sofas.Buildable
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new(Mod.Sofa1KitClassID.ToTechType(), 1)
+                    new(Sofa1KitClassID.ToTechType(), 1)
                 }
             };
             return customFabRecipe;

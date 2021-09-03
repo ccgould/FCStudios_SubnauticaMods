@@ -21,7 +21,7 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Buildables
 
             LanguageHandler.SetLanguageLine(OnHoverKey, "On Hover");
             LanguageHandler.SetLanguageLine(UnitNotEmptyKey, "One or both of the container are not empty.");
-            LanguageHandler.SetLanguageLine(StorageLabelKey, $"{Mod.MiniFountainFilterFriendly} Receptacle");
+            LanguageHandler.SetLanguageLine(StorageLabelKey, $"{MiniFountainFilterFriendly} Receptacle");
             LanguageHandler.SetLanguageLine(BottlesKey, $"Bottle(s)");
         }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
+using FCS_AlterraHub.API;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
@@ -27,15 +28,15 @@ namespace FCS_HomeSolutions.Mods.Sofas.Buildable
     {
         private GameObject _stairShipChair;
         private readonly string _kitClassID;
-        private GameObject _prefab;
+        private GameObject _gameObject;
 
         public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
         public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
 
-        protected SofaBase(string classID,string friendly,string description, string kitClassID,GameObject prefab) : base(classID, friendly, description)
+        protected SofaBase(string classID,string friendly,string description, string kitClassID,string prefabName,decimal cost) : base(classID, friendly, description)
         {
             _kitClassID = kitClassID;
-            _prefab = prefab;
+            _gameObject = FCSAssetBundlesService.PublicAPI.GetPrefabByName(prefabName, FCSAssetBundlesService.PublicAPI.GlobalBundleName);
             OnStartedPatching += () =>
             {
                 var kit = new FCSKit(kitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
@@ -43,7 +44,7 @@ namespace FCS_HomeSolutions.Mods.Sofas.Buildable
             };
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, kitClassID.ToTechType(), 3000, StoreCategory.Home);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, kitClassID.ToTechType(), cost, StoreCategory.Home);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
             };
 
@@ -57,7 +58,7 @@ namespace FCS_HomeSolutions.Mods.Sofas.Buildable
             {
                 var prefab = AddChair(additionalHeight);
 
-                var mesh = GameObject.Instantiate(_prefab);
+                var mesh = GameObject.Instantiate(_gameObject);
                 mesh.SetActive(false);
                 
                 prefab.name = this.PrefabFileName;

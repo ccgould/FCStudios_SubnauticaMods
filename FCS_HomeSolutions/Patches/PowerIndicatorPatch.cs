@@ -8,12 +8,13 @@ using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Patches;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Mods.Elevator.Mono;
+using FCS_HomeSolutions.Mods.PaintTool.Models;
+using FCS_HomeSolutions.Mods.PaintTool.Mono;
 using FCSCommon.Utilities;
 using HarmonyLib;
 using Oculus.Newtonsoft.Json.Serialization;
 using rail;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 using Action = System.Action;
 
@@ -36,13 +37,28 @@ namespace FCS_HomeSolutions.Patches
                 }
 
                 var hudTransform = GameObject.Find("ScreenCanvas").transform.Find("HUD").Find("Content");
-                var elevatorHudPrefab = GameObject.Instantiate(ModelPrefab.ElevatorUIPrefab);
 
+                var elevatorHudPrefab = GameObject.Instantiate(ModelPrefab.ElevatorUIPrefab);
                 elevatorHudPrefab.transform.SetParent(hudTransform, false);
                 elevatorHudPrefab.transform.localScale = new Vector3(2f, 2f, 2f);
                 elevatorHudPrefab.transform.SetSiblingIndex(0);
                 var elevatorHud = elevatorHudPrefab.AddComponent<ElevatorHUD>();
                 elevatorHud.Hide();
+
+                //PaintTool uGUI
+                var uGUI_PaintToolColorPicker = GameObject.Instantiate(ModelPrefab.GetPrefab("uGUI_PaintToolColorTemplate", false, false));
+                uGUI_PaintToolColorPicker.transform.SetParent(hudTransform, false);
+                uGUI_PaintToolColorPicker.transform.SetSiblingIndex(0);
+                var uGUI_PaintToolColorPickerHud = elevatorHudPrefab.AddComponent<uGUI_PaintToolColorPicker>();
+                uGUI_PaintToolColorPickerHud.Close();
+
+
+                //PaintTool Editor uGUI
+                var uGUI_PaintToolColorEditor = GameObject.Instantiate(ModelPrefab.GetPrefab("uGUI_PaintToolColorTemplate", false, false));
+                uGUI_PaintToolColorEditor.transform.SetParent(hudTransform, false);
+                uGUI_PaintToolColorEditor.transform.SetSiblingIndex(0);
+                var uGUI_PaintToolColorEditorHud = elevatorHudPrefab.AddComponent<uGUI_PaintToolColorPickerEditor>();
+                uGUI_PaintToolColorEditorHud.Close();
 
                 IndicatorInstance = __instance;
             }
@@ -50,7 +66,7 @@ namespace FCS_HomeSolutions.Patches
 
         public static uGUI_PowerIndicator IndicatorInstance { get; set; }
     }
-
+    
     public class ElevatorHUD : MonoBehaviour
     {
         public static ElevatorHUD Main;
@@ -106,11 +122,11 @@ namespace FCS_HomeSolutions.Patches
             }
 
             _toggle = GameObjectHelpers.FindGameObject(gameObject, "ShowRailingsToggle").GetComponent<Toggle>();
-                _toggle.onValueChanged.AddListener((
-                value =>
-                {
-                    _currentController.ChangeRailingVisibility(value);
-                }));
+            _toggle.onValueChanged.AddListener((
+            value =>
+            {
+                _currentController.ChangeRailingVisibility(value);
+            }));
             _slider = GameObjectHelpers.FindGameObject(gameObject, "Slider").GetComponent<Slider>();
             _slider.onValueChanged.AddListener((
             value =>
@@ -148,7 +164,7 @@ namespace FCS_HomeSolutions.Patches
         private void OnLoadDisplay()
         {
 
-            var data = _currentController.GetStoredFloorData().OrderByDescending(x=>x.Value.Meters).ToList();
+            var data = _currentController.GetStoredFloorData().OrderByDescending(x => x.Value.Meters).ToList();
 
             var total = data.Count - 1;
 
@@ -156,7 +172,7 @@ namespace FCS_HomeSolutions.Patches
             {
                 data.ElementAt(i).Value.FloorIndex = total--;
             }
-            
+
             foreach (Transform item in _grid.transform)
             {
                 Destroy(item.gameObject);
@@ -166,7 +182,7 @@ namespace FCS_HomeSolutions.Patches
             {
                 GameObject floorItemPrefab = GameObject.Instantiate(ModelPrefab.ElevatorFloorItemPrefab);
                 floorItemPrefab.transform.SetParent(_grid.transform, false);
-                
+
                 var currentElement = data.ElementAt(i);
                 var uGUI = floorItemPrefab.AddComponent<ElevatorFloorItem_uGUI>();
                 uGUI.Initialize(_currentController, currentElement.Value.FloorIndex, currentElement.Value.Meters, currentElement.Value.FloorName, currentElement.Key);
@@ -203,8 +219,8 @@ namespace FCS_HomeSolutions.Patches
                 ShowMessage($"Elevator floor limit is {MAX_FLOOR_LEVELS}");
                 return;
             }
-            
-            _currentController.AddNewFloor(Guid.NewGuid().ToString(), "Custom Floor",_currentController.GetNewFloorLevel(),_currentController.GetStoredFloorData().Count);
+
+            _currentController.AddNewFloor(Guid.NewGuid().ToString(), "Custom Floor", _currentController.GetNewFloorLevel(), _currentController.GetStoredFloorData().Count);
             OnLoadDisplay();
             onFloorAdded?.Invoke();
         }
@@ -229,7 +245,7 @@ namespace FCS_HomeSolutions.Patches
         private float MAX_FLOOR_LEVEL_IN_METERS = 200f;
         private float _prevMeters;
 
-        public void Initialize(FCSElevatorController controller, int index, float meters, string name,string id)
+        public void Initialize(FCSElevatorController controller, int index, float meters, string name, string id)
         {
             GameObjectHelpers.FindGameObject(gameObject, "ItemIndex").GetComponent<Text>().text = index.ToString("D2");
 
@@ -264,7 +280,7 @@ namespace FCS_HomeSolutions.Patches
             var goToFloorButton = GameObjectHelpers.FindGameObject(gameObject, "GoToFloorBTN").GetComponent<Button>();
             goToFloorButton.onClick.AddListener((() =>
             {
-                QuickLogger.Debug($"Attempting to go to floor with Id: {_id}",true);
+                QuickLogger.Debug($"Attempting to go to floor with Id: {_id}", true);
 
                 if (meters > MAX_FLOOR_LEVEL_IN_METERS)
                 {
@@ -276,7 +292,7 @@ namespace FCS_HomeSolutions.Patches
                 controller.GoToFloor(_id);
             }));
         }
-        
+
         private void OnValueChanged(string value)
         {
             if (string.IsNullOrWhiteSpace(value) || value.Equals("0"))

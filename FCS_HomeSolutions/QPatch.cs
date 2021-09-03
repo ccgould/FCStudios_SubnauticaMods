@@ -6,11 +6,9 @@ using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Objects;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
-using FCS_HomeSolutions.Buildables.OutDoorPlanters;
 using FCS_HomeSolutions.Configuration;
-using FCS_HomeSolutions.Mods.AlienChief.Buildables;
-using FCS_HomeSolutions.Mods.AlterraMiniShower.Buildable;
 using FCS_HomeSolutions.Mods.Cabinets.Buildable;
+using FCS_HomeSolutions.Mods.CrewLocker.Buildable;
 using FCS_HomeSolutions.Mods.Curtains.Buildable;
 using FCS_HomeSolutions.Mods.Elevator.Buildable;
 using FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Buildable;
@@ -18,17 +16,20 @@ using FCS_HomeSolutions.Mods.HologramPoster.Buildable;
 using FCS_HomeSolutions.Mods.JukeBox.Buildable;
 using FCS_HomeSolutions.Mods.LedLights.Buildable;
 using FCS_HomeSolutions.Mods.MiniFountainFilter.Buildables;
+using FCS_HomeSolutions.Mods.NeonPlanter.Buildable;
 using FCS_HomeSolutions.Mods.PaintTool.Spawnable;
 using FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Buildable;
 using FCS_HomeSolutions.Mods.SeaBreeze.Buildable;
+using FCS_HomeSolutions.Mods.Shower.Buildable;
+using FCS_HomeSolutions.Mods.Sink.Buildable;
 using FCS_HomeSolutions.Mods.Sofas.Buildable;
+using FCS_HomeSolutions.Mods.Stove.Buildable;
 using FCS_HomeSolutions.Mods.TrashReceptacle.Buildable;
 using FCS_HomeSolutions.Mods.TrashRecycler.Buildable;
 using FCS_HomeSolutions.Mods.TV.Buildable;
 using FCS_HomeSolutions.Spawnables;
 using FCSCommon.Utilities;
-using FMOD;
 using HarmonyLib;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
@@ -50,9 +51,7 @@ namespace FCS_HomeSolutions
         internal static Dictionary<string, Texture2D> Patterns = new();
 
         internal static Dictionary<Texture2D, Atlas.Sprite> PatternsIcon = new();
-
-        public static Dictionary<string, SoundEntry> AudioClips = new();
-
+        
         [QModPatch]
         public void Patch()
         {
@@ -68,40 +67,17 @@ namespace FCS_HomeSolutions
 
             if (Configuration.IsPeeperLoungeBarEnabled)
             {
-                var ahsSweetWaterBar = new PeeperLoungeBarPatch("ahsSweetWaterBar", "Peeper Lounge Bar",
-                    "All drinks on the house.", ModelPrefab.GetPrefab("PeeperLoungeBar",true), new Settings
-                    {
-                        KitClassID = "ahsSweetWaterBar_kit",
-                        AllowedInBase = true,
-                        AllowedOutside = true,
-                        AllowedOnGround = true,
-                        RotationEnabled = true,
-                        Cost = 45000,
-                        Size = new Vector3(2.020296f, 1.926336f, 2.067809f),
-                        Center = new Vector3(0, 1.5901f, 0),
-                        CategoryForPDA = TechCategory.Misc,
-                        GroupForPDA = TechGroup.Miscellaneous,
-                        IconName = "PeeperLoungeBar"
-                    });
+                var ahsSweetWaterBar = new PeeperLoungeBarPatch();
                 ahsSweetWaterBar.Patch();
-
-                LoadPeeperLoungeTracks();
-
-                PatchFood();
+                PeeperLoungeBarPatch.LoadPeeperLoungeTracks();
+                PeeperLoungeBarPatch.PatchFood();
             }
 
-            if (Configuration.IsSmartOutDoorPlanterEnabled)
+            if (Configuration.IsNeonPlanterEnabled)
             {
-                //Patch Smart Planter Pot
-                var smartOutDoorPlanter = new OutDoorPlanterPatch(Mod.SmartPlanterPotClassID, Mod.SmartPlanterPotFriendly,
-                    Mod.SmartPlanterPotDescription, ModelPrefab.SmallOutdoorPot, new Settings
-                    {
-                        KitClassID = Mod.SmartPlanterPotKitClassID,
-                        Size = new Vector3(0.7929468f, 0.3463891f, 0.7625999f),
-                        Center = new Vector3(0f, 0.2503334f, 0f)
-                    });
-
-                smartOutDoorPlanter.Patch();
+                //Patch Neon Planter Pot
+                var neonPlanter = new NeonPlanterPatch();
+                neonPlanter.Patch();
             }
 
             if (Configuration.IsMiniFountainFilterEnabled)
@@ -164,11 +140,11 @@ namespace FCS_HomeSolutions
                 quantumTeleporter.Patch();
             }
 
-            if (Configuration.IsAlienChiefEnabled)
+            if (Configuration.IsStoveEnabled)
             {
-                //Patch Alien Chief
-                var alienChief = new AlienChefBuildable();
-                alienChief.Patch();
+                //Patch Stove
+                var stoveBuildable = new StoveBuildable();
+                stoveBuildable.Patch();
             }
 
             if (Configuration.IsObservationTankEnabled)
@@ -177,11 +153,11 @@ namespace FCS_HomeSolutions
                 observationTank.Patch();
             }
             
-            if (Configuration.IsAlterraMiniBathroomEnabled)
+            if (Configuration.IsShowerEnabled)
             {
-                //Patch Alterra Mini Bathroom
-                var alterraMiniBathroom = new AlterraMiniBathroomBuildable();
-                alterraMiniBathroom.Patch();
+                //Patch Shower
+                var shower = new ShowerBuildable();
+                shower.Patch();
             }
 
             if (Configuration.IsElevatorEnabled)
@@ -192,6 +168,11 @@ namespace FCS_HomeSolutions
                 AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "LiftSoundEffect.mp3"));
             }
 
+
+            var sink = new SinkBuildable();
+            sink.Patch();
+
+
             var jukeBox = new JukeBoxBuildable();
             jukeBox.Patch();
 
@@ -201,6 +182,8 @@ namespace FCS_HomeSolutions
 
             var hologramPoster = new HologramPosterBuildable();
             hologramPoster.Patch();
+
+            PatchComputers();
 
             PatchSigns();
 
@@ -225,6 +208,48 @@ namespace FCS_HomeSolutions
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
         }
 
+        private void PatchComputers()
+        {
+            var pcCPU = new DecorationEntryPatch("pccpu", "Computer CPU", "N/A",
+                FCSAssetBundlesService.PublicAPI.GetPrefabByName("FCS_PCCpu", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                new Settings
+                {
+                    KitClassID = "pccpu_kit",
+                    AllowedInBase = true,
+                    AllowedOutside = false,
+                    AllowedOnGround = true,
+                    AllowedInSub = true,
+                    AllowedOnConstructables = true,
+                    RotationEnabled = true,
+                    Cost = 4500,
+                    Center = new Vector3(0f, 0.4660995f, 0f),
+                    Size = new Vector3(0.3240662f, 0.8089027f, 0.6231821f),
+                    CategoryForPDA = TechCategory.InteriorModule,
+                    GroupForPDA = TechGroup.InteriorModules
+                });
+            pcCPU.Patch();
+
+
+            var pcMonitor = new DecorationEntryPatch("pcmonitor", "Computer Monitor", "N/A",
+                FCSAssetBundlesService.PublicAPI.GetPrefabByName("FCS_PCmonitor", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                new Settings
+                {
+                    KitClassID = "pcmonitor_kit",
+                    AllowedInBase = true,
+                    AllowedOutside = false,
+                    AllowedOnGround = true,
+                    AllowedInSub = true,
+                    AllowedOnConstructables = true,
+                    RotationEnabled = true,
+                    Cost = 4500,
+                    Center = new Vector3(9.155273E-05f, 0.4331882f, -0.01636505f),
+                    Size = new Vector3(1.074585f, 0.6359282f, 0.2370758f),
+                    CategoryForPDA = TechCategory.InteriorModule,
+                    GroupForPDA = TechGroup.InteriorModules
+                });
+            pcMonitor.Patch();
+        }
+
         private void PatchBenches()
         {
             var sofa1 = new Sofa1Buildable();
@@ -233,45 +258,8 @@ namespace FCS_HomeSolutions
             sofa2.Patch();
             var sofa3 = new Sofa3Buildable();
             sofa3.Patch();
-        }
-
-        private void LoadPeeperLoungeTracks()
-        {
-            AudioClips.Add("PLB_AnnoyingFish", new SoundEntry
-            {
-                Sound = AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "PeeperLoungeBar_AnnoyingFish.mp3")),
-                Message = "These fish are so annoying. Would you mind taking them out?"
-            });
-            AudioClips.Add("PLB_Hello", new SoundEntry
-            {
-                Sound = AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "PeeperLoungeBar_Hello.mp3")),
-                Message = "Hello Ryley! would you like to purchase something?"
-            });
-            AudioClips.Add("PLB_ThankYou", new SoundEntry
-            {
-                Sound = AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "PeeperLoungeBar_ThankYou.mp3")),
-                Message = "Thank You! Please come back again!"
-            });            
-            AudioClips.Add("PLB_Intro", new SoundEntry
-            {
-                Sound = AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "PeeperLoungeBar_Intro.mp3")),
-                Message = "Hello, my name is Peeper Lounge, nice to meet you. My function is to make your leisure time fun and efficient with a great selection of drinks and snacks from the Alterra Corporation. I am able to speak to you through your FCS PDA, isn't that great? However, if you prefer, you can disable my voice in the settings for FCS products."
-            });
-            AudioClips.Add("PLB_FishRemoved", new SoundEntry
-            {
-                Sound = AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "PeeperLoungeBar_FishRemoved.mp3")),
-                Message = "Thank you for taking those pesky fish out!"
-            });            
-            AudioClips.Add("PLB_NoCardDetected", new SoundEntry
-            {
-                Sound = AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "PeeperLoungeBar_NoCardDetected.mp3")),
-                Message = "I maybe blind since I am just a robot, but I can't seem to locate your debit card on your body anywhere!"
-            });
-            AudioClips.Add("PLB_NotEnoughCredit", new SoundEntry
-            {
-                Sound = AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "PeeperLoungeBar_NotEnoughCredit.mp3")),
-                Message = "TI'm sorry, but it seems you do not have enough credit for this purchase."
-            });
+            var neonBarStool = new NeonBarStoolBuildable();
+            neonBarStool.Patch();
         }
         
         private void LoadAdditionalColors()
@@ -286,61 +274,13 @@ namespace FCS_HomeSolutions
         {
             if(!Configuration.IsLEDLightsEnabled) return;
 
-            var longLight = new LedLightPatch(new LedLightData
-            {
-                classId = "LedLightStickLong",
-                description = "A long LED light stick, suitable for interior and exterior use. (Change the color with the Paint Tool)",
-                friendlyName = "Long Led Light Stick",
-                allowedInBase = true,
-                allowedInSub = false,
-                allowedOnGround = true,
-                allowedOnWall = false,
-                allowedOutside = true,
-                categoryForPDA = TechCategory.Misc,
-                groupForPda = TechGroup.Miscellaneous,
-                size = Vector3.zero,
-                center = Vector3.zero,
-                prefab = ModelPrefab.LedLightLongPrefab,
-                TechData = Mod.LedLightStickLongIngredients,
-            });
+            var longLight = new LongLEDLight();
             longLight.Patch();
 
-            var shortLight = new LedLightPatch(new LedLightData
-            {
-                classId = "LedLightStickShort",
-                description = "A short LED light stick, suitable for interior and exterior use. (Change the color with the Paint Tool)",
-                friendlyName = "Short Led Light Stick",
-                allowedInBase = true,
-                allowedInSub = true,
-                allowedOnGround = true,
-                allowedOnWall = false,
-                allowedOutside = true,
-                categoryForPDA = TechCategory.Misc,
-                groupForPda = TechGroup.Miscellaneous,
-                size = Vector3.zero,
-                center = Vector3.zero,
-                prefab = ModelPrefab.LedLightShortPrefab,
-                TechData = Mod.LedLightStickShortIngredients
-            });
+            var shortLight = new ShortLEDLight();
             shortLight.Patch();
 
-            var wallLight = new LedLightPatch(new LedLightData
-            {
-                classId = "LedLightStickWall",
-                description = "A wall mountable LED light strip. (Change the color with the Paint Tool) (Interior use only)",
-                friendlyName = "Wall Mountable Led Light Strip",
-                allowedInBase = true,
-                allowedInSub = true,
-                allowedOnGround = false,
-                allowedOnWall = true,
-                allowedOutside = false,
-                categoryForPDA = TechCategory.InteriorModule,
-                groupForPda = TechGroup.InteriorModules,
-                size = Vector3.zero,
-                center = Vector3.zero,
-                prefab = ModelPrefab.LedLightWallPrefab,
-                TechData = Mod.LedLightStickWallIngredients
-            });
+            var wallLight = new WallLEDLight();
             wallLight.Patch();
         }
 
@@ -483,7 +423,7 @@ namespace FCS_HomeSolutions
             floorShelf07.Patch();
 
             var neonShelf01 = new DecorationEntryPatch("neonShelf01", "Neon Shelf 01", "A shelf with neon lights. (Paint Tool Recommended)",
-                ModelPrefab.GetPrefab("NeonShelf01"),
+                FCSAssetBundlesService.PublicAPI.GetPrefabByName("FCS_NeonShelf01", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 new Settings
                 {
                     KitClassID = "neonShelf01_kit",
@@ -495,16 +435,57 @@ namespace FCS_HomeSolutions
                     AllowedOnConstructables = true,
                     RotationEnabled = false,
                     Cost = 27000,
-                    Size = new Vector3(1.997957f, 0.06401221f, 0.9870584f),
-                    Center = new Vector3(-2.488494e-05f, -0.01308646f, 0.5065421f),
+                    Size = new Vector3(0f, -0.02069972f, 0.5016098f),
+                    Center = new Vector3(2.014741f, 0.08191673f, 1.005661f),
                     CategoryForPDA = TechCategory.InteriorModule,
                     GroupForPDA = TechGroup.InteriorModules
                 });
             neonShelf01.Patch();
 
+            var neonShelf02 = new DecorationEntryPatch("neonShelf02", "Neon Shelf 02", "A shelf with neon lights. (Paint Tool Recommended)",
+                FCSAssetBundlesService.PublicAPI.GetPrefabByName("FCS_NeonShelf02", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                new Settings
+                {
+                    KitClassID = "neonShelf02_kit",
+                    AllowedInBase = true,
+                    AllowedOutside = false,
+                    AllowedOnGround = false,
+                    AllowedInSub = true,
+                    AllowedOnWall = true,
+                    AllowedOnConstructables = true,
+                    RotationEnabled = false,
+                    Cost = 27000,
+                    Center = new Vector3(0f, -0.01520546f, 0.3414307f),
+                    Size = new Vector3(1.367249f, 0.05680838f, 0.6867371f),
+            CategoryForPDA = TechCategory.InteriorModule,
+                    GroupForPDA = TechGroup.InteriorModules
+                });
+            neonShelf02.Patch();
+
+
+            var neonShelf03 = new DecorationEntryPatch("neonShelf03", "Neon Shelf 03", "A shelf with neon lights. (Paint Tool Recommended)",
+                FCSAssetBundlesService.PublicAPI.GetPrefabByName("FCS_NeonShelf03", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                new Settings
+                {
+                    KitClassID = "neonShelf03_kit",
+                    AllowedInBase = true,
+                    AllowedOutside = false,
+                    AllowedOnGround = false,
+                    AllowedInSub = true,
+                    AllowedOnWall = true,
+                    AllowedOnConstructables = true,
+                    RotationEnabled = false,
+                    Cost = 27000,
+                    Center = new Vector3(0f, -0.01649079f, 0.3413544f),
+                    Size = new Vector3(0.6748515f, 0.05640584f, 0.6829834f),
+                    CategoryForPDA = TechCategory.InteriorModule,
+                    GroupForPDA = TechGroup.InteriorModules
+                });
+            neonShelf03.Patch();
+
 
             var neonTable01 = new DecorationEntryPatch("neonTable01", "Neon Table 01", "A table with neon lights. (Paint Tool Recommended)",
-                ModelPrefab.GetPrefab("NeonTable01"),
+                FCSAssetBundlesService.PublicAPI.GetPrefabByName("NeonTable01", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 new Settings
                 {
                     KitClassID = "neonTable01_kit",
@@ -515,15 +496,15 @@ namespace FCS_HomeSolutions
                     AllowedOnConstructables = true,
                     RotationEnabled = true,
                     Cost = 45000,
-                    Size = new Vector3(1.997957f, 0.8685947f, 2.000143f),
-                    Center = new Vector3(-2.488494e-05f, 0.5808856f, 0f),
+                    Center = new Vector3(0f, 0.5825546f, 0f),
+                    Size = new Vector3(1.181431f, 0.8781588f, 1.178702f),
                     CategoryForPDA = TechCategory.InteriorModule,
                     GroupForPDA = TechGroup.InteriorModules
                 });
             neonTable01.Patch();
 
             var neonTable02 = new DecorationEntryPatch("neonTable02", "Neon Table 02", "A table with neon lights. (Paint Tool Recommended)",
-                ModelPrefab.GetPrefab("NeonTable02"),
+                FCSAssetBundlesService.PublicAPI.GetPrefabByName("NeonTable02", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 new Settings
                 {
                     KitClassID = "neonTable02_kit",
@@ -534,8 +515,8 @@ namespace FCS_HomeSolutions
                     AllowedOnConstructables = true,
                     RotationEnabled = true,
                     Cost = 45000,
-                    Size = new Vector3(1.997957f, 0.8685947f, 2.000143f),
-                    Center = new Vector3(-2.488494e-05f, 0.5808856f, 0f),
+                    Center = new Vector3(0f, 0.5819359f, 0f),
+                    Size = new Vector3(1.174561f, 0.8792629f, 1.163364f),
                     CategoryForPDA = TechCategory.InteriorModule,
                     GroupForPDA = TechGroup.InteriorModules
                 });
@@ -556,8 +537,8 @@ namespace FCS_HomeSolutions
                     AllowedOnGround = true,
                     RotationEnabled = true,
                     Cost = 20000,
-                    Size = new Vector3(1.963638f, 1.020765f, 0.1433573f),
-                    Center = new Vector3(0f, 0.6343491f, 0f),
+                    Center = new Vector3(0f, 0.6807203f, 0f),
+                    Size = new Vector3(1.460135f, 1.058847f, 0.1297541f),
                     CategoryForPDA = TechCategory.Misc,
                     GroupForPDA = TechGroup.Miscellaneous
                 });
@@ -574,8 +555,8 @@ namespace FCS_HomeSolutions
                     AllowedOnGround = true,
                     RotationEnabled = true,
                     Cost = 20000,
-                    Size = new Vector3(1.963638f, 1.020765f, 0.1433573f),
-                    Center = new Vector3(0f, 0.6343491f, 0f),
+                    Center = new Vector3(0f, 0.6807203f, 0f),
+                    Size = new Vector3(1.460135f, 1.058847f, 0.1297541f),
                     CategoryForPDA = TechCategory.Misc,
                     GroupForPDA = TechGroup.Miscellaneous
                 });
@@ -592,8 +573,8 @@ namespace FCS_HomeSolutions
                     AllowedOnGround = true,
                     RotationEnabled = true,
                     Cost = 15000,
-                    Size = new Vector3(1f, 0.822893f, 0.1791649f),
-                    Center = new Vector3(-1.365597e-25f, 0.7452481f, -0.004088677f),
+                    Center = new Vector3(0.2120895f, 0.6853912f, 0.931488f),
+                    Size = new Vector3(1.963943f, 1.051393f, 1.979523f),
                     CategoryForPDA = TechCategory.Misc,
                     GroupForPDA = TechGroup.Miscellaneous
                 });
@@ -610,8 +591,8 @@ namespace FCS_HomeSolutions
                     AllowedOnGround = true,
                     RotationEnabled = true,
                     Cost = 15000,
-                    Size = new Vector3(1f, 0.822893f, 0.1791649f),
-                    Center = new Vector3(-1.365597e-25f, 0.7452481f, -0.004088677f),
+                    Center = new Vector3(0.2120895f, 0.6853912f, 0.931488f),
+                    Size = new Vector3(1.963943f, 1.051393f, 1.979523f),
                     CategoryForPDA = TechCategory.Misc,
                     GroupForPDA = TechGroup.Miscellaneous
                 });
@@ -628,8 +609,8 @@ namespace FCS_HomeSolutions
                     AllowedOnGround = true,
                     RotationEnabled = true,
                     Cost = 15000,
-                    Size = new Vector3(1f, 0.822893f, 0.1791649f),
-                    Center = new Vector3(-1.365597e-25f, 0.7452481f, -0.004088677f),
+                    Center = new Vector3(0.2120895f, 0.6853912f, 0.931488f),
+                    Size = new Vector3(1.963943f, 1.051393f, 1.979523f),
                     CategoryForPDA = TechCategory.Misc,
                     GroupForPDA = TechGroup.Miscellaneous
                 });
@@ -647,8 +628,8 @@ namespace FCS_HomeSolutions
                     AllowedOnGround = true,
                     RotationEnabled = true,
                     Cost = 15000,
-                    Size = new Vector3(1f, 0.822893f, 0.1791649f),
-                    Center = new Vector3(-1.365597e-25f, 0.7452481f, -0.004088677f),
+                    Center = new Vector3(0.2120895f, 0.6853912f, 0.931488f),
+                    Size = new Vector3(1.963943f, 1.051393f, 1.979523f),
                     CategoryForPDA = TechCategory.Misc,
                     GroupForPDA = TechGroup.Miscellaneous
                 });
@@ -733,6 +714,14 @@ namespace FCS_HomeSolutions
             //Patch Cabinet 3
             var cabinet3 = new Cabinet3Buildable();
             cabinet3.Patch();
+
+            //Tv Stand
+            var tvCabinetStand = new TVStandBuildable();
+            tvCabinetStand.Patch();
+
+            //Crew Locker
+            var crewLocker = new CrewLockerBuildable();
+            crewLocker.Patch();
         }
 
         private void PatchSigns()
@@ -740,7 +729,7 @@ namespace FCS_HomeSolutions
             if (!Configuration.IsWallSignsEnabled) return;
 
             var wallSign = new SignEntryPatch("wallSign", "Wall Sign", "Wall-mounted sign, suitable for use indoors. Requires a wall.",
-                ModelPrefab.GetPrefab("AlterraWallSign"),
+                FCSAssetBundlesService.PublicAPI.GetPrefabByName("FCS_AlterraWallSign", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 new Settings
                 {
                     KitClassID = "wallSign_kit",
@@ -758,7 +747,7 @@ namespace FCS_HomeSolutions
             wallSign.Patch();
 
             var outsideSign = new SignEntryPatch("outsideSign", "Outside Sign", "Freestanding sign, suitable for outside use.",
-                ModelPrefab.GetPrefab("AlterraOutsideSign"),
+                FCSAssetBundlesService.PublicAPI.GetPrefabByName("FCS_AlterraOutsideSign", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 new Settings
                 {
                     KitClassID = "outsideSign_kit",
@@ -774,121 +763,5 @@ namespace FCS_HomeSolutions
                 });
             outsideSign.Patch();
         }
-
-        private void PatchFood()
-        {
-            var mrSpicyChip = new FoodSpawnable(new PeeperBarFoodItemData
-            {
-                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("SpicyChips",FCSAssetBundlesService.PublicAPI.GlobalBundleName),
-                ClassId = "SpicyChips", 
-                Friendly = "MrSpicy Chips",
-                Description = "Your taste buds will be screaming in delight from the very first bite of MrSpicy Chips. Get energized for the big project or running for your life on an alien planet, or celebrate your victories over even the most mundane tasks with MrSpicy Chips: an adventure in every bag.",
-                Cost = 205,
-                Food = 5,
-                Water = -1
-            });
-            mrSpicyChip.Patch();
-            Mod.PeeperBarFoods.Add(mrSpicyChip.TechType, mrSpicyChip.Cost);
-
-            var z1Chips = new FoodSpawnable(new PeeperBarFoodItemData
-            {
-                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("Z1Chips",FCSAssetBundlesService.PublicAPI.GlobalBundleName),
-                ClassId = "Z1Snacks",
-                Friendly = "Z1 Snacks",
-                Description = "A Countdown to flavor and adventuring, Z1 Snacks bring out your inner intrepid adventurer. Whether you’re running toward adventure or running away because you found it, Z1 Snacks are the ideal compliment. Perfect taste on Z3...Z2...Z1 Snacks!",
-                Cost = 205,
-                Food = 15,
-                Water = -1
-            });
-            z1Chips.Patch();
-            Mod.PeeperBarFoods.Add(z1Chips.TechType, z1Chips.Cost);
-
-            var nutritionPackage = new FoodSpawnable(new PeeperBarFoodItemData
-            {
-                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("NutritionPackage", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
-                ClassId = "NutritionPackage",
-                Friendly = "Alterra Nutrient Pouch",
-                Description = "Packed with more nutrients than a momma marsupial could provide, you can feel confident of writing home of your good health and not getting in trouble later at the family reunion. It’s even tastier than the packaging it comes in!",
-                Cost = 100,
-                Food = 15,
-                Water = 1
-            });
-            nutritionPackage.Patch();
-            Mod.PeeperBarFoods.Add(nutritionPackage.TechType, nutritionPackage.Cost);
-            
-            var spicyPop = new FoodSpawnable(new PeeperBarFoodItemData
-            {
-                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("fcs_Dirnk01",FCSAssetBundlesService.PublicAPI.GlobalBundleName),
-                ClassId = "SpicyPop",
-                Friendly = "MrSpicy Pop",
-                Description = "Wake up those taste buds and the rest of you too. A delicious compliment MrSpicy chips -- IF you’re brave enough -- Spicy Pop packs a crate full of flavor in every bottle. Made with zero caffeine because who could take a nap with all that flavor on your tongue!",
-                Cost = 300,
-                Food = 0,
-                Water = 60
-            });
-            spicyPop.Patch();
-            Mod.PeeperBarFoods.Add(spicyPop.TechType, spicyPop.Cost);
-
-            var extraHotCoffee = new FoodSpawnable(new PeeperBarFoodItemData
-            {
-                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("ExtraHotCoffee", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
-                ClassId = "ExtraHotCoffee",
-                Friendly = "Extra Hot Coffee",
-                Description = "Whether you’re chilled to the bone and about to die from arctic winds or just keep getting distracted by co-workers, Alterra Extra Hot Coffee will keep you going with rich taste, deep flavor, and always the right amount of cream, sugar, salt, hot chili sauce, bacon, or...whatever makes coffee great:  Alterra knows and Alterra delivers.",
-                Cost = 250,
-                Food = 0,
-                Water = 50
-            });
-            extraHotCoffee.Patch();
-            Mod.PeeperBarFoods.Add(extraHotCoffee.TechType, extraHotCoffee.Cost);
-
-            var fcsOrangeSoda = new FoodSpawnable(new PeeperBarFoodItemData
-            {
-                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("fcsOrangeSoda", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
-                ClassId = "FCSOrangeSoda",
-                Friendly = "FCS Orange Soda",
-                Description = "Ah, the simple, joyful flavor of True-Natural synthetic oranges and a little carbon-dioxide. A simple and delicious soda to sparkle the tongue and enjoy youthful memories.",
-                Cost = 300,
-                Food = 0,
-                Water = 60
-            });
-            fcsOrangeSoda.Patch();
-            Mod.PeeperBarFoods.Add(fcsOrangeSoda.TechType, fcsOrangeSoda.Cost);
-
-            var peeperWhiskey = new FoodSpawnable(new PeeperBarFoodItemData
-            {
-                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("PeeperWhiskey", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
-                ClassId = "PeeperWhiskey",
-                Friendly = "Peeper Whiskey",
-                Description = "Always a unique flavor, this special whiskey is created from uniquely local ingredients for the perfect taste of your far-away place. Specially tailored for alcoholic effects on peepers; please do not give Peeper Whiskey to underage peepers.",
-                Cost = 425,
-                Food = 0,
-                Water = 85
-            });
-            peeperWhiskey.Patch();
-            Mod.PeeperBarFoods.Add(peeperWhiskey.TechType, peeperWhiskey.Cost);
-
-            var alterraScotch = new FoodSpawnable(new PeeperBarFoodItemData
-            {
-                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("AlterraScotch", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
-                ClassId = "AlterraScotch",
-                Friendly = "Alterra Scotch",
-                Description = "An aged whisky made by a single distillery using only malted barley and water, with a complex and mellow flavor. Perfect for taking the edge off a rough day.  (Dealcoholized for your comfort and convenience and reduced chance of hangover)",
-                Cost = 475,
-                Food = 0,
-                Water = 95
-            });
-            alterraScotch.Patch();
-            Mod.PeeperBarFoods.Add(alterraScotch.TechType, alterraScotch.Cost);
-
-
-            Mod.PeeperBarFoods.Add(TechType.NutrientBlock,100);
-        }
-    }
-
-    public struct SoundEntry
-    {
-        public string Message { get; set; }
-        public Sound Sound { get; set; }
     }
 }

@@ -4,21 +4,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Model.Utilities;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Mods.PaintTool;
-using FCS_HomeSolutions.Spawnables;
+using FCS_HomeSolutions.Structs;
 using FCSCommon.Utilities;
-using FMOD;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
-using UnityEngine.Networking;
-using Debug = System.Diagnostics.Debug;
 
 namespace FCS_HomeSolutions.Configuration
 {
@@ -54,26 +50,7 @@ namespace FCS_HomeSolutions.Configuration
         internal const string JukeBoxSpeakerPrefabName = "JukeBoxSpeaker";
         internal const string JukeBoxSpeakerKitClassID = "JukeboxSpeaker_Kit";
         internal const string JukeBoxSpeakerTabID = "JBS";
-
-        internal const string Sofa1ClassID = "Sofa1";
-        internal const string Sofa1Friendly = "Sofa 1";
-        internal const string Sofa1Description = "N/A";
-        internal const string Sofa1PrefabName = "Sofia01";
-        internal const string Sofa1KitClassID = "Sofa1_Kit";
-
-        internal const string Sofa2ClassID = "Sofa2";
-        internal const string Sofa2Friendly = "Sofa 2";
-        internal const string Sofa2Description = "N/A";
-        internal const string Sofa2PrefabName = "Sofia02";
-        internal const string Sofa2KitClassID = "Sofa2_Kit";
-
-        internal const string Sofa3ClassID = "Sofa3";
-        internal const string Sofa3Friendly = "Sofa 3";
-        internal const string Sofa3Description = "N/A";
-        internal const string Sofa3PrefabName = "Sofia03";
-        internal const string Sofa3KitClassID = "Sofa3_Kit";
-
-
+        
         internal const string ElevatorClassID = "Elevator";
         internal const string ElevatorFriendly = "Elevator";
         internal const string ElevatorDescription = "N/A";
@@ -123,8 +100,7 @@ namespace FCS_HomeSolutions.Configuration
         internal const string HoverLiftPadClassID = "HoverLiftPad";
         internal const string HoverLiftPadFriendly = "Alterra Hover Lift Pad";
 
-        internal const string HoverLiftPadDescription =
-            "Get from one elevation to the next with ease. Een your PRAWN suit along so you don’t get lonely.";
+        internal const string HoverLiftPadDescription =  "Get from one elevation to the next with ease. Een your PRAWN suit along so you don’t get lonely.";
 
         internal const string HoverLiftPrefabName = "HoverLiftPad";
         internal static string HoverLiftPadKitClassID = $"{HoverLiftPadClassID}_Kit";
@@ -137,36 +113,7 @@ namespace FCS_HomeSolutions.Configuration
         internal const string HologramPosterPrefabName = "HologramPosterSmall";
         internal static string HologramPosterKitClassID = $"{HoverLiftPadClassID}_Kit";
         internal const string HologramPosterTabID = "HGP";
-
-        internal const string SmartPlanterPotClassID = "SmartPlanterPot";
-        internal const string SmartPlanterPotFriendly = "Neon Planter Pot";
-
-        internal static string SmartPlanterPotDescription { get; } = "A planter that can be placed outside with color changing.";
-
-        internal const string SmartPlanterPotPrefabName = "SmartPlanterPot";
-        internal static string SmartPlanterPotKitClassID = $"{SmartPlanterPotClassID}_Kit";
-        internal const string SmartPlanterPotTabID = "SMP";
-
-        internal const string MiniFountainFilterClassID = "MiniFountainFilter";
-        internal const string MiniFountainFilterFriendly = "Mini Filter & Fountain";
-
-        internal const string MiniFountainFilterDescription =
-            "A smaller water filtration system for your base or cyclops.";
-
-        internal const string MiniFountainFilterPrefabName = "MiniFountainFilter";
-        internal static string MiniFountainFilterKitClassID = $"{MiniFountainFilterClassID}_Kit";
-        internal const string MiniFountainFilterTabID = "MFF";
-
-        internal const string SeaBreezeClassID = "Seabreeze";
-        internal const string SeaBreezeFriendly = "Seabreeze";
-
-        internal const string SeaBreezeDescription =
-            "Refrigeration unit for perishable food and cool, refreshing water.";
-
-        internal const string SeaBreezePrefabName = "SeaBreezeFCS32";
-        internal static string SeaBreezeKitClassID = $"{SeaBreezeClassID}_Kit";
-        internal const string SeaBreezeTabID = "SB";
-
+        
         internal const string QuantumTeleporterClassID = "QuantumTeleporter";
         internal const string QuantumTeleporterFriendly = "Quantum Teleporter";
 
@@ -180,8 +127,7 @@ namespace FCS_HomeSolutions.Configuration
         internal const string AlienChefClassID = "AlienChef";
         internal const string AlienChefFriendly = "Alien Chef";
 
-        internal const string AlienChefDescription =
-            "Forget the Fabricator: let the Alien Chef do the cooking and curing for you. 200 cooked fish for a party? No problem!";
+        internal const string AlienChefDescription = "Forget the Fabricator: let the Alien Chef do the cooking and curing for you. 200 cooked fish for a party? No problem!";
 
         internal const string AlienChefPrefabName = "AlienChef";
         internal static string AlienChiefKitClassID = $"{AlienChefClassID}_Kit";
@@ -208,6 +154,11 @@ namespace FCS_HomeSolutions.Configuration
         internal static string Cabinet3KitClassID = $"{Cabinet3ClassID}_Kit";
 
 
+        internal const string PeeperLoungeBarClassId = "ahsSweetWaterBar";
+        internal const string PeeperLoungeBarFriendly = "Peeper Lounge Bar";
+        internal const string PeeperLoungeBarDescription = "All drinks on the house.";
+        internal const string PeeperLoungeBarPrefabName = "PeeperLoungeBar";
+        internal static string PeeperLoungeBarKitClassID = $"{PeeperLoungeBarClassId}_Kit";
 
         internal const string PaintCanClassID = "PaintCan";
         internal const string PaintCanFriendly = "Paint Can";
@@ -226,12 +177,7 @@ namespace FCS_HomeSolutions.Configuration
         internal const string EmptyObservationTankPrefabName = "ObservationTank";
         public static string EmptyObservationTankKitClassID = $"{EmptyObservationTankClassID}_kit";
 
-        internal const string AlterraMiniBathroomClassID = "AlterraMiniBathroom";
-        internal const string AlterraMiniBathroomFriendly = "Alterra Mini Bathroom";
-        internal const string AlterraMiniBathroomDescription = "A lavatory and shower for convenient hygiene.";
-        internal const string AlterraMiniBathroomPrefabName = "AlterraMiniBathroom";
-        public static string AlterraMiniBathroomKitClassID = $"{AlterraMiniBathroomClassID}_kit";
-
+        public static Dictionary<string, SoundEntry> AudioClips = new();
 
         internal static readonly Dictionary<TechType, TechType> CuredCreatureList =
             new Dictionary<TechType, TechType>(TechTypeExtensions.sTechTypeComparer)
@@ -456,19 +402,6 @@ namespace FCS_HomeSolutions.Configuration
         };
 
 #if SUBNAUTICA
-        internal static TechData SmartPlanterIngredients => new TechData
-#elif BELOWZERO
-                internal static RecipeData SmartPlanterIngredients => new RecipeData
-#endif
-        {
-            craftAmount = 1,
-            Ingredients =
-            {
-                new Ingredient(SmartPlanterPotKitClassID.ToTechType(), 1),
-            }
-        };
-
-#if SUBNAUTICA
         internal static TechData AlienChiefIngredients => new TechData
 #elif BELOWZERO
                 internal static RecipeData AlienChiefIngredients => new RecipeData
@@ -487,6 +420,8 @@ namespace FCS_HomeSolutions.Configuration
         internal static string SaveDataFilename => $"{ModPackID}SaveData.json";
 
         public static TechType CurtainTechType { get; internal set; }
+
+
         public static Dictionary<TechType, decimal> PeeperBarFoods = new Dictionary<TechType, decimal>();
 
         internal static Dictionary<TechType, TechType> CustomFoods = new Dictionary<TechType, TechType>();
@@ -680,6 +615,25 @@ namespace FCS_HomeSolutions.Configuration
             }
 
             return new AlienChiefDataEntry {Id = id};
+        }
+
+        internal static StoveDataEntry GetStoveSaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.StoveDataEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new StoveDataEntry { Id = id };
         }
 
         internal static void RegisterPaintTool(PaintToolController paintTool)
@@ -945,13 +899,13 @@ namespace FCS_HomeSolutions.Configuration
             return new SignDataEntry() {Id = id};
         }
 
-        public static AlterraMiniBathroomDataEntry GetAlterraMiniBathroomSaveData(string id)
+        public static ShowerDataEntry GetShowerSaveData(string id)
         {
             LoadData();
 
             var saveData = GetSaveData();
 
-            foreach (var entry in saveData.AlterraMiniBathroomEntries)
+            foreach (var entry in saveData.ShowerEntries)
             {
                 if (string.IsNullOrEmpty(entry.Id)) continue;
 
@@ -961,7 +915,7 @@ namespace FCS_HomeSolutions.Configuration
                 }
             }
 
-            return new AlterraMiniBathroomDataEntry() {Id = id};
+            return new ShowerDataEntry() {Id = id};
         }
 
         public static PeeperLoungeBarEntry GetPeeperLoungeBarSaveData(string id)

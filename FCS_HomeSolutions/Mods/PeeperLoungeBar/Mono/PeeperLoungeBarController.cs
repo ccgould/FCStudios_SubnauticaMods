@@ -7,6 +7,7 @@ using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
+using FCS_HomeSolutions.Structs;
 using FCSCommon.Utilities;
 using FMOD;
 using SMLHelper.V2.Utility;
@@ -59,8 +60,8 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
 
         private SoundEntry FindAudioClip(string trackName)
         {
-            if(!QPatch.AudioClips.ContainsKey(trackName)) return  new SoundEntry();
-            return QPatch.AudioClips[trackName];
+            if(!Mod.AudioClips.ContainsKey(trackName)) return  new SoundEntry();
+            return Mod.AudioClips[trackName];
         }
 
         public override Vector3 GetPosition()
@@ -154,21 +155,20 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
                     return;
                 }
 
-                if (!PlayerInteractionHelper.HasItem(FCSAlterraHubService.PublicAPI.AccountSystem.CardTechType) && GetCanPlay())
+                if (!PlayerInteractionHelper.HasItem(FCSAlterraHubService.PublicAPI.AccountSystem.CardTechType))
                 {
                     //QuickLogger.ModMessage(AlterraHub.CardNotDetected());
                     PlayAudioTrack("PLB_NoCardDetected");
                     return;
                 }
 
-                if (!FCSAlterraHubService.PublicAPI.AccountSystem.HasEnough(_food.Value) && GetCanPlay())
+                if (!FCSAlterraHubService.PublicAPI.AccountSystem.HasEnough(_food.Value))
                 {
                     //QuickLogger.ModMessage("Not enough credit");
                     PlayAudioTrack("PLB_NotEnoughCredit");
                     return;
                 }
-
-                if(GetCanPlay()) PlayAudioTrack("PLB_ThankYou");
+                PlayAudioTrack("PLB_ThankYou");
                 FCSAlterraHubService.PublicAPI.AccountSystem.RemoveFinances(_food.Value);
                 PlayerInteractionHelper.GivePlayerItem(_food.Key);
                 MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);

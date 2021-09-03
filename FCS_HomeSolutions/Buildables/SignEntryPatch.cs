@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
@@ -177,7 +178,7 @@ namespace FCS_HomeSolutions.Buildables
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject,ModelPrefab.BodyMaterial);
+                _colorManager.Initialize(gameObject,AlterraHub.BasePrimaryCol);
             }
 
             IsInitialized = true;

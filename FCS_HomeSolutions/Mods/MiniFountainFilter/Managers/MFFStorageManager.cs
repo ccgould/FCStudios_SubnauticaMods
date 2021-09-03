@@ -74,7 +74,7 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Managers
 
         internal void AttemptSpawnBottle()
         {
-            if (!_mono.GetIsOperational() || !QPatch.Configuration.MiniFountainFilterAutoGenerateMode) return;
+            if (!_mono.IsOperational || !QPatch.Configuration.MiniFountainFilterAutoGenerateMode) return;
 
             if (IsFull() || !_mono.TankManager.HasEnoughWater(50)) return;
             

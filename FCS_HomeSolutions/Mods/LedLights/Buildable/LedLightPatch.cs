@@ -32,6 +32,7 @@ namespace FCS_HomeSolutions.Mods.LedLights.Buildable
             _data = data;
             GroupForPDA = data.groupForPda;
             CategoryForPDA = data.categoryForPDA;
+            
             OnStartedPatching += () =>
             {
                 var ledLightKit = new FCSKit($"{data.classId}_Kit", FriendlyName,

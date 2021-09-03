@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using FCS_AlterraHub.API;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
@@ -23,26 +24,25 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Buildable
 {
     internal partial class SeaBreezeBuildable : SMLHelper.V2.Assets.Buildable
     {
-        //public override PDAEncyclopedia.EntryData EncyclopediaEntryData => new PDAEncyclopedia.EntryData
-        //{
-        //    image = ModelPrefab.GetImageFromPrefab("SeaBreezeDescriptionImage"),
-        //    nodes = new []{"Field Creators Studios Mods", "Seabreeze",},
-        //    me
 
-        //};
-
-        public SeaBreezeBuildable() : base(Mod.SeaBreezeClassID, Mod.SeaBreezeFriendly, Mod.SeaBreezeDescription)
+        internal const string SeaBreezeClassID = "Seabreeze";
+        internal const string SeaBreezeFriendly = "Seabreeze";
+        internal const string SeaBreezeDescription = "Refrigeration unit for perishable food and cool, refreshing water.";
+        internal const string SeaBreezePrefabName = "SeaBreezeFCS32";
+        internal static string SeaBreezeKitClassID = $"{SeaBreezeClassID}_Kit";
+        internal const string SeaBreezeTabID = "SB";
+        public SeaBreezeBuildable() : base(SeaBreezeClassID, SeaBreezeFriendly, SeaBreezeDescription)
         {
             OnStartedPatching += () =>
             {
 
-                var seaBreezeKit = new FCSKit(Mod.SeaBreezeKitClassID, FriendlyName,
+                var seaBreezeKit = new FCSKit(SeaBreezeKitClassID, FriendlyName,
                     Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 seaBreezeKit.Patch();
             };
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.SeaBreezeKitClassID.ToTechType(), 131250, StoreCategory.Home);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, SeaBreezeKitClassID.ToTechType(), 131250, StoreCategory.Home);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
                 SeaBreezeAuxPatcher.AdditionalPatching();
             };
@@ -52,12 +52,12 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Buildable
         {
             try
             {
-                var prefab = GameObject.Instantiate(ModelPrefab.SeaBreezePrefab);
+                var prefab = GameObject.Instantiate(FCSAssetBundlesService.PublicAPI.GetPrefabByName(SeaBreezePrefabName, FCSAssetBundlesService.PublicAPI.GlobalBundleName));
 
                 prefab.name = this.PrefabFileName;
 
-                var center = new Vector3(0.05496028f, 1.019654f, 0.05290359f);
-                var size = new Vector3(0.9710827f, 1.908406f, 0.4202727f);
+                var center = new Vector3(0f, 1.104696f, -0.02666293f);
+                var size = new Vector3(1f, 2.013306f, 0.6097867f);
 
                 GameObjectHelpers.AddConstructableBounds(prefab,size,center);
 
@@ -114,7 +114,7 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Buildable
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(Mod.SeaBreezeKitClassID.ToTechType(), 1)
+                    new Ingredient(SeaBreezeKitClassID.ToTechType(), 1)
                 }
             };
             return customFabRecipe;

@@ -28,10 +28,10 @@ namespace FCS_HomeSolutions.Configuration
 
         public FCSGameMode ModMode;
 
-        #region Alien Chef
+        #region Stove
 
-        [Toggle("[Alien Chef] Is Mod Enabled", Tooltip = "Enables/Disables Alien Chef from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
-        public bool IsAlienChiefEnabled = true;
+        [Toggle("[Stove] Is Mod Enabled", Tooltip = "Enables/Disables Alien Chef from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        public bool IsStoveEnabled = true;
 
         #endregion
 
@@ -163,10 +163,10 @@ namespace FCS_HomeSolutions.Configuration
         
         #endregion
 
-        #region Smart OutDoor Planter
+        #region Neon Planter
 
-        [Toggle("[Smart OutDoor Planter] Is Mod Enabled",Tooltip="Enables/Disables Smart OutDoor Planter from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
-        public bool IsSmartOutDoorPlanterEnabled = true;
+        [Toggle("[Neon Planter] Is Mod Enabled",Tooltip="Enables/Disables Smart OutDoor Planter from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        public bool IsNeonPlanterEnabled = true;
 
         #endregion
 
@@ -205,10 +205,10 @@ namespace FCS_HomeSolutions.Configuration
 
         #endregion
 
-        #region Mini Bathroom
+        #region Shower
 
-        [Toggle("[Mini Bathroom] Is Mod Enabled",Tooltip="Enables/Disables Mini Bathroom from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
-        public bool IsAlterraMiniBathroomEnabled = true;
+        [Toggle("[Shower] Is Mod Enabled",Tooltip="Enables/Disables Mini Bathroom from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        public bool IsShowerEnabled = true;
 
         #endregion
 

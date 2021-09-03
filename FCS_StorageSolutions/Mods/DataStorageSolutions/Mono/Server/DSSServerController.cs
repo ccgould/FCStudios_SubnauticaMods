@@ -36,11 +36,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
         public bool IsFiltered => _filteringSettings != null && _filteringSettings.Count > 0;
         public override bool BypassRegisterCheck => true;
 
-        private void Start()
-        {
-            _storageContainer.CleanUpDuplicatedStorageNoneRoutine();
-        }
-
         private void Update()
         {
 

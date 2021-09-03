@@ -117,7 +117,7 @@ namespace FCS_EnergySolutions.Mods.JetStreamT242.Mono
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial, ModelPrefab.SecondaryMaterial);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol);
             }
 
             _unitID = GameObjectHelpers.FindGameObject(gameObject, "UNITID").GetComponent<Text>();

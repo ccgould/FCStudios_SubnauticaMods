@@ -65,7 +65,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             Manager.OnBreakerStateChanged += OnBreakerStateChanged;
             UpdateStorageCount();
             UpdateScreenState();
-            _storage?.CleanUpDuplicatedStorageNoneRoutine();
             Mod.CleanDummyServers();
             _canvas.FindChild("Home").FindChild("UnitID").GetComponentInChildren<Text>().text = $"UNIT ID: {UnitID}";
         }
@@ -584,11 +583,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         public IEnumerable<KeyValuePair<string, DSSSlotController>> GetSlots()
         {
             return Slots;
-        }
-
-        public byte[] Save(ProtobufSerializer serializer)
-        {
-            return _storage.Save(serializer);
         }
         
         public void RestoreItems(ProtobufSerializer serializer, byte[] data)

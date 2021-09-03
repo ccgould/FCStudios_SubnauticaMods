@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using FCS_AlterraHub.API;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mods.Global.Spawnables;
 using FCS_AlterraHub.Registration;
-using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.ModManagers;
 using FCS_HomeSolutions.Mods.MiniFountainFilter.Mono;
@@ -24,17 +25,29 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Buildables
 {
     internal partial class MiniFountainFilterBuildable : Buildable
     {
-        public MiniFountainFilterBuildable() : base(Mod.MiniFountainFilterClassID, Mod.MiniFountainFilterFriendly, Mod.MiniFountainFilterDescription)
+        internal const string MiniFountainFilterClassID = "MiniFountainFilter";
+        internal const string MiniFountainFilterFriendly = "Mini Filter & Fountain";
+        internal const string MiniFountainFilterDescription = "A smaller water filtration system for your base or cyclops.";
+        internal const string MiniFountainFilterPrefabName = "FCS_MiniFountainFilter";
+        internal static string MiniFountainFilterKitClassID = $"{MiniFountainFilterClassID}_Kit";
+        private readonly GameObject _prefab;
+        internal const string MiniFountainFilterTabID = "MFF";
+        public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
+        public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
+        public override string AssetsFolder { get; } = Mod.GetAssetPath();
+
+        public MiniFountainFilterBuildable() : base(MiniFountainFilterClassID, MiniFountainFilterFriendly, MiniFountainFilterDescription)
         {
+            _prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName(MiniFountainFilterPrefabName, FCSAssetBundlesService.PublicAPI.GlobalBundleName);
 
             OnStartedPatching += () =>
             {
-                var miniFountainKit = new FCSKit(Mod.MiniFountainFilterKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
+                var miniFountainKit = new FCSKit(MiniFountainFilterKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 miniFountainKit.Patch();
             };
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.MiniFountainFilterKitClassID.ToTechType(), 45000, StoreCategory.Home);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, MiniFountainFilterKitClassID.ToTechType(), 45000, StoreCategory.Home);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
                 AdditionalPatching();
             };
@@ -44,12 +57,12 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Buildables
         {
             try
             {
-                var prefab = GameObject.Instantiate(ModelPrefab.MiniFountainFilterPrefab);
+                var prefab = GameObject.Instantiate(_prefab);
 
                 prefab.name = this.PrefabFileName;
-                
-                var center = new Vector3(0.003585503f, 0.08162725f, 0.2536881f);
-                var size = new Vector3(0.9551572f, 1.22244f, 0.4737879f);
+
+                var center = new Vector3(-0.0748806f, 0.2327834f, 0.2067378f);
+                var size = new Vector3(0.7395439f, 1.192087f, 0.410716f);
 
                 GameObjectHelpers.AddConstructableBounds(prefab,size,center);
 
@@ -88,7 +101,9 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Buildables
 
                 //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
-
+                MaterialHelpers.ApplyParticlesUber(prefab, "bubble_01_sheet_premul_underwaterCamera", 1f, 0f, 1f, 10f, 3f, false, Vector4.zero, new Vector4(1f, 1f, 1f, .5f));
+                MaterialHelpers.ApplyParticlesUber(prefab, "bubble_02_sheet_add_underwaterLit", 1f, 0f, 1f, 10f, 3f, false, Vector4.zero, new Vector4(1f, 1f, 1f, 10f));
+                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, prefab, Color.cyan);
                 return prefab;
             }
             catch (Exception e)
@@ -97,9 +112,7 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Buildables
                 return null;
             }
         }
-
-        public override string AssetsFolder { get; } = Mod.GetAssetPath();
-
+        
         protected override RecipeData GetBlueprintRecipe()
         {
             QuickLogger.Debug($"Creating recipe...");
@@ -109,7 +122,7 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Buildables
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(Mod.MiniFountainFilterKitClassID.ToTechType(), 1)
+                    new Ingredient(MiniFountainFilterKitClassID.ToTechType(), 1)
                 }
             };
             return customFabRecipe;
@@ -119,8 +132,5 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Buildables
         {
             return ImageUtils.LoadSpriteFromFile(Path.Combine(AssetsFolder, $"{ClassID}.png"));
         }
-
-        public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
-        public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
     }
 }

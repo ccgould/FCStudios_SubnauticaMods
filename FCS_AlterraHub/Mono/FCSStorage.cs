@@ -53,163 +53,7 @@ namespace FCS_AlterraHub.Mono
         {
             return GetCount();
         }
-
-        public byte[] Save(ProtobufSerializer serializer)
-        {
-            if (serializer == null || storageRoot == null)
-            {
-                QuickLogger.DebugError($"Failed to save: Serializer: {serializer} || Root {storageRoot?.name}",true);
-                return null;
-            }
-
-            _storageRootBytes = StorageHelper.Save(serializer, storageRoot.gameObject);
-            return _storageRootBytes;
-        }
-
-#if SUBNAUTICA_STABLE
-        public void RestoreItems(ProtobufSerializer serializer, byte[] serialData)
-        {
-            QuickLogger.Debug("RestoreItems");
-            StorageHelper.RenewIdentifier(storageRoot.gameObject);
-            QuickLogger.Debug("RenewIdentifier Called");
-            if (serialData == null)
-            {
-                return;
-            }
-
-            QuickLogger.Debug($"Storage root Position: {storageRoot.transform.position}");
-
-            using (MemoryStream memoryStream = new MemoryStream(serialData))
-            {
-                QuickLogger.Debug("Getting Data from memory stream");
-                GameObject gObj = serializer.DeserializeObjectTree(memoryStream, 0);
-                QuickLogger.Debug($"De-serialized Object Stream. {gObj} | {gObj.name}");
-                TransferItems(gObj);
-                QuickLogger.Debug("Items Transferred");
-                QuickLogger.Debug($"Object location: {gObj.transform.position}");
-                Destroy(gObj);
-                QuickLogger.Debug("Item destroyed");
-            }
-        }
-
-        public void RestoreItems(ProtobufSerializer serializer, List<byte[]> serialData)
-        {
-            QuickLogger.Debug("RestoreItems");
-            
-            StorageHelper.RenewIdentifier(storageRoot.gameObject);
-            
-            QuickLogger.Debug("RenewIdentifier Called");
-            
-            if (serialData == null) return;
-
-            QuickLogger.Debug($"Storage root Position: {storageRoot.transform.position}");
-
-            for (var i = 0; i < serialData.Count; i++)
-            {
-                byte[] bytes = serialData[i];
-
-                QuickLogger.Debug($"Loading Save data: {i}/{serialData.Count}");
-
-                if (bytes == null) continue;
-
-                using (MemoryStream memoryStream = new MemoryStream(bytes))
-                {
-                    QuickLogger.Debug("Getting Data from memory stream");
-                    GameObject gObj = serializer.DeserializeObjectTree(memoryStream, 0);
-                    QuickLogger.Debug($"De-serialized Object Stream. {gObj} | {gObj.name}");
-                    TransferItems(gObj);
-                    QuickLogger.Debug("Items Transferred");
-                    QuickLogger.Debug($"Object location: {gObj.transform.position}");
-                    Destroy(gObj);
-                    QuickLogger.Debug("Item destroyed");
-                }
-            }
-        }
-#else
-public IEnumerator RestoreItems(ProtobufSerializer serializer, byte[] serialData)
-        {
-            QuickLogger.Debug("RestoreItems");
-            StorageHelper.RenewIdentifier(_storageRoot);
-            QuickLogger.Debug("RenewIdentifier Called");
-            if (serialData == null)
-            {
-                yield break;
-            }
-            
-            QuickLogger.Debug($"Storage root Position: {_storageRoot.transform.position}");
-
-            using (MemoryStream memoryStream = new MemoryStream(serialData))
-            {
-                QuickLogger.Debug("Getting Data from memory stream");
-                CoroutineTask<GameObject> task = serializer.DeserializeObjectTreeAsync(memoryStream, false,false,0);
-                yield return task;
-                var gObj = task.GetResult();
-                QuickLogger.Debug($"De-serialized Object Stream. {gObj} | {gObj.name}");
-                TransferItems(gObj);
-                QuickLogger.Debug("Items Transferred");
-                QuickLogger.Debug($"Object location: {gObj.transform.position}");
-                Destroy(gObj);
-                QuickLogger.Debug("Item destroyed");
-            }
-            yield break;
-        }
-#endif
-
-        private void TransferItems(GameObject source)
-        {
-            QuickLogger.Debug("Attempting to transfer items");
-
-            foreach (UniqueIdentifier uniqueIdentifier in source.GetComponentsInChildren<UniqueIdentifier>(true))
-            {
-                if (!(uniqueIdentifier.transform.parent != source.transform))
-                {
-                    Pickupable pickupable = uniqueIdentifier.gameObject.EnsureComponent<Pickupable>();
-                    if (!ItemsContainer.Contains(pickupable))
-                    {
-                        InventoryItem item = new InventoryItem(pickupable);
-                        ChangePrefabId(item);
-                        item.item.transform.parent = storageRoot.transform;
-                        ItemsContainer.UnsafeAdd(item);
-                    }
-                }
-            }
-
-            CleanUpDuplicatedStorageNoneRoutine();
-        }
-
-        private static void ChangePrefabId(InventoryItem item)
-        {
-            var uniqueIdentifiers = item.item.gameObject.GetComponentsInChildren<UniqueIdentifier>(true);
-            
-            foreach (var identifier in uniqueIdentifiers)
-            {
-                identifier.Id = Guid.NewGuid().ToString();
-            }
-        }
-
-        public void CleanUpDuplicatedStorageNoneRoutine()
-        {
-            QuickLogger.Debug("Cleaning Duplicates", true);
-
-            StoreInformationIdentifier[] sids = gameObject.GetComponentsInChildren<StoreInformationIdentifier>(true);
-#if DEBUG
-            QuickLogger.Debug($"SIDS: {sids.Length}", true);
-#endif
-
-            int num;
-            for (int i = sids.Length - 1; i >= 0; i = num - 1)
-            {
-                StoreInformationIdentifier storeInformationIdentifier = sids[i];
-                if (storeInformationIdentifier != null && storeInformationIdentifier.name.StartsWith("SerializerEmptyGameObject", StringComparison.OrdinalIgnoreCase))
-                {
-                    QuickLogger.Debug($"Duplicate: {storeInformationIdentifier.gameObject.transform.position} | {storeInformationIdentifier.gameObject.name}");
-                    Destroy(storeInformationIdentifier.gameObject);
-                    QuickLogger.Debug($"Destroyed Duplicate");
-                }
-                num = i;
-            }
-        }
-
+        
         public int GetCount()
         {
             var i = 0;
@@ -281,9 +125,12 @@ public IEnumerator RestoreItems(ProtobufSerializer serializer, byte[] serialData
 
         public override void Open(Transform useTransform)
         {
+            if (!IsAllowedToOpen) return;
             base.Open(useTransform);
             OnContainerOpened?.Invoke();
         }
+
+        public bool IsAllowedToOpen { get; set; } = true;
 
         public virtual bool CanBeStored(int amount, TechType techType)
         {
@@ -296,9 +143,7 @@ public IEnumerator RestoreItems(ProtobufSerializer serializer, byte[] serialData
 
         public virtual bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
-            if (NotAllowedToAddItems) return false;
-
-            return CanBeStored(1,pickupable.GetTechType());
+            return !NotAllowedToAddItems && CanBeStored(1,pickupable.GetTechType());
         }
 
         public bool NotAllowedToAddItems { get; set; }
@@ -326,7 +171,6 @@ public IEnumerator RestoreItems(ProtobufSerializer serializer, byte[] serialData
             OnContainerClosed?.Invoke();
         }
         
-
         /// <summary>
         /// To deactivate the storage container to prevent hover
         /// </summary>

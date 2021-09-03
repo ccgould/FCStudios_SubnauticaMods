@@ -4,10 +4,11 @@ using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Objects;
 using FCS_HomeSolutions.Mods.Elevator.Mono;
+using FCS_HomeSolutions.Mods.NeonPlanter;
+using FCS_HomeSolutions.Mods.NeonPlanter.Mono;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Enumerators;
+using FCS_HomeSolutions.Mods.Stove.Mono;
 using FCS_HomeSolutions.Mods.TrashRecycler.Model;
-using FCS_HomeSolutions.Mono.OutDoorPlanters;
-using UnityEngine;
 #if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
 #else
@@ -77,6 +78,8 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty] internal bool HasBreakerTripped { get; set; }
         [JsonProperty] internal string UnitName { get; set; }
         [JsonProperty] internal Vec4 Body { get; set; }
+        [JsonProperty] internal Vec4 Secondary { get; set; }
+        [JsonProperty] internal Vec4 Emission { get; set; }
         [JsonProperty] internal PowercellData PowercellData { get; set; }
         [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
 
@@ -115,7 +118,7 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
     }       
     
-    internal class AlterraMiniBathroomDataEntry
+    internal class ShowerDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
         [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
@@ -149,6 +152,7 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty] internal string Id { get; set; }
         [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
         [JsonProperty(PropertyName = "SCOL")] internal Vec4 Secondary { get; set; }
+        [JsonProperty]  internal string Label { get; set; }
     }
     
     internal class AlienChiefDataEntry
@@ -226,9 +230,22 @@ namespace FCS_HomeSolutions.Configuration
     }
 
     [Serializable]
+    internal class StoveDataEntry
+    {
+        [JsonProperty] internal string Id { get; set; }
+        [JsonProperty] internal Vec4 Primary { get; set; }
+        [JsonProperty] internal Vec4 Secondary { get; set; }
+        [JsonProperty] internal Vec4 Emission { get; set; }
+        [JsonProperty] internal float TimeStartCooking { get; set; }
+        [JsonProperty] internal Tuple<Queue<Cooker.CookingQueue>, float> QueuedItems { get; set; }
+    }
+
+    [Serializable]
     internal class SaveData
     {
         [JsonProperty] internal float SaveVersion { get; set; } = 1.1f;
+        [JsonProperty] internal List<StoveDataEntry> StoveDataEntries = new();
+
         [JsonProperty] internal List<JukeBoxDataEntry> JukeBoxDataEntries = new();
         [JsonProperty] internal List<ElevatorDataEntry> ElevatorDataEntries = new();
         [JsonProperty] internal List<HologramDataEntry> HologramDataEntries = new();
@@ -249,6 +266,6 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty] internal List<LedLightDataEntry> LedLightDataEntries = new();
         [JsonProperty] internal List<ObservationTankDataEntry> ObservationTankDataEntries = new();
         [JsonProperty] internal List<FEXRDataEntry> FEXRDataEntries = new();
-        [JsonProperty] internal List<AlterraMiniBathroomDataEntry> AlterraMiniBathroomEntries = new();
+        [JsonProperty] internal List<ShowerDataEntry> ShowerEntries = new();
     }
 }

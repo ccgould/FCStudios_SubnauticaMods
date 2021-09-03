@@ -1,5 +1,7 @@
 ﻿using FCS_AlterraHomeSolutions.Mono.PaintTool;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
+using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
@@ -15,13 +17,20 @@ namespace FCS_HomeSolutions.Mods.Cabinets.Mono
         private bool _runStartUpOnEnable;
         private bool _fromSave;
         private CabinetDataEntry _saveData;
+        private LabelController _labelController;
 
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.CabinetTabID, Mod.ModPackID);
         }
 
-
+        private void Update()
+        {
+            if (_storageContainer != null && _labelController != null)
+            {
+                _storageContainer.enabled = !_labelController.IsHovered;
+            }
+        }
         private void OnEnable()
         {
             if (!_runStartUpOnEnable) return;
@@ -40,6 +49,8 @@ namespace FCS_HomeSolutions.Mods.Cabinets.Mono
             {
                 _colorManager.ChangeColor(_saveData.Fcs.Vector4ToColor());
                 _colorManager.ChangeColor(_saveData.Secondary.Vector4ToColor(),ColorTargetMode.Secondary);
+                _labelController?.SetText(!string.IsNullOrWhiteSpace(_saveData.Label) ? _saveData.Label : "Locker");
+
                 _fromSave = false;
             }
         }
@@ -76,7 +87,7 @@ namespace FCS_HomeSolutions.Mods.Cabinets.Mono
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial,ModelPrefab.SecondaryMaterial);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol);
             }
 
             if (_storageContainer == null)
@@ -85,6 +96,11 @@ namespace FCS_HomeSolutions.Mods.Cabinets.Mono
                 _storageContainer.container.Resize(3,6);
             }
 
+            _labelController = GameObjectHelpers.FindGameObject(gameObject, "Label")?.AddComponent<LabelController>();
+            _labelController?.Initialize();
+
+            MaterialHelpers.ChangeMaterialColor(AlterraHub.BaseDecalsEmissiveController,gameObject,Color.cyan);
+            MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, gameObject,2f);
             IsInitialized = true;
 
             QuickLogger.Debug($"Initialized");
@@ -94,9 +110,7 @@ namespace FCS_HomeSolutions.Mods.Cabinets.Mono
         {
             if (!Mod.IsSaving())
             {
-                QuickLogger.Info($"Saving {Mod.AlienChefFriendly}");
                 Mod.Save(serializer);
-                QuickLogger.Info($"Saved {Mod.AlienChefFriendly}");
             }
         }
 
@@ -117,7 +131,7 @@ namespace FCS_HomeSolutions.Mods.Cabinets.Mono
             _saveData.Id = id;
             _saveData.Fcs = _colorManager.GetColor().ColorToVector4();
             _saveData.Secondary = _colorManager.GetSecondaryColor().ColorToVector4();
-
+            _saveData.Label = _labelController?.GetText();
             newSaveData.CabinetDataEntries.Add(_saveData);
         }
 

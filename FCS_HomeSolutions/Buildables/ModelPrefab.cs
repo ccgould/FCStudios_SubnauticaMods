@@ -22,8 +22,6 @@ namespace FCS_HomeSolutions.Buildables
         internal static GameObject PlatformFloorFrame { get; set; }
         internal static GameObject ElevatorFloorItemPrefab { get; set; }
         internal static GameObject ElevatorPrefab { get; set; }
-        internal static GameObject ColorItemPrefab { get; set; }
-        internal static GameObject ItemPrefab { get; set; }
         internal static string BodyMaterial => $"{Mod.ModPackID}_COL";
         internal static string SecondaryMaterial => $"{Mod.ModPackID}_COL_S";
         internal static string DecalMaterial => $"{Mod.ModPackID}_DECALS";
@@ -38,11 +36,7 @@ namespace FCS_HomeSolutions.Buildables
         public static AssetBundle ModBundle { get; set; }
         internal static GameObject PaintToolPrefab { get; set; }
         internal static GameObject BaseOperatorPrefab { get; set; }
-        public static GameObject HoverLiftPadPrefab { get; set; }
-        public static GameObject SmallOutdoorPot { get; set; }
-        public static GameObject MiniFountainFilterPrefab { get; set; }
         public static GameObject SeaBreezeItemPrefab { get; set; }
-        public static GameObject SeaBreezePrefab { get; set; }
         public static GameObject TrashReceptaclePrefab { get; set; }
         public static GameObject TrashRecyclerPrefab { get; set; }
         public static GameObject PaintCanPrefab { get; set; }
@@ -51,24 +45,16 @@ namespace FCS_HomeSolutions.Buildables
         public static GameObject TemplateItem { get; set; }
         public static GameObject TrashRecyclerItemPrefab { get; set; }
         public static GameObject CurtainPrefab { get; set; }
-        public static GameObject AlienChefPrefab { get; set; }
         public static GameObject Cabinet1Prefab { get; set; }
         public static GameObject Cabinet2Prefab { get; set; }
         public static GameObject Cabinet3Prefab { get; set; }
         public static GameObject CookerItemPrefab { get; set; }
         public static GameObject CookerOrderItemPrefab { get; set; }
-        public static GameObject LedLightLongPrefab { get; set; }
-        public static GameObject LedLightWallPrefab { get; set; }
-        public static GameObject LedLightShortPrefab { get; set; }
         public static GameObject ObservationTankPrefab { get; set; }
         public static GameObject FireExtinguisherRefuelerPrefab { get; set; }
-        public static GameObject AlterraMiniBathroomPrefab { get; set; }
         public static GameObject HologramPosterPrefab { get; set; }
         public static GameObject JukeboxSpeakerPrefab { get; set; }
         public static GameObject JukeboxPrefab { get; set; }
-        public static GameObject Sofa1Prefab { get; set; }
-        public static GameObject Sofa2Prefab { get; set; }
-        public static GameObject Sofa3Prefab { get; set; }
 
         internal static void Initialize()
         {
@@ -87,43 +73,30 @@ namespace FCS_HomeSolutions.Buildables
             //LoadFMod();
 
             PaintToolPrefab = GetPrefab(Mod.PaintToolPrefabName);
-            SmallOutdoorPot = GetPrefab(Mod.SmartPlanterPotPrefabName);
             ElevatorFloorItemPrefab = GetPrefab("NewFloorItem",false,false);
             TVVideoBTNPrefab = GetPrefab("TVVideoBTN", false,false);
             PlatformFloorFrame = GetPrefab("PlatformFloorFrame", true);
             ElevatorPrefab = GetPrefab(Mod.ElevatorPrefabName, true);
             ElevatorUIPrefab = GetPrefab("ElevatorUI", false,false);
             HologramPosterPrefab = GetPrefab(Mod.HologramPosterPrefabName,true);
-            //BaseOperatorPrefab = GetPrefab(Mod.BaseOperatorPrefabName);
-            //HoverLiftPadPrefab = GetPrefab(Mod.HoverLiftPrefabName);
-            MiniFountainFilterPrefab = GetPrefab(Mod.MiniFountainFilterPrefabName);
-            SeaBreezePrefab = GetPrefab(Mod.SeaBreezePrefabName);
             TrashReceptaclePrefab = GetPrefab(Mod.TrashReceptaclePrefabName);
             TrashRecyclerPrefab = GetPrefab(Mod.RecyclerPrefabName);
             PaintCanPrefab = GetPrefab(Mod.PaintCanPrefabName);
             QuantumTeleporterPrefab = GetPrefab(Mod.QuantumTeleporterPrefabName,true);
-            AlienChefPrefab = GetPrefab(Mod.AlienChefPrefabName);
             Cabinet1Prefab = GetPrefab(Mod.Cabinet1PrefabName);
             Cabinet2Prefab = GetPrefab(Mod.Cabinet2PrefabName);
             Cabinet3Prefab = GetPrefab(Mod.Cabinet3PrefabName);
-            AlterraMiniBathroomPrefab = GetPrefab(Mod.AlterraMiniBathroomPrefabName,true);
             FireExtinguisherRefuelerPrefab = GetPrefab(Mod.FireExtinguisherRefuelerPrefabName);
             ObservationTankPrefab = GetPrefab(Mod.EmptyObservationTankPrefabName);
             TrashRecyclerItemPrefab = GetPrefab("RecyclerItem");
-            SeaBreezeItemPrefab = GetPrefab("ARSItem");
+            SeaBreezeItemPrefab = GetPrefabFromGlobal("ARSItem",false);
             NetworkItemPrefab = GetPrefab("NetworkItem");
             TemplateItem = GetPrefab("TemplateItem");
             CurtainPrefab = GetPrefab("Curtain");
             CookerItemPrefab = GetPrefab("CookerItem");
             CookerOrderItemPrefab = GetPrefab("OrderItem");
-            LedLightLongPrefab = GetPrefab("FCS_LedLightStick_03");
-            LedLightShortPrefab = GetPrefab("FCS_LedLightStick_01");
-            LedLightWallPrefab = GetPrefab("FCS_LedLightStick_02");
             JukeboxPrefab = GetPrefab("JukeBox", true);
             JukeboxSpeakerPrefab = GetPrefab("JukeBoxSpeaker", true);
-            Sofa1Prefab = GetPrefabFromGlobal(Mod.Sofa1PrefabName);
-            Sofa2Prefab = GetPrefabFromGlobal(Mod.Sofa2PrefabName);
-            Sofa3Prefab = GetPrefabFromGlobal(Mod.Sofa3PrefabName);
 
             _initialized = true;
         }

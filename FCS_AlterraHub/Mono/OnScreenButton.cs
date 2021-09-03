@@ -10,7 +10,7 @@ namespace FCS_AlterraHub.Mono
     /// <seealso cref="UnityEngine.MonoBehaviour" />
     public abstract class OnScreenButton : MonoBehaviour
     {
-        protected bool IsHovered { get; set; }
+        public bool IsHovered { get; private set; }
         public string TextLineOne { get; set; }
         public string TextLineTwo { get; set; }
         public bool UseSetUseTextRaw { get; set; } = false;

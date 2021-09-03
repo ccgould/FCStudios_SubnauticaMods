@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Mono;
+using FCS_HomeSolutions.Mods.SeaBreeze.Buildable;
 using FCS_HomeSolutions.Mods.SeaBreeze.Mono;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Commands;
@@ -15,7 +16,7 @@ namespace FCS_HomeSolutions.Configuration
         [ConsoleCommand("clearseabreeze")]
         public static string ClearSeabreezeCommand(int unitID)
         {
-            var unitName = $"{Mod.SeaBreezeTabID}{unitID:D3}";
+            var unitName = $"{SeaBreezeBuildable.SeaBreezeTabID}{unitID:D3}";
 
             QuickLogger.Debug($"Trying to find device: {unitName} || Count of Devices: {FCSAlterraHubService.PublicAPI.GetRegisteredDevices()?.Count}",true);
             foreach (KeyValuePair<string, FcsDevice> device in FCSAlterraHubService.PublicAPI.GetRegisteredDevices())

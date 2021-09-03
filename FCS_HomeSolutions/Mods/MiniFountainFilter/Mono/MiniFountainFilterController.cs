@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Buildables;
-using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
@@ -11,7 +9,6 @@ using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
-using FCS_HomeSolutions.ModManagers;
 using FCS_HomeSolutions.Mods.MiniFountainFilter.Buildables;
 using FCS_HomeSolutions.Mods.MiniFountainFilter.Managers;
 using FCSCommon.Utilities;
@@ -21,30 +18,26 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Mono
 {
     internal class MiniFountainFilterController : FcsDevice,IFCSSave<SaveData>, IHandTarget
     {
-        private bool IsInitialized;
-        private int _isRunning;
-        private bool _isOperational;
         private bool _isInSub;
         private bool _runStartUpOnEnable;
         private bool _fromSave;
         private MiniFountainFilterDataEntry _data;
         private MiniFountainFilterDataEntry _saveData;
         private ParticleSystem _xBubbles;
-        private Dictionary<string, FcsDevice> _registeredDevices;
         private InterfaceInteraction _interactionHelper;
+        private float _powerUsage;
+        private FMOD_CustomLoopingEmitter _machineSound;
         internal MFFDisplayManager DisplayManager { get; private set; }
-        internal AnimationManager AnimationManager { get; private set; }
         internal MFFStorageManager StorageManager { get; private set; }
-        internal PowerManager PowerManager { get; private set; }
-        internal AudioManager AudioManager { get; private set; }
         internal TankManager TankManager { get; private set; }
         public PlayerManager PlayerManager { get; private set; }
         public Action OnMonoUpdate { get; set; }
+        public override bool IsOperational => Manager != null && IsInitialized && IsConstructed && DisplayManager != null && _xBubbles != null && TankManager != null;
 
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.MiniFountainFilterTabID, Mod.ModPackID);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, MiniFountainFilterBuildable.MiniFountainFilterTabID, Mod.ModPackID);
         }
 
         public override Vector3 GetPosition()
@@ -54,8 +47,6 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Mono
 
         private void OnEnable()
         {
-            _registeredDevices = FCSAlterraHubService.PublicAPI.GetRegisteredDevices();
-
             if (!_runStartUpOnEnable) return;
             
             if (!IsInitialized)
@@ -74,7 +65,7 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Mono
                 _colorManager.ChangeColor(_data.Body.Vector4ToColor());
                 StorageManager.NumberOfBottles = _data.ContainerAmount;
                 _isInSub = _data.IsInSub;
-                QuickLogger.Info($"Loaded {Mod.MiniFountainFilterFriendly}");
+                QuickLogger.Info($"Loaded {MiniFountainFilterBuildable.MiniFountainFilterFriendly}");
                 _fromSave = false;
             }
         }
@@ -90,14 +81,11 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Mono
         private void Update()
         {
             OnMonoUpdate?.Invoke();
-            PowerManager?.ConsumePower();
             StorageManager?.AttemptSpawnBottle();
-            UpdateSystem();
         }
 
         public override void Initialize()
         {
-            _isRunning = Animator.StringToHash("IsRunning");
             _isInSub = Player.main.IsInSubmarine();
 
             if (StorageManager == null)
@@ -106,19 +94,10 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Mono
                 StorageManager.Initialize(this);
             }
 
-            if (PowerManager == null)
-            {
-                PowerManager = new PowerManager();
-                PowerManager.Initialize(this);
-                StartCoroutine(UpdatePowerState());
-            }
-
-            AnimationManager = gameObject.GetComponent<AnimationManager>();
-
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol);
             }
 
             if (TankManager == null)
@@ -133,10 +112,16 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Mono
                 PlayerManager.Initialize();
             }
 
-            if (AudioManager == null)
+            if (_machineSound == null)
             {
-                AudioManager = new AudioManager(gameObject.GetComponent<FMOD_CustomLoopingEmitter>());
+                _machineSound = gameObject.AddComponent<FMOD_CustomLoopingEmitter>();
+                var machineSoundAsset = ScriptableObject.CreateInstance<FMODAsset>();
+                machineSoundAsset.id = "water_filter_loop";
+                machineSoundAsset.path = "event:/sub/base/water_filter_loop";
+                _machineSound.asset = machineSoundAsset;
+                _machineSound.restartOnPlay = true;
             }
+
 
             if (DisplayManager == null)
             {
@@ -145,22 +130,12 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Mono
             }
 
             _xBubbles = GameObjectHelpers.FindGameObject(gameObject, "xBubbles").GetComponent<ParticleSystem>();
-
             var canvas = gameObject.GetComponentInChildren<Canvas>();
             _interactionHelper = canvas.gameObject.AddComponent<InterfaceInteraction>();
-
+            InvokeRepeating(nameof(UpdateSystem),1f,1f);
             IsInitialized = true;
             
             QuickLogger.Debug($"Initialized");
-        }
-        
-        private IEnumerator UpdatePowerState()
-        {
-            while (true)
-            {
-                yield return new WaitForSeconds(1);
-                PowerManager.UpdatePowerState();
-            }
         }
 
         public override bool CanDeconstruct(out string reason)
@@ -207,9 +182,9 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Mono
         {
             if (!Mod.IsSaving())
             {
-                QuickLogger.Info($"Saving {Mod.MiniFountainFilterFriendly}");
+                QuickLogger.Info($"Saving {MiniFountainFilterBuildable.MiniFountainFilterFriendly}");
                 Mod.Save(serializer);
-                QuickLogger.Info($"Saved {Mod.MiniFountainFilterFriendly}");
+                QuickLogger.Info($"Saved {MiniFountainFilterBuildable.MiniFountainFilterFriendly}");
             }
         }
 
@@ -238,6 +213,7 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Mono
         public override bool IsUnderWater()
         {
             if (_isInSub) return true;
+
             if (Manager.DeviceBuilt("BUU", out var device))
             {
                 foreach (KeyValuePair<string, FcsDevice> pair in device)
@@ -251,53 +227,42 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Mono
         
         private void UpdateSystem()
         {
-            if (!IsInitialized) return;
-
-            if (!IsConstructed || PowerManager.GetPowerState() != FCSPowerStates.Powered && _isOperational)
+            if (!IsOperational || Manager.GetPowerState() == PowerSystem.Status.Offline)
             {
-                DisplayManager.TurnOffDisplay();
-                _isOperational = false;
-            }
-            
-            if (!IsUnderWater() && _isOperational)
-            {
-                DisplayManager.AboveWaterMessage();
-                _isOperational = false;
+                ToggleEffectsAndSound(false);
+                return;
             }
 
-            if (PowerManager.GetPowerState() == FCSPowerStates.Powered && IsUnderWater() && !_isOperational)
+            if (!IsUnderWater() || TankManager.IsFull())
             {
-                AudioManager.PlayMachineAudio();
-                AnimationManager.SetBoolHash(_isRunning, true);
-                DisplayManager.PowerOnDisplay();
-                _isOperational = true;
+                ToggleEffectsAndSound(false,true);
+                return;
             }
 
-            if (!_isOperational)
-            {
-                AudioManager?.StopMachineAudio();
-                AnimationManager.SetBoolHash(_isRunning, false);
-            }
-
-            UpdateBubbles();
+            ToggleEffectsAndSound(true);
         }
 
-        private void UpdateBubbles()
+        private void ToggleEffectsAndSound(bool isRunning, bool affectEffectsOnly = false)
         {
-            if (_isOperational && !_xBubbles.isPlaying)
+            if (_xBubbles == null || _machineSound == null || DisplayManager == null) return;
+            if (isRunning)
             {
-                _xBubbles.Play();
+                if (!affectEffectsOnly)
+                {
+                    DisplayManager.TurnOnDisplay();
+                }
+                if (!_xBubbles.isPlaying) _xBubbles.Play();
+                if (!_machineSound._playing) _machineSound.Play();
             }
-            else if (!_isOperational && _xBubbles.isPlaying)
+            else
             {
-                _xBubbles.Stop();
+                if (!affectEffectsOnly)
+                {
+                    DisplayManager.TurnOffDisplay();
+                }
+                if (_xBubbles.isPlaying) _xBubbles?.Stop();
+                if (_machineSound._playing) _machineSound.Stop();
             }
-
-        }
-
-        internal bool GetIsOperational()
-        {
-            return _isOperational;
         }
 
         public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
@@ -312,7 +277,7 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Mono
 
             var data = new[]
             {
-                AlterraHub.PowerPerMinute(PowerManager.GetPowerUsage())
+                AlterraHub.PowerPerMinute(_powerUsage)
             };
             data.HandHoverPDAHelperEx(GetTechType());
         }
@@ -320,6 +285,19 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Mono
         public void OnHandClick(GUIHand hand)
         {
             
+        }
+
+        public override float GetPowerUsage()
+        {
+            if (!IsOperational || TankManager.IsFull() || !IsUnderWater())
+            {
+                _powerUsage = 0f;
+            }
+            else
+            {
+                _powerUsage = Mathf.Round(QPatch.Configuration.MiniFountainFilterEnergyPerSec * 60) / 10f;
+            }
+            return  _powerUsage;
         }
     }
 }

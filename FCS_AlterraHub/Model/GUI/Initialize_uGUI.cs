@@ -77,7 +77,7 @@ namespace FCS_AlterraHub.Model.GUI
                     }
                     catch
                     {
-                        QuickLogger.Error($"Add text to slot error!");
+                        QuickLogger.DebugError($"Add text to slot error!");
                     }
                 }
                 

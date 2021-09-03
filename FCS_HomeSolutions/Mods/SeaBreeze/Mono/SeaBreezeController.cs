@@ -53,7 +53,7 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.SeaBreezeTabID, Mod.ModPackID);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, SeaBreezeBuildable.SeaBreezeTabID, Mod.ModPackID);
         }
 
         private void OnEnable()
@@ -83,7 +83,9 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Mono
                     StartCoroutine( FridgeComponent.LoadSave(_savedData.FridgeContainer));
                     NameController.SetCurrentName(_savedData.UnitName);
                     _colorManager.ChangeColor(_savedData.Body.Vector4ToColor());
-                    QuickLogger.Info($"Loaded {Mod.SeaBreezeFriendly}");
+                    _colorManager.ChangeColor(_savedData.Secondary.Vector4ToColor(),ColorTargetMode.Secondary);
+                    _colorManager.ChangeColor(_savedData.Emission.Vector4ToColor(),ColorTargetMode.Emission);
+                    QuickLogger.Info($"Loaded {SeaBreezeBuildable.SeaBreezeFriendly}");
                 }
 
                 _runStartUpOnEnable = false;
@@ -137,7 +139,7 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Mono
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol,AlterraHub.BaseSecondaryCol,AlterraHub.BaseLightsEmissiveController);
             }
 
             if (_dumpContainer == null)
@@ -162,7 +164,7 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Mono
             if (NameController == null)
             {
                 NameController = gameObject.EnsureComponent<NameController>();
-                NameController.Initialize(SeaBreezeAuxPatcher.Submit(), Mod.SeaBreezeFriendly);
+                NameController.Initialize(SeaBreezeAuxPatcher.Submit(), SeaBreezeBuildable.SeaBreezeFriendly);
                 NameController.OnLabelChanged += OnLabelChangedMethod;
                 NameController.SetCurrentName(GetNewSeaBreezeName());
             }
@@ -170,7 +172,7 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Mono
             var canvas = gameObject.GetComponentInChildren<Canvas>();
             _interactionHelper = canvas.gameObject.AddComponent<InterfaceInteraction>();
 
-            MaterialHelpers.ChangeEmissionStrength(ModelPrefab.EmissionControllerMaterial, gameObject, 5);
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
 
             IsInitialized = true;
         }
@@ -178,7 +180,7 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Mono
         private string GetNewSeaBreezeName()
         {
             QuickLogger.Debug($"Get Seabreeze New Name");
-            return $"{Mod.SeaBreezeFriendly} {UnitID}";
+            return $"{SeaBreezeBuildable.SeaBreezeFriendly} {UnitID}";
         }
 
         private void OnModModeChanged(int modMode)
@@ -246,9 +248,9 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Mono
             QuickLogger.Debug("In OnProtoSerialize");
             if (!Mod.IsSaving())
             {
-                QuickLogger.Info($"Saving {Mod.SeaBreezeFriendly}");
+                QuickLogger.Info($"Saving {SeaBreezeBuildable.SeaBreezeFriendly}");
                 Mod.Save(serializer);
-                QuickLogger.Info($"Saved {Mod.SeaBreezeFriendly}");
+                QuickLogger.Info($"Saved {SeaBreezeBuildable.SeaBreezeFriendly}");
             }
         }
 
@@ -303,6 +305,8 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Mono
              
             _savedData.Id = id;
             _savedData.Body = _colorManager.GetColor().ColorToVector4();
+            _savedData.Secondary = _colorManager.GetSecondaryColor().ColorToVector4();
+            _savedData.Emission = _colorManager.GetLumColor().ColorToVector4();
             _savedData.UnitName = NameController.GetCurrentName();
             _savedData.FridgeContainer = FridgeComponent.Save();
             _savedData.PowercellData = PowerManager.Save();

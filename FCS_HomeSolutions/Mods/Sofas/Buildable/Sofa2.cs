@@ -8,8 +8,13 @@ namespace FCS_HomeSolutions.Mods.Sofas.Buildable
 {
     internal class Sofa2Buildable : SofaBase
     {
-        public Sofa2Buildable() : base(Mod.Sofa2ClassID, Mod.Sofa2Friendly, Mod.Sofa2Description, Mod.Sofa2KitClassID,
-            ModelPrefab.Sofa2Prefab)
+        internal const string Sofa2ClassID = "Sofa2";
+        internal const string Sofa2Friendly = "Sofa 2";
+        internal const string Sofa2Description = "N/A";
+        internal const string Sofa2PrefabName = "Sofia02";
+        internal const string Sofa2KitClassID = "Sofa2_Kit";
+
+        public Sofa2Buildable() : base(Sofa2ClassID, Sofa2Friendly, Sofa2Description, Sofa2KitClassID, Sofa2PrefabName, 9000)
         {
         }
 

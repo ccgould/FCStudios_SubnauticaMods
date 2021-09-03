@@ -6,6 +6,8 @@ using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCSCommon.Utilities;
+using QModManager.API;
+using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
@@ -19,6 +21,7 @@ namespace FCS_AlterraHub.Helpers
         private static int _lastMinute;
         private static DigitalClockFormat _format;
         private static string _previousTime;
+        public static List<TechType> Craftables { get; set; } = new();
 
         public static Dictionary<TechType, PickReturnsData> PickReturns = new()
         {
@@ -181,8 +184,6 @@ namespace FCS_AlterraHub.Helpers
                 TechType.JeweledDiskPiece, new PickReturnsData { ReturnType = TechType.JeweledDiskPiece, IsLandPlant = false }
             },
         };
-
-
         public static string GetGameTimeFormat()
         {
             string period = string.Empty;
@@ -252,6 +253,7 @@ namespace FCS_AlterraHub.Helpers
             return new TimeSpan(hours, minutes, 0);
         }
 
+        public static List<TechType> BlackList = new List<TechType>() { TechType.Titanium, TechType.Copper };
         public enum DigitalClockFormat
         {
             TWELVE_HOUR,
@@ -352,6 +354,111 @@ namespace FCS_AlterraHub.Helpers
             }
 
             return bestTarget?.gameObject;
+        }
+
+        public static void GetCraftables()
+        {
+            Craftables.Clear();
+
+            var fabricator = CraftTree.GetTree(CraftTree.Type.Fabricator);
+            GetCraftTreeData(fabricator.nodes);
+
+            var cyclopsFabricator = CraftTree.GetTree(CraftTree.Type.CyclopsFabricator);
+            GetCraftTreeData(cyclopsFabricator.nodes);
+
+            var workbench = CraftTree.GetTree(CraftTree.Type.Workbench);
+            GetCraftTreeData(workbench.nodes);
+
+            var maproom = CraftTree.GetTree(CraftTree.Type.MapRoom);
+            GetCraftTreeData(maproom.nodes);
+
+            var seamothUpgrades = CraftTree.GetTree(CraftTree.Type.SeamothUpgrades);
+            GetCraftTreeData(seamothUpgrades.nodes);
+        }
+
+        private static void GetCraftTreeData(CraftNode innerNodes)
+        {
+            foreach (CraftNode craftNode in innerNodes)
+            {
+                //QuickLogger.Debug($"Craftable: {craftNode.id} | {craftNode.string0} | {craftNode.string1} | {craftNode.techType0}");
+
+                if (string.IsNullOrWhiteSpace(craftNode.id)) continue;
+                if (craftNode.id.Equals("CookedFood") || craftNode.id.Equals("CuredFood")) return;
+                if (craftNode.techType0 != TechType.None)
+                {
+                    if (!IsItemUnlocked(craftNode.techType0, true)) continue;
+                    Craftables.Add(craftNode.techType0);
+                }
+
+                if (craftNode.childCount > 0)
+                {
+                    GetCraftTreeData(craftNode);
+                }
+            }
+        }
+
+        public static bool IsItemUnlocked(TechType techType, bool useDefault = false)
+        {
+#if DEBUG
+            QuickLogger.Debug($"Checking if {Language.main.Get(techType)} is unlocked");
+#endif
+            if (useDefault)
+            {
+                return CrafterLogic.IsCraftRecipeUnlocked(techType);
+            }
+
+
+            if (GameModeUtils.RequiresBlueprints())
+            {
+                if (!QModServices.Main.ModPresent("UITweaks"))
+                {
+                    TechData data = GetData(techType);
+                    int ingredientCount = data?.ingredientCount ?? 0;
+                    for (int i = 0; i < ingredientCount; i++)
+                    {
+                        Ingredient ingredient = data.Ingredients[i];
+                        if (!BlackList.Contains(techType) && !CrafterLogic.IsCraftRecipeUnlocked(ingredient.techType))
+                        {
+#if DEBUG
+                            QuickLogger.Debug($"{Language.main.Get(ingredient.techType)} is locked");
+#endif
+                            return false;
+                        }
+                    }
+                }
+                else
+                {
+#if SUBNAUTICA
+                    if (CraftData.techData.TryGetValue(techType, out CraftData.TechData data))
+                    {
+                        int ingredientCount = data?.ingredientCount ?? 0;
+                        for (int i = 0; i < ingredientCount; i++)
+                        {
+                            IIngredient ingredient = data.GetIngredient(i);
+                            if (!BlackList.Contains(techType) &&
+                                !CrafterLogic.IsCraftRecipeUnlocked(ingredient.techType))
+                            {
+#if DEBUG
+                                QuickLogger.Debug($"{Language.main.Get(techType)} is locked");
+#endif
+                                return false;
+                            }
+                        }
+                    }
+#elif BELOWZERO
+#endif
+                }
+            }
+
+#if DEBUG
+            QuickLogger.Debug($"{Language.main.Get(techType)} is unlocked");
+#endif
+            return true;
+        }
+
+        internal static TechData GetData(TechType techType)
+        {
+            return CraftDataHandler.GetTechData(techType);
         }
     }
 

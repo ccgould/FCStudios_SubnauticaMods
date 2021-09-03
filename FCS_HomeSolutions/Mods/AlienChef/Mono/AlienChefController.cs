@@ -10,6 +10,8 @@ using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
+using FCS_HomeSolutions.Mods.SeaBreeze.Buildable;
+using FCS_HomeSolutions.Mods.Stove.Mono;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
@@ -34,7 +36,6 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.AlienChiefTabID, Mod.ModPackID);
-            DisplayManager?.UpdateStorageAmount(StorageSystem?.GetCount()??0);
         }
 
         private void OnEnable()
@@ -75,13 +76,6 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
             if (Cooker == null)
             {
                 Cooker = gameObject.EnsureComponent<Cooker>();
-                Cooker.Initialize(this);
-            }
-
-            if (DisplayManager == null)
-            {
-                DisplayManager = gameObject.EnsureComponent<DisplayManager>();
-                DisplayManager.Setup(this);
             }
 
             if (StorageSystem == null)
@@ -89,14 +83,13 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
                 StorageSystem = gameObject.GetComponent<FCSStorage>();
                 StorageSystem.NotAllowedToAddItems = true;
                 StorageSystem.SlotsAssigned = MAXSLOTS;
-                StorageSystem.Deactivate();
                 StorageSystem.ItemsContainer.onAddItem += type =>
                 {
-                    DisplayManager.UpdateStorageAmount(StorageSystem.GetCount());
+
                 };
                 StorageSystem.ItemsContainer.onRemoveItem += type =>
                 {
-                    DisplayManager.UpdateStorageAmount(StorageSystem.GetCount());
+
                 };
             }
 
@@ -141,13 +134,6 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
             {
                 Initialize();
             }
-            
-#if SUBNAUTICA_STABLE
-            //StorageSystem.RestoreItems(serializer, _saveData.Bytes);
-#else
-            //StartCoroutine(StorageSystem.RestoreItemsync(serializer, _saveData.Bytes));
-
-#endif
 
             _fromSave = true;
         }
@@ -197,7 +183,7 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
 
         internal void SendToSeaBreeze(InventoryItem inventoryItem)
         {
-            var seabreezes = Manager.GetDevices(Mod.SeaBreezeTabID);
+            var seabreezes = Manager.GetDevices(SeaBreezeBuildable.SeaBreezeTabID);
             foreach (FcsDevice device in seabreezes)
             {
                 if (!device.IsConstructed) continue;
@@ -216,72 +202,6 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
         public bool HasPowerToConsume()
         {
             return Manager.HasEnoughPower(GetPowerUsage());
-        }
-
-        public bool AttemptToCook(CookerItemController dialog, int amount, bool autoStartCooking = true)
-        {
-            if(StorageSystem.IsFull) return false;
-
-            //Check for ingredients
-            if (dialog.CheckForIngredients(amount))
-            {
-                for (int i = 0; i < amount; i++)
-                {
-                    //Consume all ingredients
-                    foreach (KeyValuePair<TechType, int> ingredient in dialog.GetIngredients())
-                    {
-                        int target = ingredient.Value * amount;
-
-                        for (int i1 = 0; i1 < ingredient.Value * amount; i1++)
-                        {
-                            if (PullFromDataStorage)
-                            {
-                                if (Inventory.main.container.Contains(ingredient.Key) && target != 0)
-                                {
-                                    Destroy(Inventory.main.container.RemoveItem(ingredient.Key).gameObject);
-                                    target--;
-                                }
-
-                                if (target == 0) break;
-
-                                if (Manager.HasItem(ingredient.Key))
-                                {
-                                    Destroy(Manager.TakeItem(ingredient.Key).gameObject);
-                                    target--;
-                                }
-
-                                if (target == 0) break;
-                            }
-                            else
-                            {
-                                if (Inventory.main.container.Contains(ingredient.Key) && target != 0)
-                                {
-                                    Destroy(Inventory.main.container.RemoveItem(ingredient.Key).gameObject);
-                                    target--;
-                                }
-                                if (target == 0) break;
-                            }
-                        }
-                    }
-
-                    //Add Craft
-                    Cooker.AddToQueue(dialog.CookingItem);
-                }
-
-                if (autoStartCooking)
-                {
-                    Cooker.StartCooking();
-                }
-                return true;
-            }
-            
-            QuickLogger.ModMessage($"Alien Chef cant find all the required ingredients for this craft");
-            return false;
-        }
-
-        public void AddToOrder(CookerItemController cookerItemDialog, int amount)
-        {
-            DisplayManager.AddToOrder(cookerItemDialog, amount);
         }
 
         public override void OnHandHover(GUIHand hand)

@@ -39,7 +39,7 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Buildable
             LanguageHandler.SetLanguageLine(SeaBreezeFullKey, "SeaBreeze is full and cannot add anymore items.");
             LanguageHandler.SetLanguageLine(ItemNotAllowedKey, "Food items allowed only.");
             LanguageHandler.SetLanguageLine(ItemKey, "Item/s");
-            LanguageHandler.SetLanguageLine(EditUnitNameKey, $"Edit {Mod.SeaBreezeFriendly} Name");
+            LanguageHandler.SetLanguageLine(EditUnitNameKey, $"Edit {SeaBreezeBuildable.SeaBreezeFriendly} Name");
             LanguageHandler.SetLanguageLine(ColorPickerKey, $"Color Picker");
             LanguageHandler.SetLanguageLine(GoHomeKey, "Home");
             LanguageHandler.SetLanguageLine(PowerBTNMessageKey, "Power Button");

@@ -32,7 +32,7 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Managers
 
         private void OnMonoUpdate()
         {
-            if (!_mono.GetIsOperational()) return;
+            if (!_mono.IsOperational) return;
 
             GenerateWater();
         }
@@ -100,7 +100,7 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Managers
 
         internal void GenerateWater()
         {
-            if (_mono.PowerManager.GetPowerState() == FCSPowerStates.Powered)
+            if (_mono.Manager.GetPowerState() != PowerSystem.Status.Offline && _mono.IsUnderWater())
             {
                 AddWater(QPatch.Configuration.MiniFountainFilterWaterPerSecond);
             }
