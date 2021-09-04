@@ -63,8 +63,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Antenna
 
             if (_fromSave)
             {
-                _colorManager.ChangeColor(_saveData.Body.Vector4ToColor());
-                _colorManager.ChangeColor(_saveData.SecondaryBody.Vector4ToColor(), ColorTargetMode.Secondary);
+                _colorManager.LoadTemplate(_saveData.ColorTemplate);
+
                 _fromSave = false;
             }
         }
@@ -122,15 +122,14 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Antenna
                 _saveData = new DSSAntennaDataEntry();
             }
             _saveData.ID = id;
-            _saveData.Body = _colorManager.GetColor().ColorToVector4();
-            _saveData.SecondaryBody = _colorManager.GetSecondaryColor().ColorToVector4();
+            _saveData.ColorTemplate = _colorManager.SaveTemplate();
 
             newSaveData.DSSAntennaDataEntries.Add(_saveData);
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
 
         public override bool CanDeconstruct(out string reason)

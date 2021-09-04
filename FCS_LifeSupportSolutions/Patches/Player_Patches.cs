@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using FCS_AlterraHub.Mono;
+﻿using FCS_AlterraHub.Mono;
 using FCS_LifeSupportSolutions.Configuration;
 using FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono;
 using FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.mono;
-using FCS_LifeSupportSolutions.Mods.OxygenTank.Mono;
 using FCSCommon.Utilities;
 using HarmonyLib;
 

@@ -5,9 +5,7 @@ using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
-using FCS_LifeSupportSolutions.Buildable;
 using FCS_LifeSupportSolutions.Configuration;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -55,8 +53,8 @@ namespace FCS_LifeSupportSolutions.Mods.MiniMedBay.mono
 
                     Container.NumberOfFirstAids = _savedData.FirstAidCount;
                     Container.SetTimeToSpawn(_savedData.TimeToSpawn);
-                    _colorManager.ChangeColor(_savedData.Body.Vector4ToColor());
-                    _colorManager.ChangeColor(_savedData.SecondaryBody.Vector4ToColor(), ColorTargetMode.Secondary);
+                    _colorManager.LoadTemplate(_savedData.ColorTemplate);
+
                 }
 
                 _runStartUpOnEnable = false;
@@ -175,8 +173,7 @@ namespace FCS_LifeSupportSolutions.Mods.MiniMedBay.mono
             }
 
             _savedData.Id = GetPrefabID();
-            _savedData.Body = _colorManager.GetColor().ColorToVector4();
-            _savedData.SecondaryBody = _colorManager.GetSecondaryColor().ColorToVector4();
+            _savedData.ColorTemplate = _colorManager.SaveTemplate();
             _savedData.FirstAidCount = Container.NumberOfFirstAids;
             _savedData.TimeToSpawn = Container.GetTimeToSpawn();
             newSaveData.MiniMedBayEntries.Add(_savedData);
@@ -188,10 +185,9 @@ namespace FCS_LifeSupportSolutions.Mods.MiniMedBay.mono
             _savedData = Mod.GetMiniMedBaySaveData(GetPrefabID());
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            QuickLogger.Debug($"Change Color: {color} {mode}",true);
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
 
         public override float GetPowerUsage()

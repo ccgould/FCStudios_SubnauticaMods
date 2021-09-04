@@ -3,6 +3,7 @@ using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_StorageSolutions.Configuration;
@@ -95,8 +96,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
 
             if (_fromSave)
             {
-                _colorManager.ChangeColor(_saveData.Body.Vector4ToColor());
-                _colorManager.ChangeColor(_saveData.SecondaryBody.Vector4ToColor(), ColorTargetMode.Secondary);
+                _colorManager.LoadTemplate(_saveData.ColorTemplate);
                 currentItem = _saveData.CurrentItem;
                 _fromSave = false;
             }
@@ -230,17 +230,16 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
                 _saveData = new DSSItemDisplayDataEntry();
             }
             _saveData.ID = id;
-            _saveData.Body = _colorManager.GetColor().ColorToVector4();
-            _saveData.SecondaryBody = _colorManager.GetSecondaryColor().ColorToVector4();
+            _saveData.ColorTemplate = _colorManager.SaveTemplate();
             _saveData.CurrentItem = currentItem;
             QuickLogger.Debug($"Adding device {UnitID} to {nameof(newSaveData.DSSItemDisplayDataEntries)} save");
             newSaveData.DSSItemDisplayDataEntries.Add(_saveData);
             QuickLogger.Debug($"Save Count {newSaveData.DSSItemDisplayDataEntries.Count}");
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
 
         public override bool CanDeconstruct(out string reason)

@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using FCS_HomeSolutions.Mods.PaintTool.Models;
+using FCS_AlterraHub.Model;
+using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,29 +13,25 @@ namespace FCS_HomeSolutions.Mods.PaintTool.Mono
         public static uGUI_PaintToolColorPicker Main;
         private Transform _grid;
         private ToggleGroup _toggleGroup;
-        private Action<ColorTemplate> _callBack;
-
-        private readonly List<ColorTemplate> _defaultTemplates = new()
+        private Action<ColorTemplate,int> _callBack;
+        private bool _isOpen;
+        private GameObject _inputDummy;
+        private GameObject inputDummy
         {
-            new ColorTemplate
+            get
             {
-                PrimaryColor = Color.white,
-                SecondaryColor = Color.gray,
-                EmissionColor = Color.cyan
-            },
-            new ColorTemplate
-            {
-                PrimaryColor = Color.red,
-                SecondaryColor = Color.gray,
-                EmissionColor = Color.white
-            },
-            new ColorTemplate
-            {
-                PrimaryColor = Color.magenta,
-                SecondaryColor = Color.gray,
-                EmissionColor = Color.white
-            },
-        };
+                if (this._inputDummy == null)
+                {
+                    this._inputDummy = new GameObject("InputDummy");
+                    this._inputDummy.SetActive(false);
+                }
+                return this._inputDummy;
+            }
+        }
+        private bool _cursorLockCached;
+        private PaintToolController _controller;
+        private HashSet<ColorPickerTemplateItemController> _colorItems = new ();
+        private bool _isInitialized;
 
         private void Awake()
         {
@@ -51,16 +48,17 @@ namespace FCS_HomeSolutions.Mods.PaintTool.Mono
             }
         }
 
-        void Start()
+        private void Initialize()
         {
+            if (_isInitialized) return;
+
             _grid = gameObject.transform.Find("Grid");
+
             for (int i = 0; i < _grid.childCount; i++)
             {
-                if (i + 1 <= _defaultTemplates.Count)
-                {
-                    var templateItem = _grid.GetChild(i).gameObject.EnsureComponent<ColorPickerTemplateItemController>();
-                    templateItem.SetColors(_defaultTemplates[i]);
-                }
+                var item = _grid.GetChild(i).gameObject.EnsureComponent<ColorPickerTemplateItemController>();
+                item.Index = i;
+                _colorItems.Add(item);
             }
 
             _toggleGroup = gameObject.GetComponentInChildren<ToggleGroup>();
@@ -75,36 +73,95 @@ namespace FCS_HomeSolutions.Mods.PaintTool.Mono
                 }
             }));
 
-
             var cancelButton = gameObject.transform.Find("CancelBTN").GetComponent<Button>();
-            cancelButton.onClick.AddListener((() =>
-            {
-                Close();
-            }));
+            cancelButton.onClick.AddListener((Close));
 
             var doneButton = gameObject.transform.Find("UseBTN").GetComponent<Button>();
             doneButton.onClick.AddListener((() =>
             {
                 var selectedTemplate = GetSelectedTemplate();
-                _callBack?.Invoke(selectedTemplate.GetTemplate());
+                _callBack?.Invoke(selectedTemplate.GetTemplate(),selectedTemplate.Index);
                 Close();
             }));
+            _isInitialized = true;
         }
 
         internal void Close()
         {
             gameObject.SetActive(false);
+            
+            if (_isOpen)
+            {
+                InterceptInput(false);
+                LockMovement(false);
+            }
+
+            _isOpen = false;
         }
 
-        private void Open(Action<ColorTemplate> callBack)
+        internal void Open(PaintToolController controller, Action<ColorTemplate,int> callBack)
         {
-            _callBack = callBack;
+            Initialize();
+            _isOpen = true;
+            _controller = controller;
+            LoadTemplates(controller.GetTemplates());
             gameObject.SetActive(true);
+            SelectTemplate(controller.GetCurrentSelectedTemplateIndex());
+            _callBack = callBack;
+            InterceptInput(true);
+            LockMovement(true);
+        }
+
+        private void SelectTemplate(int index)
+        {
+            QuickLogger.Debug($"Color Picker selecting: {index}",true);
+            _colorItems.ElementAt(index).Select();
+        }
+
+        private void LoadTemplates(List<ColorTemplate> colorTemplates)
+        {
+            for (var index = 0; index < colorTemplates.Count; index++)
+            {
+                _colorItems.ElementAt(index).SetColors(colorTemplates[index]);
+            }
         }
 
         private ColorPickerTemplateItemController GetSelectedTemplate()
         {
             return _toggleGroup.ActiveToggles().FirstOrDefault()?.gameObject.GetComponent<ColorPickerTemplateItemController>();
+        }
+
+        private void LockMovement(bool state)
+        {
+            FPSInputModule.current.lockMovement = state;
+        }
+
+        private void InterceptInput(bool state)
+        {
+            if (inputDummy.activeSelf == state)
+            {
+                return;
+            }
+            if (state)
+            {
+                InputHandlerStack.main.Push(inputDummy);
+                _cursorLockCached = UWE.Utils.lockCursor;
+                UWE.Utils.lockCursor = false;
+                return;
+            }
+            UWE.Utils.lockCursor = _cursorLockCached;
+            InputHandlerStack.main.Pop(inputDummy);
+        }
+
+        public void NotifyItemChanged(int templateIndex,ColorTemplate colorTemplate)
+        {
+            _controller.UpdateTemplates(templateIndex, colorTemplate);
+        }
+
+        public bool IsOpen()
+        {
+            var editorResult = uGUI_PaintToolColorPickerEditor.Main?.IsOpen() ?? false;
+            return _isOpen || editorResult;
         }
     }
 }

@@ -4,6 +4,7 @@ using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
@@ -49,9 +50,9 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
 
                     if (_savedData != null)
                     {
-                        _colorManager.ChangeColor(_savedData.Lum.Vector4ToColor(), ColorTargetMode.Emission);
+                        _colorManager.LoadTemplate(_savedData.ColorTemplate);
                         transform.rotation = _savedData.Rotation.Vec4ToQuaternion();
-                        _light.color = _savedData.Lum.Vector4ToColor();
+                        _light.color = _savedData.ColorTemplate.EmissionColor.Vector4ToColor();
                         if (Mod.GetSaveData().SaveVersion >= 1.1)
                         {
                             _light.intensity = _savedData.Intensity < 0.5f ? 0.5f : _savedData.Intensity;
@@ -125,7 +126,7 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
             }
             
             _savedData.Id = GetPrefabID();
-            _savedData.Lum = _colorManager.GetLumColor().ColorToVector4();
+            _savedData.ColorTemplate = _colorManager.SaveTemplate();
             _savedData.Rotation = transform.rotation.QuaternionToVec4();
             _savedData.Intensity = _light.intensity;
             _savedData.NightSensor = _nightSensor;
@@ -322,18 +323,14 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
             }
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            var result = _colorManager.ChangeColor(color, mode);
+            var result = _colorManager.ChangeColor(template);
 
-            if (result && mode == ColorTargetMode.Emission)
+            if (_light != null)
             {
-                if (_light != null)
-                {
-                    _light.color = color;
-                }
+                _light.color = template.EmissionColor;
             }
-
             return result;
 
         }

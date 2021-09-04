@@ -4,6 +4,7 @@ using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Objects;
+using FCS_HomeSolutions.Mods.QuantumTeleporter.Buildable;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Json;
 using SMLHelper.V2.Options;
@@ -110,7 +111,7 @@ namespace FCS_HomeSolutions.Configuration
 
         private static void PortalBrightnessChangeEvent(SliderChangedEventArgs e)
         {
-            BaseManager.GlobalNotifyByID(Mod.QuantumTeleporterTabID,"UpdateTeleporterEffects");
+            BaseManager.GlobalNotifyByID(QuantumTeleporterBuildable.QuantumTeleporterTabID,"UpdateTeleporterEffects");
         }
 
         [JsonProperty] internal float QuantumTeleporterGlobalTeleportPowerUsage = 1500f;

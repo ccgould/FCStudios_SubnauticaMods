@@ -54,7 +54,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
                         ReadySaveData();
                     }
 
-                    _colorManager.ChangeColor(_savedData.Body.Vector4ToColor(), ColorTargetMode.Both);
+                    _colorManager.LoadTemplate(_savedData.ColorTemplate);
                     DisplayManager.SetSpeedGraphic(_savedData.SpeedMode);
                     if (_savedData.SetBreaker)
                     {
@@ -261,7 +261,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
             }
 
             _savedData.ID = GetPrefabID();
-            _savedData.Body = _colorManager.GetColor().ColorToVector4();
+            _savedData.ColorTemplate = _colorManager.SaveTemplate();
             _savedData.IsInBase = _isInBase;
             _savedData.SpeedMode = GrowBedManager.GetCurrentSpeedMode();
             _savedData.SetBreaker = EffectsManager.GetBreakerState();
@@ -270,9 +270,9 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
             QuickLogger.Debug($"Saving ID {_savedData.ID}", true);
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
         
         public bool IsInBase()

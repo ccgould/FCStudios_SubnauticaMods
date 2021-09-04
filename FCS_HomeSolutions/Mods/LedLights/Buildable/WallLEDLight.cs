@@ -21,7 +21,7 @@ namespace FCS_HomeSolutions.Mods.LedLights.Buildable
             groupForPda = TechGroup.InteriorModules,
             size = Vector3.zero,
             center = Vector3.zero,
-            prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("FCS_LedLightStick_02", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+            prefab = ModelPrefab.GetPrefabFromGlobal("FCS_LedLightStick_02"),
             TechData = Mod.LedLightStickWallIngredients
         })
         {

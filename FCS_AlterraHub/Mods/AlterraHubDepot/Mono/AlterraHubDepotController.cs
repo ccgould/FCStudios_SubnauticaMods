@@ -8,6 +8,7 @@ using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Model.GUI;
 using FCS_AlterraHub.Mods.FCSPDA.Mono;
 using FCS_AlterraHub.Mono;
@@ -56,7 +57,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Mono
                         ReadySaveData();
                     }
 
-                    _colorManager.ChangeColor(_savedData.BodyColor.Vector4ToColor(), ColorTargetMode.Both);
+                    _colorManager.LoadTemplate(_savedData.ColorTemplate);
                     if (_savedData.Storage != null)
                     {
                         _storage = _savedData.Storage;
@@ -238,7 +239,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Mono
             }
 
             _savedData.Id = GetPrefabID();
-            _savedData.BodyColor = _colorManager.GetColor().ColorToVector4();
+            _savedData.ColorTemplate = _colorManager.SaveTemplate();
             _savedData.BaseId = BaseId;
             _savedData.Storage = _storage;
             QuickLogger.Debug($"Saving ID {_savedData.Id}", true);
@@ -251,9 +252,9 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Mono
             _savedData = Mod.GetAlterraHubDepotEntrySaveData(GetPrefabID());
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
 
         public override void OnHandHover(GUIHand hand)

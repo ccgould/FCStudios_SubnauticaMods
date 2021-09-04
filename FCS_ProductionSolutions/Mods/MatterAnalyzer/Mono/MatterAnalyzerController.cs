@@ -97,7 +97,7 @@ namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono
                         ReadySaveData();
                     }
 
-                    _colorManager.ChangeColor(_savedData.Body.Vector4ToColor(), ColorTargetMode.Both);
+                    _colorManager.LoadTemplate(_savedData.ColorTemplate);
                     _scanTime = _savedData.CurrentScanTime;
                     _maxScanTime = _savedData.CurrentMaxScanTime;
                     PickTech = _savedData.PickTechType;
@@ -526,7 +526,7 @@ namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono
             }
 
             _savedData.ID = GetPrefabID();
-            _savedData.Body = _colorManager.GetColor().ColorToVector4();
+            _savedData.ColorTemplate = _colorManager.SaveTemplate();
             _savedData.CurrentTechType = _currentTechType;
             _savedData.PickTechType = PickTech;
             _savedData.IsLandPlant = _isLandPlant;
@@ -543,9 +543,9 @@ namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono
             _savedData = Mod.GetMatterAnalyzerSaveData(GetPrefabID());
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
 
         public void SetScanTime(Plantable.PlantSize plantSize)

@@ -24,17 +24,28 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Buildable
         public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
         public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
 
+        internal const string QuantumTeleporterClassID = "QuantumTeleporter";
+        internal const string QuantumTeleporterFriendly = "Quantum Teleporter";
 
-        public QuantumTeleporterBuildable() : base(Mod.QuantumTeleporterClassID, Mod.QuantumTeleporterFriendly, Mod.QuantumTeleporterDescription)
+        internal const string QuantumTeleporterDescription = "Teleport to other Quantum Teleporter units inside your base or to an entirely different base.";
+
+        internal const string QuantumTeleporterPrefabName = "QuantumTeleporter";
+        internal static string QuantumTeleporterKitClassID = $"{QuantumTeleporterClassID}_Kit";
+        private readonly GameObject _prefab;
+        internal const string QuantumTeleporterTabID = "QT";
+
+
+        public QuantumTeleporterBuildable() : base(QuantumTeleporterClassID, QuantumTeleporterFriendly, QuantumTeleporterDescription)
         {
+            _prefab = ModelPrefab.GetPrefab(QuantumTeleporterPrefabName);
             OnStartedPatching += () =>
             {
-                var quantumTeleporterKit = new FCSKit(Mod.QuantumTeleporterKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
+                var quantumTeleporterKit = new FCSKit(QuantumTeleporterKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 quantumTeleporterKit.Patch();
             };
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.QuantumTeleporterKitClassID.ToTechType(), 750000, StoreCategory.Home);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, QuantumTeleporterKitClassID.ToTechType(), 750000, StoreCategory.Home);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
             };
         }
@@ -43,7 +54,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Buildable
         {
             try
             {
-                var prefab = GameObject.Instantiate(ModelPrefab.QuantumTeleporterPrefab);
+                var prefab = GameObject.Instantiate(_prefab);
 
                 prefab.name = this.PrefabFileName;
                 var center = new Vector3(0f, 1.433978f, 0f);
@@ -98,7 +109,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Buildable
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(Mod.QuantumTeleporterKitClassID.ToTechType(), 1)
+                    new Ingredient(QuantumTeleporterKitClassID.ToTechType(), 1)
                 }
             };
             return customFabRecipe;

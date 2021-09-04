@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
+using FCS_AlterraHub.API;
 using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mods.Global.Spawnables;
 using FCS_AlterraHub.Mono;
@@ -9,6 +11,7 @@ using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Mods.TrashRecycler.Mono;
 using FCSCommon.Utilities;
+using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 #if SUBNAUTICA
@@ -21,15 +24,24 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Buildable
 {
     internal class TrashRecyclerPatch : SMLHelper.V2.Assets.Buildable
     {
+        private readonly GameObject _prefab;
         public override TechGroup GroupForPDA => TechGroup.ExteriorModules;
         public override TechCategory CategoryForPDA => TechCategory.ExteriorModule;
         public override string AssetsFolder => Mod.GetAssetPath();
 
-        public TrashRecyclerPatch() : base(Mod.RecyclerClassID, Mod.RecyclerFriendly, Mod.RecyclerDescription)
+        internal const string RecyclerClassID = "Recycler";
+        internal const string RecyclerFriendly = "Recycler";
+        internal const string RecyclerDescription = "Recycle your trash and get your resources back";
+        internal const string RecyclerPrefabName = "FCS_Recycler";
+        internal const string RecyclerKitClassID = "Recycler_Kit";
+        internal const string RecyclerTabID = "RR";
+
+        public TrashRecyclerPatch() : base(RecyclerClassID, RecyclerFriendly, RecyclerDescription)
         {
+            _prefab = _prefab = ModelPrefab.GetPrefabFromGlobal( RecyclerPrefabName);
             OnFinishedPatching += () =>
             {
-                var recyclerKit = new FCSKit(Mod.RecyclerKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
+                var recyclerKit = new FCSKit(RecyclerKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 recyclerKit.Patch();
                 FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, recyclerKit.TechType, 157500, StoreCategory.Home);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
@@ -40,7 +52,7 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Buildable
         {
             try
             {
-                var prefab = GameObject.Instantiate(ModelPrefab.TrashRecyclerPrefab);
+                var prefab = GameObject.Instantiate(_prefab);
 
                 var size = new Vector3(5.240145f, 2.936445f, 3.069993f);
                 var center = new Vector3(0.01669312f, 1.519108f, 0.06677395f);
@@ -76,7 +88,7 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Buildable
 
                 prefab.SetActive(false);
                 var storageContainer = prefab.AddComponent<FCSStorage>();
-                storageContainer.Initialize(Mod.RecyclerClassID);
+                storageContainer.Initialize(ClassID);
                 storageContainer.enabled = false;
                 prefab.SetActive(true);
 
@@ -95,7 +107,14 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Buildable
 
         protected override RecipeData GetBlueprintRecipe()
         {
-            return Mod.TrashRecyclerIngredients;
+            return new RecipeData
+            {
+                craftAmount = 1,
+                Ingredients =
+                {
+                    new Ingredient(RecyclerKitClassID.ToTechType(), 1),
+                }
+            };
         }
 
         protected override Sprite GetItemSprite()

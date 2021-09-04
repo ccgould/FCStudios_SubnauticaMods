@@ -78,7 +78,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
 
             if (_fromSave)
             {
-                _colorManager.ChangeColor(_saveData.Body.Vector4ToColor());
+                _colorManager.LoadTemplate(_saveData.ColorTemplate);
                 
                 _speedBTN.SetSpeedMode(_saveData.Speed);
 
@@ -426,7 +426,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
                 _saveData = new ReplicatorDataEntry();
             }
             _saveData.ID = id;
-            _saveData.Body = _colorManager.GetColor().ColorToVector4();
+            _saveData.ColorTemplate = _colorManager.SaveTemplate();
             _saveData.TargetItem = _replicatorSlot.GetTargetItem();
             _saveData.Progress = _replicatorSlot.GenerationProgress;
             _saveData.Speed = _replicatorSlot.CurrentSpeedMode;
@@ -434,9 +434,9 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             newSaveData.ReplicatorEntries.Add(_saveData);
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
 
         public void SetSpeedMode(SpeedModes speed)

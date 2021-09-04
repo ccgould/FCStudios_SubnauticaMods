@@ -1,11 +1,9 @@
-﻿using FCS_AlterraHomeSolutions.Mono.PaintTool;
-using FCS_AlterraHub.Buildables;
+﻿using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Enumerators;
-using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
-using FCS_EnergySolutions.Buildable;
 using FCS_EnergySolutions.Configuration;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -48,8 +46,7 @@ namespace FCS_EnergySolutions.Mods.JetStreamT242.Mono
                         ReadySaveData();
                     }
 
-                    _colorManager.ChangeColor(_savedData.Body.Vector4ToColor());
-                    _colorManager.ChangeColor(_savedData.SecondaryBody.Vector4ToColor(), ColorTargetMode.Secondary);
+                    _colorManager.LoadTemplate(_savedData.ColorTemplate);
                     _powerManager.LoadFromSave(_savedData);
                     _motor?.LoadSave(_savedData);
                     _tilter?.LoadSave(_savedData);
@@ -210,8 +207,7 @@ namespace FCS_EnergySolutions.Mods.JetStreamT242.Mono
             _savedData.Id = GetPrefabID();
 
             QuickLogger.Debug($"Saving ID {_savedData.Id}", true);
-            _savedData.Body = _colorManager.GetColor().ColorToVector4();
-            _savedData.SecondaryBody = _colorManager.GetSecondaryColor().ColorToVector4();
+            _savedData.ColorTemplate = _colorManager.SaveTemplate();
             _powerManager.Save(_savedData);
             _motor?.Save(_savedData);
             _tilter?.Save(_savedData);
@@ -265,9 +261,9 @@ namespace FCS_EnergySolutions.Mods.JetStreamT242.Mono
             }
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
 
         public override float GetPowerProducing()

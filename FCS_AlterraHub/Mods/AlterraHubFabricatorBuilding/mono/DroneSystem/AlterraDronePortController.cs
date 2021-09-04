@@ -241,7 +241,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
                         ReadySaveData();
                     }
 
-                    _colorManager.ChangeColor(_savedData.BodyColor.Vector4ToColor());
+                    _colorManager.LoadTemplate(_savedData.ColorTemplate);
                 }
 
                 _runStartUpOnEnable = false;
@@ -297,9 +297,9 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             IsInitialized = true;
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
 
         public DroneController SpawnDrone()
@@ -358,7 +358,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             _savedData.Id = GetPrefabID();
 
             QuickLogger.Debug($"Saving ID {_savedData.Id}", true);
-            _savedData.BodyColor = _colorManager.GetColor().ColorToVector4();
+            _savedData.ColorTemplate = _colorManager.SaveTemplate();
             _savedData.BaseId = BaseId;
             newSaveData.AlterraDronePortEntries.Add(_savedData);
         }

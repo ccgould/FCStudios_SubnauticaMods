@@ -22,17 +22,25 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Buildable
 {
     internal class JukeBoxSpeakerBuildable : SMLHelper.V2.Assets.Buildable
     {
-        public JukeBoxSpeakerBuildable() : base(Mod.JukeBoxSpeakerClassID, Mod.JukeBoxSpeakerFriendly, Mod.JukeBoxSpeakerDescription)
-        {
+        private readonly GameObject _prefab;
+        internal const string JukeBoxSpeakerClassID = "FCSJukeboxSpeaker";
+        internal const string JukeBoxSpeakerFriendly = "Jukebox Speaker";
+        internal const string JukeBoxSpeakerDescription = "N/A";
+        internal const string JukeBoxSpeakerPrefabName = "JukeBoxSpeaker";
+        internal const string JukeBoxSpeakerKitClassID = "JukeboxSpeaker_Kit";
+        internal const string JukeBoxSpeakerTabID = "JBS";
 
+        public JukeBoxSpeakerBuildable() : base(JukeBoxSpeakerClassID, JukeBoxSpeakerFriendly, JukeBoxSpeakerDescription)
+        {
+            _prefab = ModelPrefab.GetPrefab(JukeBoxSpeakerPrefabName);
             OnStartedPatching += () =>
             {
-                var jukeboxSpeakerKit = new FCSKit(Mod.JukeBoxSpeakerKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
+                var jukeboxSpeakerKit = new FCSKit(JukeBoxSpeakerKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 jukeboxSpeakerKit.Patch();
             };
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.JukeBoxSpeakerKitClassID.ToTechType(), 100000, StoreCategory.Home);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, JukeBoxSpeakerKitClassID.ToTechType(), 100000, StoreCategory.Home);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
             };
         }
@@ -41,7 +49,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Buildable
         {
             try
             {
-                var prefab = GameObject.Instantiate(ModelPrefab.JukeboxSpeakerPrefab);
+                var prefab = GameObject.Instantiate(_prefab);
 
                 prefab.name = this.PrefabFileName;
                 
@@ -102,7 +110,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Buildable
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(Mod.JukeBoxSpeakerKitClassID.ToTechType(), 1)
+                    new Ingredient(JukeBoxSpeakerKitClassID.ToTechType(), 1)
                 }
             };
             return customFabRecipe;

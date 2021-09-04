@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using FCS_AlterraHub.Interfaces;
-using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Objects;
 using FCS_AlterraHub.Systems;
-using FCSCommon.Interfaces;
-using UnityEngine;
 #if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
 #else
@@ -21,7 +19,7 @@ namespace FCS_AlterraHub.Configuration
         [JsonProperty] internal float RPM;
         public string Id { get; set; }
         public string BaseId { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
         [JsonProperty(PropertyName = "TL")] internal float TimeLeft { get; set; }
         [JsonProperty(PropertyName = "OQ")] internal Queue<TechType> OreQueue { get; set; }
         [JsonProperty(PropertyName = "BT")] internal bool IsBreakerTripped { get; set; }
@@ -31,7 +29,7 @@ namespace FCS_AlterraHub.Configuration
     {
         public string Id { get; set; }
         public string BaseId { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal Vec4 BodyColor { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
         [JsonProperty(PropertyName = "Data")] internal Dictionary<TechType, int> Storage { get; set; }
     }    
     
@@ -39,20 +37,16 @@ namespace FCS_AlterraHub.Configuration
     {
         public string Id { get; set; }
         public string BaseId { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal Vec4 BodyColor { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
     }
 
     internal class AlterraTransportDroneEntry
     {
         public string Id { get; set; }
-        public int DockedPortID { get; set; }
-        public IEnumerable<CartItemSaveData> Cargo { get; set; }
         public int DestinationPortID { get; set; }
         public string DestinationBaseID { get; set; }
         public string DepartureBaseID { get; set; }
         public int DeparturePortID { get; set; }
-        public string ParentID { get; set; }
-        public string DockedPortBaseID { get; set; }
         public Vec3 Position { get; set; }
         public Vec4 Rotation { get; set; }
         public string State { get; set; }
@@ -68,13 +62,13 @@ namespace FCS_AlterraHub.Configuration
     internal class SaveData
     {
         [JsonProperty] internal float SaveVersion { get; set; } = 1.0f;
-        [JsonProperty] internal List<OreConsumerDataEntry> OreConsumerEntries = new List<OreConsumerDataEntry>();
-        [JsonProperty] internal FCSPDAEntry FCSPDAEntry = new FCSPDAEntry();
+        [JsonProperty] internal List<OreConsumerDataEntry> OreConsumerEntries = new();
+        [JsonProperty] internal FCSPDAEntry FCSPDAEntry = new();
         [JsonProperty(PropertyName = "Acc")] internal AccountDetails AccountDetails { get; set; }
-        [JsonProperty] internal List<AlterraHubDepotEntry> AlterraHubDepotEntries { get; set; } = new List<AlterraHubDepotEntry>();
-        [JsonProperty] internal List<AlterraDronePortEntry> AlterraDronePortEntries { get; set; } = new List<AlterraDronePortEntry>();
-        [JsonProperty] internal List<AlterraTransportDroneEntry> AlterraTransportDroneEntries { get; set; } = new List<AlterraTransportDroneEntry>();
+        [JsonProperty] internal List<AlterraHubDepotEntry> AlterraHubDepotEntries { get; set; } = new();
+        [JsonProperty] internal List<AlterraDronePortEntry> AlterraDronePortEntries { get; set; } = new();
+        [JsonProperty] internal List<AlterraTransportDroneEntry> AlterraTransportDroneEntries { get; set; } = new();
 
-        [JsonProperty] internal List<BaseSaveData> BaseSaves = new List<BaseSaveData>();
+        [JsonProperty] internal List<BaseSaveData> BaseSaves = new();
     }
 }

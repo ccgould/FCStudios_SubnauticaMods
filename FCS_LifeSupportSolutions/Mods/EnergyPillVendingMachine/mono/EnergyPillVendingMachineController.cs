@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
-using FCS_LifeSupportSolutions.Buildable;
 using FCS_LifeSupportSolutions.Configuration;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -55,8 +53,7 @@ namespace FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.mono
                         ReadySaveData();
                     }
 
-                    _colorManager.ChangeColor(_savedData.Body.Vector4ToColor());
-                    _colorManager.ChangeColor(_savedData.SecondaryBody.Vector4ToColor(), ColorTargetMode.Secondary);
+                    _colorManager.LoadTemplate(_savedData.ColorTemplate);
                 }
 
                 _runStartUpOnEnable = false;
@@ -151,8 +148,8 @@ namespace FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.mono
             }
 
             _savedData.Id = GetPrefabID();
-            _savedData.Body = _colorManager.GetColor().ColorToVector4();
-            _savedData.SecondaryBody = _colorManager.GetSecondaryColor().ColorToVector4();
+            _savedData.ColorTemplate = _colorManager.SaveTemplate();
+
             QuickLogger.Debug($"Saving ID {_savedData.Id}");
             newSaveData.EnergyPillVendingMachineEntries.Add(_savedData);
         }
@@ -163,9 +160,9 @@ namespace FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.mono
             _savedData = Mod.GetEnergyPillVendingMachineSaveData(GetPrefabID());
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
 
         public void PurchaseItem(string itemKey)

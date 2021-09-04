@@ -124,8 +124,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
                     {
                         BaseId = _savedData.BaseId;
                     }
-                    _colorManager.ChangeColor(_savedData.Body.Vector4ToColor());
-                    _colorManager.ChangeColor(_savedData.SecondaryBody.Vector4ToColor(),ColorTargetMode.Secondary);
+                    _colorManager.LoadTemplate(_savedData.ColorTemplate);
 
                     switch (_savedData.PylonMode)
                     {
@@ -367,9 +366,9 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             IsInitialized = true;
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
 
         public void DeleteFrequencyItemAndDisconnectRelay(string unitID)
@@ -782,8 +781,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             _savedData.Id = GetPrefabID();
 
             QuickLogger.Debug($"Saving ID {_savedData.Id}", true);
-            _savedData.Body = _colorManager.GetColor().ColorToVector4();
-            _savedData.SecondaryBody = _colorManager.GetSecondaryColor().ColorToVector4();
+            _savedData.ColorTemplate = _colorManager.SaveTemplate();
             _savedData.BaseId = BaseId;
             _savedData.PylonMode = GetCurrentMode();
             _savedData.CurrentConnections = GetCurrentConnectionIDs().ToList();

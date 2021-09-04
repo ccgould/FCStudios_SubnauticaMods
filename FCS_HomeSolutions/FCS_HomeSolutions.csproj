@@ -19,16 +19,13 @@
   <Import Project="$(SolutionDir)\Configurations.targets" />
   <Import Project="$(SolutionDir)\References.targets" />
   <ItemGroup>
-    <Compile Include="BaseOperator\Model\TimeCache.cs" />
-    <Compile Include="BaseOperator\Mono\BaseOperatorController.cs" />
-    <Compile Include="BaseOperator\Mono\BaseOperatorDisplay.cs" />
     <Compile Include="Buildables\DecorationController.cs" />
     <Compile Include="Buildables\DecorationEntryPatch.cs" />
     <Compile Include="Buildables\ModelPrefab.cs" />
-    <Compile Include="BaseOperator\Buildable\BaseOperatorPatch.cs" />
     <Compile Include="Mods\CrewLocker\Buildable\CrewLockerPatch.cs" />
+    <Compile Include="Mods\Microwave\Buildable\MicrowavePatch.cs" />
+    <Compile Include="Mods\Microwave\Mono\MicrowaveController.cs" />
     <Compile Include="Mods\NeonPlanter\Buildable\NeonPlanterPatch.cs" />
-    <Compile Include="Mods\PaintTool\Models\ColorTemplate.cs" />
     <Compile Include="Mods\PaintTool\Mono\ColorPickerTemplateItemController.cs" />
     <Compile Include="Mods\PaintTool\Mono\HSVControl.cs" />
     <Compile Include="Mods\PaintTool\Mono\uGUI_PaintToolColorPicker.cs" />

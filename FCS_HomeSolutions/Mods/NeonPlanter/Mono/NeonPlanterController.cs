@@ -4,6 +4,7 @@ using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
@@ -42,9 +43,7 @@ namespace FCS_HomeSolutions.Mods.NeonPlanter.Mono
                         ReadySaveData();
                     }
 
-                    _colorManager.ChangeColor(_savedData.Fcs.Vector4ToColor());
-                    _colorManager.ChangeColor(_savedData.Secondary.Vector4ToColor(), ColorTargetMode.Secondary);
-                    _colorManager.ChangeColor(_savedData.Lum.Vector4ToColor(), ColorTargetMode.Emission);
+                    _colorManager.LoadTemplate(_savedData.ColorTemplate);
                 }
 
                 _runStartUpOnEnable = false;
@@ -68,9 +67,8 @@ namespace FCS_HomeSolutions.Mods.NeonPlanter.Mono
             }
 
             _savedData.Id = GetPrefabID();
-            _savedData.Fcs = _colorManager.GetColor().ColorToVector4();
-            _savedData.Secondary = _colorManager.GetSecondaryColor().ColorToVector4();
-            _savedData.Lum = _colorManager.GetLumColor().ColorToVector4();
+            _savedData.ColorTemplate = _colorManager.SaveTemplate();
+
             QuickLogger.Debug($"Saving ID {_savedData.Id}");
             newSaveData.PlanterEntries.Add(_savedData);
         }
@@ -135,9 +133,9 @@ namespace FCS_HomeSolutions.Mods.NeonPlanter.Mono
             }
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
     }
 

@@ -40,7 +40,7 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
         internal const float POWERUSAGE = .5f;
         internal PlatformTrigger PlatformTrigger { get; private set; }
         private const float LerpTime = .1f;
-        public override bool IsOperational => IsConstructed && IsInitialized && Manager != null;
+        public override bool IsOperational => IsConstructed && IsInitialized && Manager != null && PlatformTrigger != null;
 
         public override float GetPowerUsage()
         {
@@ -114,6 +114,7 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
             _trans = gameObject.transform;
             var platForm = GameObjectHelpers.FindGameObject(gameObject, "Platform");
             PlatformTrigger = platForm.AddComponent<PlatformTrigger>();
+            PlatformTrigger.Initialize(this);
             _platFormTrans = platForm.transform;
             
             _poleController = GameObjectHelpers.FindGameObject(gameObject, "pole")
@@ -147,7 +148,7 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
                 _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol);
             }
 
-            _colorManager.ChangeColor(new Color(0.8666667f, 0.6588235f, 0.01960784f), ColorTargetMode.Secondary);
+            _colorManager.ChangeColor(new ColorTemplate{SecondaryColor = new Color(0.8666667f, 0.6588235f, 0.01960784f) });
 
             AddNewFloor("base", "Home", _startPos.transform.localPosition.y, 0);
             _currentFloor = GetFloorData("base");
@@ -241,8 +242,7 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
                         ReadySaveData();
                     }
 
-                    _colorManager.ChangeColor(_savedData.Primary.Vector4ToColor());
-                    _colorManager.ChangeColor(_savedData.Secondary.Vector4ToColor(), ColorTargetMode.Secondary);
+                    _colorManager.LoadTemplate(_savedData.ColorTemplate);
 
                     //Set the platform position
                     _platFormTrans.localPosition = new Vector3(_platFormTrans.localPosition.x,_savedData.PlateformPosition, _platFormTrans.localPosition.z);
@@ -333,8 +333,7 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
             }
 
             _savedData.Id = GetPrefabID();
-            _savedData.Primary = _colorManager.GetColor().ColorToVector4();
-            _savedData.Secondary = _colorManager.GetSecondaryColor().ColorToVector4();
+            _savedData.ColorTemplate = _colorManager.SaveTemplate();
             _savedData.FloorData = _floorData;
             _savedData.CurrentFloorId = _currentFloor?.FloorId;
             _savedData.PlateformPosition = _platFormTrans.localPosition.y;
@@ -477,9 +476,9 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
             return _isRailingsVisible;
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
 
         public Transform GetHighestFloor()

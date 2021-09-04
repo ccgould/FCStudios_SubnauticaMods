@@ -15,6 +15,7 @@ using FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Buildable;
 using FCS_HomeSolutions.Mods.HologramPoster.Buildable;
 using FCS_HomeSolutions.Mods.JukeBox.Buildable;
 using FCS_HomeSolutions.Mods.LedLights.Buildable;
+using FCS_HomeSolutions.Mods.Microwave.Buildable;
 using FCS_HomeSolutions.Mods.MiniFountainFilter.Buildables;
 using FCS_HomeSolutions.Mods.NeonPlanter.Buildable;
 using FCS_HomeSolutions.Mods.PaintTool.Spawnable;
@@ -200,12 +201,36 @@ namespace FCS_HomeSolutions
             PatchCabinets();
 
             PatchBenches();
-            
+
+            PatchMiscItems();
+
             var harmony = new Harmony("com.homesolutions.fstudios");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
             
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
+        }
+
+        private void PatchMiscItems()
+        {
+            var microwave = new MicrowavePatch("fcsmicrowave", "Microwave", "N/A",
+                ModelPrefab.GetPrefabFromGlobal("FCS_Microwave"),
+                new Settings
+                {
+                    KitClassID = "microwave_kit",
+                    AllowedInBase = true,
+                    AllowedOutside = false,
+                    AllowedOnGround = true,
+                    AllowedInSub = true,
+                    AllowedOnConstructables = true,
+                    RotationEnabled = true,
+                    Cost = 1500,
+                    Center = new Vector3(0f, 0.2938644f, 0.2363691f),
+                    Size = new Vector3(0.8795165f, 0.4697664f, 0.6358638f),
+                    CategoryForPDA = TechCategory.InteriorModule,
+                    GroupForPDA = TechGroup.InteriorModules
+                });
+            microwave.Patch();
         }
 
         private void PatchComputers()
@@ -289,7 +314,7 @@ namespace FCS_HomeSolutions
             if (!Configuration.IsShelvesAndTablesEnabled) return;
 
             var floorShelf01 = new DecorationEntryPatch("floorShelf01", "Floor Shelf 1", "Don’t put your things on the floor, put them on this lovely shelf!",
-                ModelPrefab.GetPrefab("FloorShelf01"),
+                ModelPrefab.GetPrefabFromGlobal("FCS_FloorShelf01"),
                 new Settings
                 {
                     KitClassID = "floorShelf01_kit",
@@ -308,7 +333,7 @@ namespace FCS_HomeSolutions
             floorShelf01.Patch();
 
             var floorShelf02 = new DecorationEntryPatch("floorShelf02", "Floor Shelf 2", "Don’t put your things on the floor, put them on this lovely shelf!",
-                ModelPrefab.GetPrefab("FloorShelf02"),
+                ModelPrefab.GetPrefabFromGlobal("FCS_FloorShelf02"),
                 new Settings
                 {
                     KitClassID = "floorShelf02_kit",
@@ -326,7 +351,7 @@ namespace FCS_HomeSolutions
             floorShelf02.Patch();
 
             var floorShelf03 = new DecorationEntryPatch("floorShelf03", "Floor Shelf 3", "Don’t put your things on the floor, put them on this lovely shelf!",
-                ModelPrefab.GetPrefab("FloorShelf03"),
+                ModelPrefab.GetPrefabFromGlobal("FCS_FloorShelf03"),
                 new Settings
                 {
                     KitClassID = "floorShelf03_kit",
@@ -346,7 +371,7 @@ namespace FCS_HomeSolutions
 
 
             var floorShelf04 = new DecorationEntryPatch("floorShelf04", "Floor Shelf 4", "Don’t put your things on the floor, put them on this lovely shelf!",
-                ModelPrefab.GetPrefab("FloorShelf04"),
+                ModelPrefab.GetPrefabFromGlobal("FCS_FloorShelf04"),
                 new Settings
                 {
                     KitClassID = "floorShelf04_kit",
@@ -365,7 +390,7 @@ namespace FCS_HomeSolutions
             floorShelf04.Patch();
 
             var floorShelf05 = new DecorationEntryPatch("floorShelf05", "Floor Shelf 5", "Don’t put your things on the floor, put them on this lovely shelf!",
-                ModelPrefab.GetPrefab("FloorShelf05"),
+                ModelPrefab.GetPrefabFromGlobal("FCS_FloorShelf05"),
                 new Settings
                 {
                     KitClassID = "floorShelf05_kit",
@@ -384,7 +409,7 @@ namespace FCS_HomeSolutions
             floorShelf05.Patch();
 
             var floorShelf06 = new DecorationEntryPatch("floorShelf06", "Floor Shelf 6", "Don’t put your things on the floor, put them on this lovely shelf!",
-                ModelPrefab.GetPrefab("FloorShelf06"),
+                ModelPrefab.GetPrefabFromGlobal("FCS_FloorShelf06"),
                 new Settings
                 {
                     KitClassID = "floorShelf06_kit",
@@ -404,7 +429,7 @@ namespace FCS_HomeSolutions
 
 
             var floorShelf07 = new DecorationEntryPatch("floorShelf07", "Floor Shelf 7", "Don’t put your things on the floor, put them on this lovely shelf!",
-                ModelPrefab.GetPrefab("FloorShelf07"),
+                ModelPrefab.GetPrefabFromGlobal("FCS_FloorShelf07"),
                 new Settings
                 {
                     KitClassID = "floorShelf07_kit",
@@ -423,7 +448,7 @@ namespace FCS_HomeSolutions
             floorShelf07.Patch();
 
             var neonShelf01 = new DecorationEntryPatch("neonShelf01", "Neon Shelf 01", "A shelf with neon lights. (Paint Tool Recommended)",
-                FCSAssetBundlesService.PublicAPI.GetPrefabByName("FCS_NeonShelf01", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                ModelPrefab.GetPrefabFromGlobal("FCS_NeonShelf01"),
                 new Settings
                 {
                     KitClassID = "neonShelf01_kit",
@@ -443,7 +468,7 @@ namespace FCS_HomeSolutions
             neonShelf01.Patch();
 
             var neonShelf02 = new DecorationEntryPatch("neonShelf02", "Neon Shelf 02", "A shelf with neon lights. (Paint Tool Recommended)",
-                FCSAssetBundlesService.PublicAPI.GetPrefabByName("FCS_NeonShelf02", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                ModelPrefab.GetPrefabFromGlobal("FCS_NeonShelf02"),
                 new Settings
                 {
                     KitClassID = "neonShelf02_kit",
@@ -464,7 +489,7 @@ namespace FCS_HomeSolutions
 
 
             var neonShelf03 = new DecorationEntryPatch("neonShelf03", "Neon Shelf 03", "A shelf with neon lights. (Paint Tool Recommended)",
-                FCSAssetBundlesService.PublicAPI.GetPrefabByName("FCS_NeonShelf03", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                ModelPrefab.GetPrefabFromGlobal("FCS_NeonShelf03"),
                 new Settings
                 {
                     KitClassID = "neonShelf03_kit",
@@ -485,7 +510,7 @@ namespace FCS_HomeSolutions
 
 
             var neonTable01 = new DecorationEntryPatch("neonTable01", "Neon Table 01", "A table with neon lights. (Paint Tool Recommended)",
-                FCSAssetBundlesService.PublicAPI.GetPrefabByName("NeonTable01", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                ModelPrefab.GetPrefabFromGlobal("NeonTable01"),
                 new Settings
                 {
                     KitClassID = "neonTable01_kit",
@@ -504,7 +529,7 @@ namespace FCS_HomeSolutions
             neonTable01.Patch();
 
             var neonTable02 = new DecorationEntryPatch("neonTable02", "Neon Table 02", "A table with neon lights. (Paint Tool Recommended)",
-                FCSAssetBundlesService.PublicAPI.GetPrefabByName("NeonTable02", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                ModelPrefab.GetPrefabFromGlobal("NeonTable02"),
                 new Settings
                 {
                     KitClassID = "neonTable02_kit",
@@ -729,7 +754,7 @@ namespace FCS_HomeSolutions
             if (!Configuration.IsWallSignsEnabled) return;
 
             var wallSign = new SignEntryPatch("wallSign", "Wall Sign", "Wall-mounted sign, suitable for use indoors. Requires a wall.",
-                FCSAssetBundlesService.PublicAPI.GetPrefabByName("FCS_AlterraWallSign", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                ModelPrefab.GetPrefabFromGlobal("FCS_AlterraWallSign"),
                 new Settings
                 {
                     KitClassID = "wallSign_kit",
@@ -747,7 +772,7 @@ namespace FCS_HomeSolutions
             wallSign.Patch();
 
             var outsideSign = new SignEntryPatch("outsideSign", "Outside Sign", "Freestanding sign, suitable for outside use.",
-                FCSAssetBundlesService.PublicAPI.GetPrefabByName("FCS_AlterraOutsideSign", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                ModelPrefab.GetPrefabFromGlobal("FCS_AlterraOutsideSign"),
                 new Settings
                 {
                     KitClassID = "outsideSign_kit",

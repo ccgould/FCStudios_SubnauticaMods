@@ -7,7 +7,6 @@ using FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Buildable;
 using FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.Buildable;
 using FCS_LifeSupportSolutions.Mods.MiniMedBay.Buildable;
 using FCS_LifeSupportSolutions.Spawnables;
-using FCSCommon.Utilities;
 using HarmonyLib;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;

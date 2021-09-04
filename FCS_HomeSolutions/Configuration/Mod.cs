@@ -29,27 +29,6 @@ namespace FCS_HomeSolutions.Configuration
         internal const string ModBundleName = "fcshomesolutionsbundle";
 
         internal const string DecorationItemTabId = "DI";
-
-        internal const string RecyclerClassID = "Recycler";
-        internal const string RecyclerFriendly = "Recycler";
-        internal const string RecyclerDescription = "Recycle your trash and get your resources back";
-        internal const string RecyclerPrefabName = "Recycler";
-        internal const string RecyclerKitClassID = "Recycler_Kit";
-        internal const string RecyclerTabID = "RR";
-
-        internal const string JukeBoxClassID = "FCSJukebox";
-        internal const string JukeBoxFriendly = "Jukebox";
-        internal const string JukeBoxDescription = "N/A";
-        internal const string JukeBoxPrefabName = "Jukebox";
-        internal const string JukeBoxKitClassID = "Jukebox_Kit";
-        internal const string JukeBoxTabID = "JB";
-
-        internal const string JukeBoxSpeakerClassID = "FCSJukeboxSpeaker";
-        internal const string JukeBoxSpeakerFriendly = "Jukebox Speaker";
-        internal const string JukeBoxSpeakerDescription = "N/A";
-        internal const string JukeBoxSpeakerPrefabName = "JukeBoxSpeaker";
-        internal const string JukeBoxSpeakerKitClassID = "JukeboxSpeaker_Kit";
-        internal const string JukeBoxSpeakerTabID = "JBS";
         
         internal const string ElevatorClassID = "Elevator";
         internal const string ElevatorFriendly = "Elevator";
@@ -57,17 +36,7 @@ namespace FCS_HomeSolutions.Configuration
         internal const string ElevatorPrefabName = "Elevator";
         internal const string ElevatorKitClassID = "Elevator_Kit";
         internal const string ElevatorTabID = "EV";
-
-        internal const string TrashReceptacleClassID = "TrashReceptacle";
-        internal const string TrashReceptacleFriendly = "Trash Receptacle";
-
-        internal const string TrashReceptacleDescription =
-            "Use the Trash Receptacle to quickly send your trash to the recycler from the inside of your base";
-
-        internal const string TrashReceptaclePrefabName = "TrashReceptacle";
-        internal const string TrashReceptacleKitClassID = "TrashReceptacle_Kit";
-        internal const string TrashReceptacleTabID = "TR";
-
+        
         internal const string FireExtinguisherRefuelerClassID = "FireExtinguisherRefueler";
         internal const string FireExtinguisherRefuelerFriendly = "Fire Extinguisher Refueler";
 
@@ -78,96 +47,13 @@ namespace FCS_HomeSolutions.Configuration
         internal const string FireExtinguisherRefuelerKitClassID = "FireExtinguisherRefueler_Kit";
         internal const string FireExtinguisherRefuelerTabID = "FER";
 
-        internal const string PaintToolClassID = "PaintTool";
-        internal const string PaintToolFriendly = "Alterra Paint Tool";
-
-        internal const string PaintToolDescription =
-            "Change the color of Primary and Secondary surfaces, and LED lights (requires Paint Can). Only suitable for Alterra FCStudios products.";
-
-        internal const string PaintToolPrefabName = "PaintTool";
-        internal const string PaintToolKitClassID = "PaintTool_Kit";
-
-        internal const string BaseOperatorClassID = "BaseOperator";
-        internal const string BaseOperatorFriendly = "Alterra Base Operator";
-
-        internal const string BaseOperatorDescription =
-            "Controls various Base functions (Lights, Beacon, Power, etc, etc)";
-
-        internal const string BaseOperatorPrefabName = "BaseOperator";
-        internal const string BaseOperatorKitClassID = "BaseOperator_Kit";
-        internal const string BaseOperatorTabID = "BO";
-
-        internal const string HoverLiftPadClassID = "HoverLiftPad";
-        internal const string HoverLiftPadFriendly = "Alterra Hover Lift Pad";
-
-        internal const string HoverLiftPadDescription =  "Get from one elevation to the next with ease. Een your PRAWN suit along so you don’t get lonely.";
-
-        internal const string HoverLiftPrefabName = "HoverLiftPad";
-        internal static string HoverLiftPadKitClassID = $"{HoverLiftPadClassID}_Kit";
-        internal const string HoverLiftPadTabID = "HLP";
-
-
         internal const string HologramPosterClassID = "HologramPoster";
         internal const string HologramPosterFriendly = "Hologram Poster";
         internal const string HologramPosterDescription = "N/A";
         internal const string HologramPosterPrefabName = "HologramPosterSmall";
-        internal static string HologramPosterKitClassID = $"{HoverLiftPadClassID}_Kit";
+        internal static string HologramPosterKitClassID = $"{HologramPosterClassID}_Kit";
         internal const string HologramPosterTabID = "HGP";
         
-        internal const string QuantumTeleporterClassID = "QuantumTeleporter";
-        internal const string QuantumTeleporterFriendly = "Quantum Teleporter";
-
-        internal const string QuantumTeleporterDescription =
-            "Teleport to other Quantum Teleporter units inside your base or to an entirely different base.";
-
-        internal const string QuantumTeleporterPrefabName = "QuantumTeleporter";
-        internal static string QuantumTeleporterKitClassID = $"{QuantumTeleporterClassID}_Kit";
-        internal const string QuantumTeleporterTabID = "QT";
-
-        internal const string AlienChefClassID = "AlienChef";
-        internal const string AlienChefFriendly = "Alien Chef";
-
-        internal const string AlienChefDescription = "Forget the Fabricator: let the Alien Chef do the cooking and curing for you. 200 cooked fish for a party? No problem!";
-
-        internal const string AlienChefPrefabName = "AlienChef";
-        internal static string AlienChiefKitClassID = $"{AlienChefClassID}_Kit";
-        internal const string AlienChiefTabID = "AC";
-
-        internal const string Cabinet1ClassID = "CabinetWide";
-        internal const string Cabinet1Friendly = "Wide Floor Cabinet";
-        internal const string Cabinet1Description = "A stylish furniture piece for storage and decoration";
-        internal const string Cabinet1PrefabName = "Cabinet_01";
-        internal static string Cabinet1KitClassID = $"{Cabinet1ClassID}_Kit";
-        internal const string CabinetTabID = "CB";
-
-        internal const string Cabinet2ClassID = "CabinetMediumTall";
-        internal const string Cabinet2Friendly = "Medium Vertical Cabinet";
-        internal const string Cabinet2Description = "A stylish furniture piece for storage and decoration";
-        internal const string Cabinet2PrefabName = "Cabinet_02";
-        internal static string Cabinet2KitClassID = $"{Cabinet2ClassID}_Kit";
-
-
-        internal const string Cabinet3ClassID = "CabinetTall";
-        internal const string Cabinet3Friendly = "Tall Vertical Cabinet";
-        internal const string Cabinet3Description = "A stylish furniture piece for storage and decoration";
-        internal const string Cabinet3PrefabName = "Cabinet_03";
-        internal static string Cabinet3KitClassID = $"{Cabinet3ClassID}_Kit";
-
-
-        internal const string PeeperLoungeBarClassId = "ahsSweetWaterBar";
-        internal const string PeeperLoungeBarFriendly = "Peeper Lounge Bar";
-        internal const string PeeperLoungeBarDescription = "All drinks on the house.";
-        internal const string PeeperLoungeBarPrefabName = "PeeperLoungeBar";
-        internal static string PeeperLoungeBarKitClassID = $"{PeeperLoungeBarClassId}_Kit";
-
-        internal const string PaintCanClassID = "PaintCan";
-        internal const string PaintCanFriendly = "Paint Can";
-
-        internal const string PaintCanDescription =
-            "Plug into your Paint Tool to color FCStudios Appliances, Furniture, Machines, and LED Lights";
-
-        internal const string PaintCanPrefabName = "PaintCan";
-
         internal const string EmptyObservationTankClassID = "EmptyObservationTank";
         internal const string EmptyObservationTankFriendly = "Observation Tank";
 
@@ -321,34 +207,6 @@ namespace FCS_HomeSolutions.Configuration
         };
 #endif
 
-
-#if SUBNAUTICA
-        internal static TechData PaintToolIngredients => new TechData
-#elif BELOWZERO
-                internal static RecipeData PaintToolIngredients => new RecipeData
-#endif
-        {
-            craftAmount = 1,
-            Ingredients =
-            {
-                new Ingredient(PaintToolKitClassID.ToTechType(), 1),
-            }
-        };
-
-
-#if SUBNAUTICA
-        internal static TechData BaseOperatorIngredients => new TechData
-#elif BELOWZERO
-                internal static RecipeData BaseOperatorIngredients => new RecipeData
-#endif
-        {
-            craftAmount = 1,
-            Ingredients =
-            {
-                new Ingredient(BaseOperatorKitClassID.ToTechType(), 1),
-            }
-        };
-
 #if SUBNAUTICA
         internal static TechData CurtainIngredients => new TechData
 #elif BELOWZERO
@@ -361,60 +219,6 @@ namespace FCS_HomeSolutions.Configuration
                 new Ingredient("Curtain_Kit".ToTechType(), 1),
             }
         };
-
-#if SUBNAUTICA
-        internal static TechData HoverLiftPadIngredients => new TechData
-#elif BELOWZERO
-                internal static RecipeData HoverLiftPadIngredients => new RecipeData
-#endif
-        {
-            craftAmount = 1,
-            Ingredients =
-            {
-                new Ingredient(HoverLiftPadKitClassID.ToTechType(), 1),
-            }
-        };
-
-#if SUBNAUTICA
-        internal static TechData TrashReceptacleIngredients => new TechData
-#elif BELOWZERO
-                internal static RecipeData TrashReceptacleIngredients => new RecipeData
-#endif
-        {
-            craftAmount = 1,
-            Ingredients =
-            {
-                new Ingredient(TrashReceptacleKitClassID.ToTechType(), 1),
-            }
-        };
-
-#if SUBNAUTICA
-        internal static TechData TrashRecyclerIngredients => new TechData
-#elif BELOWZERO
-                internal static RecipeData TrashRecyclerIngredients => new RecipeData
-#endif
-        {
-            craftAmount = 1,
-            Ingredients =
-            {
-                new Ingredient(RecyclerKitClassID.ToTechType(), 1),
-            }
-        };
-
-#if SUBNAUTICA
-        internal static TechData AlienChiefIngredients => new TechData
-#elif BELOWZERO
-                internal static RecipeData AlienChiefIngredients => new RecipeData
-#endif
-        {
-            craftAmount = 1,
-            Ingredients =
-            {
-                new Ingredient(AlienChiefKitClassID.ToTechType(), 1),
-            }
-        };
-
-
         internal static Action<SaveData> OnDataLoaded { get; set; }
 
         internal static string SaveDataFilename => $"{ModPackID}SaveData.json";

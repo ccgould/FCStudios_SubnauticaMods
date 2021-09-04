@@ -1,19 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
-using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
-using FCS_AlterraHub.Patches;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Mods.Elevator.Mono;
-using FCS_HomeSolutions.Mods.PaintTool.Models;
 using FCS_HomeSolutions.Mods.PaintTool.Mono;
 using FCSCommon.Utilities;
 using HarmonyLib;
-using Oculus.Newtonsoft.Json.Serialization;
-using rail;
 using UnityEngine;
 using UnityEngine.UI;
 using Action = System.Action;
@@ -46,18 +39,18 @@ namespace FCS_HomeSolutions.Patches
                 elevatorHud.Hide();
 
                 //PaintTool uGUI
-                var uGUI_PaintToolColorPicker = GameObject.Instantiate(ModelPrefab.GetPrefab("uGUI_PaintToolColorTemplate", false, false));
+                var uGUI_PaintToolColorPicker = GameObject.Instantiate(ModelPrefab.GetPrefab("uGUI_PaintToolColorTemplate",  false));
                 uGUI_PaintToolColorPicker.transform.SetParent(hudTransform, false);
                 uGUI_PaintToolColorPicker.transform.SetSiblingIndex(0);
-                var uGUI_PaintToolColorPickerHud = elevatorHudPrefab.AddComponent<uGUI_PaintToolColorPicker>();
+                var uGUI_PaintToolColorPickerHud = uGUI_PaintToolColorPicker.AddComponent<uGUI_PaintToolColorPicker>();
                 uGUI_PaintToolColorPickerHud.Close();
 
 
                 //PaintTool Editor uGUI
-                var uGUI_PaintToolColorEditor = GameObject.Instantiate(ModelPrefab.GetPrefab("uGUI_PaintToolColorTemplate", false, false));
+                var uGUI_PaintToolColorEditor = GameObject.Instantiate(ModelPrefab.GetPrefab("uGUI_PaintToolColorPicker",  false));
                 uGUI_PaintToolColorEditor.transform.SetParent(hudTransform, false);
                 uGUI_PaintToolColorEditor.transform.SetSiblingIndex(0);
-                var uGUI_PaintToolColorEditorHud = elevatorHudPrefab.AddComponent<uGUI_PaintToolColorPickerEditor>();
+                var uGUI_PaintToolColorEditorHud = uGUI_PaintToolColorEditor.AddComponent<uGUI_PaintToolColorPickerEditor>();
                 uGUI_PaintToolColorEditorHud.Close();
 
                 IndicatorInstance = __instance;

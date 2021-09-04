@@ -4,6 +4,7 @@ using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
@@ -57,7 +58,7 @@ namespace FCS_HomeSolutions.Mods.Stove.Mono
 
             if (_fromSave)
             {
-                _colorManager.ChangeColor(_saveData.Primary.Vector4ToColor());
+                _colorManager.LoadTemplate(_saveData.ColorTemplate);
                 Cooker.Load(_saveData.QueuedItems);
                 RefreshUI();
                 _fromSave = false;
@@ -150,9 +151,9 @@ namespace FCS_HomeSolutions.Mods.Stove.Mono
         {
             if (!Mod.IsSaving())
             {
-                QuickLogger.Info($"Saving {Mod.AlienChefFriendly}");
+                QuickLogger.Info($"Saving {StoveBuildable.StoveFriendly}");
                 Mod.Save(serializer);
-                QuickLogger.Info($"Saved {Mod.AlienChefFriendly}");
+                QuickLogger.Info($"Saved {StoveBuildable.StoveFriendly}");
             }
         }
 
@@ -209,7 +210,7 @@ namespace FCS_HomeSolutions.Mods.Stove.Mono
             }
 
             _saveData.Id = id;
-            _saveData.Primary = _colorManager.GetColor().ColorToVector4();
+            _saveData.ColorTemplate = _colorManager.SaveTemplate();
             _saveData.QueuedItems = Cooker.Save();
             newSaveData.StoveDataEntries.Add(_saveData);
         }
@@ -227,9 +228,9 @@ namespace FCS_HomeSolutions.Mods.Stove.Mono
             }
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
 
         public bool HasPowerToConsume()

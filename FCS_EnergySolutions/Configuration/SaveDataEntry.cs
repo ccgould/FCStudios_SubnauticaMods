@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Interfaces;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Objects;
 using FCS_EnergySolutions.Mods.PowerStorage.Enums;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Model;
@@ -20,7 +21,7 @@ namespace FCS_EnergySolutions.Configuration
     {
         public string Id { get; set; }
         [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
-        [JsonProperty] internal Vec4 Body { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
         [JsonProperty] internal Dictionary<TechType, int> Storage { get; set; }
         [JsonProperty] internal float ToConsume { get; set; }
         [JsonProperty] internal FCSPowerStates PowerState { get; set; }
@@ -35,7 +36,7 @@ namespace FCS_EnergySolutions.Configuration
         public string Id { get; set; }
         public string BaseId { get; set; }
         [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
-        [JsonProperty] internal Vec4 Body { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
         [JsonProperty] internal float StoredPower { get; set; }
     }
 
@@ -44,8 +45,7 @@ namespace FCS_EnergySolutions.Configuration
         public string Id { get; set; }
         public string BaseId { get; set; }
         [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
-        [JsonProperty] internal Vec4 Body { get; set; }
-        [JsonProperty] internal Vec4 SecondaryBody { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
         [JsonProperty] internal FCSPowerStates PowerState { get; set; }
         [JsonProperty] internal float StoredPower { get; set; }
         [JsonProperty] internal string CurrentBiome { get; set; }
@@ -65,8 +65,7 @@ namespace FCS_EnergySolutions.Configuration
         public string Id { get; set; }
         public string BaseId { get; set; }
         [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
-        [JsonProperty] internal Vec4 Body { get; set; }
-        [JsonProperty] internal Vec4 SecondaryBody { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
         [JsonProperty] internal FCSPowerStates PowerState { get; set; }
         [JsonProperty] internal byte[] Data { get; set; }
     }    
@@ -76,8 +75,7 @@ namespace FCS_EnergySolutions.Configuration
         public string Id { get; set; }
         public string BaseId { get; set; }
         [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
-        [JsonProperty] internal Vec4 Body { get; set; }
-        [JsonProperty] internal Vec4 SecondaryBody { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
         [JsonProperty] internal Dictionary<string, string> BatteryData { get; set; }
         [JsonProperty] internal Dictionary<string, string> ChargerData { get; set; }
         [JsonProperty] internal PowerChargerMode Mode { get; set; }
@@ -88,8 +86,7 @@ namespace FCS_EnergySolutions.Configuration
         public string Id { get; set; }
         public string BaseId { get; set; }
         [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
-        [JsonProperty] internal Vec4 Body { get; set; }
-        [JsonProperty] internal Vec4 SecondaryBody { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
         [JsonProperty] internal FCSPowerStates PowerState { get; set; }
         [JsonProperty] internal TelepowerPylonMode PylonMode { get; set; }
         [JsonProperty] internal List<string> CurrentConnections { get; set; }
@@ -100,8 +97,7 @@ namespace FCS_EnergySolutions.Configuration
         public string Id { get; set; }
         public string BaseId { get; set; }
         [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
-        [JsonProperty] internal Vec4 Body { get; set; }
-        [JsonProperty] internal Vec4 SecondaryBody { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
         [JsonProperty] internal FCSPowerStates PowerState { get; set; }
         [JsonProperty] internal TelepowerPylonMode PylonMode { get; set; }
         [JsonProperty] internal SortedDictionary<string, ConnectedTurbineData> CurrentConnections { get; set; }
@@ -114,8 +110,7 @@ namespace FCS_EnergySolutions.Configuration
         public string Id { get; set; }
         public string BaseId { get; set; }
         [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
-        [JsonProperty] internal Vec4 Body { get; set; }
-        [JsonProperty] internal Vec4 SecondaryBody { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
         [JsonProperty] internal FCSPowerStates PowerState { get; set; }
         [JsonProperty] internal float StoredPower { get; set; }
         [JsonProperty] internal Vec3 Position { get; set; }
@@ -127,13 +122,13 @@ namespace FCS_EnergySolutions.Configuration
     [Serializable]
     internal class SaveData
     {
-        [JsonProperty] internal List<AlterraGenDataEntry> AlterraGenEntries = new List<AlterraGenDataEntry>();
-        [JsonProperty] internal List<JetStreamT242DataEntry> MarineTurbineEntries = new List<JetStreamT242DataEntry>();
-        [JsonProperty] internal List<PowerStorageDataEntry> PowerStorageEntries = new List<PowerStorageDataEntry>();
-        [JsonProperty] internal List<UniversalChargerDataEntry> UniversalChargerEntries = new List<UniversalChargerDataEntry>();
-        [JsonProperty] internal List<AlterraSolarClusterDataEntry> AlterraSolarClusterEntries = new List<AlterraSolarClusterDataEntry>();
-        [JsonProperty] internal List<TelepowerPylonDataEntry> TelepowerPylonEntries = new List<TelepowerPylonDataEntry>();
-        [JsonProperty] internal List<WindSurferOperatorDataEntry> WindSurferOperatorEntries = new List<WindSurferOperatorDataEntry>();
-        [JsonProperty] internal List<WindSurferDataEntry> WindSurferEntries = new List<WindSurferDataEntry>();
+        [JsonProperty] internal List<AlterraGenDataEntry> AlterraGenEntries = new();
+        [JsonProperty] internal List<JetStreamT242DataEntry> MarineTurbineEntries = new();
+        [JsonProperty] internal List<PowerStorageDataEntry> PowerStorageEntries = new();
+        [JsonProperty] internal List<UniversalChargerDataEntry> UniversalChargerEntries = new();
+        [JsonProperty] internal List<AlterraSolarClusterDataEntry> AlterraSolarClusterEntries = new();
+        [JsonProperty] internal List<TelepowerPylonDataEntry> TelepowerPylonEntries = new();
+        [JsonProperty] internal List<WindSurferOperatorDataEntry> WindSurferOperatorEntries = new();
+        [JsonProperty] internal List<WindSurferDataEntry> WindSurferEntries = new();
     }
 }

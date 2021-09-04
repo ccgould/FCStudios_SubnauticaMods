@@ -3,11 +3,13 @@ using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Managers;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.Controllers;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
+using FCS_HomeSolutions.Mods.QuantumTeleporter.Buildable;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -38,7 +40,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.QuantumTeleporterTabID, Mod.ModPackID);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, QuantumTeleporterBuildable.QuantumTeleporterTabID, Mod.ModPackID);
             NameController.SetCurrentName(string.IsNullOrWhiteSpace(_data?.UnitName) ? GetNewName() : _data.UnitName, DisplayManager.GetNameTextBox());
             
             if (Manager != null)
@@ -48,7 +50,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
                 if (_notifyCreation)
                 {
                     QuickLogger.Debug("Notifying Creation on start",true);
-                    Manager?.NotifyByID(Mod.QuantumTeleporterTabID, "RefreshDisplay");
+                    Manager?.NotifyByID(QuantumTeleporterBuildable.QuantumTeleporterTabID, "RefreshDisplay");
                     _notifyCreation = false;
                 }
             }
@@ -106,7 +108,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
             {
                 NameController.SetCurrentName(_data.UnitName);
                 IsGlobal = _data.IsGlobal;
-                _colorManager.ChangeColor(_data.Fcs.Vector4ToColor());
+                _colorManager.LoadTemplate(_data.ColorTemplate);
                 DisplayManager.Load(_data);
                 _linkedPortal = _data.LinkedPortal;
                 IsLinked = _data.IsLinked;
@@ -117,7 +119,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
         public override void OnDestroy()
         {
             base.OnDestroy();
-            Manager?.NotifyByID(Mod.QuantumTeleporterTabID, "RefreshDisplay");
+            Manager?.NotifyByID(QuantumTeleporterBuildable.QuantumTeleporterTabID, "RefreshDisplay");
         }
 
         public override void Initialize()
@@ -176,7 +178,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
 
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseLightsEmissiveController, gameObject, Color.green);
 
-            NameController.Initialize(AuxPatchers.Submit(), Mod.QuantumTeleporterFriendly);
+            NameController.Initialize(AuxPatchers.Submit(), QuantumTeleporterBuildable.QuantumTeleporterFriendly);
             NameController.OnLabelChanged += OnLabelChanged;
             
             IsInitialized = true;
@@ -201,7 +203,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
             }
 
             _data.Id = id;
-            _data.Fcs = _colorManager.GetColor().ColorToVector4();
+            _data.ColorTemplate = _colorManager.SaveTemplate();
             _data.UnitName = NameController.GetCurrentName();
             _data.IsGlobal = IsGlobal;
             _data.SelectedTab = DisplayManager.GetSelectedTab();
@@ -214,9 +216,9 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
         {
             if (!Mod.IsSaving())
             {
-                QuickLogger.Info($"Saving {Mod.QuantumTeleporterFriendly}");
+                QuickLogger.Info($"Saving {QuantumTeleporterBuildable.QuantumTeleporterFriendly}");
                 Mod.Save(serializer);
-                QuickLogger.Info($"Saved {Mod.QuantumTeleporterFriendly}");
+                QuickLogger.Info($"Saved {QuantumTeleporterBuildable.QuantumTeleporterFriendly}");
             }
         }
 
@@ -255,7 +257,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
         private void OnLabelChanged(string obj, NameController nameController)
         {
             DisplayManager?.RefreshBaseName(GetName());
-            Manager?.NotifyByID(Mod.QuantumTeleporterTabID, "RefreshDisplay");
+            Manager?.NotifyByID(QuantumTeleporterBuildable.QuantumTeleporterTabID, "RefreshDisplay");
         }
         
         public string GetName()
@@ -281,12 +283,12 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
         public void ToggleIsGlobal()
         {
             IsGlobal = !IsGlobal;
-            BaseManager.GlobalNotifyByID(Mod.QuantumTeleporterTabID, "RefreshDisplay");
+            BaseManager.GlobalNotifyByID(QuantumTeleporterBuildable.QuantumTeleporterTabID, "RefreshDisplay");
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
     }
 }

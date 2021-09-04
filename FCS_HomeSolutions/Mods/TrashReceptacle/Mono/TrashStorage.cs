@@ -5,6 +5,7 @@ using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Mono;
 using FCS_HomeSolutions.Configuration;
+using FCS_HomeSolutions.Mods.TrashRecycler.Buildable;
 using FCS_HomeSolutions.Mods.TrashRecycler.Mono;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -55,7 +56,7 @@ namespace FCS_HomeSolutions.Mods.TrashReceptacle.Mono
 
         private TrashRecyclerController FindRecycler()
         {
-            var recyclers = _mono.Manager.GetDevices(Mod.RecyclerTabID).ToArray();
+            var recyclers = _mono.Manager.GetDevices(TrashRecyclerPatch.RecyclerTabID).ToArray();
             
             foreach (FcsDevice device in recyclers)
             {
@@ -71,7 +72,7 @@ namespace FCS_HomeSolutions.Mods.TrashReceptacle.Mono
 
         private IEnumerable<TrashRecyclerController> GetRecyclers()
         {
-            var recyclers = _mono.Manager.GetDevices(Mod.RecyclerTabID).ToArray();
+            var recyclers = _mono.Manager.GetDevices(TrashRecyclerPatch.RecyclerTabID).ToArray();
 
             foreach (FcsDevice device in recyclers)
             {
@@ -109,7 +110,7 @@ namespace FCS_HomeSolutions.Mods.TrashReceptacle.Mono
         private int GetTotal()
         {
             int amount = 0;
-            var recyclers = _mono.Manager.GetDevices(Mod.RecyclerTabID).ToArray();
+            var recyclers = _mono.Manager.GetDevices(TrashRecyclerPatch.RecyclerTabID).ToArray();
 
             foreach (FcsDevice device in recyclers)
             {

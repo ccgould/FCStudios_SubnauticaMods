@@ -10,6 +10,7 @@ using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
+using FCS_HomeSolutions.Mods.QuantumTeleporter.Buildable;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Enumerators;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -225,7 +226,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
                 if (SelectedTab == QTTeleportTypes.Global)
                 {
                     items = new List<FcsDevice>();
-                    foreach (var device in FCSAlterraHubService.PublicAPI.GetRegisteredDevicesOfId(Mod.QuantumTeleporterTabID))
+                    foreach (var device in FCSAlterraHubService.PublicAPI.GetRegisteredDevicesOfId(QuantumTeleporterBuildable.QuantumTeleporterTabID))
                     {
                         var fcsDevice = (QuantumTeleporterController)device.Value;
                         if (fcsDevice.IsGlobal && fcsDevice.Manager != _mono.Manager)
@@ -236,7 +237,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
                 }
                 else if (SelectedTab == QTTeleportTypes.Intra)
                 {
-                    items = _mono.Manager.GetDevices(Mod.QuantumTeleporterTabID).Where(x => x.Manager == _mono.Manager)
+                    items = _mono.Manager.GetDevices(QuantumTeleporterBuildable.QuantumTeleporterTabID).Where(x => x.Manager == _mono.Manager)
                         .ToList();
                 }
 

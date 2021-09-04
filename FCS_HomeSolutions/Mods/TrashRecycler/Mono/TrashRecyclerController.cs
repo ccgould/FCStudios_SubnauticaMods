@@ -4,11 +4,13 @@ using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.ObjectPooler;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
+using FCS_HomeSolutions.Mods.TrashRecycler.Buildable;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
@@ -45,7 +47,7 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.RecyclerTabID, Mod.ModPackID);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, TrashRecyclerPatch.RecyclerTabID, Mod.ModPackID);
         }
 
         public override Vector3 GetPosition()
@@ -75,8 +77,7 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Mono
                         ReadySaveData();
                     }
                     _recycler.Load(_savedData);
-                    _colorManager.ChangeColor(_savedData.Fcs.Vector4ToColor());
-                    _colorManager.ChangeColor(_savedData.Secondary.Vector4ToColor(), ColorTargetMode.Secondary);
+                    _colorManager.LoadTemplate(_savedData.ColorTemplate);
                     _timeLeft = _savedData.CurrentTime;
                     RefreshUI();
                     TryStartRecycling(true);
@@ -126,7 +127,7 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Mono
             _inventoryPage = GameObjectHelpers.FindGameObject(gameObject, "Inventory");
             _storageLabel = GameObjectHelpers.FindGameObject(gameObject, "StorageLabel")?.GetComponent<Text>();
             _statusLabel = GameObjectHelpers.FindGameObject(gameObject, "StatusLabel")?.GetComponent<Text>();
-            _statusLabel.text = Mod.RecyclerFriendly;
+            _statusLabel.text = TrashRecyclerPatch.RecyclerFriendly;
             _percentageLabel = GameObjectHelpers.FindGameObject(gameObject, "Percentage")?.GetComponent<Text>();
             
             if (_colorManager == null)
@@ -153,7 +154,7 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Mono
                 {
                     if (!_recycler.HasItems())
                     {
-                        _statusLabel.text = Mod.RecyclerFriendly;
+                        _statusLabel.text = TrashRecyclerPatch.RecyclerFriendly;
                         _percentageLabel.text = AuxPatchers.Waiting();
                     }
                     _storageLabel.text = AuxPatchers.TrashRecyclerStorageFormat(_recycler.GetCount(), _recycler.MaxStorage);
@@ -281,7 +282,7 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Mono
         {
             if (_recycler.HasItems())
             {
-                reason = AuxPatchers.ModNotEmptyFormat(Mod.RecyclerFriendly);
+                reason = AuxPatchers.ModNotEmptyFormat(TrashRecyclerPatch.RecyclerFriendly);
                 return false;
             }
             reason = string.Empty;
@@ -314,8 +315,7 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Mono
             }
 
             _savedData.Id = GetPrefabID();
-            _savedData.Fcs = _colorManager.GetColor().ColorToVector4();
-            _savedData.Secondary = _colorManager.GetSecondaryColor().ColorToVector4();
+            _savedData.ColorTemplate = _colorManager.SaveTemplate();
             _savedData.BaseID = Manager.BaseID;
             _recycler.Save(serializer,_savedData);
             _savedData.CurrentTime = _timeLeft;
@@ -351,9 +351,9 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Mono
             _gridHelper.DrawPage();
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
 
         public override float GetPowerUsage()

@@ -6,6 +6,7 @@ using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mods.Global.Spawnables;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.Controllers;
@@ -153,7 +154,7 @@ namespace FCS_HomeSolutions.Buildables
                         ReadySaveData();
                     }
 
-                    _colorManager.ChangeColor(_savedData.Body.Vector4ToColor());
+                    _colorManager.LoadTemplate(_savedData.ColorTemplate);
                     _arrow.transform.rotation = _savedData.ArrowDirection.Vec4ToQuaternion();
                     _labelController.SetText(_savedData.SignName);
                 }
@@ -218,7 +219,7 @@ namespace FCS_HomeSolutions.Buildables
             }
 
             _savedData.Id = GetPrefabID();
-            _savedData.Body = _colorManager.GetColor().ColorToVector4();
+            _savedData.ColorTemplate = _colorManager.SaveTemplate();
             _savedData.SignName = _labelController.GetText();
             _savedData.ArrowDirection = _arrow.transform.rotation.QuaternionToVec4();
             QuickLogger.Debug($"Saving ID {_savedData.Id}");
@@ -258,9 +259,9 @@ namespace FCS_HomeSolutions.Buildables
             }
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
     }
 

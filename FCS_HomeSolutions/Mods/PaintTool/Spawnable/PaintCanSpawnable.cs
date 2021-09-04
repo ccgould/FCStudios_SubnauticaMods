@@ -16,10 +16,17 @@ namespace FCS_HomeSolutions.Mods.PaintTool.Spawnable
 {
     internal class PaintCanSpawnable : SMLHelper.V2.Assets.Spawnable
     {
+        private readonly GameObject _prefab;
         public override string AssetsFolder => Mod.GetAssetPath();
+        internal const string PaintCanClassID = "PaintCan";
+        internal const string PaintCanFriendly = "Paint Can";
+        internal const string PaintCanDescription = "Plug into your Paint Tool to color FCStudios Appliances, Furniture, Machines, and LED Lights";
+        internal const string PaintCanPrefabName = "FCS_PaintCan";
 
-        public PaintCanSpawnable() : base(Mod.PaintCanClassID, Mod.PaintCanFriendly, Mod.PaintCanDescription)
+
+        public PaintCanSpawnable() : base(PaintCanClassID, PaintCanFriendly, PaintCanDescription)
         {
+            _prefab = ModelPrefab.GetPrefab(PaintCanPrefabName);
             OnFinishedPatching += () =>
             { 
                 FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, TechType, 1,7500, StoreCategory.Home,true);
@@ -31,7 +38,7 @@ namespace FCS_HomeSolutions.Mods.PaintTool.Spawnable
         {
             try
             {
-                var prefab = GameObject.Instantiate(ModelPrefab.PaintCanPrefab);
+                var prefab = GameObject.Instantiate(_prefab);
 
                 prefab.AddComponent<PrefabIdentifier>();
                 prefab.AddComponent<TechTag>().type = TechType;

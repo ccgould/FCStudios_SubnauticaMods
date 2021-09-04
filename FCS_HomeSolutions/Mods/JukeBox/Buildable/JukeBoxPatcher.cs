@@ -5,12 +5,10 @@ using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mods.Global.Spawnables;
-using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Mods.JukeBox.Mono;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
@@ -24,17 +22,26 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Buildable
 {
     internal class JukeBoxBuildable : SMLHelper.V2.Assets.Buildable
     {
-        public JukeBoxBuildable() : base(Mod.JukeBoxClassID, Mod.JukeBoxFriendly, Mod.JukeBoxDescription)
+        private readonly GameObject _prefab;
+        internal const string JukeBoxClassID = "FCSJukebox";
+        internal const string JukeBoxFriendly = "Jukebox";
+        internal const string JukeBoxDescription = "N/A";
+        internal const string JukeBoxPrefabName = "Jukebox";
+        internal const string JukeBoxKitClassID = "Jukebox_Kit";
+        internal const string JukeBoxTabID = "JB";
+
+        public JukeBoxBuildable() : base(JukeBoxClassID, JukeBoxFriendly, JukeBoxDescription)
         {
+            _prefab = ModelPrefab.GetPrefab(JukeBoxPrefabName);
 
             OnStartedPatching += () =>
             {
-                var jukeboxKit = new FCSKit(Mod.JukeBoxKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
+                var jukeboxKit = new FCSKit(JukeBoxKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 jukeboxKit.Patch();
             };
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.JukeBoxKitClassID.ToTechType(), 700000, StoreCategory.Home);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, JukeBoxKitClassID.ToTechType(), 700000, StoreCategory.Home);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
             };
         }
@@ -43,7 +50,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Buildable
         {
             try
             {
-                var prefab = GameObject.Instantiate(ModelPrefab.JukeboxPrefab);
+                var prefab = GameObject.Instantiate(_prefab);
 
                 prefab.name = this.PrefabFileName;
                 
@@ -105,7 +112,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Buildable
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(Mod.JukeBoxKitClassID.ToTechType(), 1)
+                    new Ingredient(JukeBoxKitClassID.ToTechType(), 1)
                 }
             };
             return customFabRecipe;

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
+using FCS_AlterraHub.API;
 using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mods.Global.Spawnables;
 using FCS_AlterraHub.Registration;
@@ -8,6 +10,7 @@ using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Mods.TrashReceptacle.Mono;
 using FCSCommon.Utilities;
+using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 #if SUBNAUTICA
@@ -19,15 +22,26 @@ namespace FCS_HomeSolutions.Mods.TrashReceptacle.Buildable
 {
     internal class TrashReceptaclePatch : SMLHelper.V2.Assets.Buildable
     {
+        private readonly GameObject _prefab;
         public override TechGroup GroupForPDA => TechGroup.InteriorModules;
         public override TechCategory CategoryForPDA => TechCategory.InteriorModule;
         public override string AssetsFolder => Mod.GetAssetPath();
 
-        public TrashReceptaclePatch() : base(Mod.TrashReceptacleClassID, Mod.TrashReceptacleFriendly, Mod.TrashReceptacleDescription)
+        internal const string TrashReceptacleClassID = "TrashReceptacle";
+        internal const string TrashReceptacleFriendly = "Trash Receptacle";
+
+        internal const string TrashReceptacleDescription = "Use the Trash Receptacle to quickly send your trash to the recycler from the inside of your base";
+
+        internal const string TrashReceptaclePrefabName = "FCS_TrashReceptacle";
+        internal const string TrashReceptacleKitClassID = "TrashReceptacle_Kit";
+        internal const string TrashReceptacleTabID = "TR";
+
+        public TrashReceptaclePatch() : base(TrashReceptacleClassID, TrashReceptacleFriendly, TrashReceptacleDescription)
         {
+            _prefab = _prefab = ModelPrefab.GetPrefabFromGlobal(TrashReceptaclePrefabName);
             OnFinishedPatching += () =>
             {
-                var trashReceptacleKit = new FCSKit(Mod.TrashReceptacleKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
+                var trashReceptacleKit = new FCSKit(TrashReceptacleKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 trashReceptacleKit.Patch();
                 FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, trashReceptacleKit.TechType, 78750, StoreCategory.Home);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
@@ -38,7 +52,7 @@ namespace FCS_HomeSolutions.Mods.TrashReceptacle.Buildable
         {
             try
             {
-                var prefab = GameObject.Instantiate(ModelPrefab.TrashReceptaclePrefab);
+                var prefab = GameObject.Instantiate(_prefab);
 
                 var size = new Vector3(0.8523935f, 1.468681f, 0.5830949f);
                 var center = new Vector3(0f, -0.007400334f, 0.3679641f);
@@ -87,8 +101,15 @@ namespace FCS_HomeSolutions.Mods.TrashReceptacle.Buildable
 
         protected override RecipeData GetBlueprintRecipe()
         {
-            return Mod.TrashReceptacleIngredients;
-        }
+            return new RecipeData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TrashReceptacleKitClassID.ToTechType(), 1),
+            }
+        };
+    }
 
         protected override Sprite GetItemSprite()
         {

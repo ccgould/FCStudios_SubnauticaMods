@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using FCS_AlterraHub.API;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
@@ -9,7 +10,6 @@ using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Mods.Cabinets.Mono;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
@@ -25,19 +25,27 @@ namespace FCS_HomeSolutions.Mods.Cabinets.Buildable
     internal class Cabinet3Buildable : SMLHelper.V2.Assets.Buildable
     {
         private GameObject _locker;
+        private readonly GameObject _prefab;
+        internal const string Cabinet3ClassID = "CabinetTall";
+        internal const string Cabinet3Friendly = "Tall Vertical Cabinet";
+        internal const string Cabinet3Description = "A stylish furniture piece for storage and decoration";
+        internal const string Cabinet3PrefabName = "FCS_Cabinet_03";
+        internal static string Cabinet3KitClassID = $"{Cabinet3ClassID}_Kit";
 
-        public Cabinet3Buildable() : base(Mod.Cabinet3ClassID, Mod.Cabinet3Friendly, Mod.Cabinet3Description)
+        public Cabinet3Buildable() : base(Cabinet3ClassID, Cabinet3Friendly, Cabinet3Description)
         {
+            _prefab = ModelPrefab.GetPrefabFromGlobal(Cabinet3PrefabName);
+
             _locker = Resources.Load<GameObject>("Submarine/Build/Locker");
 
             OnStartedPatching += () =>
             {
-                var miniFountainKit = new FCSKit(Mod.Cabinet3KitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
+                var miniFountainKit = new FCSKit(Cabinet3KitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 miniFountainKit.Patch();
             };
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.Cabinet3KitClassID.ToTechType(), 6000, StoreCategory.Home);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Cabinet3KitClassID.ToTechType(), 6000, StoreCategory.Home);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
             };
         }
@@ -46,7 +54,7 @@ namespace FCS_HomeSolutions.Mods.Cabinets.Buildable
         {
             try
             {
-                var prefab = GameObject.Instantiate(ModelPrefab.Cabinet3Prefab);
+                var prefab = GameObject.Instantiate(_prefab);
                 GameObject container = GameObject.Instantiate(_locker);
 
                 // Update container renderers
@@ -134,7 +142,7 @@ namespace FCS_HomeSolutions.Mods.Cabinets.Buildable
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(Mod.Cabinet3KitClassID.ToTechType(), 1)
+                    new Ingredient(Cabinet3KitClassID.ToTechType(), 1)
                 }
             };
             return customFabRecipe;

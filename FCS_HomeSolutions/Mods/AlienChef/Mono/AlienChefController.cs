@@ -35,7 +35,7 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.AlienChiefTabID, Mod.ModPackID);
+            //FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.AlienChiefTabID, Mod.ModPackID);
         }
 
         private void OnEnable()
@@ -54,7 +54,7 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
 
             if (_fromSave)
             {
-                _colorManager.ChangeColor(_saveData.Fcs.Vector4ToColor());
+                _colorManager.LoadTemplate(_saveData.ColorTemplate);
                 RefreshUI();
                 _fromSave = false;
             }
@@ -117,9 +117,9 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
         {
             if (!Mod.IsSaving())
             {
-                QuickLogger.Info($"Saving {Mod.AlienChefFriendly}");
-                Mod.Save(serializer);
-                QuickLogger.Info($"Saved {Mod.AlienChefFriendly}");
+                //QuickLogger.Info($"Saving {Mod.AlienChefFriendly}");
+                //Mod.Save(serializer);
+                //QuickLogger.Info($"Saved {Mod.AlienChefFriendly}");
             }
         }
 
@@ -176,7 +176,7 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
             }
 
             _saveData.Id = id;
-            _saveData.Fcs = _colorManager.GetColor().ColorToVector4();
+            _saveData.ColorTemplate= _colorManager.SaveTemplate();
             //_saveData.Bytes = StorageSystem.Save(serializer);
             newSaveData.AlienChiefDataEntries.Add(_saveData);
         }
@@ -194,9 +194,9 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
             }
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
 
         public bool HasPowerToConsume()

@@ -1,7 +1,6 @@
-﻿using FCS_AlterraHomeSolutions.Mono.PaintTool;
-using FCS_AlterraHub.Buildables;
-using FCS_AlterraHub.Extensions;
+﻿using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Configuration;
@@ -45,8 +44,7 @@ namespace FCS_HomeSolutions.Mods.Shower.Mono
 
             if (_fromSave)
             {
-                _colorManager.ChangeColor(_saveData.Fcs.Vector4ToColor());
-                _colorManager.ChangeColor(_saveData.Secondary.Vector4ToColor(), ColorTargetMode.Secondary);
+                _colorManager.LoadTemplate(_saveData.ColorTemplate);
                 _fromSave = false;
             }
         }
@@ -80,7 +78,7 @@ namespace FCS_HomeSolutions.Mods.Shower.Mono
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseSecondaryCol, gameObject, new Color(0.8f, 0.4933333f, 0f));
             MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseDecalsEmissiveController, gameObject,  2.5f);
 
-            _colorManager.ChangeColor(new Color(0.8f, 0.4933333f, 0f), ColorTargetMode.Secondary);
+            _colorManager.ChangeColor(new ColorTemplate{SecondaryColor = new Color(0.8f, 0.4933333f, 0f) });
             
             IsInitialized = true;
             
@@ -91,9 +89,9 @@ namespace FCS_HomeSolutions.Mods.Shower.Mono
         {
             if (!Mod.IsSaving())
             {
-                QuickLogger.Info($"Saving {Mod.AlienChefFriendly}");
+                QuickLogger.Info($"Saving {ShowerBuildable.ShowerFriendly}");
                 Mod.Save(serializer);
-                QuickLogger.Info($"Saved {Mod.AlienChefFriendly}");
+                QuickLogger.Info($"Saved {ShowerBuildable.ShowerFriendly}");
             }
         }
 
@@ -112,15 +110,15 @@ namespace FCS_HomeSolutions.Mods.Shower.Mono
                 _saveData = new ShowerDataEntry();
             }
             _saveData.Id = id;
-            _saveData.Fcs = _colorManager.GetColor().ColorToVector4();
-            _saveData.Secondary = _colorManager.GetSecondaryColor().ColorToVector4();
+            _saveData.ColorTemplate = _colorManager.SaveTemplate();
+
 
             newSaveData.ShowerEntries.Add(_saveData);
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
 
         public override bool CanDeconstruct(out string reason)

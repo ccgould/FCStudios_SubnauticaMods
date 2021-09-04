@@ -173,8 +173,6 @@ namespace FCS_AlterraHub.Objects
             new Vec4(0.3f,0.3f,0.3f,1f),
         };
         
-
-
         public static void AddColor(Color color, string colorName = "N/A")
         {
             var vec4Color = color.ColorToVector4();
@@ -200,8 +198,6 @@ namespace FCS_AlterraHub.Objects
             Colors.Add(vec4Color, colorName);
             QuickLogger.Info($"Added new color to ColorsList: {color}");
         }
-
-
 
         public static Vec4 ConvertColor(Vec4 color)
         {
@@ -258,5 +254,6 @@ namespace FCS_AlterraHub.Objects
         {
             return (string)Colors[currentVec4];
         }
+
     }
 }

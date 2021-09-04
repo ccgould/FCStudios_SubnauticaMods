@@ -60,7 +60,7 @@ namespace FCS_EnergySolutions.Mods.AlterraGen.Mono
                         ReadySaveData();
                     }
 
-                    _colorManager.ChangeColor(_savedData.Body.Vector4ToColor());
+                    _colorManager.LoadTemplate(_savedData.ColorTemplate);
                     PowerManager.LoadFromSave(_savedData);
                 }
 
@@ -139,13 +139,13 @@ namespace FCS_EnergySolutions.Mods.AlterraGen.Mono
             return _prefabID;
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
 #if DEBUG
             QuickLogger.Debug($"Changing AlterraGen color to {ColorList.GetName(color)}",true);
 #endif
 
-           return _colorManager.ChangeColor(color,mode);
+           return _colorManager.ChangeColor(template);
         }
         
         public override bool CanBeStored(int amount, TechType techType)
@@ -221,7 +221,7 @@ namespace FCS_EnergySolutions.Mods.AlterraGen.Mono
             _savedData.Id = GetPrefabID();
 
             QuickLogger.Debug($"Saving ID {_savedData.Id}",true);
-            _savedData.Body = _colorManager.GetColor().ColorToVector4();
+            _savedData.ColorTemplate = _colorManager.SaveTemplate();
             _savedData.Storage = PowerManager.GetItemsWithin();
             _savedData.ToConsume = PowerManager.GetToConsume();
             _savedData.PowerState = PowerManager.PowerState;

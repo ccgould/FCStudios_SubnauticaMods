@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
@@ -68,7 +69,7 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
 
                     if (_savedData != null)
                     { 
-                        _colorManager.ChangeColor(_savedData.Body.Vector4ToColor());
+                        _colorManager.LoadTemplate(_savedData.ColorTemplate);
                         _isFromSave = false;
                     }
                 }
@@ -182,8 +183,6 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
             }
 
             _savedData.Id = GetPrefabID();
-            _savedData.Body = _colorManager.GetColor().ColorToVector4();
-            //_savedData.Data = _storage.Save(serializer);
             QuickLogger.Debug($"Saving ID {_savedData.Id}");
             newSaveData.FEXRDataEntries.Add(_savedData);
         }
@@ -300,9 +299,9 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
             
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
 
         private void ReadySaveData()

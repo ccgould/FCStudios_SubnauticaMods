@@ -136,9 +136,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
                     if (SavedData != null)
                     {
-                        _colorManager.ChangeColor(SavedData.BodyColor.Vector4ToColor());
-                        _colorManager.ChangeColor(SavedData.SecondaryColor.Vector4ToColor(),ColorTargetMode.Secondary);
-                        _colorManager.ChangeColor(SavedData.EmissionColor.Vector4ToColor(),ColorTargetMode.Emission);
+                        _colorManager.LoadTemplate(SavedData.ColorTemplate);
                     }
                 }
 
@@ -534,9 +532,9 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
 
         public void OnHandHover(GUIHand hand)

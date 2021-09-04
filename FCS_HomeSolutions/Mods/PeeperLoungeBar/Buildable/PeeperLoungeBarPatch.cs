@@ -19,7 +19,13 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
 {
     internal class PeeperLoungeBarPatch : DecorationEntryPatch
     {
-        public PeeperLoungeBarPatch() : base(Mod.PeeperLoungeBarClassId, Mod.PeeperLoungeBarFriendly, Mod.PeeperLoungeBarDescription, ModelPrefab.GetPrefab(Mod.PeeperLoungeBarPrefabName, true), new Settings
+        internal const string PeeperLoungeBarClassId = "ahsSweetWaterBar";
+        internal const string PeeperLoungeBarFriendly = "Peeper Lounge Bar";
+        internal const string PeeperLoungeBarDescription = "All drinks on the house.";
+        internal const string PeeperLoungeBarPrefabName = "PeeperLoungeBar";
+        internal static string PeeperLoungeBarKitClassID = $"{PeeperLoungeBarClassId}_Kit";
+
+        public PeeperLoungeBarPatch() : base(PeeperLoungeBarClassId, PeeperLoungeBarFriendly, PeeperLoungeBarDescription, ModelPrefab.GetPrefab(PeeperLoungeBarPrefabName, true), new Settings
         {
             KitClassID = "ahsSweetWaterBar_kit",
             AllowedInBase = true,

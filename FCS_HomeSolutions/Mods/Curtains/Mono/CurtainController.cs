@@ -6,6 +6,7 @@ using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Managers;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
@@ -53,8 +54,8 @@ namespace FCS_HomeSolutions.Mods.Curtains.Mono
                         ReadySaveData();
                     }
 
-                    _colorManager.ChangeColor(_savedData.Fcs.Vector4ToColor());
-                    _colorManager.ChangeColor(_savedData.Secondary.Vector4ToColor(), ColorTargetMode.Secondary);
+                    _colorManager.LoadTemplate(_savedData.ColorTemplate);
+
                     if (_savedData.SelectedTexturePath != null && QPatch.Patterns.ContainsKey(_savedData.SelectedTexturePath))
                     {
                         LoadImage(QPatch.Patterns[_savedData.SelectedTexturePath]);
@@ -147,8 +148,7 @@ namespace FCS_HomeSolutions.Mods.Curtains.Mono
             }
 
             _savedData.Id = GetPrefabID();
-            _savedData.Fcs = _colorManager.GetColor().ColorToVector4();
-            _savedData.Secondary = _colorManager.GetSecondaryColor().ColorToVector4();
+            _savedData.ColorTemplate = _colorManager.SaveTemplate();
             _savedData.SelectedTexturePath = _selectedImagePath;
             _savedData.IsOpen = _animationHandler.GetBoolHash(_isOpen);
             QuickLogger.Debug($"Saving ID {_savedData.Id}");
@@ -209,9 +209,9 @@ namespace FCS_HomeSolutions.Mods.Curtains.Mono
             _animationHandler.SetBoolHash(_isOpen, !_animationHandler.GetBoolHash(_isOpen));
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
     }
 

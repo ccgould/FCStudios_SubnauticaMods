@@ -2,6 +2,7 @@
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Configuration;
@@ -42,9 +43,7 @@ namespace FCS_HomeSolutions.Buildables
                         ReadySaveData();
                     }
 
-                    _colorManager.ChangeColor(_savedData.Fcs.Vector4ToColor());
-                    _colorManager.ChangeColor(_savedData.Secondary.Vector4ToColor(),ColorTargetMode.Secondary);
-                    _colorManager.ChangeColor(_savedData.Emission.Vector4ToColor(),ColorTargetMode.Emission);
+                    _colorManager.LoadTemplate(_savedData.ColorTemplate);
                 }
 
                 _runStartUpOnEnable = false;
@@ -100,9 +99,7 @@ namespace FCS_HomeSolutions.Buildables
             }
 
             _savedData.Id = GetPrefabID();
-            _savedData.Fcs = _colorManager.GetColor().ColorToVector4();
-            _savedData.Secondary = _colorManager.GetSecondaryColor().ColorToVector4();
-            _savedData.Emission = _colorManager.GetLumColor().ColorToVector4();
+            _savedData.ColorTemplate = _colorManager.SaveTemplate();
             QuickLogger.Debug($"Saving ID {_savedData.Id}");
             newSaveData.DecorationEntries.Add(_savedData);
         }
@@ -140,9 +137,9 @@ namespace FCS_HomeSolutions.Buildables
             }
         }
 
-        public override bool ChangeBodyColor(Color color,ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color,mode);
+            return _colorManager.ChangeColor(template);
         }
     }
 }

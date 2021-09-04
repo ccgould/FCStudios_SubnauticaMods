@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
+using FCS_HomeSolutions.Mods.QuantumTeleporter.Buildable;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Mono;
 using FCS_HomeSolutions.Mods.SeaBreeze.Buildable;
 using FCS_HomeSolutions.Mods.SeaBreeze.Mono;
@@ -35,7 +36,7 @@ namespace FCS_HomeSolutions.Configuration
         [ConsoleCommand("setallglobal")]
         public static string SetAllGlobal(bool setGlobal)
         {
-            foreach (KeyValuePair<string, FcsDevice> device in FCSAlterraHubService.PublicAPI.GetRegisteredDevicesOfId(Mod.QuantumTeleporterTabID))
+            foreach (KeyValuePair<string, FcsDevice> device in FCSAlterraHubService.PublicAPI.GetRegisteredDevicesOfId(QuantumTeleporterBuildable.QuantumTeleporterTabID))
             {
                 var controller = device.Value.gameObject.GetComponent<QuantumTeleporterController>();
                 controller.IsGlobal = setGlobal;

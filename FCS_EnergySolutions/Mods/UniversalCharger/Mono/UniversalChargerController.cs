@@ -56,9 +56,7 @@ namespace FCS_EnergySolutions.Mods.UniversalCharger.Mono
                         ReadySaveData();
                     }
 
-                    _colorManager.ChangeColor(_savedData.Body.Vector4ToColor());
-                    _colorManager.ChangeColor(_savedData.SecondaryBody.Vector4ToColor(), ColorTargetMode.Secondary);
-
+                    _colorManager.LoadTemplate(_savedData.ColorTemplate);
                     LoadChargerFromSave();
 
                     _runStartUpOnEnable = false;
@@ -237,16 +235,15 @@ namespace FCS_EnergySolutions.Mods.UniversalCharger.Mono
             _savedData.Id = GetPrefabID();
 
             QuickLogger.Debug($"Saving ID {_savedData.Id}", true);
-            _savedData.Body = _colorManager.GetColor().ColorToVector4();
-            _savedData.SecondaryBody = _colorManager.GetSecondaryColor().ColorToVector4();
+            _savedData.ColorTemplate = _colorManager.SaveTemplate();
             _savedData.ChargerData = PowercellCharger.Save();
             _savedData.Mode = PowercellCharger.GetMode();
             newSaveData.UniversalChargerEntries.Add(_savedData);
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
 
         public override void OnHandHover(GUIHand hand)

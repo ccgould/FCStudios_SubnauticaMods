@@ -8,9 +8,7 @@ using FCS_AlterraHub.Registration;
 using FCS_LifeSupportSolutions.Buildable;
 using FCS_LifeSupportSolutions.Configuration;
 using FCS_LifeSupportSolutions.Mods.MiniMedBay.mono;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 #if SUBNAUTICA

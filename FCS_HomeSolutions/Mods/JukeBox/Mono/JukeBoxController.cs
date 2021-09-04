@@ -2,9 +2,11 @@
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Configuration;
+using FCS_HomeSolutions.Mods.JukeBox.Buildable;
 using FCS_HomeSolutions.Mods.JukeBox.Spectrum;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -44,7 +46,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.JukeBoxTabID, Mod.ModPackID);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, JukeBoxBuildable.JukeBoxTabID, Mod.ModPackID);
             _baseJukeBox = Manager.Habitat.GetComponent<BaseJukeBox>();
             RegisterDevice();
         }
@@ -178,9 +180,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
                         ReadySaveData();
                     }
 
-                    _colorManager.ChangeColor(_savedData.Primary.Vector4ToColor());
-                    _colorManager.ChangeColor(_savedData.Secondary.Vector4ToColor(), ColorTargetMode.Secondary);
-                    _colorManager.ChangeColor(_savedData.Emission.Vector4ToColor(), ColorTargetMode.Emission);
+                    _colorManager.LoadTemplate(_savedData.ColorTemplate);
                     _volumeSlider.value = _savedData.Volume;
                     _audio.volume = _savedData.Volume;
                     _volumePercentage.text = CalculateVolumePercentage();
@@ -383,17 +383,15 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
             }
 
             _savedData.Id = GetPrefabID();
-            _savedData.Primary = _colorManager.GetColor().ColorToVector4();
-            _savedData.Secondary = _colorManager.GetSecondaryColor().ColorToVector4();
-            _savedData.Emission = _colorManager.GetLumColor().ColorToVector4();
+            _savedData.ColorTemplate = _colorManager.SaveTemplate();
             _savedData.Volume = _audio.volume;
             QuickLogger.Debug($"Saving ID {_savedData.Id}");
             newSaveData.JukeBoxDataEntries.Add(_savedData);
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
 
         public override float GetPowerUsage()

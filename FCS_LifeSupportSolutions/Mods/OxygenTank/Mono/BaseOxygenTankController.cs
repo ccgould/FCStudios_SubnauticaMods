@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Text;
-using FCS_AlterraHomeSolutions.Mono.PaintTool;
-using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Managers;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_LifeSupportSolutions.Buildable;
@@ -49,8 +48,7 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
                         ReadySaveData();
                     }
 
-                    _colorManager.ChangeColor(_savedData.Body.Vector4ToColor());
-                    _colorManager.ChangeColor(_savedData.SecondaryBody.Vector4ToColor(), ColorTargetMode.Secondary);
+                    _colorManager.LoadTemplate(_savedData.ColorTemplate);
 
                     if (!string.IsNullOrEmpty(_savedData.ParentID))
                         _oxygenAttachPoint.parentPipeUID = _savedData.ParentID;
@@ -149,8 +147,7 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
             }
 
             _savedData.Id = GetPrefabID();
-            _savedData.Body = _colorManager.GetColor().ColorToVector4();
-            _savedData.SecondaryBody = _colorManager.GetSecondaryColor().ColorToVector4();
+            _savedData.ColorTemplate = _colorManager.SaveTemplate();
             _savedData.ParentID = _oxygenAttachPoint.parentPipeUID;
             QuickLogger.Debug($"Saving ID {_savedData.Id}");
             newSaveData.BaseOxygenTankEntries.Add(_savedData);
@@ -162,9 +159,9 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
             _savedData = Mod.GetOxygenTankSaveData(GetPrefabID());
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
 
         public override void OnHandHover(GUIHand hand)

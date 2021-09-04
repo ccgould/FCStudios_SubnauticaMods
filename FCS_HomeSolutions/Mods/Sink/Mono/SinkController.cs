@@ -7,6 +7,7 @@ using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Configuration;
@@ -49,9 +50,7 @@ namespace FCS_HomeSolutions.Mods.Sink.Mono
 
             if (_fromSave)
             {
-                _colorManager.ChangeColor(_saveData.Fcs.Vector4ToColor());
-                _colorManager.ChangeColor(_saveData.Secondary.Vector4ToColor(), ColorTargetMode.Secondary);
-                _colorManager.ChangeColor(_saveData.Emission.Vector4ToColor(), ColorTargetMode.Emission);
+                _colorManager.LoadTemplate(_saveData.ColorTemplate);
                 _fromSave = false;
             }
         }
@@ -110,16 +109,15 @@ namespace FCS_HomeSolutions.Mods.Sink.Mono
                 _saveData = new DecorationDataEntry();
             }
             _saveData.Id = id;
-            _saveData.Fcs = _colorManager.GetColor().ColorToVector4();
-            _saveData.Secondary = _colorManager.GetSecondaryColor().ColorToVector4();
-            _saveData.Emission = _colorManager.GetLumColor().ColorToVector4();
+            _saveData.ColorTemplate = _colorManager.SaveTemplate();
+
 
             newSaveData.DecorationEntries.Add(_saveData);
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
 
         public override bool CanDeconstruct(out string reason)

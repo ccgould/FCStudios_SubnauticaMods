@@ -71,9 +71,6 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Mono
                 case "RenameBTN":
                     _mono.NameController.Show();
                     break;
-                case "ColorItem":
-                    _mono.GetColorManager().ChangeColor((Color) tag);
-                    break;
                 case "HomeBTN":
                     GotoPage(SeaBreezePages.HomePage);
                     break;

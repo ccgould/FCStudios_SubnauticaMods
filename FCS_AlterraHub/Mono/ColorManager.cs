@@ -1,7 +1,10 @@
 ﻿using System;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
+using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Model;
 using FCSCommon.Helpers;
+using FCSCommon.Utilities;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Mono
@@ -10,13 +13,13 @@ namespace FCS_AlterraHub.Mono
     {
         private string _bodyMaterial;
         private GameObject _gameObject;
-        public Action<Color> OnColorChanged;
         private string _bodySecondary;
         private Color _currentColor = Color.white;
         private Color _currentSecondaryColor = Color.white;
         private Color _currentLumColor = Color.white;
         private string _lumMaterial;
-        
+        private ColorTemplate _currentTemplate;
+
 
         public void Initialize(GameObject gameObject, string bodyMaterial, string secondaryMaterial = "",
             string lumControllerMaterial = "")
@@ -26,12 +29,7 @@ namespace FCS_AlterraHub.Mono
             _bodySecondary = secondaryMaterial;
             _lumMaterial = lumControllerMaterial;
         }
-
-        public Color GetColor()
-        {
-            return _currentColor;
-        }
-
+        
         public Color GetColor(ColorTargetMode mode)
         {
             switch (mode)
@@ -47,65 +45,44 @@ namespace FCS_AlterraHub.Mono
             return _currentColor;
         }
 
-        public bool ChangeColor(Color color,ColorTargetMode mode = ColorTargetMode.Primary)
+        public bool ChangeColor(ColorTemplate template)
         {
-            bool result = false;
 
-            //if (GetColor(mode) == color) return result; //Disabled to allow paint to be used even when the object already has the color.
-            switch (mode)
+            bool result;
+
+            if (template == null) return false;
+
+            try
             {
-                case ColorTargetMode.Primary:
-                    result = MaterialHelpers.ChangeMaterialColor(_bodyMaterial, _gameObject, color);
-                    _currentColor = color;
-                    break;
-
-                case ColorTargetMode.Secondary:
-                    result = !string.IsNullOrWhiteSpace(_bodySecondary) && MaterialHelpers.ChangeMaterialColor(_bodySecondary, _gameObject, color);
-                    _currentSecondaryColor = color;
-                    break;
-
-                case ColorTargetMode.Both:
-                    result = MaterialHelpers.ChangeMaterialColor(_bodyMaterial, _gameObject, color);
-
-                    if (!string.IsNullOrWhiteSpace(_bodySecondary))
-                    {
-
-                        var secResult = MaterialHelpers.ChangeMaterialColor(_bodySecondary, _gameObject, color);
-                        if (secResult)
-                        {
-                            result = secResult;
-                        }
-                    }
-
-                    _currentColor = color;
-                    _currentSecondaryColor = color;
-
-                    break;
-
-                case ColorTargetMode.Emission:
-
-                    if (!string.IsNullOrWhiteSpace(_lumMaterial) || _currentLumColor != color)
-                    {
-                        var emissionResult = MaterialHelpers.ChangeEmissionColor(_lumMaterial, _gameObject, color);
-                        _currentLumColor = color;
-                        OnColorChanged?.Invoke(color);
-                        return true;
-                    }
-                    break;
+                _currentTemplate = template;
+                MaterialHelpers.ChangeMaterialColor(_bodyMaterial, _gameObject, template.PrimaryColor);
+                MaterialHelpers.ChangeMaterialColor(_bodySecondary, _gameObject, template.SecondaryColor);
+                MaterialHelpers.ChangeEmissionColor(_lumMaterial, _gameObject, template.EmissionColor);
+                result = true;
             }
-
-            OnColorChanged?.Invoke(color);
+            catch (Exception e)
+            {
+                QuickLogger.Error(e.StackTrace);
+                QuickLogger.Error(e.Message);
+                result = false;
+            }
             return result;
         }
 
-        public Color GetSecondaryColor()
+
+        public ColorTemplate GetTemplate()
         {
-            return _currentSecondaryColor;
+            return _currentTemplate;
         }
 
-        public Color GetLumColor()
+        public void LoadTemplate(ColorTemplateSave colorTemplate)
         {
-            return _currentLumColor;
+            ChangeColor(colorTemplate.ToColorTemplate());
+        }
+
+        public ColorTemplateSave SaveTemplate()
+        {
+            return _currentTemplate.ToColorTemplate();
         }
     }
 }

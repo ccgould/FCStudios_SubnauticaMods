@@ -1,6 +1,4 @@
-﻿using FCS_AlterraHomeSolutions.Mono.PaintTool;
-using FCS_AlterraHub.Buildables;
-using FCS_AlterraHub.Extensions;
+﻿using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_LifeSupportSolutions.Configuration;
@@ -69,8 +67,8 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
                     }
 
                     OxygenManager.SetO2Level(_savedData.O2Level);
-                    _colorManager.ChangeColor(_savedData.Body.Vector4ToColor());
-                    _colorManager.ChangeColor(_savedData.SecondaryBody.Vector4ToColor(), ColorTargetMode.Secondary);
+                    _colorManager.LoadTemplate(_savedData.ColorTemplate);
+
                 }
 
                 _runStartUpOnEnable = false;
@@ -234,8 +232,7 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
 
             _savedData.Id = GetPrefabID();
             _savedData.O2Level = OxygenManager.GetO2Level();
-            _savedData.Body = _colorManager.GetColor().ColorToVector4();
-            _savedData.SecondaryBody = _colorManager.GetSecondaryColor().ColorToVector4();
+            _savedData.ColorTemplate = _colorManager.SaveTemplate();
             QuickLogger.Debug($"Saving ID {_savedData.Id}");
             newSaveData.BaseUtilityUnitEntries.Add(_savedData);
         }
@@ -246,9 +243,9 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
             _savedData = Mod.GetBaseUtilityUnitSaveData(GetPrefabID());
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
 
         public override void TurnOffDevice()

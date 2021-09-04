@@ -1,11 +1,16 @@
-﻿using FCS_AlterraHomeSolutions.Mono.PaintTool;
+﻿using System.Collections.Generic;
+using System.Linq;
+using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Objects;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
+using FCS_HomeSolutions.Mods.PaintTool.Mono;
+using FCS_HomeSolutions.Mods.PaintTool.Spawnable;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,24 +21,23 @@ namespace FCS_HomeSolutions.Mods.PaintTool
     {
         private BoxCollider _collider;
         private const float Range = 10f;
-        private Image _colorRing;
+        private Image _primaryColorRing;
         private Text _amountLbl;
-        private Color _currentColor;
         private int _paintCanFillAmount;
-        private int _currentIndex;
-        private GameObject _liquid;
         private bool _isFromSave;
         private PaintToolDataEntry _savedData;
         private string _prefabID;
         private Text _mode;
         private Text _currentIndexLBL;
         private Text _colorNameLbl;
-        private Image _selectedColor;
         private ColorTargetMode _colorTargetMode = ColorTargetMode.Primary;
         private Text _totalColorsLBL;
-        private int _numberColorTargetModeTypes;
-        private int _painterModeIndex = 1;
         private TechType _validFuelTechType;
+        private ColorTemplate _currentTemplate;
+        private List<ColorTemplate> _currentTemplates = new();
+        private int _currentTemplateIndex;
+        private Image _secondaryColorRing;
+        private Image _emissionColorRing;
         internal bool IsInitialized { get; set; }
 
         public override string animToolName => TechType.Scanner.AsString(true);
@@ -41,19 +45,61 @@ namespace FCS_HomeSolutions.Mods.PaintTool
         private void Initialize()
         {
             if (IsInitialized) return;
-            _validFuelTechType = Mod.PaintCanClassID.ToTechType();
-            _numberColorTargetModeTypes = System.Enum.GetValues(typeof(ColorTargetMode)).Length;
+
+            _currentTemplates = new List<ColorTemplate>
+            {
+                new ColorTemplate
+                {
+                    PrimaryColor = Color.white,
+                    SecondaryColor = new Color(0.1882353f, 0.1843137f, 0.1803922f, 1f),
+                    EmissionColor = Color.cyan
+                },
+                new ColorTemplate
+                {
+                    PrimaryColor = new Color(0.1882353f, 0.1843137f, 0.1803922f, 1f),
+                    SecondaryColor = new Color(0.1882353f, 0.1843137f, 0.1803922f, 1f),
+                    EmissionColor = Color.red
+                },
+                new ColorTemplate
+                {
+                    PrimaryColor = new Color(0.1882353f, 0.1843137f, 0.1803922f, 1f),
+                    SecondaryColor = new Color(0.1882353f, 0.1843137f, 0.1803922f, 1f),
+                    EmissionColor = Color.magenta
+                },
+                new ColorTemplate(),
+                new ColorTemplate(),
+                new ColorTemplate(),
+                new ColorTemplate(),
+                new ColorTemplate(),
+                new ColorTemplate(),
+                new ColorTemplate(),
+                new ColorTemplate(),
+                new ColorTemplate(),
+                new ColorTemplate(),
+                new ColorTemplate(),
+                new ColorTemplate(),
+                new ColorTemplate(),
+                new ColorTemplate(),
+                new ColorTemplate(),
+            };
+
+            _validFuelTechType = PaintCanSpawnable.PaintCanClassID.ToTechType();
+
             _collider = gameObject.GetComponent<BoxCollider>();
-            _colorRing = GameObjectHelpers.FindGameObject(gameObject, "ColorFill").GetComponent<Image>();
+            _primaryColorRing = GameObjectHelpers.FindGameObject(gameObject, "PrimaryColorFill").GetComponent<Image>();
+            _secondaryColorRing = GameObjectHelpers.FindGameObject(gameObject, "SecondaryColorFill").GetComponent<Image>();
+            _emissionColorRing = GameObjectHelpers.FindGameObject(gameObject, "EmissionColorFill").GetComponent<Image>();
             _amountLbl = GameObjectHelpers.FindGameObject(gameObject, "Amount").GetComponent<Text>();
-            _selectedColor = GameObjectHelpers.FindGameObject(gameObject, "SelectedColor").GetComponent<Image>();
+            
             _colorNameLbl = GameObjectHelpers.FindGameObject(gameObject, "ColorName").GetComponent<Text>();
             _currentIndexLBL = GameObjectHelpers.FindGameObject(gameObject, "CurrentIndex").GetComponent<Text>();
             _totalColorsLBL = GameObjectHelpers.FindGameObject(gameObject, "TotalColors").GetComponent<Text>();
             _mode = GameObjectHelpers.FindGameObject(gameObject, "Mode").GetComponent<Text>();
-            _liquid = GameObjectHelpers.FindGameObject(gameObject, "liquid");
+
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
+
             Mod.RegisterPaintTool(this);
-            ChangeColor(Color.black);
+            ChangeColor(new ColorTemplate());
             RefreshUI();
             IsInitialized = true;
         }
@@ -79,12 +125,13 @@ namespace FCS_HomeSolutions.Mods.PaintTool
                 }
 
                 _paintCanFillAmount = _savedData.Amount;
-                _currentColor = _savedData.Fcs.Vector4ToColor();
-                _colorTargetMode = _savedData.ColorTargetMode == 0 ? ColorTargetMode.Primary : _savedData.ColorTargetMode;
-                _painterModeIndex = (int) _colorTargetMode;
+                _currentTemplate = _savedData.ColorTemplate.ToColorTemplate();
+                if(_savedData.ColorTemplates != null)
+                    _currentTemplates = _savedData.ColorTemplates.ToListOfColorTemplates();
+                _currentTemplateIndex = _savedData.CurrentTemplateIndex;
 
-                ChangeColor(_currentColor);
-                _currentIndex = ColorList.GetColorIndex(_currentColor);
+                ChangeColor(_currentTemplates.ElementAt(_currentTemplateIndex));
+
                 RefreshUI();
                 _isFromSave = false;
             }
@@ -92,36 +139,40 @@ namespace FCS_HomeSolutions.Mods.PaintTool
 
         private void Update()
         {
-            //TODO use the % operator to replace this watch unity videoplayer  tut in your youTube lib
-            if (base.isDrawn && Input.GetKeyDown(QPatch.Configuration.PaintToolSelectColorForwardKeyCode))
+            if (uGUI_PaintToolColorPicker.Main != null && !uGUI_PaintToolColorPicker.Main.IsOpen())
             {
-                _currentIndex += 1;
-
-                if (_currentIndex > ColorList.GetCount() - 1)
+                //TODO use the % operator to replace this watch unity videoplayer  tut in your youTube lib
+                if (base.isDrawn && Input.GetKeyDown(QPatch.Configuration.PaintToolSelectColorForwardKeyCode))
                 {
-                    _currentIndex = 0;
+                    _currentTemplateIndex += 1;
+
+                    if (_currentTemplateIndex > _currentTemplates.Count - 1)
+                    {
+                        _currentTemplateIndex = 0;
+                    }
+
+                    ChangeColor(_currentTemplates.ElementAt(_currentTemplateIndex));
                 }
-
-                ChangeColor(ColorList.GetColor(_currentIndex));
-            }
-            else if (base.isDrawn && Input.GetKeyDown(QPatch.Configuration.PaintToolSelectColorBackKeyCode))
-            {
-                _currentIndex -= 1;
-
-                if (_currentIndex < 0)
+                else if (base.isDrawn && Input.GetKeyDown(QPatch.Configuration.PaintToolSelectColorBackKeyCode))
                 {
-                    _currentIndex = ColorList.GetCount() - 1;
-                }
+                    _currentTemplateIndex -= 1;
 
-                ChangeColor(ColorList.GetColor(_currentIndex));
+                    if (_currentTemplateIndex < 0)
+                    {
+                        _currentTemplateIndex = _currentTemplates.Count - 1;
+                    }
+
+                    ChangeColor(_currentTemplates.ElementAt(_currentTemplateIndex));
+                }
+                RefreshUI();
             }
-            RefreshUI();
         }
         
-        private void ChangeColor(Color color)
+        private void ChangeColor(ColorTemplate template)
         {
-            _currentColor = color;
-            MaterialHelpers.ChangeMaterialColor(ModelPrefab.BodyMaterial, _liquid, color);
+            if (template == null) return;
+            _currentTemplate = template;
+            MaterialHelpers.ChangeMaterialColor(AlterraHub.BasePrimaryCol, gameObject, template.PrimaryColor);
         }
 
         private void Reload()
@@ -140,7 +191,7 @@ namespace FCS_HomeSolutions.Mods.PaintTool
             var fcsDevice = go?.GetComponentInParent<FcsDevice>();
             if (fcsDevice != null)
             {
-                var result = fcsDevice.ChangeBodyColor(_currentColor, _colorTargetMode);
+                var result = fcsDevice.ChangeBodyColor(_currentTemplate);
 
                 if (result)
                 {
@@ -156,33 +207,16 @@ namespace FCS_HomeSolutions.Mods.PaintTool
         private void RefreshUI()
         {
             if (!IsInitialized) return;
-            _currentIndexLBL.text = (_currentIndex + 1).ToString();
-            _totalColorsLBL.text = ColorList.GetCount().ToString();
-
-            var currentColorVec4 = _currentColor.ColorToVector4();
-            if (ColorList.Contains(currentColorVec4))
-            {
-                _colorNameLbl.text = ColorList.GetName(currentColorVec4);
-            }
-            else
-            {
-                ResetColor();
-            }
-
-            _selectedColor.color = _currentColor;
+            _currentIndexLBL.text = (_currentTemplateIndex + 1).ToString();
+            _totalColorsLBL.text = _currentTemplates.Count.ToString();
             _mode.text = ((int) _colorTargetMode).ToString();
-            _colorRing.color = _currentColor;
-            _colorRing.fillAmount = _paintCanFillAmount /100f;
+            _primaryColorRing.color = _currentTemplate.PrimaryColor;
+            _secondaryColorRing.color = _currentTemplate.SecondaryColor;
+            _emissionColorRing.color = _currentTemplate.EmissionColor;
+            _primaryColorRing.fillAmount = _paintCanFillAmount /100f;
             _amountLbl.text = _paintCanFillAmount.ToString();
         }
-
-        private void ResetColor()
-        {
-            ChangeColor(Color.black);
-            _currentIndex = 0;
-            _currentColor = Color.black;
-        }
-
+        
         public void OnProtoSerialize(ProtobufSerializer serializer)
         {
             QuickLogger.Debug($"In OnProtoSerialize: Painter Tool");
@@ -230,9 +264,11 @@ namespace FCS_HomeSolutions.Mods.PaintTool
             }
 
             _savedData.Id = GetPrefabID();
-            _savedData.Fcs = _currentColor.ColorToVector4();
+            _savedData.ColorTemplate = _currentTemplate.ToColorTemplate();
+            _savedData.ColorTemplates = _currentTemplates.ToListOfColorTemplatesSaves();
             _savedData.Amount = _paintCanFillAmount;
-            _savedData.ColorTargetMode = _colorTargetMode;
+            _savedData.CurrentTemplateIndex = _currentTemplateIndex;
+
             newSaveData.PaintToolEntries.Add(_savedData);
         }
         
@@ -244,19 +280,13 @@ namespace FCS_HomeSolutions.Mods.PaintTool
 
         public override bool OnAltDown()
         {
-            _painterModeIndex += 1;
 
-            if (_painterModeIndex <= _numberColorTargetModeTypes)
+            uGUI_PaintToolColorPicker.Main.Open(this,(template,index) =>
             {
-                _colorTargetMode = (ColorTargetMode)_painterModeIndex;
-            }
-            else
-            {
-                _painterModeIndex = 1;
-                _colorTargetMode = (ColorTargetMode)_painterModeIndex;
-            }
-
-            QuickLogger.Info($"[Painter Tool] Mode: {GetTargetModeString(_colorTargetMode)}",true);
+                QuickLogger.Debug($"P Color: {template.PrimaryColor} | S Color: {template.SecondaryColor} | E Color: {template.EmissionColor}",true);
+                _currentTemplate = template;
+                _currentTemplateIndex = index;
+            });
 
             return true;
         }
@@ -321,7 +351,29 @@ namespace FCS_HomeSolutions.Mods.PaintTool
 
         public override string GetCustomUseText()
         {
-            return $"Press Change Colors ({QPatch.Configuration.PaintToolSelectColorBackKeyCode})/({QPatch.Configuration.PaintToolSelectColorForwardKeyCode}) | Use Paint Can: {GameInput.GetBindingName(GameInput.Button.Reload, GameInput.BindingSet.Primary)} | Change Mode: {GameInput.GetBindingName(GameInput.Button.AltTool, GameInput.BindingSet.Primary)}";
+            return $"Press Change Colors ({QPatch.Configuration.PaintToolSelectColorBackKeyCode})/({QPatch.Configuration.PaintToolSelectColorForwardKeyCode}) | Use Paint Can: {GameInput.GetBindingName(GameInput.Button.Reload, GameInput.BindingSet.Primary)} | Change Template: {GameInput.GetBindingName(GameInput.Button.AltTool, GameInput.BindingSet.Primary)}";
+        }
+
+        public List<ColorTemplate> GetTemplates()
+        {
+            return _currentTemplates;
+        }
+
+        public int GetCurrentSelectedTemplateIndex()
+        {
+            return _currentTemplateIndex;
+        }
+        public void UpdateTemplates(int templateIndex, ColorTemplate colorTemplate)
+        {
+            if (_currentTemplates.Count < templateIndex + 1)
+            {
+                var amountToCreate = templateIndex + 1 -  _currentTemplates.Count;
+                for (int i = 0; i < amountToCreate; i++)
+                {
+                    _currentTemplates.Add(new ColorTemplate());
+                }
+            }
+            _currentTemplates[templateIndex] = colorTemplate;
         }
     }
 }

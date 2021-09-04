@@ -2,6 +2,7 @@
 using FCS_AlterraHub.Helpers;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Patches;
+using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -93,7 +94,9 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
 
         public void OnPointerHover(PointerEventData eventData)
         {
-            if(!WorldHelpers.CheckIfInRange(gameObject,Player.main.gameObject,1)) return;
+            if(_controller == null || !_controller.IsOperational || !WorldHelpers.CheckIfInRange(gameObject,Player.main.gameObject,1)) return;
+
+
             var main = HandReticle.main;
 
             if (!_controller.IsOperational || !_controller.Manager.HasEnoughPower(FCSElevatorController.POWERUSAGE))
@@ -111,7 +114,7 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (!_controller.IsOperational || !WorldHelpers.CheckIfInRange(gameObject, Player.main.gameObject, 1) || !_controller.Manager.HasEnoughPower(FCSElevatorController.POWERUSAGE)) return;
+            if (_controller == null || !_controller.IsOperational || !_controller.PlatformTrigger.IsPlayerInside || !WorldHelpers.CheckIfInRange(gameObject, Player.main.gameObject, 1) || !_controller.Manager.HasEnoughPower(FCSElevatorController.POWERUSAGE)) return;
             ElevatorHUD.Main.Show(_controller);
         }
     }

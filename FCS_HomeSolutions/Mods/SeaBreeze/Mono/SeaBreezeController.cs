@@ -82,9 +82,7 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Mono
                     PowerManager.LoadSave(_savedData.PowercellData, _savedData.HasBreakerTripped);
                     StartCoroutine( FridgeComponent.LoadSave(_savedData.FridgeContainer));
                     NameController.SetCurrentName(_savedData.UnitName);
-                    _colorManager.ChangeColor(_savedData.Body.Vector4ToColor());
-                    _colorManager.ChangeColor(_savedData.Secondary.Vector4ToColor(),ColorTargetMode.Secondary);
-                    _colorManager.ChangeColor(_savedData.Emission.Vector4ToColor(),ColorTargetMode.Emission);
+                    _colorManager.LoadTemplate(_savedData.ColorTemplate);
                     QuickLogger.Info($"Loaded {SeaBreezeBuildable.SeaBreezeFriendly}");
                 }
 
@@ -304,9 +302,7 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Mono
             }
              
             _savedData.Id = id;
-            _savedData.Body = _colorManager.GetColor().ColorToVector4();
-            _savedData.Secondary = _colorManager.GetSecondaryColor().ColorToVector4();
-            _savedData.Emission = _colorManager.GetLumColor().ColorToVector4();
+            _savedData.ColorTemplate = _colorManager.SaveTemplate();
             _savedData.UnitName = NameController.GetCurrentName();
             _savedData.FridgeContainer = FridgeComponent.Save();
             _savedData.PowercellData = PowerManager.Save();
@@ -314,9 +310,9 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Mono
             newSaveData.SeaBreezeDataEntries.Add(_savedData);
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
 
         public void ClearSeaBreeze()

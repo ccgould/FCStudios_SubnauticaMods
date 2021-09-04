@@ -313,25 +313,6 @@ namespace FCS_StorageSolutions.Configuration
             return new DSSServerDataEntry() { ID = id };
         }
 
-        internal static DSSFormattingStationDataEntry GetDSSFormattingStationSaveData(string id)
-        {
-            LoadData();
-
-            var saveData = GetSaveData();
-
-            foreach (var entry in saveData.DSSFormattingStationDataEntries)
-            {
-                if (string.IsNullOrEmpty(entry.ID)) continue;
-
-                if (entry.ID == id)
-                {
-                    return entry;
-                }
-            }
-
-            return new DSSFormattingStationDataEntry() { ID = id };
-        }
-
         internal static DSSItemDisplayDataEntry GetDSSItemDisplaySaveData(string id)
         {
             LoadData();

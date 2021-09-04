@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using FCS_AlterraHub.Interfaces;
-using FCS_AlterraHub.Objects;
-using FCSCommon.Interfaces;
+using FCS_AlterraHub.Model;
 #if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
 #else
@@ -17,8 +16,7 @@ namespace FCS_LifeSupportSolutions.Configuration
         public string Id { get; set; }
         public string BaseId { get; set; }
         [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
-        [JsonProperty] internal Vec4 Body { get; set; }
-        [JsonProperty] internal Vec4 SecondaryBody { get; set; }
+        [JsonProperty] internal ColorTemplateSave ColorTemplate { get; set; }
     }      
     
     internal class BaseUtilityEntry : ISaveDataEntry
@@ -26,8 +24,7 @@ namespace FCS_LifeSupportSolutions.Configuration
         public string Id { get; set; }
         public string BaseId { get; set; }
         [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
-        [JsonProperty] internal Vec4 Body { get; set; }
-        [JsonProperty] internal Vec4 SecondaryBody { get; set; }
+        [JsonProperty] internal ColorTemplateSave ColorTemplate { get; set; }
         [JsonProperty] internal float O2Level { get; set; }
     }
     internal class BaseOxygenTankEntry : ISaveDataEntry
@@ -35,8 +32,7 @@ namespace FCS_LifeSupportSolutions.Configuration
         public string Id { get; set; }
         public string BaseId { get; set; }
         [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
-        [JsonProperty] internal Vec4 Body { get; set; }
-        [JsonProperty] internal Vec4 SecondaryBody { get; set; }
+        [JsonProperty] internal ColorTemplateSave ColorTemplate { get; set; }
         [JsonProperty] internal float O2Level { get; set; }
         [JsonProperty] internal string ParentID { get; set;}
     }    
@@ -46,8 +42,7 @@ namespace FCS_LifeSupportSolutions.Configuration
         public string Id { get; set; }
         public string BaseId { get; set; }
         [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
-        [JsonProperty] internal Vec4 Body { get; set; }
-        [JsonProperty] internal Vec4 SecondaryBody { get; set; }
+        [JsonProperty] internal ColorTemplateSave ColorTemplate { get; set; }
         [JsonProperty] internal int FirstAidCount { get; set; }
         [JsonProperty] internal float TimeToSpawn { get; set; }
     }
@@ -55,9 +50,9 @@ namespace FCS_LifeSupportSolutions.Configuration
     [Serializable]
     internal class SaveData
     {
-        [JsonProperty] internal List<EnergyPillVendingMachineEntry> EnergyPillVendingMachineEntries = new List<EnergyPillVendingMachineEntry>();
-        [JsonProperty] internal List<MiniMedBayEntry> MiniMedBayEntries = new List<MiniMedBayEntry>();
-        [JsonProperty] internal List<BaseUtilityEntry> BaseUtilityUnitEntries = new List<BaseUtilityEntry>();
-        [JsonProperty] internal List<BaseOxygenTankEntry> BaseOxygenTankEntries = new List<BaseOxygenTankEntry>();
+        [JsonProperty] internal List<EnergyPillVendingMachineEntry> EnergyPillVendingMachineEntries = new();
+        [JsonProperty] internal List<MiniMedBayEntry> MiniMedBayEntries = new();
+        [JsonProperty] internal List<BaseUtilityEntry> BaseUtilityUnitEntries = new();
+        [JsonProperty] internal List<BaseOxygenTankEntry> BaseOxygenTankEntries = new();
     }
 }

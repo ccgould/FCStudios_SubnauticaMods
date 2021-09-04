@@ -2,10 +2,12 @@
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
+using FCS_HomeSolutions.Mods.Cabinets.Buildable;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -21,7 +23,7 @@ namespace FCS_HomeSolutions.Mods.Cabinets.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.CabinetTabID, Mod.ModPackID);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Cabinet1Buildable.CabinetTabID, Mod.ModPackID);
         }
 
         private void Update()
@@ -47,8 +49,7 @@ namespace FCS_HomeSolutions.Mods.Cabinets.Mono
 
             if (_fromSave)
             {
-                _colorManager.ChangeColor(_saveData.Fcs.Vector4ToColor());
-                _colorManager.ChangeColor(_saveData.Secondary.Vector4ToColor(),ColorTargetMode.Secondary);
+                _colorManager.LoadTemplate(_saveData.ColorTemplate);
                 _labelController?.SetText(!string.IsNullOrWhiteSpace(_saveData.Label) ? _saveData.Label : "Locker");
 
                 _fromSave = false;
@@ -129,15 +130,14 @@ namespace FCS_HomeSolutions.Mods.Cabinets.Mono
                 _saveData = new CabinetDataEntry();
             }
             _saveData.Id = id;
-            _saveData.Fcs = _colorManager.GetColor().ColorToVector4();
-            _saveData.Secondary = _colorManager.GetSecondaryColor().ColorToVector4();
+            _saveData.ColorTemplate = _colorManager.SaveTemplate();
             _saveData.Label = _labelController?.GetText();
             newSaveData.CabinetDataEntries.Add(_saveData);
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
 
         public override bool CanDeconstruct(out string reason)

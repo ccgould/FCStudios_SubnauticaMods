@@ -159,7 +159,7 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
                         ToggleBreakerState();
                     }
                     MotorHandler.SpeedByPass(_savedData.RPM);
-                    _colorManager.ChangeColor(_savedData.Fcs.Vector4ToColor(),ColorTargetMode.Both);
+                    _colorManager.LoadTemplate(_savedData.ColorTemplate);
                 }
 
                 _runStartUpOnEnable = false;
@@ -399,7 +399,7 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
             _savedData.OreQueue = _oreQueue;
             _savedData.TimeLeft = _timeLeft;
             _savedData.RPM = MotorHandler.GetRPM();
-            _savedData.Fcs = _colorManager.GetColor().ColorToVector4();
+            _savedData.ColorTemplate = _colorManager.SaveTemplate();
             _savedData.BaseId = BaseId;
             _savedData.IsBreakerTripped = _isBreakerTripped;
             QuickLogger.Debug($"Saving ID {_savedData.Id}", true);
@@ -412,9 +412,9 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
             _savedData = Mod.GetOreConsumerDataEntrySaveData(GetPrefabID());
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color,mode);   
+            return _colorManager.ChangeColor(template);   
         }
 
         public override void OnHandHover(GUIHand hand)

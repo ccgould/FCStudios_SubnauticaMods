@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Objects;
 using FCS_HomeSolutions.Mods.Elevator.Mono;
-using FCS_HomeSolutions.Mods.NeonPlanter;
 using FCS_HomeSolutions.Mods.NeonPlanter.Mono;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Enumerators;
 using FCS_HomeSolutions.Mods.Stove.Mono;
@@ -21,9 +19,7 @@ namespace FCS_HomeSolutions.Configuration
     internal class DecorationDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
-        [JsonProperty(PropertyName = "SCOL")] internal Vec4 Secondary { get; set; }
-        [JsonProperty(PropertyName = "ECOL")] internal Vec4 Emission { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
         [JsonProperty(PropertyName = "VOL")] internal float Volume { get; set; }
         [JsonProperty(PropertyName = "Path")] internal string Video { get; set; }
         [JsonProperty(PropertyName = "IsOn")] internal bool IsOn { get; set; }
@@ -33,8 +29,7 @@ namespace FCS_HomeSolutions.Configuration
     internal class CurtainDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
-        [JsonProperty(PropertyName = "SCOL")] internal Vec4 Secondary { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
         public string SelectedTexturePath { get; set; }
         [JsonProperty] internal bool IsOpen { get; set; }
     }
@@ -44,17 +39,16 @@ namespace FCS_HomeSolutions.Configuration
     internal class PaintToolDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
         [JsonProperty(PropertyName = "A")] internal int Amount { get; set; }
-        [JsonProperty(PropertyName = "PTM")] internal ColorTargetMode ColorTargetMode { get; set; }
+        public List<ColorTemplateSave> ColorTemplates { get; set; }
+        public int CurrentTemplateIndex { get; set; }
     }
     
     internal class PlanterDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
-        [JsonProperty(PropertyName = "SCOL")] internal Vec4 Secondary { get; set; }
-        [JsonProperty(PropertyName = "LUMCOL")] internal Vec4 Lum { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
         [JsonProperty]  internal byte[] Bytes { get; set; }
         [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
         public IEnumerable<PlantData> PlantAges { get; set; }
@@ -63,7 +57,7 @@ namespace FCS_HomeSolutions.Configuration
     internal class MiniFountainFilterDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal Vec4 Body { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
         [JsonProperty] internal float TankLevel { get; set; }
         [JsonProperty] internal int ContainerAmount { get; set; }
         [JsonProperty] internal bool IsInSub { get; set; }
@@ -77,9 +71,7 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty] internal List<EatableEntities> FridgeContainer { get; set; }
         [JsonProperty] internal bool HasBreakerTripped { get; set; }
         [JsonProperty] internal string UnitName { get; set; }
-        [JsonProperty] internal Vec4 Body { get; set; }
-        [JsonProperty] internal Vec4 Secondary { get; set; }
-        [JsonProperty] internal Vec4 Emission { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
         [JsonProperty] internal PowercellData PowercellData { get; set; }
         [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
 
@@ -88,8 +80,7 @@ namespace FCS_HomeSolutions.Configuration
     internal class TrashRecyclerDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
-        [JsonProperty(PropertyName = "SCOL")] internal Vec4 Secondary { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
         [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
         public bool IsRecycling { get; set; }
         public float CurrentTime { get; set; }
@@ -100,9 +91,7 @@ namespace FCS_HomeSolutions.Configuration
     internal class QuantumTeleporterDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
-        [JsonProperty(PropertyName = "SCOL")] internal Vec4 Secondary { get; set; }
-        [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
         [JsonProperty] internal string UnitName { get; set; }
         [JsonProperty] internal bool IsGlobal { get; set; }
         [JsonProperty] internal QTTeleportTypes SelectedTab { get; set; }
@@ -113,35 +102,26 @@ namespace FCS_HomeSolutions.Configuration
     internal class BaseOperatorDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
-        [JsonProperty(PropertyName = "SCOL")] internal Vec4 Secondary { get; set; }
-        [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
     }       
     
     internal class ShowerDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
-        [JsonProperty(PropertyName = "SCOL")] internal Vec4 Secondary { get; set; }
-        public bool ShowerDoorState { get; set; }
-        public bool ToiletDoorState { get; set; }
-        public bool IsShowerOn { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
     }       
     
     internal class ObservationTankDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal Vec4 Body { get; set; }
-        [JsonProperty(PropertyName = "SCOL")] internal Vec4 Secondary { get; set; }
-        [JsonProperty(PropertyName = "ECOL")] internal Vec4 Emission { get; set; }
-        [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
     }
 
 
     internal class SignDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal Vec4 Body { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
         [JsonProperty(PropertyName = "ADir")] internal Vec4 ArrowDirection { get; set; }
         [JsonProperty(PropertyName = "SignName")] internal string SignName { get; set; }
     }
@@ -150,47 +130,39 @@ namespace FCS_HomeSolutions.Configuration
     internal class CabinetDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
-        [JsonProperty(PropertyName = "SCOL")] internal Vec4 Secondary { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
         [JsonProperty]  internal string Label { get; set; }
     }
     
     internal class AlienChiefDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
-        [JsonProperty(PropertyName = "SCOL")] internal Vec4 Secondary { get; set; }
-        [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
-        [JsonProperty(PropertyName = "Data")] internal byte[] Bytes { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
     }    
     
     internal class FEXRDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal Vec4 Body { get; set; }
-        [JsonProperty(PropertyName = "ECOL")] internal Vec4 Emission { get; set; }
-        [JsonProperty(PropertyName = "Data")] internal byte[] Data { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
     }
 
     internal class PeeperLoungeBarEntry
     {
         [JsonProperty] internal string Id { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal Vec4 Body { get; set; }
-        public string BaseId { get; set; }
+        public ColorTemplate ColorTemplate { get; set; }
     }
 
     internal class TrashReceptacleDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal Vec4 Body { get; set; }
         public string BaseId { get; set; }
-        [JsonProperty(PropertyName = "COLSEC")]  internal  Vec4 BodySecondary { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
     }
 
     internal class LedLightDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
-        [JsonProperty(PropertyName = "LUM")] internal Vec4 Lum { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
         [JsonProperty(PropertyName = "ROT")] internal Vec4 Rotation { get; set; }
         [JsonProperty] internal float Intensity { get; set; }
         [JsonProperty] internal bool NightSensor { get; set; }
@@ -201,8 +173,7 @@ namespace FCS_HomeSolutions.Configuration
     internal class HologramDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
-        [JsonProperty(PropertyName = "SCOL")] internal Vec4 Secondary { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
         public string SelectedTexturePath { get; set; }
     }
 
@@ -210,8 +181,7 @@ namespace FCS_HomeSolutions.Configuration
     internal class ElevatorDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
-        [JsonProperty] internal Vec4 Primary { get; set; }
-        [JsonProperty] internal Vec4 Secondary { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
         [JsonProperty] internal Dictionary<string, ElevatorFloorData> FloorData { get; set; }
         [JsonProperty] internal string CurrentFloorId { get; set; }
         [JsonProperty] internal float PlateformPosition { get; set; }
@@ -223,9 +193,7 @@ namespace FCS_HomeSolutions.Configuration
     internal class JukeBoxDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
-        [JsonProperty] internal Vec4 Primary { get; set; }
-        [JsonProperty] internal Vec4 Secondary { get; set; }
-        [JsonProperty] internal Vec4 Emission { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
         [JsonProperty] internal float Volume { get; set; }
     }
 
@@ -233,10 +201,7 @@ namespace FCS_HomeSolutions.Configuration
     internal class StoveDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
-        [JsonProperty] internal Vec4 Primary { get; set; }
-        [JsonProperty] internal Vec4 Secondary { get; set; }
-        [JsonProperty] internal Vec4 Emission { get; set; }
-        [JsonProperty] internal float TimeStartCooking { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
         [JsonProperty] internal Tuple<Queue<Cooker.CookingQueue>, float> QueuedItems { get; set; }
     }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mods.Global.Spawnables;
 using FCS_AlterraHub.Registration;
@@ -8,6 +9,7 @@ using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Assets;
+using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 #if SUBNAUTICA
@@ -20,6 +22,7 @@ namespace FCS_HomeSolutions.Mods.PaintTool.Spawnable
 {
     internal class PaintToolSpawnable : Equipable
     {
+        private readonly GameObject _prefab;
         public override EquipmentType EquipmentType => EquipmentType.Hand;
         public override string AssetsFolder => Mod.GetAssetPath();
         public override QuickSlotType QuickSlotType => QuickSlotType.Selectable;
@@ -27,11 +30,22 @@ namespace FCS_HomeSolutions.Mods.PaintTool.Spawnable
         public override TechGroup GroupForPDA => TechGroup.Personal;
         public override TechCategory CategoryForPDA => TechCategory.Tools;
 
-        public PaintToolSpawnable() : base(Mod.PaintToolClassID, Mod.PaintToolFriendly, Mod.PaintToolDescription)
+        internal const string PaintToolClassID = "PaintTool";
+        internal const string PaintToolFriendly = "Alterra Paint Tool";
+
+        internal const string PaintToolDescription =
+            "Change the color of Primary and Secondary surfaces, and LED lights (requires Paint Can). Only suitable for Alterra FCStudios products.";
+
+        internal const string PaintToolPrefabName = "FCS_PaintTool";
+        internal const string PaintToolKitClassID = "PaintTool_Kit";
+
+
+        public PaintToolSpawnable() : base(PaintToolClassID, PaintToolFriendly, PaintToolDescription)
         {
+            _prefab = ModelPrefab.GetPrefab(PaintToolPrefabName);
             OnFinishedPatching += () =>
             {
-                var paintToolKit = new FCSKit(Mod.PaintToolKitClassID, Mod.PaintToolFriendly, Path.Combine(AssetsFolder, $"{ClassID}.png"));
+                var paintToolKit = new FCSKit(PaintToolKitClassID, PaintToolFriendly, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 paintToolKit.Patch();
                 FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, TechType,1,7500, StoreCategory.Home,true);
             };
@@ -41,7 +55,7 @@ namespace FCS_HomeSolutions.Mods.PaintTool.Spawnable
         {
             try
             {
-                var prefab = GameObject.Instantiate(ModelPrefab.PaintToolPrefab);
+                var prefab = GameObject.Instantiate(_prefab);
                 
                 prefab.SetActive(false);
 
@@ -109,8 +123,15 @@ namespace FCS_HomeSolutions.Mods.PaintTool.Spawnable
         
         protected override RecipeData GetBlueprintRecipe()
         {
-            return Mod.PaintToolIngredients;
-        }
+            return new RecipeData
+            {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(PaintToolKitClassID.ToTechType(), 1),
+            }
+        };
+    }
 
         protected override Sprite GetItemSprite()
         {

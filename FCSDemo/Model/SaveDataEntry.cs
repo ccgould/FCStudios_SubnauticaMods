@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using FCS_AlterraHub.Objects;
+using FCS_AlterraHub.Model;
 using Oculus.Newtonsoft.Json;
 
-namespace Model
+namespace FCSDemo.Model
 {
     [Serializable]
     internal class SaveDataEntry
     {
         [JsonProperty] internal string ID { get; set; }
-        [JsonProperty] internal Vec4 Body { get; set; }
+        [JsonProperty] internal ColorTemplateSave ColorTemplate { get; set; }
     }
 
     [Serializable]

@@ -2,11 +2,12 @@
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Objects;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using Model;
+using FCSDemo.Model;
 using UnityEngine;
 
 namespace FCSDemo.Mono
@@ -101,24 +102,19 @@ namespace FCSDemo.Mono
 
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            QuickLogger.Info($"Changing material {AlterraHub.BasePrimaryCol} color to {ColorList.GetName(color)}",true);
             
-            var result = _colorManager.ChangeColor(color, mode);
+            var result = _colorManager.ChangeColor(template);
 
-            if(result && mode == ColorTargetMode.Emission)
+            var lights = gameObject.GetComponentsInChildren<Light>();
+            if (lights != null)
             {
-                var lights = gameObject.GetComponentsInChildren<Light>();
-                if (lights != null)
+                foreach (Light light in lights)
                 {
-                    foreach (Light light in lights)
-                    {
-                        light.color = color;
-                    }
+                    light.color = template.EmissionColor;
                 }
             }
-
             return result;
 
         }

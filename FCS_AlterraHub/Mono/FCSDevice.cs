@@ -5,6 +5,7 @@ using System.Text;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Interfaces;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mods.FCSPDA.Mono;
 using FCS_AlterraHub.Registration;
 using FCSCommon.Utilities;
@@ -164,7 +165,7 @@ namespace FCS_AlterraHub.Mono
         /// Changes the body color of the device
         /// </summary>
         /// <param name="color"></param>
-        public virtual bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public virtual bool ChangeBodyColor(ColorTemplate template)
         {
             QuickLogger.ModMessage("I don't have any color changing abilities");
             return false;

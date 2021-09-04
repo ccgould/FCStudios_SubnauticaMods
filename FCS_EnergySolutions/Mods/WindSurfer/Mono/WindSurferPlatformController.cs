@@ -83,7 +83,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
             _savedData.Id = GetPrefabID();
 
             QuickLogger.Debug($"Saving ID {_savedData.Id}", true);
-            //_savedData.Body = _colorManager.GetColor().ColorToVector4();
+            //_savedData.Body = _colorManager.SaveTemplate();
             _savedData.BaseId = BaseId;
             _savedData.Position = transform.position.ToVec3();
             _savedData.Rotation = transform.rotation.QuaternionToVec4();

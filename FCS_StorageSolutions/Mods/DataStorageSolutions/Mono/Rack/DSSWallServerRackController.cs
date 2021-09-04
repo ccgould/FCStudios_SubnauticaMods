@@ -36,9 +36,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             base.Save(newSaveData, serializer);
 
             SavedData.ID = GetPrefabID();
-            SavedData.BodyColor = _colorManager.GetColor().ColorToVector4();
-            SavedData.SecondaryColor = _colorManager.GetSecondaryColor().ColorToVector4();
-            //SavedData.Slot1 = Save(serializer);
+            SavedData.ColorTemplate = _colorManager.SaveTemplate();
             newSaveData.DSSWallServerRackDataEntries.Add(SavedData);
             QuickLogger.Debug($"Saving ID {SavedData.ID}", true);
         }

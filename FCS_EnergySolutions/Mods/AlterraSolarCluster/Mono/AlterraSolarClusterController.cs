@@ -2,6 +2,7 @@
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Objects;
 using FCS_AlterraHub.Registration;
@@ -56,7 +57,7 @@ namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
                     {
                         BaseId = _savedData.BaseId;
                     }
-                    _colorManager.ChangeColor(_savedData.Body.Vector4ToColor());
+                    _colorManager.LoadTemplate(_savedData.ColorTemplate);
                     _powerManager.SetPower(_savedData.StoredPower);
                 }
 
@@ -131,13 +132,13 @@ namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
             IsInitialized = true;
         }
         
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
 #if DEBUG
             QuickLogger.Debug($"Changing Alterra Solar Cluster color to {ColorList.GetName(color)}", true);
 #endif
 
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
 
         #endregion
@@ -198,7 +199,7 @@ namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
             _savedData.Id = GetPrefabID();
 
             QuickLogger.Debug($"Saving ID {_savedData.Id}", true);
-            _savedData.Body = _colorManager.GetColor().ColorToVector4();
+            _savedData.ColorTemplate = _colorManager.SaveTemplate();
             _savedData.BaseId = BaseId;
             _savedData.StoredPower = _powerManager.GetStoredPower();
             newSaveData.AlterraSolarClusterEntries.Add(_savedData);

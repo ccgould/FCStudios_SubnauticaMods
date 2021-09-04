@@ -4,6 +4,7 @@ using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mods.Global.Spawnables;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
@@ -134,9 +135,7 @@ namespace FCS_HomeSolutions.Spawnables
                         ReadySaveData();
                     }
 
-                    _colorManager.ChangeColor(_savedTankData.Body.Vector4ToColor());
-                    _colorManager.ChangeColor(_savedTankData.Secondary.Vector4ToColor(), ColorTargetMode.Secondary);
-                    _colorManager.ChangeColor(_savedTankData.Emission.Vector4ToColor(), ColorTargetMode.Emission);
+                    _colorManager.LoadTemplate(_savedTankData.ColorTemplate);
                 }
 
                 _runStartUpOnEnable = false;
@@ -214,9 +213,9 @@ namespace FCS_HomeSolutions.Spawnables
             }
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
 
         public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)
@@ -229,9 +228,7 @@ namespace FCS_HomeSolutions.Spawnables
             }
 
             _savedTankData.Id = GetPrefabID();
-            _savedTankData.Body = _colorManager.GetColor().ColorToVector4();
-            _savedTankData.Secondary = _colorManager.GetSecondaryColor().ColorToVector4();
-            _savedTankData.Emission = _colorManager.GetLumColor().ColorToVector4();
+            _savedTankData.ColorTemplate = _colorManager.SaveTemplate();
             QuickLogger.Debug($"Saving ID {_savedTankData.Id}");
             newSaveData.ObservationTankDataEntries.Add(_savedTankData);
         }

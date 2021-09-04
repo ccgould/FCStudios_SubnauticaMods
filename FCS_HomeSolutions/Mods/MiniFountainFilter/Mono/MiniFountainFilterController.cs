@@ -62,7 +62,7 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Mono
             if (_fromSave)
             {
                 TankManager.SetTankLevel(_data.TankLevel);
-                _colorManager.ChangeColor(_data.Body.Vector4ToColor());
+                _colorManager.LoadTemplate(_data.ColorTemplate);
                 StorageManager.NumberOfBottles = _data.ContainerAmount;
                 _isInSub = _data.IsInSub;
                 QuickLogger.Info($"Loaded {MiniFountainFilterBuildable.MiniFountainFilterFriendly}");
@@ -203,7 +203,7 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Mono
                 _saveData = new MiniFountainFilterDataEntry();
             }
             _saveData.Id = id;
-            _saveData.Body = _colorManager.GetColor().ColorToVector4();
+            _saveData.ColorTemplate = _colorManager.SaveTemplate();
             _saveData.TankLevel = TankManager.GetTankLevel();
             _saveData.ContainerAmount = StorageManager.NumberOfBottles;
             _saveData.IsInSub = _isInSub;
@@ -265,9 +265,9 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Mono
             }
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
 
         public override void OnHandHover(GUIHand hand)

@@ -1,10 +1,12 @@
 ﻿using System;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Extensions;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
+using FCS_HomeSolutions.Mods.TrashReceptacle.Buildable;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -20,7 +22,7 @@ namespace FCS_HomeSolutions.Mods.TrashReceptacle.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.TrashReceptacleTabID, Mod.ModPackID);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, TrashReceptaclePatch.TrashReceptacleTabID, Mod.ModPackID);
         }
 
         private void OnEnable()
@@ -38,7 +40,7 @@ namespace FCS_HomeSolutions.Mods.TrashReceptacle.Mono
                 {
                     ReadySaveData();
                 }
-                _colorManager.ChangeColor(_savedData.Body.Vector4ToColor());
+                _colorManager.LoadTemplate(_savedData.ColorTemplate);
             }
 
             _runStartUpOnEnable = false;
@@ -62,8 +64,8 @@ namespace FCS_HomeSolutions.Mods.TrashReceptacle.Mono
             if(!IsInitialized || Manager == null) return;
             var main = HandReticle.main;
             main.SetIcon(HandReticle.IconType.Info);
-            main.SetInteractText( Manager.DeviceBuilt(Mod.RecyclerTabID)
-                ? AuxPatchers.ClickToOpenRecycle(Mod.TrashReceptacleFriendly)
+            main.SetInteractText( Manager.DeviceBuilt(TrashReceptaclePatch.TrashReceptacleTabID)
+                ? AuxPatchers.ClickToOpenRecycle(TrashReceptaclePatch.TrashReceptacleFriendly)
                 : AuxPatchers.NoRecyclerConnected());
         }
 
@@ -71,7 +73,7 @@ namespace FCS_HomeSolutions.Mods.TrashReceptacle.Mono
         {
             if (!IsInitialized || Manager == null) return;
 
-            if (Manager.DeviceBuilt(Mod.RecyclerTabID))
+            if (Manager.DeviceBuilt(TrashReceptaclePatch.TrashReceptacleTabID))
             {
                 _dumpContainer.OpenStorage();
             }
@@ -108,9 +110,9 @@ namespace FCS_HomeSolutions.Mods.TrashReceptacle.Mono
         {
             if (!Mod.IsSaving())
             {
-                QuickLogger.Info($"Saving {Mod.AlienChefFriendly}");
+                QuickLogger.Info($"Saving {TrashReceptaclePatch.TrashReceptacleFriendly}");
                 Mod.Save(serializer);
-                QuickLogger.Info($"Saved {Mod.AlienChefFriendly}");
+                QuickLogger.Info($"Saved {TrashReceptaclePatch.TrashReceptacleFriendly}");
             }
         }
 
@@ -148,9 +150,9 @@ namespace FCS_HomeSolutions.Mods.TrashReceptacle.Mono
             }
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
 
         public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)
@@ -166,8 +168,7 @@ namespace FCS_HomeSolutions.Mods.TrashReceptacle.Mono
             _savedData.Id = GetPrefabID();
 
             QuickLogger.Debug($"Saving ID {_savedData.Id}", true);
-            _savedData.Body = _colorManager.GetColor().ColorToVector4();
-            _savedData.BodySecondary = _colorManager.GetSecondaryColor().ColorToVector4();
+            _savedData.ColorTemplate = _colorManager.SaveTemplate();
             _savedData.BaseId = BaseId;
             newSaveData.TrashReceptacleEntries.Add(_savedData);
         }

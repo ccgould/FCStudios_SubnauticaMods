@@ -75,7 +75,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
                         ReadySaveData();
                     }
 
-                    _colorManager.ChangeColor(_savedData.Body.Vector4ToColor(), ColorTargetMode.Both);
+                    _colorManager.LoadTemplate(_savedData.ColorTemplate);
                     _labelText.text = _savedData.StorageName;
                     _nameController.SetCurrentName(_savedData.StorageName);
                 }
@@ -316,7 +316,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
             }
 
             _savedData.ID = GetPrefabID();
-            _savedData.Body = _colorManager.GetColor().ColorToVector4();
+            _savedData.ColorTemplate = _colorManager.SaveTemplate();
             _savedData.StorageName = _nameController.GetCurrentName();
             newSaveData.AlterraStorageDataEntries.Add(_savedData);
             QuickLogger.Debug($"Saving ID {_savedData.ID}", true);
@@ -401,9 +401,9 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
             return _storageContainer.container.count;
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
 
         public override int GetMaxStorage()

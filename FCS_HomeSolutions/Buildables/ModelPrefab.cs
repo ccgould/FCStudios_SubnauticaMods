@@ -34,27 +34,16 @@ namespace FCS_HomeSolutions.Buildables
         internal static string DetailTexture => $"{Mod.ModPackID}_D";
         public static AssetBundle GlobalBundle { get; set; }
         public static AssetBundle ModBundle { get; set; }
-        internal static GameObject PaintToolPrefab { get; set; }
-        internal static GameObject BaseOperatorPrefab { get; set; }
         public static GameObject SeaBreezeItemPrefab { get; set; }
-        public static GameObject TrashReceptaclePrefab { get; set; }
-        public static GameObject TrashRecyclerPrefab { get; set; }
-        public static GameObject PaintCanPrefab { get; set; }
-        public static GameObject QuantumTeleporterPrefab { get; set; }
         public static GameObject NetworkItemPrefab { get; set; }
         public static GameObject TemplateItem { get; set; }
         public static GameObject TrashRecyclerItemPrefab { get; set; }
         public static GameObject CurtainPrefab { get; set; }
-        public static GameObject Cabinet1Prefab { get; set; }
-        public static GameObject Cabinet2Prefab { get; set; }
-        public static GameObject Cabinet3Prefab { get; set; }
         public static GameObject CookerItemPrefab { get; set; }
         public static GameObject CookerOrderItemPrefab { get; set; }
         public static GameObject ObservationTankPrefab { get; set; }
         public static GameObject FireExtinguisherRefuelerPrefab { get; set; }
         public static GameObject HologramPosterPrefab { get; set; }
-        public static GameObject JukeboxSpeakerPrefab { get; set; }
-        public static GameObject JukeboxPrefab { get; set; }
 
         internal static void Initialize()
         {
@@ -72,20 +61,12 @@ namespace FCS_HomeSolutions.Buildables
 
             //LoadFMod();
 
-            PaintToolPrefab = GetPrefab(Mod.PaintToolPrefabName);
-            ElevatorFloorItemPrefab = GetPrefab("NewFloorItem",false,false);
-            TVVideoBTNPrefab = GetPrefab("TVVideoBTN", false,false);
+            ElevatorFloorItemPrefab = GetPrefab("NewFloorItem",false);
+            TVVideoBTNPrefab = GetPrefab("TVVideoBTN", false);
             PlatformFloorFrame = GetPrefab("PlatformFloorFrame", true);
             ElevatorPrefab = GetPrefab(Mod.ElevatorPrefabName, true);
-            ElevatorUIPrefab = GetPrefab("ElevatorUI", false,false);
+            ElevatorUIPrefab = GetPrefab("ElevatorUI", false);
             HologramPosterPrefab = GetPrefab(Mod.HologramPosterPrefabName,true);
-            TrashReceptaclePrefab = GetPrefab(Mod.TrashReceptaclePrefabName);
-            TrashRecyclerPrefab = GetPrefab(Mod.RecyclerPrefabName);
-            PaintCanPrefab = GetPrefab(Mod.PaintCanPrefabName);
-            QuantumTeleporterPrefab = GetPrefab(Mod.QuantumTeleporterPrefabName,true);
-            Cabinet1Prefab = GetPrefab(Mod.Cabinet1PrefabName);
-            Cabinet2Prefab = GetPrefab(Mod.Cabinet2PrefabName);
-            Cabinet3Prefab = GetPrefab(Mod.Cabinet3PrefabName);
             FireExtinguisherRefuelerPrefab = GetPrefab(Mod.FireExtinguisherRefuelerPrefabName);
             ObservationTankPrefab = GetPrefab(Mod.EmptyObservationTankPrefabName);
             TrashRecyclerItemPrefab = GetPrefab("RecyclerItem");
@@ -95,28 +76,17 @@ namespace FCS_HomeSolutions.Buildables
             CurtainPrefab = GetPrefab("Curtain");
             CookerItemPrefab = GetPrefab("CookerItem");
             CookerOrderItemPrefab = GetPrefab("OrderItem");
-            JukeboxPrefab = GetPrefab("JukeBox", true);
-            JukeboxSpeakerPrefab = GetPrefab("JukeBoxSpeaker", true);
-
             _initialized = true;
         }
         
-        internal static GameObject GetPrefab(string prefabName, bool isV2 = false, bool applyShaders = true)
+        internal static GameObject GetPrefab(string prefabName, bool applyShaders = true)
         {
             try
             {
                 GameObject prefabGo;
 
                 QuickLogger.Debug($"Getting Prefab: {prefabName}");
-                if (isV2)
-                {
-                    if (!LoadAssetV2(prefabName, ModBundle, out prefabGo, applyShaders)) return null;
-                }
-                else
-                {
-                    if (!LoadAsset(prefabName, ModBundle, out prefabGo, applyShaders)) return null;
-                }
-                
+                if (!LoadAssetV2(prefabName, ModBundle, out prefabGo, applyShaders)) return null;
                 return prefabGo;
             }
             catch (Exception e)
@@ -126,6 +96,11 @@ namespace FCS_HomeSolutions.Buildables
             }
         }
 
+        internal static GameObject GetPrefabFromGlobal(string prefabName)
+        {
+            return FCSAssetBundlesService.PublicAPI.GetPrefabByName(prefabName,
+                FCSAssetBundlesService.PublicAPI.GlobalBundleName);
+        }
         internal static GameObject GetPrefabFromGlobal(string prefabName, bool applyShaders = true)
         {
             try

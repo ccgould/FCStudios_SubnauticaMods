@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
@@ -106,7 +107,7 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
                         ReadySaveData();
                     }
 
-                    _colorManager.ChangeColor(_savedData.Fcs.Vector4ToColor());
+                    _colorManager.LoadTemplate(_savedData.ColorTemplate);
                     
                     _videoSection.ChangeVolume(_savedData.Volume, _savedData.Volume > 0f);
                     
@@ -142,7 +143,7 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
             }
 
             _savedData.Id = GetPrefabID();
-            _savedData.Fcs = _colorManager.GetColor().ColorToVector4();
+            _savedData.ColorTemplate = _colorManager.SaveTemplate();
             _savedData.Volume = _videoSection.GetVolume();
             _savedData.Video = _videoSection.GetCurrentChannel();
             _savedData.IsOn = _isOn;
@@ -288,9 +289,9 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
             }
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
 
         public override void OnHandHover(GUIHand hand)

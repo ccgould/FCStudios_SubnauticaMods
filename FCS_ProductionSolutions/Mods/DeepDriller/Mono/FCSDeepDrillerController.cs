@@ -8,6 +8,7 @@ using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_ProductionSolutions.Buildable;
@@ -104,8 +105,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Mono
                     OreGenerator.Load(_saveData.FocusOres);
                 }
 
-                _colorManager.ChangeColor(_saveData.Body.Vector4ToColor());
-                _colorManager.ChangeColor(_saveData.Sec.Vector4ToColor(), ColorTargetMode.Secondary);
+                _colorManager.LoadTemplate(_saveData.ColorTemplate);
                 CurrentBiome = _saveData.Biome;
                 OilHandler.SetOilTimeLeft(_saveData.OilTimeLeft);
 
@@ -272,8 +272,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Mono
             QuickLogger.Message($"SaveData = {_saveData}", true);
 
             _saveData.Id = GetPrefabID();
-            _saveData.Body = _colorManager.GetColor().ColorToVector4();
-            _saveData.Sec = _colorManager.GetSecondaryColor().ColorToVector4();
+            _saveData.ColorTemplate = _colorManager.SaveTemplate();
 
             _saveData.PowerState = DeepDrillerPowerManager.GetPowerState();
             _saveData.PullFromRelay = DeepDrillerPowerManager.GetPullFromPowerRelay();
@@ -382,7 +381,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Mono
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
                 _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol,AlterraHub.BaseSecondaryCol);
-                _colorManager.ChangeColor(Color.white, ColorTargetMode.Secondary);
+                _colorManager.ChangeColor(new ColorTemplate());
             }
             
             DeepDrillerContainer = new FCSDeepDrillerContainer();
@@ -657,9 +656,9 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Mono
             _isRangeVisible = !_isRangeVisible;
         }
 
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(ColorTemplate template)
         {
-            return _colorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(template);
         }
 
         internal bool IsBreakSet()
