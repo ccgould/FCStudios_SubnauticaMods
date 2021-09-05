@@ -1380,21 +1380,21 @@ namespace FCS_AlterraHub.Mono
                         break;
                     case Base.CellType.MapRoom:
                         if (hardcore)
-                            bigRooms += 1f / 9f;
+                            bigRooms += 0.9f;
                         else
-                            smallRooms += 1f / 9f;
+                            smallRooms += 1f;
                         break;
                     case Base.CellType.MapRoomRotated:
                         if (hardcore)
-                            bigRooms += 1f / 9f;
+                            bigRooms += 0.9f;
                         else
-                            smallRooms += 1f / 9f;
+                            smallRooms += 1f;
                         break;
                     case Base.CellType.Moonpool:
-                        bigRooms += 1f / 12f;
+                        bigRooms += 1.2f;
                         break;
                     case Base.CellType.Room:
-                        bigRooms += 1f / 9f;
+                        bigRooms += 1f;
                         break;
                 }
             }
