@@ -25,6 +25,11 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty(PropertyName = "IsOn")] internal bool IsOn { get; set; }
     }
 
+    internal class StairsDataEntry : DecorationDataEntry
+    {
+        public int ChildCount { get; set; }
+    }
+
     [Serializable]
     internal class CurtainDataEntry
     {
@@ -232,5 +237,6 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty] internal List<ObservationTankDataEntry> ObservationTankDataEntries = new();
         [JsonProperty] internal List<FEXRDataEntry> FEXRDataEntries = new();
         [JsonProperty] internal List<ShowerDataEntry> ShowerEntries = new();
+        [JsonProperty] internal List<StairsDataEntry> StairsEntries = new();
     }
 }

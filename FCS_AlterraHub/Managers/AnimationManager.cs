@@ -20,7 +20,7 @@ namespace FCS_AlterraHub.Managers
         {
             Animator = gameObject?.GetComponent<Animator>() ?? gameObject?.GetComponentInChildren<Animator>();
             if (Animator != null) return true;
-            QuickLogger.Error("Animator component not found on the GameObject.");
+            QuickLogger.DebugError("Animator component not found on the GameObject.");
             return false;
         }
 

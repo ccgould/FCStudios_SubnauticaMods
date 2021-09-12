@@ -23,17 +23,23 @@ namespace FCS_HomeSolutions.Mods.Elevator.Buildable
 {
     internal class ElevatorBuildable : SMLHelper.V2.Assets.Buildable
     {
-        public ElevatorBuildable() : base(Mod.ElevatorClassID, Mod.ElevatorFriendly, Mod.ElevatorDescription)
+        internal const string ElevatorClassID = "Elevator";
+        internal const string ElevatorFriendly = "Elevator";
+        internal const string ElevatorDescription = "Get from one elevation to the next with ease. Even bring your PRAWN suit along so you don’t get lonely.";
+        internal const string ElevatorPrefabName = "Elevator";
+        internal const string ElevatorKitClassID = "Elevator_Kit";
+        internal const string ElevatorTabID = "EV";
+        public ElevatorBuildable() : base(ElevatorClassID, ElevatorFriendly, ElevatorDescription)
         {
 
             OnStartedPatching += () =>
             {
-                var Elevator = new FCSKit(Mod.ElevatorKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
+                var Elevator = new FCSKit(ElevatorKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 Elevator.Patch();
             };
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.ElevatorKitClassID.ToTechType(), 45000, StoreCategory.Home);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, ElevatorKitClassID.ToTechType(), 45000, StoreCategory.Home);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
             };
         }
@@ -112,7 +118,7 @@ namespace FCS_HomeSolutions.Mods.Elevator.Buildable
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(Mod.ElevatorKitClassID.ToTechType(), 1)
+                    new Ingredient(ElevatorKitClassID.ToTechType(), 1)
                 }
             };
             return customFabRecipe;

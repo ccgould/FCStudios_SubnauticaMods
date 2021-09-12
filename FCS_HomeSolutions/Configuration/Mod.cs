@@ -30,30 +30,6 @@ namespace FCS_HomeSolutions.Configuration
 
         internal const string DecorationItemTabId = "DI";
         
-        internal const string ElevatorClassID = "Elevator";
-        internal const string ElevatorFriendly = "Elevator";
-        internal const string ElevatorDescription = "N/A";
-        internal const string ElevatorPrefabName = "Elevator";
-        internal const string ElevatorKitClassID = "Elevator_Kit";
-        internal const string ElevatorTabID = "EV";
-        
-        internal const string FireExtinguisherRefuelerClassID = "FireExtinguisherRefueler";
-        internal const string FireExtinguisherRefuelerFriendly = "Fire Extinguisher Refueler";
-
-        internal const string FireExtinguisherRefuelerDescription =
-            "Use the Fire Extinguisher Refueler to refill any fire extinguisher";
-
-        internal const string FireExtinguisherRefuelerPrefabName = "FireExtinguisherRefueler";
-        internal const string FireExtinguisherRefuelerKitClassID = "FireExtinguisherRefueler_Kit";
-        internal const string FireExtinguisherRefuelerTabID = "FER";
-
-        internal const string HologramPosterClassID = "HologramPoster";
-        internal const string HologramPosterFriendly = "Hologram Poster";
-        internal const string HologramPosterDescription = "N/A";
-        internal const string HologramPosterPrefabName = "HologramPosterSmall";
-        internal static string HologramPosterKitClassID = $"{HologramPosterClassID}_Kit";
-        internal const string HologramPosterTabID = "HGP";
-        
         internal const string EmptyObservationTankClassID = "EmptyObservationTank";
         internal const string EmptyObservationTankFriendly = "Observation Tank";
 
@@ -837,6 +813,25 @@ namespace FCS_HomeSolutions.Configuration
             }
 
             return new JukeBoxDataEntry() {Id = id};
+        }
+
+        public static StairsDataEntry GetStairsEntrySaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.StairsEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new StairsDataEntry() { Id = id };
         }
     }
 }

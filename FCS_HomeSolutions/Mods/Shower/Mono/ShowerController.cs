@@ -12,7 +12,7 @@ namespace FCS_HomeSolutions.Mods.Shower.Mono
         public string TurnOnText { get; set; }= "Turn On Shower";
         private void Update()
         {
-            if (_showerFx != null && _showerFx.isPlaying)
+            if (_showerFx != null)
             {
 
                 if (_showerFx.isPlaying && Mathf.Approximately(Time.timeScale, 0f))

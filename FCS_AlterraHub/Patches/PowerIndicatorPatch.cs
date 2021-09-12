@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Buildables;
+using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Model.GUI;
+using FCS_AlterraHub.Mods.OreConsumer.Mono;
 using FCSCommon.Utilities;
 using HarmonyLib;
-using Oculus.Newtonsoft.Json.Serialization;
 using UnityEngine;
 using UnityEngine.UI;
+using Object = UnityEngine.Object;
 
 namespace FCS_AlterraHub.Patches
 {
@@ -26,7 +29,7 @@ namespace FCS_AlterraHub.Patches
                 {
                     return;
                 }
-                var prefab = GameObject.Instantiate(AlterraHub.MissionMessageBoxPrefab);
+                var prefab = Object.Instantiate(AlterraHub.MissionMessageBoxPrefab);
                 var hudTransform = GameObject.Find("ScreenCanvas").transform.Find("HUD").Find("Content");
                 prefab.transform.SetParent(hudTransform, false);
                 prefab.transform.localPosition = new Vector3(1400.00f, 340.00f, 0f);
@@ -35,7 +38,14 @@ namespace FCS_AlterraHub.Patches
                 prefab.transform.SetSiblingIndex(0);
                 MissionHUD = prefab.AddComponent<MissionHUD>();
 
-                var imageSelectorPrefab = GameObject.Instantiate(AlterraHub.ImageSelectorHUDPrefab);
+                var oreConsumerPrefab = Object.Instantiate(AlterraHub.GetPrefab("uGUI_OreConsumer"));
+
+                oreConsumerPrefab.transform.SetParent(hudTransform, false);
+                oreConsumerPrefab.transform.SetSiblingIndex(0);
+                var oreConsumerHud = oreConsumerPrefab.AddComponent<OreConsumerHUD>();
+                oreConsumerHud.Hide();
+
+                var imageSelectorPrefab = Object.Instantiate(AlterraHub.ImageSelectorHUDPrefab);
 
                 imageSelectorPrefab.transform.SetParent(hudTransform, false);
                 imageSelectorPrefab.transform.localScale = new Vector3(2f,2f,2f);
@@ -52,32 +62,18 @@ namespace FCS_AlterraHub.Patches
         public static MissionHUD MissionHUD { get; set; }
     }
 
-    public class ImageSelectorHUD : MonoBehaviour
+    public class ImageSelectorHUD : uGUI_InputGroup, uGUI_IButtonReceiver
     {
         private System.Action<Texture2D, Atlas.Sprite> _callback;
         private ToggleGroup _toggleGroup;
         private Dictionary<Texture2D, Atlas.Sprite> _images;
         public static ImageSelectorHUD Main;
-        private GameObject _inputDummy;
-        private GameObject inputDummy
-        {
-            get
-            {
-                if (this._inputDummy == null)
-                {
-                    this._inputDummy = new GameObject("InputDummy");
-                    this._inputDummy.SetActive(false);
-                }
-                return this._inputDummy;
-            }
-        }
-        private bool _cursorLockCached;
-        private bool _isOpen;
-        private List<ImageSelectorItem_uGUI> _currentButtons = new ();
 
-        private void Awake()
+        private List<ImageSelectorItem_uGUI> _currentButtons = new();
+        
+        public override void Awake()
         {
-
+            base.Awake();
             if (Main == null)
             {
                 Main = this;
@@ -117,28 +113,41 @@ namespace FCS_AlterraHub.Patches
             }));
         }
 
-        public void Hide()
+        private void Start()
         {
             gameObject.SetActive(false);
-            if(_isOpen)
-            {
-                InterceptInput(false);
-                LockMovement(false);
-            }
+        }
 
-            _isOpen = false;
+        public override void Update()
+        {
+            base.Update();
+            if (focused && GameInput.GetButtonDown(GameInput.Button.PDA))
+            {
+                Hide();
+            }
+        }
+
+        public void Hide()
+        {
+            Deselect();
         }
 
         public void Show(Dictionary<Texture2D, Atlas.Sprite> images, Texture2D selectedImage, System.Action<Texture2D, Atlas.Sprite> onDoneClicked)
         {
-            _isOpen = true;
+            if (Time.timeSinceLevelLoad < 1f)
+            {
+                return;
+            }
+            if (!gameObject.activeInHierarchy)
+            {
+                gameObject.SetActive(true);
+                Select();
+            }
+
             _images = images;
             _callback = onDoneClicked;
             OnLoadDisplay();
-            InterceptInput(true);
-            LockMovement(true);
             SelectWithTexture2D(selectedImage);
-            gameObject.SetActive(true);
         }
 
         private void OnLoadDisplay()
@@ -152,7 +161,7 @@ namespace FCS_AlterraHub.Patches
 
             for (int i = 0; i < _images.Count; i++)
             {
-                GameObject buttonPrefab = GameObject.Instantiate(AlterraHub.ImageSelectorItemPrefab);
+                GameObject buttonPrefab = Instantiate(AlterraHub.ImageSelectorItemPrefab);
                 buttonPrefab.transform.SetParent(_toggleGroup.gameObject.transform, false);
 
                 buttonPrefab.GetComponent<Toggle>().group = _toggleGroup;
@@ -162,28 +171,6 @@ namespace FCS_AlterraHub.Patches
                 uGUI.Initialize(currentElement.Key,currentElement.Value);
                 _currentButtons.Add(uGUI);
             }
-        }
-
-        private void LockMovement(bool state)
-        {
-            FPSInputModule.current.lockMovement = state;
-        }
-
-        private void InterceptInput(bool state)
-        {
-            if (inputDummy.activeSelf == state)
-            {
-                return;
-            }
-            if (state)
-            {
-                InputHandlerStack.main.Push(inputDummy);
-                _cursorLockCached = UWE.Utils.lockCursor;
-                UWE.Utils.lockCursor = false;
-                return;
-            }
-            UWE.Utils.lockCursor = _cursorLockCached;
-            InputHandlerStack.main.Pop(inputDummy);
         }
 
         public void SelectWithTexture2D(Texture2D texture2D)
@@ -200,6 +187,212 @@ namespace FCS_AlterraHub.Patches
                     }
                 }
             }
+        }
+
+        public bool OnButtonDown(GameInput.Button button)
+        {
+            if (button == GameInput.Button.UICancel || button == GameInput.Button.PDA)
+            {
+                Deselect();
+                return true;
+            }
+            return false;
+        }
+
+        public override void OnDeselect()
+        {
+            base.OnDeselect();
+            gameObject.SetActive(false);
+        }
+
+        public override void OnReselect(bool lockMovement)
+        {
+            base.OnReselect(true);
+        }
+    }
+
+    public class OreConsumerHUD : uGUI_InputGroup, uGUI_IButtonReceiver
+    {
+        private GameObject _grid;
+        public static OreConsumerHUD Main;
+        private bool _isOpen;
+        private readonly List<uGUI_FCSDisplayItem> _currentItems = new();
+        private OreConsumerController _sender;
+        private Slider _powerSlider;
+        private Text _powerUsageLabel;
+        private Text _processingItemLabel;
+        private Text _oreValueLabel;
+        private Text _time;
+        private Text _speedValueLabel;
+
+        public override void Update()
+        {
+            base.Update();
+            if (focused && GameInput.GetButtonDown(GameInput.Button.PDA))
+            {
+                Hide();
+            }
+            UpdateScreen();
+        }
+
+        public override void Awake()
+        {
+            base.Awake();
+
+            if (Main == null)
+            {
+                Main = this;
+                DontDestroyOnLoad(this);
+            }
+            else if (Main != null)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            _speedValueLabel = GameObjectHelpers.FindGameObject(gameObject, "SpeedValueLabel").GetComponent<Text>();
+            _oreValueLabel = GameObjectHelpers.FindGameObject(gameObject, "OreValueLabel").GetComponent<Text>();
+
+            _powerSlider = gameObject.GetComponentInChildren<Slider>();
+            _powerSlider.onValueChanged.AddListener((value =>
+            {
+                var asInt = Mathf.RoundToInt(value);
+                var speedMode = (SpeedModes) asInt;
+                _sender?.ChangeSpeedMultiplier(speedMode);
+                ChangeSpeedLabelText(speedMode.ToString());
+            }));
+
+            _powerUsageLabel = GameObjectHelpers.FindGameObject(gameObject, "PowerUsageLabel").GetComponent<Text>();
+            _processingItemLabel = GameObjectHelpers.FindGameObject(gameObject, "ItemProcessingLabel").GetComponent<Text>();
+            _time = GameObjectHelpers.FindGameObject(gameObject, "Time").GetComponent<Text>();
+
+            _grid = gameObject.GetComponentInChildren<GridLayoutGroup>()?.gameObject;
+
+            if (_grid != null)
+            {
+                foreach (Transform item in _grid.transform)
+                {
+                    var displayItem = item.gameObject.AddComponent<uGUI_FCSDisplayItem>();
+                    displayItem.Initialize(TechType.None);
+                    _currentItems.Add(displayItem);
+                }
+            }
+
+            GameObjectHelpers.FindGameObject(gameObject, "CloseBTN").GetComponent<Button>().onClick.AddListener(Hide);
+
+            GameObjectHelpers.FindGameObject(gameObject, "OpenBTN").GetComponent<Button>().onClick.AddListener((() =>
+            {
+                _sender.OpenStorage();
+                Hide();
+            }));
+
+        }
+
+        private void Start()
+        {
+            gameObject.SetActive(false);
+        }
+
+        private void ChangeSpeedLabelText(string value)
+        {
+            _speedValueLabel.text = value;
+        }
+        
+        private void UpdateScreen()
+        {
+            if (_sender == null || !_isOpen) return;
+
+            if (_powerUsageLabel != null)
+            {
+                _powerUsageLabel.text = $"{Language.main.Get("POWER")}: {_sender.GetPowerUsage()}";
+            }
+
+            if (_processingItemLabel != null)
+            {
+                _processingItemLabel.text = $"{AlterraHub.ProcessingItem()}: {_sender.GetProcessingItemString()}";
+            }
+
+            if (_oreValueLabel != null)
+            {
+                _oreValueLabel.text = $"{AlterraHub.OreValue()}: {_sender.GetOreValue()}";
+            }
+
+            if (_time != null)
+            {
+                _time.text = $"{AlterraHub.TimeLeft()}: {_sender.GetTimeLeftString()}s";
+            }
+        }
+
+        private void OnLoadDisplay()
+        {
+            ClearItems();
+            var oreQueue = _sender.GetOreQueue();
+            for (int i = 0; i < oreQueue.Count; i++)
+            {
+                _currentItems[i].Set(oreQueue.ElementAt(i));
+            }
+        }
+
+        private void ClearItems()
+        {
+            foreach (uGUI_FCSDisplayItem currentItem in _currentItems)
+            {
+                currentItem.Clear();
+            }
+        }
+
+        internal void Show(OreConsumerController sender)
+        {
+            if (Time.timeSinceLevelLoad < 1f)
+            {
+                return;
+            }
+            if (!gameObject.activeInHierarchy)
+            {
+                gameObject.SetActive(true);
+                Select();
+            }
+
+            _sender = sender;
+            OnLoadDisplay();
+            _sender.OnProcessingCompleted += OnLoadDisplay;
+
+            _powerSlider.SetValueWithoutNotify(sender.GetSpeedMultiplier());
+            ChangeSpeedLabelText(((SpeedModes)sender.GetSpeedMultiplier()).ToString());
+            _isOpen = true;
+        }
+
+        public void Hide()
+        {
+            Deselect();
+        }
+
+        public bool OnButtonDown(GameInput.Button button)
+        {
+            if (button == GameInput.Button.UICancel || button == GameInput.Button.PDA)
+            {
+                Deselect();
+                return true;
+            }
+            return false;
+        }
+
+        public override void OnDeselect()
+        {
+            base.OnDeselect();
+            gameObject.SetActive(false);
+            ClearItems();
+            _isOpen = false;
+            if (_sender != null)
+            {
+                _sender.OnProcessingCompleted -= OnLoadDisplay;
+                _sender = null;
+            }
+        }
+
+        public override void OnReselect(bool lockMovement)
+        {
+            base.OnReselect(true);
         }
     }
 

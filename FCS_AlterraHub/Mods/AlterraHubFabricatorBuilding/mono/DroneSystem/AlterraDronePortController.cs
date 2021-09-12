@@ -14,6 +14,7 @@ using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Enums;
 using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Interfaces;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.Mono;
+using FCS_AlterraHub.Objects;
 using FCS_AlterraHub.Registration;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -198,6 +199,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             return false;
         }
 
+        internal bool HasDepot()
+        {
+            return Manager?.GetDevices(Mod.AlterraHubDepotTabID)?.Any() ?? false;
+        }
+
         private static bool GetCurrentOrder(out Shipment order)
         {
             order = AlterraFabricatorStationController.Main.GetCurrentOrder();
@@ -274,12 +280,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
             CreateLadders();
 
-            if (_colorManager == null)
-            {
-                _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject,AlterraHub.BasePrimaryCol);
-            }
-
             if (_portManager == null)
             {
                 _portManager = gameObject.GetComponentInParent<PortManager>();
@@ -289,10 +289,14 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol,AlterraHub.BaseSecondaryCol,AlterraHub.BaseDecalsEmissiveController);
             }
 
+            var antenna = GameObjectHelpers.FindGameObject(gameObject, "AntennaMeshController")?.AddComponent<MotorHandler>();
+            antenna?.Initialize(30);
+
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseSecondaryCol, gameObject, ColorList.GetColor(14));
             
             IsInitialized = true;
         }
@@ -330,11 +334,10 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         private void CreateLadders()
         {
             if(!IsConstructed) return;
-            var t01 = GameObjectHelpers.FindGameObject(gameObject, "Trigger_ladder01").AddComponent<LadderController>();
-            t01.Set(GameObjectHelpers.FindGameObject(gameObject, "ladder01_spawnpoint"));
-
-            var t02 = GameObjectHelpers.FindGameObject(gameObject, "Trigger_ladder02").AddComponent<LadderController>();
-            t02.Set(GameObjectHelpers.FindGameObject(gameObject, "ladder02_spawnpoint"));
+            var ladder = GameObjectHelpers.FindGameObject(gameObject, "Trigger_ladder01");
+            if (ladder == null) return;
+            var t01 = ladder.AddComponent<CinematicLadderController>();
+            t01.Set(GameObjectHelpers.FindGameObject(gameObject, "lockingPoint").transform, "use_ladder", "rocketship_outLadder",3);
         }
 
         private void ReadySaveData()

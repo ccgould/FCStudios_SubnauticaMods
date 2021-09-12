@@ -52,7 +52,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Spawnables
                 col.gameObject.EnsureComponent<ConstructionObstacle>();
             }
 
-            MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
+            MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID,1f,2f,0.2f);
             
             prefab.AddComponent<AlterraFabricatorStationController>();
             prefab.AddComponent<PortManager>();

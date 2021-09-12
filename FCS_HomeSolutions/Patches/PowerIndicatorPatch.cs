@@ -60,25 +60,10 @@ namespace FCS_HomeSolutions.Patches
         public static uGUI_PowerIndicator IndicatorInstance { get; set; }
     }
     
-    public class ElevatorHUD : MonoBehaviour
+    public class ElevatorHUD : uGUI_InputGroup, uGUI_IButtonReceiver
     {
         public static ElevatorHUD Main;
-        private GameObject _inputDummy;
-        private GameObject inputDummy
-        {
-            get
-            {
-                if (this._inputDummy == null)
-                {
-                    this._inputDummy = new GameObject("InputDummy");
-                    this._inputDummy.SetActive(false);
-                }
-                return this._inputDummy;
-            }
-        }
         public int MAX_FLOOR_LEVELS = 20;
-        private bool _cursorLockCached;
-        private bool _isOpen;
         private GameObject _grid;
         private FCSElevatorController _currentController;
         private Slider _slider;
@@ -89,9 +74,24 @@ namespace FCS_HomeSolutions.Patches
         internal Action onFloorRemoved;
         internal Action onFloorLevelChanged;
 
-        private void Awake()
+        public override void Update()
         {
+            base.Update();
+            if (focused && GameInput.GetButtonDown(GameInput.Button.PDA))
+            {
+                Hide();
+            }
+        }
 
+        private void Start()
+        {
+            gameObject.SetActive(false);
+        }
+
+
+        public override void Awake()
+        {
+            base.Awake();
             if (Main == null)
             {
                 Main = this;
@@ -131,27 +131,26 @@ namespace FCS_HomeSolutions.Patches
 
         public void Hide()
         {
-            gameObject.SetActive(false);
-            if (_isOpen)
-            {
-                InterceptInput(false);
-                LockMovement(false);
-            }
-
-            _isOpen = false;
+            Deselect();
         }
 
         internal void Show(FCSElevatorController controller)
         {
+            if (Time.timeSinceLevelLoad < 1f)
+            {
+                return;
+            }
+            if (!gameObject.activeInHierarchy)
+            {
+                gameObject.SetActive(true);
+                Select();
+            }
+
             _currentController = controller;
-            _isOpen = true;
             OnLoadDisplay();
-            InterceptInput(true);
-            LockMovement(true);
             _toggle.SetIsOnWithoutNotify(controller.IsRailingsVisible());
             _slider.SetValueWithoutNotify(controller.GetSpeedValue());
             _speedAmount.text = controller.GetSpeedValue().ToString("0.00");
-            gameObject.SetActive(true);
         }
 
         private void OnLoadDisplay()
@@ -182,29 +181,7 @@ namespace FCS_HomeSolutions.Patches
             }
 
         }
-
-        private void LockMovement(bool state)
-        {
-            FPSInputModule.current.lockMovement = state;
-        }
-
-        private void InterceptInput(bool state)
-        {
-            if (inputDummy.activeSelf == state)
-            {
-                return;
-            }
-            if (state)
-            {
-                InputHandlerStack.main.Push(inputDummy);
-                _cursorLockCached = UWE.Utils.lockCursor;
-                UWE.Utils.lockCursor = false;
-                return;
-            }
-            UWE.Utils.lockCursor = _cursorLockCached;
-            InputHandlerStack.main.Pop(inputDummy);
-        }
-
+        
         private void AddNewItem()
         {
             if (_currentController.GetFloorCount() > MAX_FLOOR_LEVELS)
@@ -226,6 +203,27 @@ namespace FCS_HomeSolutions.Patches
         internal void Refresh()
         {
             OnLoadDisplay();
+        }
+
+        public bool OnButtonDown(GameInput.Button button)
+        {
+            if (button == GameInput.Button.UICancel || button == GameInput.Button.PDA)
+            {
+                Deselect();
+                return true;
+            }
+            return false;
+        }
+
+        public override void OnDeselect()
+        {
+            base.OnDeselect();
+            gameObject.SetActive(false);
+        }
+
+        public override void OnReselect(bool lockMovement)
+        {
+            base.OnReselect(true);
         }
     }
 

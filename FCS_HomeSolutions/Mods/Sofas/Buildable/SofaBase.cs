@@ -206,7 +206,7 @@ namespace FCS_HomeSolutions.Mods.Sofas.Buildable
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol,AlterraHub.BaseSecondaryCol);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol,AlterraHub.BaseSecondaryCol,AlterraHub.BaseLightsEmissiveController);
                 _colorManager.ChangeColor(new ColorTemplate{SecondaryColor = Color.gray});
             }
             

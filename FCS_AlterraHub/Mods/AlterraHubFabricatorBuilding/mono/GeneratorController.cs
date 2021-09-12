@@ -64,12 +64,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                 _slots.Add(pSlot);
             }
 
-            _machineSound = gameObject.AddComponent<FMOD_CustomLoopingEmitter>();
-            var machineSoundAsset = ScriptableObject.CreateInstance<FMODAsset>();
-            machineSoundAsset.id = "water_filter_loop";
-            machineSoundAsset.path = "event:/sub/base/water_filter_loop";
-            _machineSound.asset = machineSoundAsset;
-            _machineSound.restartOnPlay = true;
+            _machineSound = FModHelpers.CreateCustomLoopingEmitter(gameObject, "water_filter_loop", "event:/sub/base/water_filter_loop");
         }
 
         public void LoadSave()

@@ -23,17 +23,25 @@ namespace FCS_HomeSolutions.Mods.HologramPoster.Buildable
 {
     internal class HologramPosterBuildable : SMLHelper.V2.Assets.Buildable
     {
-        public HologramPosterBuildable() : base(Mod.HologramPosterClassID, Mod.HologramPosterFriendly, Mod.HologramPosterDescription)
-        {
+        internal const string HologramPosterClassID = "HologramPoster";
+        internal const string HologramPosterFriendly = "Hologram Poster";
+        internal const string HologramPosterDescription = "Wall mounted holographic poster frame.";
+        internal const string HologramPosterPrefabName = "HologramPosterSmall";
+        internal static string HologramPosterKitClassID = $"{HologramPosterClassID}_Kit";
+        private readonly GameObject _prefab;
+        internal const string HologramPosterTabID = "HGP";
 
+        public HologramPosterBuildable() : base(HologramPosterClassID, HologramPosterFriendly, HologramPosterDescription)
+        {
+            _prefab = ModelPrefab.GetPrefabFromGlobal(HologramPosterPrefabName);
             OnStartedPatching += () =>
             {
-                var hologramPoster = new FCSKit(Mod.HologramPosterKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
+                var hologramPoster = new FCSKit(HologramPosterKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 hologramPoster.Patch();
             };
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.HologramPosterKitClassID.ToTechType(), 45000, StoreCategory.Home);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, HologramPosterKitClassID.ToTechType(), 45000, StoreCategory.Home);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
             };
         }
@@ -42,7 +50,7 @@ namespace FCS_HomeSolutions.Mods.HologramPoster.Buildable
         {
             try
             {
-                var prefab = GameObject.Instantiate(ModelPrefab.HologramPosterPrefab);
+                var prefab = GameObject.Instantiate(_prefab);
 
                 prefab.name = this.PrefabFileName;
                 
@@ -104,7 +112,7 @@ namespace FCS_HomeSolutions.Mods.HologramPoster.Buildable
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(Mod.HologramPosterKitClassID.ToTechType(), 1)
+                    new Ingredient(HologramPosterKitClassID.ToTechType(), 1)
                 }
             };
             return customFabRecipe;

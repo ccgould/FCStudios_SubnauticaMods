@@ -4,6 +4,7 @@ using FCS_AlterraHub.API;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Helpers;
 using FCS_HomeSolutions.Configuration;
+using FCS_HomeSolutions.Mods.Elevator.Buildable;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FMOD.Studio;
@@ -39,11 +40,6 @@ namespace FCS_HomeSolutions.Buildables
         public static GameObject TemplateItem { get; set; }
         public static GameObject TrashRecyclerItemPrefab { get; set; }
         public static GameObject CurtainPrefab { get; set; }
-        public static GameObject CookerItemPrefab { get; set; }
-        public static GameObject CookerOrderItemPrefab { get; set; }
-        public static GameObject ObservationTankPrefab { get; set; }
-        public static GameObject FireExtinguisherRefuelerPrefab { get; set; }
-        public static GameObject HologramPosterPrefab { get; set; }
 
         internal static void Initialize()
         {
@@ -64,18 +60,13 @@ namespace FCS_HomeSolutions.Buildables
             ElevatorFloorItemPrefab = GetPrefab("NewFloorItem",false);
             TVVideoBTNPrefab = GetPrefab("TVVideoBTN", false);
             PlatformFloorFrame = GetPrefab("PlatformFloorFrame", true);
-            ElevatorPrefab = GetPrefab(Mod.ElevatorPrefabName, true);
+            ElevatorPrefab = GetPrefab(ElevatorBuildable.ElevatorPrefabName, true);
             ElevatorUIPrefab = GetPrefab("ElevatorUI", false);
-            HologramPosterPrefab = GetPrefab(Mod.HologramPosterPrefabName,true);
-            FireExtinguisherRefuelerPrefab = GetPrefab(Mod.FireExtinguisherRefuelerPrefabName);
-            ObservationTankPrefab = GetPrefab(Mod.EmptyObservationTankPrefabName);
             TrashRecyclerItemPrefab = GetPrefab("RecyclerItem");
             SeaBreezeItemPrefab = GetPrefabFromGlobal("ARSItem",false);
             NetworkItemPrefab = GetPrefab("NetworkItem");
             TemplateItem = GetPrefab("TemplateItem");
             CurtainPrefab = GetPrefab("Curtain");
-            CookerItemPrefab = GetPrefab("CookerItem");
-            CookerOrderItemPrefab = GetPrefab("OrderItem");
             _initialized = true;
         }
         

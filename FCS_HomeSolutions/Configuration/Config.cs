@@ -198,14 +198,7 @@ namespace FCS_HomeSolutions.Configuration
         public bool IsCurtainEnabled = true;
 
         #endregion
-
-        #region Observation Tank
-
-        [Toggle("[Observation Tank] Is Mod Enabled",Tooltip="Enables/Disables Observation Tank from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
-        public bool IsObservationTankEnabled = true;
-
-        #endregion
-
+        
         #region Shower
 
         [Toggle("[Shower] Is Mod Enabled",Tooltip="Enables/Disables Mini Bathroom from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]

@@ -74,6 +74,7 @@ namespace FCS_AlterraHub.Mono
             "powerstorage",
             "recycler",
             "alterrahubdepot",
+            "neonplanter"
         };
         public readonly HashSet<StorageContainer> BaseStorageLockers = new();
         public readonly HashSet<FcsDevice> BaseServers = new();

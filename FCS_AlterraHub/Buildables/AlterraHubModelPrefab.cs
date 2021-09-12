@@ -7,6 +7,7 @@ using FCS_AlterraHub.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
+using Object = UnityEngine.Object;
 
 namespace FCS_AlterraHub.Buildables
 {
@@ -95,10 +96,6 @@ namespace FCS_AlterraHub.Buildables
         internal static string LUMTexture => $"fcs{Mod.ModPackID}_E";
         internal static string NormalTexture => $"fcs{Mod.ModPackID}_N";
         internal static string DetailTexture => $"fcs{Mod.ModPackID}_D";
-
-        internal static GameObject OilPrefab { get; set; }
-        internal static GameObject OreConsumerPrefab { get; set; }
-        internal static GameObject OreConsumerFragPrefab { get; set; }
         internal static GameObject DebitCardPrefab { get; set; }
         internal static GameObject KitPrefab { get; set; }
         internal static GameObject CartItemPrefab { get; set; }
@@ -111,10 +108,8 @@ namespace FCS_AlterraHub.Buildables
         public static GameObject AlterraHubDepotItemPrefab { get; set; }
         public static GameObject EncyclopediaEntryPrefab { get; set; }
         public static GameObject AlterraHubFabricatorPrefab { get; set; }
-        public static GameObject AlterraHubDepotFragmentPrefab { get; set; }
         public static Sprite UpArrow { get; set; }
         public static Sprite DownArrow { get; set; }
-        public static GameObject StaffKeyCardPrefab { get; set; }
         public static Sprite EncyclopediaEntryBackgroundNormal { get; set; }
         public static Sprite EncyclopediaEntryBackgroundSelected { get; set; }
         public static Sprite EncyclopediaEntryBackgroundHover { get; set; }
@@ -149,12 +144,7 @@ namespace FCS_AlterraHub.Buildables
                     if (!LoadAsset(Mod.KitPrefabName, QPatch.GlobalBundle, out var kitPrefabGo)) return false; 
                     KitPrefab = kitPrefabGo;
 
-                    if (!LoadAsset(Mod.OreConsumerPrefabName, QPatch.GlobalBundle, out var oreConsumerPrefabGo)) return false;
-                    OreConsumerPrefab = oreConsumerPrefabGo;                    
-                    
-                    //if (!LoadAsset("OreConsumerFrag", QPatch.GlobalBundle, out var oreConsumerFragPrefabGo)) return false;
-                    //OreConsumerFragPrefab = oreConsumerFragPrefabGo;
-                    
+
                     if (!LoadAsset("CartItem", QPatch.GlobalBundle, out var cartItemPrefabGo)) return false;
                     CartItemPrefab = cartItemPrefabGo;
 
@@ -187,17 +177,9 @@ namespace FCS_AlterraHub.Buildables
                      if (!LoadAsset("PDAShipmentItemNode", QPatch.GlobalBundle, out var pdaShipmentItemNodePrefab, false)) return false;
                      PDAShipmentItemNodePrefab = pdaShipmentItemNodePrefab;
 
-                    //AddFabStationComponents();
-
-                    //if (!LoadAsset("AlterraHubDepotFrag", QPatch.GlobalBundle, out var alterraHubDepotFragmentPrefab)) return false;
-                    //AlterraHubDepotFragmentPrefab = alterraHubDepotFragmentPrefab;
-
-                    if (!LoadAsset("AlterraHubDepotItem", QPatch.GlobalBundle, out var alterraHubDepotItemPrefab)) return false;
+                     if (!LoadAsset("AlterraHubDepotItem", QPatch.GlobalBundle, out var alterraHubDepotItemPrefab)) return false;
                     AlterraHubDepotItemPrefab = alterraHubDepotItemPrefab;                    
                     
-                    if (!LoadAsset("StaffKeyCard", QPatch.GlobalBundle, out var staffKeyCardPrefab)) return false;
-                    StaffKeyCardPrefab = staffKeyCardPrefab;
-
                     if (!LoadAsset("uGUI_PDAScreen", QPatch.GlobalBundle, out var pdaCanvas)) return false;
                     PDAScreenPrefab = pdaCanvas;
 
@@ -214,9 +196,6 @@ namespace FCS_AlterraHub.Buildables
                     if (!LoadAssetV2("AlterraHubTransportDrone", QPatch.GlobalBundle, out var alterraHubTransportDronePrefab)) return false;
                     AlterraHubTransportDronePrefab = alterraHubTransportDronePrefab;
 
-                    //if (!LoadAssetV2("DronePort_Fragments", QPatch.GlobalBundle, out var dronePortFragmentsPrefab)) return false;
-                    //DronePortFragmentsPrefab = dronePortFragmentsPrefab;
-
                     if (!LoadAssetV2("BLUEPRINT_DATA_DISC", QPatch.GlobalBundle, out var blueprintDataDiscPrefab)) return false;
                     BluePrintDataDiscPrefab = blueprintDataDiscPrefab;                    
                     
@@ -225,9 +204,6 @@ namespace FCS_AlterraHub.Buildables
 
                     if (!LoadAsset("ImageSelectorUI", QPatch.GlobalBundle, out var imageSelectorPrefab, false)) return false;
                     ImageSelectorHUDPrefab = imageSelectorPrefab;
-
-                    //if (!LoadAsset("PDAEntry", QPatch.GlobalBundle, out var pdaEntryPrefabGo, false)) return false;
-                    //PDAEntryPrefab = pdaEntryPrefabGo;
 
                     if (!LoadAssetV2("fcs_BlueprintBox", QPatch.GlobalBundle, out var fcsDataBox)) return false;
                     DataBoxPrefab = fcsDataBox;
@@ -608,6 +584,12 @@ namespace FCS_AlterraHub.Buildables
             QuickLogger.Error($"{prefabName} Prefab Not Found!");
             go = null;
             return false;
+        }
+
+        public static GameObject GetPrefab(string prefabName)
+        {
+            LoadAssetV2(prefabName, QPatch.GlobalBundle, out var result);
+            return result;
         }
     }
 }

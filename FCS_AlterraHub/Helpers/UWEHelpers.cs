@@ -5,7 +5,7 @@ namespace FCS_AlterraHub.Helpers
     public static class UWEHelpers
     {
         /// <summary>
-        /// Creates a default UWE <see cref="StorageContainer"/>
+        /// Creates a default UWE <see cref="StorageContainer". Warningdisabled and enables object./>
         /// </summary>
         /// <param name="prefab">The object to add a storage container component.</param>
         /// <param name="storageRoot">The storage root.This is were items will be held.</param>

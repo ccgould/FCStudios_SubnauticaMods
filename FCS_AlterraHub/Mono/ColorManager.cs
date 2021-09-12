@@ -18,7 +18,12 @@ namespace FCS_AlterraHub.Mono
         private Color _currentSecondaryColor = Color.white;
         private Color _currentLumColor = Color.white;
         private string _lumMaterial;
-        private ColorTemplate _currentTemplate;
+        private ColorTemplate _currentTemplate = new ColorTemplate
+        {
+            PrimaryColor = Color.white,
+            SecondaryColor = Color.white,
+            EmissionColor = Color.cyan
+        };
 
 
         public void Initialize(GameObject gameObject, string bodyMaterial, string secondaryMaterial = "",

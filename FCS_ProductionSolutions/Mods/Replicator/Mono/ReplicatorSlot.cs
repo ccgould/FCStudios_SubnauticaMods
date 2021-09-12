@@ -16,12 +16,12 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
         private readonly IList<float> _progress = new List<float>(new[] { -1f, -1f, -1f });
         private ReplicatorController _mono;
         public bool IsOccupied => _targetItem != TechType.None;
-        private SpeedModes _currentMode;
+        private HarvesterSpeedModes _currentHarvesterMode;
         private TechType _targetItem;
         private const int MAXCOUNT = 25;
         private const float EnergyConsumption = 15000f;
         internal bool PauseUpdates { get; set; }
-        internal bool NotAllowToGenerate => _mono == null || !_mono.IsOperational || PauseUpdates || CurrentSpeedMode == SpeedModes.Off || _targetItem == TechType.None || IsFull;
+        internal bool NotAllowToGenerate => _mono == null || !_mono.IsOperational || PauseUpdates || CurrentHarvesterSpeedMode == HarvesterSpeedModes.Off || _targetItem == TechType.None || IsFull;
         public Action<int, int> OnContainerUpdate { get; set; }
         public Action<FcsDevice, TechType> OnContainerAddItem { get; set; }
         public Action<FcsDevice, TechType> OnContainerRemoveItem { get; set; }
@@ -30,17 +30,17 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             get => _progress[(int)ClonePhases.Generating];
             set => _progress[(int)ClonePhases.Generating] = value;
         }
-        internal SpeedModes CurrentSpeedMode
+        internal HarvesterSpeedModes CurrentHarvesterSpeedMode
         {
-            get => _currentMode;
+            get => _currentHarvesterMode;
             set
             {
-                SpeedModes previousMode = _currentMode;
-                _currentMode = value;
+                HarvesterSpeedModes previousMode = _currentHarvesterMode;
+                _currentHarvesterMode = value;
 
-                if (_currentMode != SpeedModes.Off)
+                if (_currentHarvesterMode != HarvesterSpeedModes.Off)
                 {
-                    if (previousMode == SpeedModes.Off)
+                    if (previousMode == HarvesterSpeedModes.Off)
                         TryStartingNextClone();
                 }
             }
@@ -107,8 +107,8 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
 
         private float CalculateEnergyPerSecond()
         {
-            if (CurrentSpeedMode == SpeedModes.Off) return 0f;
-            var creationTime = Convert.ToSingle(CurrentSpeedMode);
+            if (CurrentHarvesterSpeedMode == HarvesterSpeedModes.Off) return 0f;
+            var creationTime = Convert.ToSingle(CurrentHarvesterSpeedMode);
             return EnergyConsumption / creationTime;
         }
 
@@ -200,7 +200,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
         {
             QuickLogger.Debug("Trying to start another clone", true);
 
-            if (CurrentSpeedMode == SpeedModes.Off || _targetItem == TechType.None)
+            if (CurrentHarvesterSpeedMode == HarvesterSpeedModes.Off || _targetItem == TechType.None)
                 return;// Powered off, can't start a new clone
 
             if (!IsFull && GenerationProgress == -1f)

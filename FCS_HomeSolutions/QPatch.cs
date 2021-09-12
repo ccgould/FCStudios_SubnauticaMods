@@ -7,6 +7,7 @@ using FCS_AlterraHub.Objects;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
+using FCS_HomeSolutions.Enums;
 using FCS_HomeSolutions.Mods.Cabinets.Buildable;
 using FCS_HomeSolutions.Mods.CrewLocker.Buildable;
 using FCS_HomeSolutions.Mods.Curtains.Buildable;
@@ -25,11 +26,12 @@ using FCS_HomeSolutions.Mods.SeaBreeze.Buildable;
 using FCS_HomeSolutions.Mods.Shower.Buildable;
 using FCS_HomeSolutions.Mods.Sink.Buildable;
 using FCS_HomeSolutions.Mods.Sofas.Buildable;
+using FCS_HomeSolutions.Mods.Stairs.Buildable;
 using FCS_HomeSolutions.Mods.Stove.Buildable;
+using FCS_HomeSolutions.Mods.Toilet.Buildable;
 using FCS_HomeSolutions.Mods.TrashReceptacle.Buildable;
 using FCS_HomeSolutions.Mods.TrashRecycler.Buildable;
 using FCS_HomeSolutions.Mods.TV.Buildable;
-using FCS_HomeSolutions.Spawnables;
 using FCSCommon.Utilities;
 using HarmonyLib;
 using QModManager.API.ModLoading;
@@ -68,8 +70,8 @@ namespace FCS_HomeSolutions
 
             if (Configuration.IsPeeperLoungeBarEnabled)
             {
-                var ahsSweetWaterBar = new PeeperLoungeBarPatch();
-                ahsSweetWaterBar.Patch();
+                var peeperLoungeBarPatch = new PeeperLoungeBarPatch();
+                peeperLoungeBarPatch.Patch();
                 PeeperLoungeBarPatch.LoadPeeperLoungeTracks();
                 PeeperLoungeBarPatch.PatchFood();
             }
@@ -148,12 +150,6 @@ namespace FCS_HomeSolutions
                 stoveBuildable.Patch();
             }
 
-            if (Configuration.IsObservationTankEnabled)
-            {
-                var observationTank = new ObservationTankBuildable();
-                observationTank.Patch();
-            }
-            
             if (Configuration.IsShowerEnabled)
             {
                 //Patch Shower
@@ -179,6 +175,9 @@ namespace FCS_HomeSolutions
 
             var jukeboxSpeaker = new JukeBoxSpeakerBuildable();
             jukeboxSpeaker.Patch();
+
+            var stairs = new StairsBuildable();
+            stairs.Patch();
 
 
             var hologramPoster = new HologramPosterBuildable();
@@ -213,7 +212,11 @@ namespace FCS_HomeSolutions
 
         private void PatchMiscItems()
         {
-            var microwave = new MicrowavePatch("fcsmicrowave", "Microwave", "N/A",
+            var toiletBuildable = new ToiletBuildable();
+            toiletBuildable.Patch();
+
+
+            var microwave = new CookerPatch("fcsmicrowave", "Microwave", "N/A",
                 ModelPrefab.GetPrefabFromGlobal("FCS_Microwave"),
                 new Settings
                 {
@@ -231,6 +234,25 @@ namespace FCS_HomeSolutions
                     GroupForPDA = TechGroup.InteriorModules
                 });
             microwave.Patch();
+
+            var curingCabinet = new CookerPatch("fcsCuringCabinet", "Curing Cabinet", "N/A",
+                ModelPrefab.GetPrefabFromGlobal("FCS_CuringCabinet"),
+                new Settings
+                {
+                    KitClassID = "curingCabinet_kit",
+                    AllowedInBase = true,
+                    AllowedOutside = false,
+                    AllowedOnGround = true,
+                    AllowedInSub = true,
+                    AllowedOnConstructables = true,
+                    RotationEnabled = true,
+                    Cost = 1500,
+                    Center = new Vector3(0.009382606f, 0.5641674f, 0.2060485f),
+                    Size = new Vector3(0.9137022f, 1.016351f, 0.587903f),
+                    CategoryForPDA = TechCategory.InteriorModule,
+                    GroupForPDA = TechGroup.InteriorModules
+                },CookingMode.Curing);
+            curingCabinet.Patch();
         }
 
         private void PatchComputers()
@@ -460,9 +482,9 @@ namespace FCS_HomeSolutions
                     AllowedOnConstructables = true,
                     RotationEnabled = false,
                     Cost = 27000,
-                    Size = new Vector3(0f, -0.02069972f, 0.5016098f),
-                    Center = new Vector3(2.014741f, 0.08191673f, 1.005661f),
-                    CategoryForPDA = TechCategory.InteriorModule,
+                    Center = new Vector3(-0.002281189f, -0.01851261f, 0.504714f),
+                    Size = new Vector3(1.99176f, 0.08865887f, 0.9866596f),
+            CategoryForPDA = TechCategory.InteriorModule,
                     GroupForPDA = TechGroup.InteriorModules
                 });
             neonShelf01.Patch();
@@ -553,7 +575,7 @@ namespace FCS_HomeSolutions
             if (!Configuration.IsRailingsEnabled) return;
 
             var ahsrailing = new DecorationEntryPatch("ahsrailing", "Railing", "A railing to create a barrior",
-                ModelPrefab.GetPrefab("Railing_Normal"),
+                ModelPrefab.GetPrefabFromGlobal("Railing_Normal"),
                 new Settings
                 {
                     KitClassID = "ahsrailing_kit",
@@ -571,7 +593,7 @@ namespace FCS_HomeSolutions
 
             var ahsrailingglass = new DecorationEntryPatch("ahsrailingglass", "Railing With Glass",
                 "A railing to create a barrior",
-                ModelPrefab.GetPrefab("Railing_Normal_wGlass"),
+                ModelPrefab.GetPrefabFromGlobal("Railing_Normal_wGlass"),
                 new Settings
                 {
                     KitClassID = "ahsrailingglass_kit",
@@ -589,7 +611,7 @@ namespace FCS_HomeSolutions
 
             var ahsLeftCornerRail = new DecorationEntryPatch("ahsLeftCornerRailing", "Railing Left Corner",
                 "A railing to create a barrior",
-                ModelPrefab.GetPrefab("Railing_LeftCorner"),
+                ModelPrefab.GetPrefabFromGlobal("Railing_LeftCorner"),
                 new Settings
                 {
                     KitClassID = "ahsleftcornerrailing_kit",
@@ -607,7 +629,7 @@ namespace FCS_HomeSolutions
 
             var ahsLeftCornerwGlassRail = new DecorationEntryPatch("ahsLeftCornerwGlassRailing", "Railing Left Corner wGlass",
                 "A railing to create a barrior",
-                ModelPrefab.GetPrefab("Railing_LeftCorner_wGlass"),
+                ModelPrefab.GetPrefabFromGlobal("Railing_LeftCorner_wGlass"),
                 new Settings
                 {
                     KitClassID = "ahsleftcornerwGlassrailing_kit",
@@ -625,7 +647,7 @@ namespace FCS_HomeSolutions
 
             var ahsRightCornerRail = new DecorationEntryPatch("ahsRightCornerRailing", "Railing Right Corner",
                 "A railing to create a barrior",
-                ModelPrefab.GetPrefab("Railing_RightCorner"),
+                ModelPrefab.GetPrefabFromGlobal("Railing_RightCorner"),
                 new Settings
                 {
                     KitClassID = "ahsrightcornerrailing_kit",
@@ -644,7 +666,7 @@ namespace FCS_HomeSolutions
 
             var ahsRightCornerwGlassRail = new DecorationEntryPatch("ahsRightCornerwGlassRailing", "Railing Right Corner wGlass",
                 "A railing to create a barrior",
-                ModelPrefab.GetPrefab("Railing_RightCorner_wGlass"),
+                ModelPrefab.GetPrefabFromGlobal("Railing_RightCorner_wGlass"),
                 new Settings
                 {
                     KitClassID = "ahsrightcornerwGlassrailing_kit",
@@ -667,7 +689,7 @@ namespace FCS_HomeSolutions
 
             var tableSmartTV = new TVPatch("tableSmartTV", "Smart TV With Table Mount",
                 "Take a little break and watch some TV. Includes Table Mount.",
-                ModelPrefab.GetPrefab("TableSmartTV"),
+                ModelPrefab.GetPrefabFromGlobal("FCS_TableSmartTV"),
                 new Settings
                 {
                     KitClassID = "tableSmartTV_kit",
@@ -684,7 +706,7 @@ namespace FCS_HomeSolutions
 
             var mountSmartTV = new TVPatch("mountSmartTV", "Smart TV With Wall Mount",
                 "Take a little break and watch some TV. Includes Wall Mount.",
-                ModelPrefab.GetPrefab("MountSmartTV"),
+                ModelPrefab.GetPrefabFromGlobal("FCS_MountSmartTV"),
                 new Settings
                 {
                     KitClassID = "mountSmartTV_kit",
@@ -704,7 +726,7 @@ namespace FCS_HomeSolutions
         private void LoadCurtainTemplates()
         {
 
-            var path = Path.Combine(Mod.GetAssetPath(), "CurtainTemplates");
+            var path = Path.Combine(Mod.GetAssetPath(), "CustomImages");
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);

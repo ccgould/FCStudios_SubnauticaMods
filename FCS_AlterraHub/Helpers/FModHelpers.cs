@@ -6,7 +6,7 @@ namespace FCS_AlterraHub.Helpers
     {
         public static FMOD_CustomEmitter CreateCustomEmitter(GameObject go, string name, string eventPath, bool followParent = true, bool restartOnPlay = true, bool playOnAwake = false)
         {
-            var customEmitter = go.EnsureComponent<FMOD_CustomEmitter>();
+            var customEmitter = go.AddComponent<FMOD_CustomEmitter>();
             if (customEmitter.asset == null)
             {
                 var fmodAsset = ScriptableObject.CreateInstance<FMODAsset>();
@@ -21,9 +21,9 @@ namespace FCS_AlterraHub.Helpers
             return customEmitter;
         }
 
-        public static FMOD_CustomEmitter CreateCustomLoopingEmitter(GameObject go, string name,string eventPath, bool followParent = true, bool restartOnPlay = true, bool playOnAwake = false)
+        public static FMOD_CustomLoopingEmitter CreateCustomLoopingEmitter(GameObject go, string name,string eventPath, bool followParent = true, bool restartOnPlay = true, bool playOnAwake = false)
         {
-            var customEmitter = go.EnsureComponent<FMOD_CustomLoopingEmitter>();
+            var customEmitter = go.AddComponent<FMOD_CustomLoopingEmitter>();
 
             if (customEmitter.asset == null)
             {
@@ -36,6 +36,15 @@ namespace FCS_AlterraHub.Helpers
                 customEmitter.asset = fmodAsset;
             }
             return customEmitter;
+        }
+
+        public static FMODAsset CreateFmodAsset(string name, string eventPath,string id = "")
+        {
+            var result = ScriptableObject.CreateInstance<FMODAsset>();
+            result.id = id;
+            result.name = name;
+            result.path = eventPath;
+            return result;
         }
     }
 }

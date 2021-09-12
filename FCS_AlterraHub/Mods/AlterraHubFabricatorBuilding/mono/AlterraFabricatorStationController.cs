@@ -16,6 +16,7 @@ using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
+using rail;
 using SMLHelper.V2.Json.ExtensionMethods;
 using Steamworks;
 using Story;
@@ -107,6 +108,10 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             transportDoor.doorOpenMethod = StarshipDoor.OpenMethodEnum.Manual;
             transportDoor.ManualHoverText2 = "No Power.Please check generator";
 
+            var securityDoor = GameObjectHelpers.FindGameObject(gameObject, "LockedDoor04").AddComponent<DoorController>();
+            securityDoor.doorOpenMethod = StarshipDoor.OpenMethodEnum.Manual;
+            securityDoor.ManualHoverText2 = "Access to security booth needed to unlock.";
+            
             var antennaDialPad = GameObjectHelpers.FindGameObject(gameObject, "AntennaDialpad").AddComponent<KeyPadAccessController>();
             antennaDialPad.Initialize("3491", antennaDoor,2);
             _keyPads.Add(antennaDialPad);
@@ -118,6 +123,14 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             var transportDialPad = GameObjectHelpers.FindGameObject(gameObject, "TransportDialpad").AddComponent<KeyPadAccessController>();
             transportDialPad.Initialize("4865", transportDoor, 3);
             _keyPads.Add(transportDialPad);
+
+            var securityDialPad = GameObjectHelpers.FindGameObject(gameObject, "SecurityDialpad").AddComponent<KeyPadAccessController>();
+            securityDialPad.Initialize("####", securityDoor, 4);
+            _keyPads.Add(securityDialPad);
+
+            var securityDialPad2 = GameObjectHelpers.FindGameObject(gameObject, "SecurityDialpad_2").AddComponent<KeyPadAccessController>();
+            securityDialPad2.Initialize("####", securityDoor, 5);
+            _keyPads.Add(securityDialPad2);
 
             _motor = GameObjectHelpers.FindGameObject(gameObject, "AlternatorMotor").AddComponent<MotorHandler>();
             _motor.Initialize(100);
@@ -159,6 +172,28 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseLightsEmissiveController, gameObject, Color.red);
 
             OnGamePlaySettingsLoaded(Mod.GamePlaySettings);
+
+            InvokeRepeating(nameof(CheckIfSecurityDoorCanUnlock),1f,1f);
+        }
+
+        private void CheckIfSecurityDoorCanUnlock()
+        {
+            if (_securityBoxTrigger == null) return;
+
+            if (Mod.GamePlaySettings.IsPDAUnlocked || _keyPads[4].IsUnlocked() || _keyPads[3].IsUnlocked())
+            {
+                CancelInvoke(nameof(CheckIfSecurityDoorCanUnlock));
+                return;
+            }
+
+            if (_securityBoxTrigger.IsPlayerInRange && IsPowerOn)
+            {
+                _keyPads[3].Unlock();
+                _keyPads[3].ForceOpen();
+                _keyPads[4].Unlock();
+                _keyPads[4].ForceOpen();
+            }
+
         }
 
         internal SecurityBoxTrigger GetSecurityBoxTrigger()
@@ -325,13 +360,14 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             Mod.GamePlaySettings.AlterraHubDepotPowercellSlot.Add(slot);
         }
 
+
+
         internal void TurnOnBase()
         {
             TurnOnLights();
             TurnOnScreens();
             TurnOnKeyPads();
             _keyPads[2].Unlock();
-            _keyPads[2].ForceOpen();
             _motor.StartMotor();
             Mod.GamePlaySettings.BreakerOn = true;
         }

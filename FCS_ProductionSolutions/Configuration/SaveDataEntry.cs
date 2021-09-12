@@ -26,7 +26,7 @@ namespace FCS_ProductionSolutions.Configuration
         [JsonProperty] internal ColorTemplateSave ColorTemplate { get; set; }
         [JsonProperty] internal Dictionary<TechType, int> Storage { get; set; }
         [JsonProperty] internal bool IsInBase { get; set; }
-        [JsonProperty] internal SpeedModes SpeedMode { get; set; }
+        [JsonProperty] internal HarvesterSpeedModes HarvesterSpeedMode { get; set; }
         [JsonProperty] internal List<SlotsData> SlotData { get; set; }
         [JsonProperty] internal bool SetBreaker { get; set; }
     }
@@ -39,7 +39,7 @@ namespace FCS_ProductionSolutions.Configuration
         [JsonProperty] internal TechType TargetItem { get; set; }
         [JsonProperty] internal float Progress { get; set; }
         [JsonProperty] internal int ItemCount { get; set; }
-        [JsonProperty] internal SpeedModes Speed { get; set; }
+        [JsonProperty] internal HarvesterSpeedModes HarvesterSpeed { get; set; }
     }
 
     internal class MatterAnalyzerDataEntry

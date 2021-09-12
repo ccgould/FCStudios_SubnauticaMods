@@ -55,7 +55,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
                     }
 
                     _colorManager.LoadTemplate(_savedData.ColorTemplate);
-                    DisplayManager.SetSpeedGraphic(_savedData.SpeedMode);
+                    DisplayManager.SetSpeedGraphic(_savedData.HarvesterSpeedMode);
                     if (_savedData.SetBreaker)
                     {
                         EffectsManager.SetBreaker(true);
@@ -86,15 +86,15 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
 
             switch (GrowBedManager.GetCurrentSpeedMode())
             {
-                case SpeedModes.Off:
+                case HarvesterSpeedModes.Off:
                     return 0;
-                case SpeedModes.Max:
+                case HarvesterSpeedModes.Max:
                     return powerUsage * 4;
-                case SpeedModes.High:
+                case HarvesterSpeedModes.High:
                     return powerUsage * 3;
-                case SpeedModes.Low:
+                case HarvesterSpeedModes.Low:
                     return powerUsage * 2;
-                case SpeedModes.Min:
+                case HarvesterSpeedModes.Min:
                     return powerUsage;
                 default:
                     return 0f;
@@ -263,7 +263,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
             _savedData.ID = GetPrefabID();
             _savedData.ColorTemplate = _colorManager.SaveTemplate();
             _savedData.IsInBase = _isInBase;
-            _savedData.SpeedMode = GrowBedManager.GetCurrentSpeedMode();
+            _savedData.HarvesterSpeedMode = GrowBedManager.GetCurrentSpeedMode();
             _savedData.SetBreaker = EffectsManager.GetBreakerState();
             GrowBedManager.Save(_savedData);
             newSaveData.HydroponicHarvesterEntries.Add(_savedData);

@@ -22,9 +22,10 @@
     <Compile Include="Buildables\DecorationController.cs" />
     <Compile Include="Buildables\DecorationEntryPatch.cs" />
     <Compile Include="Buildables\ModelPrefab.cs" />
+    <Compile Include="Enums\CookingMode.cs" />
     <Compile Include="Mods\CrewLocker\Buildable\CrewLockerPatch.cs" />
-    <Compile Include="Mods\Microwave\Buildable\MicrowavePatch.cs" />
-    <Compile Include="Mods\Microwave\Mono\MicrowaveController.cs" />
+    <Compile Include="Mods\Microwave\Buildable\CookerPatch.cs" />
+    <Compile Include="Mods\Microwave\Mono\CookerController.cs" />
     <Compile Include="Mods\NeonPlanter\Buildable\NeonPlanterPatch.cs" />
     <Compile Include="Mods\PaintTool\Mono\ColorPickerTemplateItemController.cs" />
     <Compile Include="Mods\PaintTool\Mono\HSVControl.cs" />
@@ -33,6 +34,8 @@
     <Compile Include="Mods\Sink\Buildable\SinkPrefab.cs" />
     <Compile Include="Mods\Sink\Mono\SinkController.cs" />
     <Compile Include="Mods\Sofas\Buildable\NeonBarStool.cs" />
+    <Compile Include="Mods\Stairs\Buildable\StairsPatcher.cs" />
+    <Compile Include="Mods\Stairs\Mono\StairsController.cs" />
     <Compile Include="Mods\Stove\Buildable\StovePatcher.cs" />
     <Compile Include="Mods\Stove\Mono\StoveController.cs" />
     <Compile Include="Mods\Elevator\Buildable\ElevatorPatcher.cs" />
@@ -94,6 +97,7 @@
     <Compile Include="Mods\Sofas\Buildable\Sofa2.cs" />
     <Compile Include="Mods\Sofas\Buildable\Sofa1.cs" />
     <Compile Include="Mods\Stove\Struct\CookingItem.cs" />
+    <Compile Include="Mods\Toilet\Buildable\ToiletPatch.cs" />
     <Compile Include="Mods\TVStand\Buildable\TVStandPatch.cs" />
     <Compile Include="Mods\TV\Buildable\TVPatch.cs" />
     <Compile Include="Mods\TV\Mono\HomeSectionController.cs" />
@@ -102,6 +106,7 @@
     <Compile Include="Mods\NeonPlanter\Mono\NeonPlanterController.cs" />
     <Compile Include="Mods\PaintTool\PaintToolController.cs" />
     <Compile Include="Patches\Builder_Patches.cs" />
+    <Compile Include="Patches\OSubmarinHelper.cs" />
     <Compile Include="Patches\Player_Patches.cs" />
     <Compile Include="Patches\PowerIndicatorPatch.cs" />
     <Compile Include="Patches\ReleaseEventPrefix_Patch.cs" />
@@ -126,7 +131,6 @@
     <Compile Include="Mods\SeaBreeze\Mono\SeaBreezePowerManager.cs" />
     <Compile Include="Mods\SeaBreeze\Mono\SeaBreezeController.cs" />
     <Compile Include="Structs\SoundEntry.cs" />
-    <Compile Include="Spawnables\ObservationTank.cs" />
     <Compile Include="Spawnables\FoodSpawnable.cs" />
     <Compile Include="Mods\PaintTool\Spawnable\PaintCanSpawnable.cs" />
     <Compile Include="Mods\PaintTool\Spawnable\PaintToolSpawnable.cs" />

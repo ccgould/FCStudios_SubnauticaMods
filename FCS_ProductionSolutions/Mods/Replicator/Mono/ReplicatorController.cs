@@ -80,14 +80,14 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             {
                 _colorManager.LoadTemplate(_saveData.ColorTemplate);
                 
-                _speedBTN.SetSpeedMode(_saveData.Speed);
+                _speedBTN.SetSpeedMode(_saveData.HarvesterSpeed);
 
                 if (_saveData.TargetItem != TechType.None)
                 {
                     QuickLogger.Debug("Loading Replicator save");
                     _replicatorSlot.ChangeTargetItem(_saveData.TargetItem,true);
                     _replicatorSlot.SetItemCount(_saveData.ItemCount);
-                    _replicatorSlot.CurrentSpeedMode = _saveData.Speed;
+                    _replicatorSlot.CurrentHarvesterSpeedMode = _saveData.HarvesterSpeed;
                     _replicatorSlot.GenerationProgress = _saveData.Progress;
                     _techTypeIcon.sprite = SpriteManager.Get(_saveData.TargetItem);
                     SpawnModel(_saveData.TargetItem);
@@ -159,17 +159,17 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
         {
             if (!IsOperational || _replicatorSlot == null || !_replicatorSlot.IsOccupied) return 0f;
 
-            switch (_replicatorSlot.CurrentSpeedMode)
+            switch (_replicatorSlot.CurrentHarvesterSpeedMode)
             {
-                case SpeedModes.Off:
+                case HarvesterSpeedModes.Off:
                     return 0;
-                case SpeedModes.Max:
+                case HarvesterSpeedModes.Max:
                     return PowerUsage * 4;
-                case SpeedModes.High:
+                case HarvesterSpeedModes.High:
                     return PowerUsage * 3;
-                case SpeedModes.Low:
+                case HarvesterSpeedModes.Low:
                     return PowerUsage * 2;
-                case SpeedModes.Min:
+                case HarvesterSpeedModes.Min:
                     return PowerUsage;
                 default:
                     return 0f;
@@ -291,7 +291,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
 
         internal void UpdateUI()
         {
-            _unitPerSecond.text = AuxPatchers.GenerationTimeMinutesOnlyFormat(Convert.ToSingle(_replicatorSlot.CurrentSpeedMode));
+            _unitPerSecond.text = AuxPatchers.GenerationTimeMinutesOnlyFormat(Convert.ToSingle(_replicatorSlot.CurrentHarvesterSpeedMode));
             _powerUsagePerSecond.text = AuxPatchers.PowerUsagePerSecondFormat(GetPowerUsage());
             _containerAmount.text = $"{_replicatorSlot.GetCount()}/{_replicatorSlot.GetMaxCount()}";
             UpdateTerminals();
@@ -429,7 +429,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             _saveData.ColorTemplate = _colorManager.SaveTemplate();
             _saveData.TargetItem = _replicatorSlot.GetTargetItem();
             _saveData.Progress = _replicatorSlot.GenerationProgress;
-            _saveData.Speed = _replicatorSlot.CurrentSpeedMode;
+            _saveData.HarvesterSpeed = _replicatorSlot.CurrentHarvesterSpeedMode;
             _saveData.ItemCount = _replicatorSlot.GetCount();
             newSaveData.ReplicatorEntries.Add(_saveData);
         }
@@ -439,11 +439,11 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             return _colorManager.ChangeColor(template);
         }
 
-        public void SetSpeedMode(SpeedModes speed)
+        public void SetSpeedMode(HarvesterSpeedModes harvesterSpeed)
         {
             if (_replicatorSlot != null)
             {
-                _replicatorSlot.CurrentSpeedMode = speed;
+                _replicatorSlot.CurrentHarvesterSpeedMode = harvesterSpeed;
                 UpdateUI();
             }
         }

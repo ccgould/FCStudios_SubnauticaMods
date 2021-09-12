@@ -412,7 +412,7 @@ namespace FCS_AlterraHub.Helpers
         /// Adds glass material to the gameobject.
         /// </summary>
         /// <param name="gameObject">The game object to add the glass material</param>
-        public static void ApplyGlassShaderTemplate(GameObject gameObject,string matchName, string newMaterialName = "object")
+        public static void ApplyGlassShaderTemplate(GameObject gameObject,string matchName, string newMaterialName = "object",float fresnel= 0.7f,float shininess = 7f,float specInt = 7f)
         {
             GetIngameObjects();
 
@@ -427,6 +427,10 @@ namespace FCS_AlterraHub.Helpers
                     if(render == null) continue;
 
                     render.material = _glassMaterial;
+                    var glassMat = render.material;
+                    glassMat.SetFloat("_Fresnel", fresnel);
+                    glassMat.SetFloat("_Shininess", shininess);
+                    glassMat.SetFloat("_SpecInt", specInt);
                 }
                 else
                 {

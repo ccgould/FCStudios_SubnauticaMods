@@ -66,7 +66,12 @@ namespace FCS_HomeSolutions.Mods.PaintTool
                     SecondaryColor = new Color(0.1882353f, 0.1843137f, 0.1803922f, 1f),
                     EmissionColor = Color.magenta
                 },
-                new ColorTemplate(),
+                new ColorTemplate
+                {
+                    PrimaryColor = Color.white,
+                    SecondaryColor = new Color(0.8941177f,0.6784314f,0.01960784f,1f),
+                    EmissionColor = Color.cyan
+                },
                 new ColorTemplate(),
                 new ColorTemplate(),
                 new ColorTemplate(),
@@ -264,7 +269,7 @@ namespace FCS_HomeSolutions.Mods.PaintTool
             }
 
             _savedData.Id = GetPrefabID();
-            _savedData.ColorTemplate = _currentTemplate.ToColorTemplate();
+            _savedData.ColorTemplate = _currentTemplate?.ToColorTemplate() ?? new ColorTemplateSave();
             _savedData.ColorTemplates = _currentTemplates.ToListOfColorTemplatesSaves();
             _savedData.Amount = _paintCanFillAmount;
             _savedData.CurrentTemplateIndex = _currentTemplateIndex;
@@ -374,6 +379,7 @@ namespace FCS_HomeSolutions.Mods.PaintTool
                 }
             }
             _currentTemplates[templateIndex] = colorTemplate;
+            RefreshUI();
         }
     }
 }

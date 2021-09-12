@@ -53,44 +53,44 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
             _icon.sprite = _images[_index];
         }
 
-        public SpeedModes GetMode()
+        public HarvesterSpeedModes GetMode()
         {
             switch (_index)
             {
                 case 0:
-                    return SpeedModes.Off;
+                    return HarvesterSpeedModes.Off;
                 case 1:
-                    return SpeedModes.Min;
+                    return HarvesterSpeedModes.Min;
                 case 2:
-                    return SpeedModes.Low;
+                    return HarvesterSpeedModes.Low;
                 case 3:
-                    return SpeedModes.High;
+                    return HarvesterSpeedModes.High;
                 case 4:
-                    return SpeedModes.Max;
+                    return HarvesterSpeedModes.Max;
             }
 
-            return SpeedModes.Off;
+            return HarvesterSpeedModes.Off;
         }
 
-        public void SetSpeedMode(SpeedModes speedMode)
+        public void SetSpeedMode(HarvesterSpeedModes harvesterSpeedMode)
         {
             Initialize();
 
-            switch (speedMode)
+            switch (harvesterSpeedMode)
             {
-                case SpeedModes.Max:
+                case HarvesterSpeedModes.Max:
                     _index = _images.Length - 1;
                     _icon.sprite = _images[_index];
                     break;
-                case SpeedModes.High:
+                case HarvesterSpeedModes.High:
                     _index = 3;
                     _icon.sprite = _images[_index];
                     break;
-                case SpeedModes.Low:
+                case HarvesterSpeedModes.Low:
                     _index = 2;
                     _icon.sprite = _images[_index];
                     break;
-                case SpeedModes.Min:
+                case HarvesterSpeedModes.Min:
                     _index = 1;
                     _icon.sprite = _images[_index];
                     break;

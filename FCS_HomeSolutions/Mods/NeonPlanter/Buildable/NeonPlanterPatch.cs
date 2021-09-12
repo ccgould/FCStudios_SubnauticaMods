@@ -64,10 +64,7 @@ namespace FCS_HomeSolutions.Mods.NeonPlanter.Buildable
             try
             {
                 var prefab = GameObject.Instantiate(_prefab);
-
-                //Disable the object so we can fill in the properties before awake
-                prefab.SetActive(false);
-
+                
                 GameObjectHelpers.AddConstructableBounds(prefab, _settings.Size, _settings.Center);
 
                 var model = prefab.FindChild("model");
@@ -117,7 +114,11 @@ namespace FCS_HomeSolutions.Mods.NeonPlanter.Buildable
                 prefab.AddComponent<TechTag>().type = TechType;
                 
                 var storage = UWEHelpers.CreateStorageContainer(prefab,sRoot,ClassID,FriendlyName,2,2);
+
+                //Disable the object so we can fill in the properties before awake
+                prefab.SetActive(false);
                 var planter = prefab.AddComponent<Planter>();
+                
                 planter.slots = new[]
                 {
                     slot1.transform,

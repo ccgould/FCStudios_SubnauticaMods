@@ -223,12 +223,12 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
             return true;
         }
 
-        public void SetSpeedMode(SpeedModes result)
+        public void SetSpeedMode(HarvesterSpeedModes result)
         {
             QuickLogger.Debug($"Setting SpeedMode to {result}",true);
             foreach (PlantSlot plantSlot in Slots)
             {
-                plantSlot.CurrentSpeedMode = result;
+                plantSlot.CurrentHarvesterSpeedMode = result;
             }
             HarvesterController.DisplayManager.UpdateUI();
         }
@@ -248,14 +248,14 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
             return Slots[slotIndex];
         }
 
-        public SpeedModes GetCurrentSpeedMode()
+        public HarvesterSpeedModes GetCurrentSpeedMode()
         {
-            return Slots[0].CurrentSpeedMode;
+            return Slots[0].CurrentHarvesterSpeedMode;
         }
 
         public void Load(HydroponicHarvesterDataEntry savedData)
         {
-            SetSpeedMode(savedData.SpeedMode);
+            SetSpeedMode(savedData.HarvesterSpeedMode);
             
             if (savedData.SlotData.Count != 3) return;
 

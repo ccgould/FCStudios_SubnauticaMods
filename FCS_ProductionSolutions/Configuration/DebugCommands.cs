@@ -73,7 +73,7 @@ namespace FCS_ProductionSolutions.Configuration
                 if (controller.UnitID.Equals($"HH{id:D3}", StringComparison.OrdinalIgnoreCase))
                 {
 
-                    if (Enum.TryParse(mode, true, out SpeedModes result))
+                    if (Enum.TryParse(mode, true, out HarvesterSpeedModes result))
                     {
                         controller.GrowBedManager.SetSpeedMode(result);
                     }

@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FCS_AlterraHomeSolutions.Mono.PaintTool;
+﻿using System.Linq;
 using FCS_AlterraHub.Buildables;
-using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
-using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
+using FCS_HomeSolutions.Mods.HologramPoster.Buildable;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -28,9 +22,9 @@ namespace FCS_HomeSolutions.Mods.HologramPoster.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.HologramPosterTabID, Mod.ModPackID);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, HologramPosterBuildable.HologramPosterTabID, Mod.ModPackID);
         }
-
+        
         private void OnEnable()
         {
             if (_runStartUpOnEnable)

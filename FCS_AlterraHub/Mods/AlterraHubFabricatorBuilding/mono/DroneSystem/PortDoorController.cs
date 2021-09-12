@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using FCS_AlterraHub.Helpers;
+using UnityEngine;
 
 namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 {
@@ -14,12 +15,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             closedPos = transform.position;
             openPos = transform.TransformPoint(new Vector3(OpenPosX, 0f, 0f));
 
-            _openSound = gameObject.AddComponent<FMOD_CustomEmitter>();
-            var openDoor = ScriptableObject.CreateInstance<FMODAsset>();
-            openDoor.id = "keypad_door_open";
-            openDoor.path = "event:/env/keypad_door_open";
-            _openSound.asset = openDoor;
-            _openSound.restartOnPlay = true;
+            _openSound = FModHelpers.CreateCustomEmitter(gameObject, "keypad_door_open", "event:/env/keypad_door_open");
 
             if (StartDoorOpen || doorOpen)
             {

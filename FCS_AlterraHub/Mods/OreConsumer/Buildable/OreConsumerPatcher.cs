@@ -1,4 +1,6 @@
-﻿#if SUBNAUTICA
+﻿
+using SMLHelper.V2.Crafting;
+#if SUBNAUTICA
 using System;
 using System.IO;
 using FCS_AlterraHub.Buildables;
@@ -18,6 +20,7 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Buildable
 {
     internal class OreConsumerPatcher : SMLHelper.V2.Assets.Buildable
     {
+        private readonly GameObject _prefab;
         public override TechGroup GroupForPDA => TechGroup.ExteriorModules;
         public override TechCategory CategoryForPDA => TechCategory.ExteriorModule;
         public override string AssetsFolder => Mod.GetAssetPath();
@@ -26,8 +29,14 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Buildable
 
         public static float OreProcessingTime { get; set; } = 90;
 
-        public OreConsumerPatcher() : base(Mod.OreConsumerClassID, Mod.OreConsumerFriendly, Mod.OreConsumerDescription)
+        internal const string OreConsumerClassID = "OreConsumer";
+        internal const string OreConsumerFriendly = "Alterra Ore Consumer";
+        internal const string OreConsumerDescription = " Turns your ores into credits to use at the Alterra Hub. The Ore Consumer is always very hungry: keep it well fed.";
+        internal const string OreConsumerPrefabName = "FCS_OreConsumer";
+
+        public OreConsumerPatcher() : base(OreConsumerClassID, OreConsumerFriendly, OreConsumerDescription)
         {
+            _prefab = AlterraHub.GetPrefab(OreConsumerPrefabName);
             OnFinishedPatching += () =>
             {
                 Mod.OreConsumerTechType = TechType;
@@ -40,10 +49,10 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Buildable
         {
             try
             {
-                var prefab = GameObject.Instantiate(AlterraHub.OreConsumerPrefab);
+                var prefab = GameObject.Instantiate(_prefab);
 
-                var size = new Vector3(1.353966f, 2.503282f, 1.006555f);
-                var center = new Vector3(0.006554961f, 1.394679f, 0.003277525f);
+                var center = new Vector3(0f, 3.477769f, 0f);
+                var size = new Vector3(6.227153f, 6.457883f, 5.26316f);
 
                 GameObjectHelpers.AddConstructableBounds(prefab, size, center);
 
@@ -73,6 +82,10 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Buildable
                 constructable.allowedOnConstructables = false;
                 constructable.model = model;
                 constructable.techType = TechType;
+                constructable.forceUpright = true;
+                constructable.placeDefaultDistance = 5;
+                constructable.placeMinDistance = 5;
+                constructable.placeMaxDistance = 10;
 
                 PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = ClassID;
@@ -145,7 +158,18 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Buildable
 
         protected override RecipeData GetBlueprintRecipe()
         {
-            return Mod.OreConsumerIngredients;
+            return new RecipeData
+            {
+                craftAmount = 1,
+                Ingredients =
+                {
+                    new Ingredient(TechType.Glass, 2),
+                    new Ingredient(TechType.PlasteelIngot, 2),
+                    new Ingredient(TechType.AdvancedWiringKit, 1),
+                    new Ingredient(TechType.Silicone, 2),
+                    new Ingredient(TechType.Lubricant, 1)
+                }
+            };
         }
 
         protected override Sprite GetItemSprite()

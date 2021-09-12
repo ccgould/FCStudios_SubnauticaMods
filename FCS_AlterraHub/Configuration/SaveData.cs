@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
@@ -23,6 +24,12 @@ namespace FCS_AlterraHub.Configuration
         [JsonProperty(PropertyName = "TL")] internal float TimeLeft { get; set; }
         [JsonProperty(PropertyName = "OQ")] internal Queue<TechType> OreQueue { get; set; }
         [JsonProperty(PropertyName = "BT")] internal bool IsBreakerTripped { get; set; }
+        public float SpeedMultiplyer { get; set; }
+        public float PendingSpeedMultiplyer { get; set; }
+        public float TargetTime { get; set; }
+        public int PendingTargetTime { get; set; }
+        public SpeedModes CurrentSpeedMode { get; set; } = SpeedModes.Min;
+        public SpeedModes PendingSpeedMode { get; set; } = SpeedModes.Min;
     }
 
     internal class AlterraHubDepotEntry : ISaveDataEntry

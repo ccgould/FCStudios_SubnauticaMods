@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.API;
 using FCS_AlterraHub.Helpers;
@@ -9,6 +10,8 @@ using FCS_HomeSolutions.Spawnables;
 using FCS_HomeSolutions.Structs;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using Oculus.Newtonsoft.Json;
+using Oculus.Newtonsoft.Json.Linq;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 #if SUBNAUTICA
@@ -19,15 +22,15 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
 {
     internal class PeeperLoungeBarPatch : DecorationEntryPatch
     {
-        internal const string PeeperLoungeBarClassId = "ahsSweetWaterBar";
+        internal const string PeeperLoungeBarClassId = "PeeperLoungeBar";
         internal const string PeeperLoungeBarFriendly = "Peeper Lounge Bar";
         internal const string PeeperLoungeBarDescription = "All drinks on the house.";
         internal const string PeeperLoungeBarPrefabName = "PeeperLoungeBar";
         internal static string PeeperLoungeBarKitClassID = $"{PeeperLoungeBarClassId}_Kit";
 
-        public PeeperLoungeBarPatch() : base(PeeperLoungeBarClassId, PeeperLoungeBarFriendly, PeeperLoungeBarDescription, ModelPrefab.GetPrefab(PeeperLoungeBarPrefabName, true), new Settings
+        private static readonly Settings Settings = new Settings
         {
-            KitClassID = "ahsSweetWaterBar_kit",
+            KitClassID = PeeperLoungeBarKitClassID,
             AllowedInBase = true,
             AllowedOutside = true,
             AllowedOnGround = true,
@@ -38,7 +41,9 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
             CategoryForPDA = TechCategory.Misc,
             GroupForPDA = TechGroup.Miscellaneous,
             IconName = "PeeperLoungeBar"
-        })
+        };
+
+        public PeeperLoungeBarPatch() : base(PeeperLoungeBarClassId, PeeperLoungeBarFriendly, PeeperLoungeBarDescription, ModelPrefab.GetPrefabFromGlobal(PeeperLoungeBarPrefabName),Settings) 
         {
 
         }
@@ -53,7 +58,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
                 //Disable the object so we can fill in the properties before awake
                 prefab.SetActive(false);
 
-                GameObjectHelpers.AddConstructableBounds(prefab, _settings.Size, _settings.Center);
+                GameObjectHelpers.AddConstructableBounds(prefab, Settings.Size, Settings.Center);
 
                 var model = prefab.FindChild("model");
 
@@ -68,14 +73,14 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
                 // Add constructible
                 var constructable = prefab.AddComponent<Constructable>();
 
-                constructable.allowedOutside = _settings.AllowedOutside;
-                constructable.allowedInBase = _settings.AllowedInBase;
-                constructable.allowedOnGround = _settings.AllowedOnGround;
-                constructable.allowedOnWall = _settings.AllowedOnWall;
-                constructable.rotationEnabled = _settings.RotationEnabled;
-                constructable.allowedOnCeiling = _settings.AllowedOnCeiling;
-                constructable.allowedInSub = _settings.AllowedInSub;
-                constructable.allowedOnConstructables = _settings.AllowedOnConstructables;
+                constructable.allowedOutside = Settings.AllowedOutside;
+                constructable.allowedInBase = Settings.AllowedInBase;
+                constructable.allowedOnGround = Settings.AllowedOnGround;
+                constructable.allowedOnWall = Settings.AllowedOnWall;
+                constructable.rotationEnabled = Settings.RotationEnabled;
+                constructable.allowedOnCeiling = Settings.AllowedOnCeiling;
+                constructable.allowedInSub = Settings.AllowedInSub;
+                constructable.allowedOnConstructables = Settings.AllowedOnConstructables;
                 constructable.model = model;
                 constructable.techType = TechType;
                 
@@ -207,7 +212,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
 
             var spicyPop = new FoodSpawnable(new PeeperBarFoodItemData
             {
-                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("fcs_Dirnk01", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("SpicyPop", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 ClassId = "SpicyPop",
                 Friendly = "MrSpicy Pop",
                 Description = "Wake up those taste buds and the rest of you too. A delicious compliment MrSpicy chips -- IF you’re brave enough -- Spicy Pop packs a crate full of flavor in every bottle. Made with zero caffeine because who could take a nap with all that flavor on your tongue!",
@@ -276,41 +281,38 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
 
         internal static void LoadPeeperLoungeTracks()
         {
-            Mod.AudioClips.Add("PLB_AnnoyingFish", new SoundEntry
+            QuickLogger.Debug($"Peeper Lounge Path: {Path.Combine(Mod.GetAudioFolderPath(), "PeeperLoungeBarTrackConfig.json")}");
+
+            // read file into a string and deserialize JSON to a type
+            var audioEntries = JsonConvert.DeserializeObject<List<AudioData>>(File.ReadAllText(Path.Combine(Mod.GetAudioFolderPath(), "PeeperLoungeBarTrackConfig.json")));
+
+            if (audioEntries == null)
             {
-                Sound = AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "PeeperLoungeBar_AnnoyingFish.mp3")),
-                Message = "These fish are so annoying. Would you mind taking them out?"
-            });
-            Mod.AudioClips.Add("PLB_Hello", new SoundEntry
+                QuickLogger.Error("Failed to load peeper lounge bar audio tracks");
+                return;
+            }
+
+            QuickLogger.Info($"Attempting to load Peeper Lounge Bar audio tracks. Collection size: {audioEntries.Count}");
+
+
+            foreach (AudioData audioData in audioEntries)
             {
-                Sound = AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "PeeperLoungeBar_Hello.mp3")),
-                Message = "Hello Ryley! would you like to purchase something?"
-            });
-            Mod.AudioClips.Add("PLB_ThankYou", new SoundEntry
-            {
-                Sound = AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "PeeperLoungeBar_ThankYou.mp3")),
-                Message = "Thank You! Please come back again!"
-            });
-            Mod.AudioClips.Add("PLB_Intro", new SoundEntry
-            {
-                Sound = AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "PeeperLoungeBar_Intro.mp3")),
-                Message = "Hello, my name is Peeper Lounge, nice to meet you. My function is to make your leisure time fun and efficient with a great selection of drinks and snacks from the Alterra Corporation. I am able to speak to you through your FCS PDA, isn't that great? However, if you prefer, you can disable my voice in the settings for FCS products."
-            });
-            Mod.AudioClips.Add("PLB_FishRemoved", new SoundEntry
-            {
-                Sound = AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "PeeperLoungeBar_FishRemoved.mp3")),
-                Message = "Thank you for taking those pesky fish out!"
-            });
-            Mod.AudioClips.Add("PLB_NoCardDetected", new SoundEntry
-            {
-                Sound = AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "PeeperLoungeBar_NoCardDetected.mp3")),
-                Message = "I maybe blind since I am just a robot, but I can't seem to locate your debit card on your body anywhere!"
-            });
-            Mod.AudioClips.Add("PLB_NotEnoughCredit", new SoundEntry
-            {
-                Sound = AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "PeeperLoungeBar_NotEnoughCredit.mp3")),
-                Message = "TI'm sorry, but it seems you do not have enough credit for this purchase."
-            });
+                Mod.AudioClips.Add(audioData.Key, new SoundEntry
+                {
+                    Sound = AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", $"{audioData.TrackName}.mp3")),
+                    Message = audioData.Caption,
+                    IsRandom = audioData.IsRandom
+                });
+                QuickLogger.Info($"Loaded Peeper Lounge Bar track: {audioData.TrackName}");
+            }
         }
+    }
+
+    internal class AudioData
+    {
+        public string Key { get; set; }
+        public string TrackName { get; set; }
+        public string Caption { get; set; }
+        public bool IsRandom { get; set; }
     }
 }

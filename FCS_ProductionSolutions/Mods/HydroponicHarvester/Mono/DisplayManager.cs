@@ -178,9 +178,9 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
             _homePage.SetActive(true);
         }
         
-        public void SetSpeedGraphic(SpeedModes speedMode)
+        public void SetSpeedGraphic(HarvesterSpeedModes harvesterSpeedMode)
         {
-            _speedBTN.SetSpeedMode(speedMode);
+            _speedBTN.SetSpeedMode(harvesterSpeedMode);
         }
 
         public void SetLightGraphicOff()

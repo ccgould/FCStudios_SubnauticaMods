@@ -11,6 +11,8 @@ using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
+using Button = UnityEngine.UI.Button;
 
 namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
 {
@@ -90,9 +92,14 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
             if (SelectedDestination == null)
             {
                 MessageBoxHandler.main.Show( Buildables.AlterraHub.NoDestinationFound(),FCSMessageButton.OK);
-                VoiceNotificationSystem.main.Play("PDA_Drone_Instructions_key");
                 return false;
             }
+
+            //if (!SelectedDestination.HasDepot())
+            //{
+            //    VoiceNotificationSystem.main.Play("PDA_Drone_Instructions_key");
+            //    return false;
+            //}
 
             if (!CardSystem.main.HasBeenRegistered())
             {

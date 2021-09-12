@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Buildables;
-using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
+using FCS_HomeSolutions.Mods.Elevator.Buildable;
 using FCS_HomeSolutions.Patches;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -49,7 +47,7 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.ElevatorTabID, Mod.ModPackID);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, ElevatorBuildable.ElevatorTabID, Mod.ModPackID);
             if (Manager == null) _screensGroup.gameObject.SetActive(false);
         }
 
@@ -77,8 +75,7 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
                 _platFormTrans.position = Vector3.MoveTowards(pos, Vector3.Lerp(pos, target, LerpTime), _speed * Time.deltaTime);
             }
         }
-
-
+        
         private bool MoveTowards(Transform t, Vector3 target, float speed)
         {
             if (Vector3.Distance(t.position, target) < speed)

@@ -6,6 +6,7 @@ using System.Reflection;
 using FCS_AlterraHub.API;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Structs;
 using FCS_AlterraHub.Systems;
@@ -349,10 +350,7 @@ namespace FCS_AlterraHub.Registration
                                 var audioPath = Path.Combine(modPackData.FilePath, "Audio", $"{entryData.AudioName}.mp3");
                                 if (File.Exists(audioPath))
                                 {
-                                    fModAsset = ScriptableObject.CreateInstance<FMODAsset>();
-                                    fModAsset.id = entryData.AudioName;
-                                    fModAsset.name = "";
-                                    fModAsset.path = audioPath;
+                                    fModAsset = FModHelpers.CreateFmodAsset(string.Empty, audioPath);
 
                                     CustomSoundHandler.Main.RegisterCustomSound(fModAsset.id, fModAsset.path);
                                 }

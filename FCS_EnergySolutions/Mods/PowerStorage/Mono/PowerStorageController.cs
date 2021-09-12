@@ -29,7 +29,7 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
         private readonly Color _colorFull = new Color(0f, 1f, 0f, 1f);
         private Image _bar;
         private ParticleSystem[] _particles;
-        private FMOD_CustomEmitter _audio;
+        private FMOD_CustomLoopingEmitter _audio;
         private bool _allowedToCharge;
         private BasePowerStorage _basePowerStorage;
 
@@ -217,7 +217,10 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
                 }
                 _audio?.Play();
             }
-            _audio?.Stop();
+            else
+            {
+                _audio?.Stop();
+            }
         }
 
         public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)

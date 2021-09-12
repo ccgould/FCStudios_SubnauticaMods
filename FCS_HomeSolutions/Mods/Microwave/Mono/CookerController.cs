@@ -5,6 +5,7 @@ using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Model.Converters;
 using FCS_HomeSolutions.Configuration;
+using FCS_HomeSolutions.Enums;
 using FCS_HomeSolutions.Mods.Stove.Struct;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -12,19 +13,22 @@ using UnityEngine.UI;
 
 namespace FCS_HomeSolutions.Mods.Microwave.Mono
 {
-    internal class MicrowaveController : MonoBehaviour
+    internal class CookerController : MonoBehaviour
     {
         private StorageContainer _storageContainer;
-        private static HashSet<TechType> _allowedTech;
-        private static readonly Dictionary<TechType, CookingItem> _knownCookingData = new();
+        private HashSet<TechType> _allowedTech;
+        private readonly Dictionary<TechType, CookingItem> _knownCookingData = new();
         private CookingItem _pendingItem;
         private float _cookingTime = -1;
         private InterfaceInteraction _interfaceInteraction;
         private Text _textDisplay;
+        public CookingMode CookingMode;
+        public GameObject DummyFoodObject;
 
         private void Update()
         {
-            if (Time.timeScale <= 0 || _interfaceInteraction == null || _storageContainer == null || _storageContainer.container == null) return;
+            if (Time.timeScale <= 0 || _interfaceInteraction == null || _storageContainer == null ||
+                _storageContainer.container == null) return;
 
             _storageContainer.enabled = !_interfaceInteraction.IsInRange;
 
@@ -42,13 +46,15 @@ namespace FCS_HomeSolutions.Mods.Microwave.Mono
                 }
             }
         }
-        
+
         private void Awake()
         {
-            _interfaceInteraction = gameObject.GetComponentInChildren<Canvas>().gameObject.AddComponent<InterfaceInteraction>();
+            _interfaceInteraction = gameObject.GetComponentInChildren<Canvas>().gameObject
+                .AddComponent<InterfaceInteraction>();
             _storageContainer = GetComponent<StorageContainer>();
             _storageContainer.container.allowedTech = GetAllowedTech();
-
+            _storageContainer.container.onAddItem += Container_onAddItem;
+            _storageContainer.container.onRemoveItem += Container_onRemoveItem;
 
             var startBTN = GameObjectHelpers.FindGameObject(gameObject, "StartBTN").GetComponent<Button>();
             _textDisplay = GameObjectHelpers.FindGameObject(gameObject, "InputField").GetComponentInChildren<Text>();
@@ -71,43 +77,62 @@ namespace FCS_HomeSolutions.Mods.Microwave.Mono
                 _pendingItem = new CookingItem();
                 _cookingTime = 0;
                 _storageContainer.enabled = true;
+                _storageContainer.Open(Player.main.transform);
+                _textDisplay.text = TimeConverters.SecondsToMS(0);
             }));
         }
 
-        public static CookingItem GetCookingItemData(TechType techType)
+        private void Container_onRemoveItem(InventoryItem item)
+        {
+            if (!_storageContainer.container.Any())
+            {
+                DummyFoodObject?.SetActive(false);
+            }
+        }
+
+        private void Container_onAddItem(InventoryItem item)
+        {
+            DummyFoodObject?.SetActive(true);
+        }
+
+        public CookingItem GetCookingItemData(TechType techType)
         {
             if (_knownCookingData.ContainsKey(techType))
             {
                 return _knownCookingData[techType];
             }
 
+            var newCookingData = new CookingItem { TechType = techType};
+
             if (CraftData.cookedCreatureList.ContainsKey(techType))
             {
-                var foodData = CraftData.cookedCreatureList[techType];
-                var newCookingData = new CookingItem { TechType = techType, ReturnItem = foodData };
-                _knownCookingData.Add(techType, newCookingData);
-                return newCookingData;
+                var foodData = CraftData.cookedCreatureList[techType]; 
+                if (CookingMode == CookingMode.Cooking) newCookingData.ReturnItem = foodData;
+                newCookingData.CookedItem = foodData;
             }
-
 
             if (Mod.CuredCreatureList.ContainsKey(techType))
             {
                 var foodData = Mod.CuredCreatureList[techType];
-                var newCookingData = new CookingItem { TechType = techType, ReturnItem = foodData };
-                _knownCookingData.Add(techType, newCookingData);
-                return newCookingData;
+                if (CookingMode == CookingMode.Curing) newCookingData.ReturnItem = foodData;
+                newCookingData.CuredItem = foodData;
             }
 
             if (Mod.CustomFoods.ContainsKey(techType))
             {
                 var foodData = Mod.CustomFoods[techType];
-                var newCookingData = new CookingItem { TechType = techType, ReturnItem = foodData };
+                if (CookingMode == CookingMode.Custom) newCookingData.ReturnItem = foodData;
+                newCookingData.CustomItem = foodData;
+            }
+
+            if (newCookingData.CustomItem != TechType.None || newCookingData.CookedItem != TechType.None ||
+                newCookingData.CuredItem != TechType.None)
+            {
                 _knownCookingData.Add(techType, newCookingData);
                 return newCookingData;
             }
 
             return new CookingItem();
-
         }
 
         private float GetCookingTime()
@@ -120,30 +145,49 @@ namespace FCS_HomeSolutions.Mods.Microwave.Mono
             {
                 duration = 2.7f;
             }
+
             QuickLogger.Debug($"Cooking Time Set to: {TimeConverters.SecondsToMS(duration)}");
             return duration;
         }
 
-        private static HashSet<TechType> GetAllowedTech()
+        private HashSet<TechType> GetAllowedTech()
         {
             if (_allowedTech == null)
             {
-                _allowedTech = new HashSet<TechType>();
-
-                foreach (var item in CraftData.cookedCreatureList)
+#if SUBNAUTICA_STABLE
+                _allowedTech = new HashSet<TechType>
                 {
-                    _allowedTech.Add(item.Key);
-                }
+                    TechType.Bladderfish,
+                    TechType.Boomerang,
+                    TechType.Eyeye,
+                    TechType.GarryFish,
+                    TechType.HoleFish,
+                    TechType.Hoopfish,
+                    TechType.Hoverfish,
+                    TechType.LavaBoomerang,
+                    TechType.Oculus,
+                    TechType.Peeper,
+                    TechType.LavaEyeye,
+                    TechType.Reginald,
+                    TechType.Spadefish,
+                    TechType.Spinefish
+                };
+#endif
 
-                foreach (var item in Mod.CuredCreatureList)
-                {
-                    _allowedTech.Add(item.Key);
-                }
+                //foreach (var item in CraftData.cookedCreatureList)
+                //{
+                //    _allowedTech.Add(item.Key);
+                //}
 
-                foreach (var item in Mod.CustomFoods)
-                {
-                    _allowedTech.Add(item.Key);
-                }
+                //foreach (var item in Mod.CuredCreatureList)
+                //{
+                //    _allowedTech.Add(item.Key);
+                //}
+
+                //foreach (var item in Mod.CustomFoods)
+                //{
+                //    _allowedTech.Add(item.Key);
+                //}
 
             }
 

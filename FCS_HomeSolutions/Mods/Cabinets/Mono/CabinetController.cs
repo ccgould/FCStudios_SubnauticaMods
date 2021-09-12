@@ -1,6 +1,4 @@
-﻿using FCS_AlterraHomeSolutions.Mono.PaintTool;
-using FCS_AlterraHub.Buildables;
-using FCS_AlterraHub.Extensions;
+﻿using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
@@ -99,6 +97,7 @@ namespace FCS_HomeSolutions.Mods.Cabinets.Mono
 
             _labelController = GameObjectHelpers.FindGameObject(gameObject, "Label")?.AddComponent<LabelController>();
             _labelController?.Initialize();
+            _labelController?.SetText("Locker");
 
             MaterialHelpers.ChangeMaterialColor(AlterraHub.BaseDecalsEmissiveController,gameObject,Color.cyan);
             MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, gameObject,2f);

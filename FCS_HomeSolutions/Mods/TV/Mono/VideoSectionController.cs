@@ -28,6 +28,8 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
         private GameObject _videoPlayer;
         private GameObject _noVideosFound;
         private RenderTexture _renderTexture;
+        private Button _playBTN;
+        private Button _pauseBTN;
 
         private void Update()
         {
@@ -82,19 +84,34 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
             _noVideosFound = GameObjectHelpers.FindGameObject(videoSelection, "Details");
             var previousBTN = GameObjectHelpers.FindGameObject(_videoPlayer, "PreviousBTN").GetComponent<Button>();
             previousBTN.onClick.AddListener(ChannelDown);
-            var playBTN = GameObjectHelpers.FindGameObject(_videoPlayer, "PlayBTN").GetComponent<Button>();
-            playBTN.onClick.AddListener(Play);
-            var stopBTN = GameObjectHelpers.FindGameObject(_videoPlayer, "StopBTN").GetComponent<Button>();
-            stopBTN.onClick.AddListener(Stop);
-            var nextBTN = GameObjectHelpers.FindGameObject(_videoPlayer, "NextBTN").GetComponent<Button>();
-            nextBTN.onClick.AddListener(ChannelUp);
+            
+            _playBTN = GameObjectHelpers.FindGameObject(_videoPlayer, "PlayBTN").GetComponent<Button>();
+            _playBTN.onClick.AddListener((() =>
+            {
+                Play();
+            }));
 
-            var closeBTN = GameObjectHelpers.FindGameObject(_videoPlayer, "CloseBTN").GetComponent<Button>();
-            closeBTN.onClick.AddListener((() =>
+            _pauseBTN = GameObjectHelpers.FindGameObject(_videoPlayer, "PauseBTN").GetComponent<Button>();
+            _pauseBTN.onClick.AddListener((() =>
+            {
+                Pause();
+            }));
+
+            var stopBTN = GameObjectHelpers.FindGameObject(_videoPlayer, "StopBTN").GetComponent<Button>();
+            stopBTN.onClick.AddListener((() =>
             {
                 _videoPlayer.SetActive(false);
                 Stop();
             }));
+            var nextBTN = GameObjectHelpers.FindGameObject(_videoPlayer, "NextBTN").GetComponent<Button>();
+            nextBTN.onClick.AddListener(ChannelUp);
+
+            //var closeBTN = GameObjectHelpers.FindGameObject(_videoPlayer, "CloseBTN").GetComponent<Button>();
+            //closeBTN.onClick.AddListener((() =>
+            //{
+            //    _videoPlayer.SetActive(false);
+            //    Stop();
+            //}));
 
             _renderTexture = new RenderTexture(1920, 1080, 24);
             _renderTexture.Create();
@@ -167,7 +184,7 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
         {
             if (string.IsNullOrWhiteSpace(_currentChannel) || _videoLocations.Count <= 0 || !_videoLocations.Contains(_currentChannel)) return;
             _video.url = _currentChannel;
-            _video.Play();
+            Play();
             _videoPlayer.SetActive(true);
         }
         
@@ -180,18 +197,21 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
         internal void ChannelDown()
         {
             _currentChannel = _videoLocations.TakeWhile(x => x != _currentChannel).DefaultIfEmpty(_videoLocations[_videoLocations.Count - 1]).LastOrDefault();
-
             ForceChannel();
         }
 
         internal void Play()
         {
             _video.Play();
+            _pauseBTN.gameObject.SetActive(true);
+            _playBTN.gameObject.SetActive(false);
         }
 
         internal void Pause()
         {
             _video.Pause();
+            _pauseBTN.gameObject.SetActive(false);
+            _playBTN.gameObject.SetActive(true);
         }
 
         internal void Stop()

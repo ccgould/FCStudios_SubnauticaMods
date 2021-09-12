@@ -1,5 +1,6 @@
 ﻿using System;
 using FCS_AlterraHub.Buildables;
+using FCS_AlterraHub.Helpers;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
@@ -31,12 +32,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 
         private void Start()
         {
-            openSound = gameObject.AddComponent<FMOD_CustomEmitter>();
-            var rejectedSoundAsset = ScriptableObject.CreateInstance<FMODAsset>();
-            rejectedSoundAsset.id = "keypad_door_open";
-            rejectedSoundAsset.path = "event:/env/keypad_door_open";
-            openSound.asset = rejectedSoundAsset;
-            openSound.restartOnPlay = true;
+            openSound = FModHelpers.CreateCustomEmitter(gameObject, "keypad_door_open", "event:/env/keypad_door_open");
+
             if (!doorObject)
             {
                 doorObject = gameObject;

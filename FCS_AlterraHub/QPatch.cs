@@ -46,8 +46,8 @@ namespace FCS_AlterraHub
 
             LanguageHandler.SetLanguageLine($"Ency_{Mod.AlterraHubDepotClassID}", Mod.AlterraHubDepotFriendly);
             LanguageHandler.SetLanguageLine($"EncyDesc_{Mod.AlterraHubDepotClassID}", PdaEntryMessage);
-            LanguageHandler.SetLanguageLine($"Ency_{Mod.OreConsumerClassID}", Mod.OreConsumerFriendly);
-            LanguageHandler.SetLanguageLine($"EncyDesc_{Mod.OreConsumerClassID}", PdaEntryMessage);
+            LanguageHandler.SetLanguageLine($"Ency_{OreConsumerPatcher.OreConsumerClassID}", OreConsumerPatcher.OreConsumerFriendly);
+            LanguageHandler.SetLanguageLine($"EncyDesc_{OreConsumerPatcher.OreConsumerClassID}", PdaEntryMessage);
 
             //QModServices.Main.AddCriticalMessage($"Power Loss Over Distance Result: {MathHelpers.PowerLossOverDistance(379)}");
 
@@ -157,9 +157,7 @@ namespace FCS_AlterraHub
             var transportDrone = new AlterraTransportDroneSpawnable();
             transportDrone.Patch();
 
-            BoxOpenSoundAsset = ScriptableObject.CreateInstance<FMODAsset>();
-            BoxOpenSoundAsset.id = "box_open";
-            BoxOpenSoundAsset.path = "event:/loot/databox/box_open";
+            BoxOpenSoundAsset = FModHelpers.CreateFmodAsset("box_open", "event:/loot/databox/box_open");
 
             var station = new AlterraStationSpawnable();
             station.Patch();

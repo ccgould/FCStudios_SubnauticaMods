@@ -68,22 +68,17 @@ namespace FCS_AlterraHub.Configuration
         internal const string DebitCardDescription = "This card lets you access your Alterra Account. You must have this card with you to make Alterra Hub purchases.";
         internal const string CardPrefabName = "CreditCard";
         internal static TechType DebitCardTechType { get; set; }
-
-        internal const string OreConsumerClassID = "OreConsumer";
-        internal const string OreConsumerFriendly = "Alterra Ore Consumer";
-        internal const string OreConsumerDescription = " Turns your ores into credits to use at the Alterra Hub. The Ore Consumer is always very hungry: keep it well fed.";
-        internal const string OreConsumerPrefabName = "OreConsumer";
-
+        
         internal const string AlterraHubDepotClassID = "AlterraHubDepot";
         internal const string AlterraHubDepotFriendly = "AlterraHub Depot";
-        internal const string AlterraHubDepotDescription = "N/A";
+        internal const string AlterraHubDepotDescription = "Holds delivered AlterraHub Orders for pickup.";
         internal const string AlterraHubDepotPrefabName = "AlterraHubDepot";
         internal const string AlterraHubDepotTabID = "AHD";
 
         internal const string DronePortPadHubNewClassID = "DronePortPad";
         internal const string DronePortPadHubNewKitClassID = "DronePortPad_Kit";
         internal const string DronePortPadHubNewFriendly = "Transport Drone Terminal";
-        internal const string DronePortPadHubNewDescription = "N/A";
+        internal const string DronePortPadHubNewDescription = "Receives Transport Drones to transfer items to and from the AlterraHub Depot.";
         internal const string DronePortPadHubNewTabID = "DPP";
 
         internal const string AlterraHubStationClassID = "AlterraHubStation";
@@ -111,24 +106,6 @@ namespace FCS_AlterraHub.Configuration
                 new Ingredient(TechType.TitaniumIngot, 1),
                 new Ingredient(TechType.WiringKit, 1),
                 new Ingredient(TechType.ComputerChip, 1)
-            }
-        };
-
-#if SUBNAUTICA
-        internal static TechData OreConsumerIngredients => new()
-#elif BELOWZERO
-                internal static RecipeData OreConsumerIngredients => new RecipeData
-#endif
-        {
-            craftAmount = 1,
-            Ingredients =
-            {
-                new Ingredient(TechType.Glass, 1),
-                new Ingredient(TechType.TitaniumIngot, 1),
-                new Ingredient(TechType.WiringKit, 1),
-                new Ingredient(TechType.Silicone, 1),
-                new Ingredient(TechType.CopperWire, 1),
-                new Ingredient(TechType.Lubricant, 1)
             }
         };
 

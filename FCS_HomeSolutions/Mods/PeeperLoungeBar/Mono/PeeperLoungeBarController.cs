@@ -39,11 +39,12 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
         private Random _random;
         private readonly List<string> _welcomeChatMessages = new()
         {
-            "PLB_Hello",
-            "PLB_AnnoyingFish"
+            //"PLB_Hello",
+            //"PLB_AnnoyingFish"
         };
 
         private InterfaceInteraction _interactionHelper;
+        private Random _fishRandom;
 
         public Channel AudioTrack { get; set; }
         private float _speed => QPatch.Configuration.PeeperLoungeBarTurnSpeed;
@@ -119,6 +120,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
                 }
             };
             _random = new Random();
+            _fishRandom = new Random();
 
             CreateAquariumBTN();
 
@@ -184,6 +186,14 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
 
             var canvas = gameObject.GetComponentInChildren<Canvas>();
             _interactionHelper = canvas.gameObject.AddComponent<InterfaceInteraction>();
+
+            foreach (KeyValuePair<string, SoundEntry> audioClip in Mod.AudioClips)
+            {
+                if (audioClip.Value.IsRandom)
+                {
+                    _welcomeChatMessages.Add(audioClip.Key);
+                }
+            }
 
             UpdateSelection();
             IsInitialized = true;
@@ -256,14 +266,16 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
             
             if (!CheckIfPlayingTrack() && GetCanPlay())
             {
+                var index = _random.Next(_welcomeChatMessages.Count);
+
                 if (_sc.container.count > 0)
                 {
-                    var index = _random.Next(_welcomeChatMessages.Count);
-                    PlayAudioTrack(_welcomeChatMessages[index]);
+                    PlayAudioTrack(_fishRandom.Next(0, 2) == 1 ? "PLB_AnnoyingFish" : _welcomeChatMessages[index]);
                 }
                 else
                 {
-                    PlayAudioTrack(_welcomeChatMessages[0]);
+
+                    PlayAudioTrack(_welcomeChatMessages[index]);
                 }
             }
 

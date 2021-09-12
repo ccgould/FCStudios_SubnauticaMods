@@ -68,7 +68,8 @@ namespace FCS_AlterraHub.Systems
 
         public bool GetCanPlay()
         {
-            return DayNightCycle.main.timePassedAsFloat >= this.timeNextPlay;
+            _currentChannel.isPlaying(out bool isPlaying);
+            return isPlaying;
         }
 
         public bool Play(string notificationKey, params object[] args)
@@ -76,18 +77,13 @@ namespace FCS_AlterraHub.Systems
             if (!GetCanPlay())
             {
                 AddToQueue(notificationKey, args);
+                return false;
             }
             if (_voiceNotifications.ContainsKey(notificationKey))
             {
                 var sound = _voiceNotifications[notificationKey].Sound;
                 var text = _voiceNotifications[notificationKey].Text;
 
-                float timePassedAsFloat = DayNightCycle.main.timePassedAsFloat;
-                if (timePassedAsFloat < this.timeNextPlay)
-                {
-                    return false;
-                }
-                this.timeNextPlay = timePassedAsFloat + this.minInterval;
                 if (!string.IsNullOrEmpty(text))
                 {
                     Subtitles.main.Add(text, args);
@@ -99,6 +95,11 @@ namespace FCS_AlterraHub.Systems
             return false;
         }
 
+        private float GetCharDelay()
+        {
+            return 1f / speed;
+        }
+        public float speed = 15f;
         private void AddToQueue(string notificationKey, object[] args)
         {
             if (_queue.Any(x => x.Key.Equals(notificationKey))) return;

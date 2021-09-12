@@ -32,7 +32,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
         private int BuildingCapacity = 15;
         private PlatformController _platformController;
         private float _timeBuildCompleted = -1f;
-        private bool _isBuilding;
+        private bool _isBuilding = true;
 
         private SortedDictionary<string, ConnectedTurbineData> _connectedTurbines = new SortedDictionary<string, ConnectedTurbineData>();
         private SortedDictionary<string, WindSurferPlatformBase> _connectedTurbinesController = new SortedDictionary<string, WindSurferPlatformBase>();
@@ -96,6 +96,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
                 
                 //_colorManager.ChangeColor(_saveData.Body.Vector4ToColor());
                //_colorManager.ChangeColor(_saveData.SecondaryBody.Vector4ToColor(), ColorTargetMode.Secondary);
+               _isBuilding = false;
                 _fromSave = false;
             }
         }
@@ -105,7 +106,17 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
             if (!_rb.isKinematic && !_isBuilding && _timeBuildCompleted + 3f < Time.time &&_rb.velocity.sqrMagnitude < 0.1f)
             {
                 _rb.isKinematic = true;
+                foreach (LadderController controller in _ladders)
+                {
+                    controller.gameObject.SetActive(true);
+                }
             }
+        }
+
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
+            Manager?.NotifyByID(Mod.TelepowerPylonTabID, "PylonDestroy");
         }
 
         public void SubConstructionComplete()
@@ -210,7 +221,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
         private int _childPlacementsCorrect;
         private bool _removingPlatform;
         private FCSStorage _storage;
-
+        private List<LadderController> _ladders = new();
 
         private void UpdateData()
         {
@@ -220,6 +231,11 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
                 _unitIDText.text = UnitID;
                 _turbineCountText.text = $"{_connectedTurbines.Count}/{BuildingCapacity}";
             }
+        }
+
+        internal bool IsBuilding()
+        {
+            return _isBuilding;
         }
 
         private void CheckTeleportationComplete()
@@ -272,15 +288,25 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
         {
             var t01 = GameObjectHelpers.FindGameObject(gameObject, "T01").EnsureComponent<LadderController>();
             t01.Set(GameObjectHelpers.FindGameObject(gameObject, "T01_Top"));
+            t01.gameObject.SetActive(false);
 
             var t02 = GameObjectHelpers.FindGameObject(gameObject, "T02").EnsureComponent<LadderController>();
             t02.Set(GameObjectHelpers.FindGameObject(gameObject, "T02_Top"));
+            t02.gameObject.SetActive(false);
 
             var t03 = GameObjectHelpers.FindGameObject(gameObject, "T03").EnsureComponent<LadderController>();
             t03.Set(GameObjectHelpers.FindGameObject(gameObject, "T03_Top"));
+            t03.gameObject.SetActive(false);
 
             var t04 = GameObjectHelpers.FindGameObject(gameObject, "T04").EnsureComponent<LadderController>();
             t04.Set(GameObjectHelpers.FindGameObject(gameObject, "T04_Top"));
+            t04.gameObject.SetActive(false);
+
+
+            _ladders.Add(t01);
+            _ladders.Add(t02);
+            _ladders.Add(t03);
+            _ladders.Add(t04);
         }
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)

@@ -460,6 +460,11 @@ namespace FCS_AlterraHub.Helpers
         {
             return CraftDataHandler.GetTechData(techType);
         }
+
+        public static bool IsNear(Vector3 a, Vector3 b)
+        {
+            return a.x < b.x + 0.1f && a.x > b.x - 0.1f && a.y < b.y + 0.1f && a.y > b.y - 0.1f && a.z < b.z + 0.1f && a.z > b.z - 0.1f;
+        }
     }
 
     public struct PickReturnsData

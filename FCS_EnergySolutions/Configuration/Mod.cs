@@ -100,7 +100,7 @@ namespace FCS_EnergySolutions.Configuration
         internal static string PowerStoragePrefabName => PowerStorageModName;
 
         internal const string UniversalChargerTabID = "UC";
-        internal const string UniversalChargerDescription = "Holds up to 10 Power Cells and 6 Batteries. Recharges cells when Base Power is plentiful. Swap Power Cells at any time.";
+        internal const string UniversalChargerDescription = "Zero maintenance power backup. Stores energy when Base Power is plentiful, discharges energy when Base Power is low.";
         internal const string UniversalChargerFriendlyName = "Universal Charger";
         internal const string UniversalChargerModName = "UniversalCharger";
         internal const string UniversalChargerClassName = "UniversalCharger";

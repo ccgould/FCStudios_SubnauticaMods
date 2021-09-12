@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Buildables;
-using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
-using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Mods.MiniFountainFilter.Buildables;
 using FCS_HomeSolutions.Mods.MiniFountainFilter.Managers;
@@ -114,12 +111,7 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Mono
 
             if (_machineSound == null)
             {
-                _machineSound = gameObject.AddComponent<FMOD_CustomLoopingEmitter>();
-                var machineSoundAsset = ScriptableObject.CreateInstance<FMODAsset>();
-                machineSoundAsset.id = "water_filter_loop";
-                machineSoundAsset.path = "event:/sub/base/water_filter_loop";
-                _machineSound.asset = machineSoundAsset;
-                _machineSound.restartOnPlay = true;
+                _machineSound = FModHelpers.CreateCustomLoopingEmitter(gameObject, "water_filter_loop", "event:/sub/base/water_filter_loop");
             }
 
 
@@ -229,37 +221,33 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Mono
         {
             if (!IsOperational || Manager.GetPowerState() == PowerSystem.Status.Offline)
             {
+                DisplayManager.TurnOffDisplay();
                 ToggleEffectsAndSound(false);
                 return;
             }
 
             if (!IsUnderWater() || TankManager.IsFull())
             {
-                ToggleEffectsAndSound(false,true);
+                DisplayManager.TurnOnDisplay();
+                ToggleEffectsAndSound(false);
                 return;
             }
 
+            DisplayManager.TurnOnDisplay();
             ToggleEffectsAndSound(true);
         }
 
-        private void ToggleEffectsAndSound(bool isRunning, bool affectEffectsOnly = false)
+        private void ToggleEffectsAndSound(bool isRunning)
         {
-            if (_xBubbles == null || _machineSound == null || DisplayManager == null) return;
+            if (_xBubbles == null || _machineSound == null) return;
+
             if (isRunning)
             {
-                if (!affectEffectsOnly)
-                {
-                    DisplayManager.TurnOnDisplay();
-                }
                 if (!_xBubbles.isPlaying) _xBubbles.Play();
                 if (!_machineSound._playing) _machineSound.Play();
             }
             else
             {
-                if (!affectEffectsOnly)
-                {
-                    DisplayManager.TurnOffDisplay();
-                }
                 if (_xBubbles.isPlaying) _xBubbles?.Stop();
                 if (_machineSound._playing) _machineSound.Stop();
             }

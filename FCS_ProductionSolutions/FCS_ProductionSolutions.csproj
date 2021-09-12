@@ -60,7 +60,6 @@
     <Compile Include="Mods\DeepDriller\Mono\FCSDeepDrillerThermalController.cs" />
     <Compile Include="Mods\DeepDriller\Structs\FilterBtnData.cs" />
     <Compile Include="Mods\DeepDriller\Mono\NotificationSystem.cs" />
-    <Compile Include="Mods\DeepDriller\Mono\PistonBobbing.cs" />
     <Compile Include="Mods\DeepDriller\Ores\SandOrePatcher.cs" />
     <Compile Include="Mods\DeepDriller\Patchers\Builder_CheckAsSubModule_Patch.cs" />
     <Compile Include="Mods\DeepDriller\Patchers\FCSConnectableAwake_Patcher.cs" />
@@ -75,7 +74,7 @@
     <Compile Include="Mods\HydroponicHarvester\Mono\SlotsData.cs" />
     <Compile Include="Mods\MatterAnalyzer\Buildable\MatterAnalyzerPatch.cs" />
     <Compile Include="Mods\HydroponicHarvester\Enumerators\ClonePhases.cs" />
-    <Compile Include="Mods\HydroponicHarvester\Enumerators\SpeedModes.cs" />
+    <Compile Include="Mods\HydroponicHarvester\Enumerators\HarvesterSpeedModes.cs" />
     <Compile Include="Mods\HydroponicHarvester\Models\PlantSlot.cs" />
     <Compile Include="Mods\HydroponicHarvester\Mono\GrowBedManager.cs" />
     <Compile Include="Mods\HydroponicHarvester\Mono\HydroponicHarvesterController.cs" />

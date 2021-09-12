@@ -51,7 +51,7 @@ namespace FCS_AlterraHub.Configuration
         [JsonIgnore]
         internal Action<bool> OnPlaySoundToggleEvent { get; set; }
 
-        [Toggle("[Alterra Transport Drone] Enable Transport Drone Audio", Order = 1, Tooltip = "Enables/Disables the sound effects on the drone.")]
+        [Toggle("[Alterra Transport Drone] Enable Drone Audio", Order = 1, Tooltip = "Enables/Disables the sound effects on the drone.")]
         public bool AlterraTransportDroneFxAllowed { get; set; } = true;
 
         [Slider("[Alterra Transport Drone] Master Volume", 0.0f, 1.0f, DefaultValue = 1.0f, Step = 0.01f,

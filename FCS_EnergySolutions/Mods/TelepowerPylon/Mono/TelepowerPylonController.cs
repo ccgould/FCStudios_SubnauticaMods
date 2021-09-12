@@ -92,6 +92,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             }
 
             InvokeRepeating(nameof(CheckTeleportationComplete), 0.2f, 0.2f);
+            Manager.NotifyByID(Mod.TelepowerPylonTabID, "PylonBuilt");
         }
 
         private void CheckTeleportationComplete()
@@ -178,6 +179,8 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
                         break;
                 }
             }
+
+            Manager?.NotifyByID(Mod.TelepowerPylonTabID, "PylonDestroy");
 
         }
 
@@ -358,6 +361,14 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
                 }
             };
 
+            IPCMessage += message =>
+            {
+                if (message.Equals("PylonBuilt") || message.Equals("PylonDestroy"))
+                {
+                    RefreshPylonList();
+                }
+            };
+
             var canvas = gameObject.GetComponentInChildren<Canvas>();
             _interactionHelper = canvas.gameObject.AddComponent<InterfaceInteraction>();
 
@@ -530,6 +541,15 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         private void RefreshPylonList()
         {
             foreach (var fcsDeviceKey in FCSAlterraHubService.PublicAPI.GetRegisteredDevicesOfId(Mod.TelepowerPylonTabID))
+            {
+                if (fcsDeviceKey.Value is not ITelepowerPylonConnection pylon) continue;
+
+                if (pylon.Equals(GetPrefabID()) || pylon.GetCurrentMode() != TelepowerPylonMode.PUSH || fcsDeviceKey.Value.Manager == Manager) continue;
+
+                TryAddPylonToPullGrid(pylon.UnitID, pylon);
+            }
+
+            foreach (var fcsDeviceKey in FCSAlterraHubService.PublicAPI.GetRegisteredDevicesOfId(Mod.WindSurferOperatorTabID))
             {
                 if (fcsDeviceKey.Value is not ITelepowerPylonConnection pylon) continue;
 
@@ -739,7 +759,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         public override bool CanDeconstruct(out string reason)
         {
             reason = string.Empty;
-            if ((_powerManager != null && _powerManager.HasConnections()) || _trackedPullFrequencyItem.Any())
+            if ((_powerManager != null && _powerManager.HasConnections()) )
             {
                 reason = AuxPatchers.RemoveAllTelepowerConnections();
                 return false;

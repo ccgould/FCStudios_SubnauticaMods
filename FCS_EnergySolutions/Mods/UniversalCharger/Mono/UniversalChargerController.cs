@@ -1,11 +1,10 @@
 ﻿using System.Linq;
-using FCS_AlterraHomeSolutions.Mono.PaintTool;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
-using FCS_EnergySolutions.Buildable;
 using FCS_EnergySolutions.Configuration;
 using FCS_EnergySolutions.Mods.PowerStorage.Enums;
 using FCSCommon.Utilities;
@@ -96,7 +95,7 @@ namespace FCS_EnergySolutions.Mods.UniversalCharger.Mono
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial, ModelPrefab.SecondaryMaterial, ModelPrefab.EmissiveControllerMaterial);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol, AlterraHub.BaseLightsEmissiveController);
             }
 
             _handTarget = GameObjectHelpers.FindGameObject(gameObject, "HandTarget");
@@ -141,16 +140,7 @@ namespace FCS_EnergySolutions.Mods.UniversalCharger.Mono
                 {
                     _previousToggle.SetIsOnWithoutNotify(true);
                 }
-                //if (_toggleGroup.ActiveToggles().ElementAt(0).name.StartsWith("BatteryToggle"))
-                //{
-                //    _powercellToggle.SetIsOnWithoutNotify(true);
-                //    _batteryToggle.SetIsOnWithoutNotify(false);
-                //}
-                //else
-                //{
-                //    _powercellToggle.SetIsOnWithoutNotify(false);
-                //    _batteryToggle.SetIsOnWithoutNotify(true);
-                //}
+
                 _messageBox.Show(AuxPatchers.UniversalChargerCannotChangeMode(), FCSMessageButton.OK, null);
                 return;
             }

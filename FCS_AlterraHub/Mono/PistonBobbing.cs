@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 
-namespace FCS_ProductionSolutions.Mods.DeepDriller.Mono
+namespace FCS_AlterraHub.Mono
 {
-    internal class PistonBobbing : MonoBehaviour
+    public class PistonBobbing : MonoBehaviour
     {
         // User Inputs
         public float amplitude = -0.1f;//0.5f;
@@ -10,6 +10,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Mono
 
         // Position Storage Variable
         private Vector3 originalLocalPosition;
+        [SerializeField]
         private bool _isRunning;
         public bool Invert { get; set; }
 
@@ -25,7 +26,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Mono
             _isRunning = isRunning;
         }
 
-        // Update is called once per frame
+        // Update is called once per frame  
         private void Update()
         {
             if (!_isRunning) return;

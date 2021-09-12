@@ -22,7 +22,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Models
         
         public int Id;
         public bool IsOccupied;
-        private SpeedModes _currentMode;
+        private HarvesterSpeedModes _currentHarvesterMode;
         public GameObject PlantModel;
         private const int MaxCapacity = 50;
         public bool PauseUpdates { get; set; }
@@ -33,7 +33,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Models
 
         public bool NotAllowToGenerate()
         {
-            return GrowBedManager == null || !GrowBedManager.GetIsConstructed() || PauseUpdates|| CurrentSpeedMode == SpeedModes.Off || _plantable == null;
+            return GrowBedManager == null || !GrowBedManager.GetIsConstructed() || PauseUpdates|| CurrentHarvesterSpeedMode == HarvesterSpeedModes.Off || _plantable == null;
         }
 
         internal float GenerationProgress
@@ -42,17 +42,17 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Models
             set => _progress[(int)ClonePhases.Generating] = value;
         }
         
-        internal SpeedModes CurrentSpeedMode
+        internal HarvesterSpeedModes CurrentHarvesterSpeedMode
         {
-            get => _currentMode;
+            get => _currentHarvesterMode;
             set
             {
-                SpeedModes previousMode = _currentMode;
-                _currentMode = value;
+                HarvesterSpeedModes previousMode = _currentHarvesterMode;
+                _currentHarvesterMode = value;
 
-                if (_currentMode != SpeedModes.Off)
+                if (_currentHarvesterMode != HarvesterSpeedModes.Off)
                 {
-                    if (previousMode == SpeedModes.Off)
+                    if (previousMode == HarvesterSpeedModes.Off)
                         TryStartingNextClone();
                 }
             }
@@ -88,8 +88,8 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Models
 
         private float CalculateEnergyPerSecond()
         {
-            if (CurrentSpeedMode == SpeedModes.Off) return 0f;
-            var creationTime = Convert.ToSingle(CurrentSpeedMode);
+            if (CurrentHarvesterSpeedMode == HarvesterSpeedModes.Off) return 0f;
+            var creationTime = Convert.ToSingle(CurrentHarvesterSpeedMode);
             return EnergyConsumption / creationTime;
         }
         
@@ -172,7 +172,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Models
         {
             QuickLogger.Debug("Trying to start another clone", true);
 
-            if (CurrentSpeedMode == SpeedModes.Off)
+            if (CurrentHarvesterSpeedMode == HarvesterSpeedModes.Off)
                 return;// Powered off, can't start a new clone
 
             if (!IsFull && GenerationProgress == -1f)

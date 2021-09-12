@@ -24,17 +24,27 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Buildable
 {
     internal partial class FireExtinguisherRefuelerBuildable : SMLHelper.V2.Assets.Buildable
     {
-        public FireExtinguisherRefuelerBuildable() : base(Mod.FireExtinguisherRefuelerClassID, Mod.FireExtinguisherRefuelerFriendly, Mod.FireExtinguisherRefuelerDescription)
-        {
+        private readonly GameObject _prefab;
+        internal const string FireExtinguisherRefuelerClassID = "FireExtinguisherRefueler";
+        internal const string FireExtinguisherRefuelerFriendly = "Fire Extinguisher Refueler";
 
+        internal const string FireExtinguisherRefuelerDescription =
+            "Use the Fire Extinguisher Refueler to refill any fire extinguisher";
+
+        internal const string FireExtinguisherRefuelerPrefabName = "FCS_FireExtinguisherRefueler";
+        internal const string FireExtinguisherRefuelerKitClassID = "FireExtinguisherRefueler_Kit";
+        internal const string FireExtinguisherRefuelerTabID = "FER";
+        public FireExtinguisherRefuelerBuildable() : base(FireExtinguisherRefuelerClassID, FireExtinguisherRefuelerFriendly, FireExtinguisherRefuelerDescription)
+        {
+            _prefab = ModelPrefab.GetPrefabFromGlobal(FireExtinguisherRefuelerPrefabName);
             OnStartedPatching += () =>
             {
-                var miniFountainKit = new FCSKit(Mod.FireExtinguisherRefuelerKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
+                var miniFountainKit = new FCSKit(FireExtinguisherRefuelerKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 miniFountainKit.Patch();
             };
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.FireExtinguisherRefuelerKitClassID.ToTechType(), 60000, StoreCategory.Home);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, FireExtinguisherRefuelerKitClassID.ToTechType(), 60000, StoreCategory.Home);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
             };
         }
@@ -43,7 +53,7 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Buildable
         {
             try
             {
-                var prefab = GameObject.Instantiate(ModelPrefab.FireExtinguisherRefuelerPrefab);
+                var prefab = GameObject.Instantiate(_prefab);
 
                 prefab.name = this.PrefabFileName;
                 
@@ -89,6 +99,7 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Buildable
                 UWEHelpers.CreateStorageContainer(prefab, prefab.FindChild("StorageRoot"), ClassID, "Fire Extinguisher Receptacle",feItemSize.x, feItemSize.y);
 
                 prefab.AddComponent<FireExtinguisherRefuelerController>();
+                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", ClassID);
 
                 return prefab;
             }
@@ -110,7 +121,7 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Buildable
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(Mod.FireExtinguisherRefuelerKitClassID.ToTechType(), 1)
+                    new Ingredient(FireExtinguisherRefuelerKitClassID.ToTechType(), 1)
                 }
             };
             return customFabRecipe;

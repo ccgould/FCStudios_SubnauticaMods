@@ -1,6 +1,6 @@
 ﻿namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Enumerators
 {
-    internal enum SpeedModes
+    internal enum HarvesterSpeedModes
     {
         Off = 0,
         Max = 1 * 60,

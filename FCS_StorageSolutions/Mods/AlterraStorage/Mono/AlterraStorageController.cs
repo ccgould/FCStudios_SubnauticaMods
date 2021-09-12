@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Enumerators;
-using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Model;
@@ -43,6 +41,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
         private NameController _nameController;
         private Text _labelText;
         private PaginatorController _paginatorController;
+        private bool _subscribed;
 
         public override StorageType StorageType => StorageType.OtherStorage;
 
@@ -52,11 +51,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.AlterraStorageTabID, Mod.ModPackID);
             Manager.AlertNewFcsStoragePlaced(this);
-        }
-
-        private void Update()
-        {
-
+            UpdateStorageCount();
         }
 
         private void OnEnable()
@@ -88,6 +83,11 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
         {
             base.OnDestroy();
             _isBeingDestroyed = true;
+            if (_storageContainer?.container != null)
+            {
+                _storageContainer.container.onAddItem -= OnStorageUpdate;
+                _storageContainer.container.onRemoveItem -= OnStorageUpdate;
+            }
         }
 
         #endregion
@@ -102,18 +102,29 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
             return this;
         }
 
+        private void LateUpdate()
+        {
+            Subscribe(true);
+        }
+
         public override void Initialize()
         {
+            
             _storageAmount = GameObjectHelpers.FindGameObject(gameObject, "StorageAmount").GetComponent<Text>();
 
-            foreach (Transform invItem in GameObjectHelpers.FindGameObject(gameObject, "Grid").transform)
+            var grid = GameObjectHelpers.FindGameObject(gameObject, "Grid"); 
+            if (grid != null)
             {
-                var invButton = invItem.gameObject.EnsureComponent<InventoryButton>();
-                invButton.ButtonMode = InterfaceButtonMode.Background;
-                invButton.BtnName = "InventoryBTN";
-                invButton.OnButtonClick += OnButtonClick;
-                _inventoryButtons.Add(invButton);
+                foreach (Transform invItem in grid.transform)
+                {
+                    var invButton = invItem.gameObject.EnsureComponent<InventoryButton>();
+                    invButton.ButtonMode = InterfaceButtonMode.Background;
+                    invButton.BtnName = "InventoryBTN";
+                    invButton.OnButtonClick += OnButtonClick;
+                    _inventoryButtons.Add(invButton);
+                }
             }
+
 
             if (_dumpContainer == null)
             {
@@ -128,18 +139,12 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
                 _colorManager.Initialize(gameObject, AlterraHub.BaseOpaqueExterior);
             }
 
-            _storageContainer = gameObject.GetComponent<StorageContainer>();
-            _storageContainer.enabled = false;
-            _storageContainer.container.onAddItem += item =>
+            if (_storageContainer == null)
             {
-                _inventoryGrid.DrawPage();
-                UpdateStorageCount();
-            };
-            _storageContainer.container.onRemoveItem += item =>
-            {
-                _inventoryGrid.DrawPage();
-                UpdateStorageCount();
-            };
+                _storageContainer = gameObject.GetComponent<StorageContainer>();
+                _storageContainer.enabled = false;
+            }
+
 
             _labelText = GameObjectHelpers.FindGameObject(gameObject, "ContainerLabel").GetComponent<Text>();
             var label = GameObjectHelpers.FindGameObject(gameObject, "ContainerLabel").AddComponent<InterfaceButton>();
@@ -175,6 +180,49 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
             IsInitialized = true;
         }
 
+        private void OnDisable()
+        {
+            Subscribe(false);
+            if (_storageContainer != null)
+            {
+                _storageContainer.enabled = false;
+            }
+        }
+
+        private void Subscribe(bool state)
+        {
+            if (_subscribed == state)
+            {
+                return;
+            }
+            if (_storageContainer.container == null)
+            {
+                QuickLogger.Debug("AlterraStorager.Subscribe(): container null; will retry next frame");
+                return;
+            }
+            if (_subscribed)
+            {
+                _storageContainer.container.onAddItem -= OnStorageUpdate;
+                _storageContainer.container.onRemoveItem -= OnStorageUpdate;
+                _storageContainer.container.isAllowedToAdd = null;
+                _storageContainer.container.isAllowedToRemove = null;
+            }
+            else
+            {
+                _storageContainer.container.onAddItem += OnStorageUpdate;
+                _storageContainer.container.onRemoveItem += OnStorageUpdate;
+                _storageContainer.container.isAllowedToAdd = IsAllowedToAdd;
+            }
+            _subscribed = state;
+        }
+
+        private void OnStorageUpdate(InventoryItem item)
+        {
+            _inventoryGrid.DrawPage();
+            UpdateStorageCount();
+        }
+
+
         private void OnLabelChanged(string arg1, NameController arg2)
         {
             _labelText.text = arg1;
@@ -189,7 +237,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
 
         private void UpdateStorageCount()
         {
-            _storageAmount.text = AuxPatchers.AlterraStorageAmountFormat(_storageContainer.container.count, MAXSTORAGE);
+            _storageAmount.text = AuxPatchers.AlterraStorageAmountFormat(_storageContainer?.container?.count ?? 0, MAXSTORAGE);
         }
 
         private void OnButtonClick(string arg1, object arg2)

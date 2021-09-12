@@ -27,9 +27,9 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             _id = id;
             _door = door;
 
-            keyInputSound = gameObject.AddComponent<FMOD_CustomEmitter>();
-            acceptedSound = gameObject.AddComponent<FMOD_CustomEmitter>();
-            rejectedSound = gameObject.AddComponent<FMOD_CustomEmitter>();
+            keyInputSound = FModHelpers.CreateCustomEmitter(gameObject, "input_number", "event:/env/input_number");
+            acceptedSound = FModHelpers.CreateCustomEmitter(gameObject, "keypad_correct", "event:/env/keypad_correct");
+            rejectedSound = FModHelpers.CreateCustomEmitter(gameObject, "keypad_wrong", "event:/env/keypad_wrong");
 
             keypadUI = GameObjectHelpers.FindGameObject(gameObject, "DialPadBG");
             unlockIcon = GameObjectHelpers.FindGameObject(gameObject, "LockIcon");
@@ -37,25 +37,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             numberField = GameObjectHelpers.FindGameObject(gameObject, "DisplayText").GetComponent<Text>();
             var backBTN = GameObjectHelpers.FindGameObject(gameObject, "BackButton").GetComponent<Button>();
             backBTN.onClick.AddListener(BackspaceButtonPress);
-
-            var keyInputAsset = ScriptableObject.CreateInstance<FMODAsset>();
-            keyInputAsset.id = "input_number";
-            keyInputAsset.path = "event:/env/input_number";
-            keyInputSound.asset = keyInputAsset;
-            keyInputSound.restartOnPlay = true;
-
-            var acceptedSoundAsset = ScriptableObject.CreateInstance<FMODAsset>();
-            acceptedSoundAsset.id = "keypad_correct";
-            acceptedSoundAsset.path = "event:/env/keypad_correct";
-            acceptedSound.asset = acceptedSoundAsset;
-            acceptedSound.restartOnPlay = true;
-
-            var rejectedSoundAsset = ScriptableObject.CreateInstance<FMODAsset>();
-            rejectedSoundAsset.id = "keypad_wrong";
-            rejectedSoundAsset.path = "event:/env/keypad_wrong";
-            rejectedSound.asset = rejectedSoundAsset;
-            rejectedSound.restartOnPlay = true;
-
 
             _accessCode = accessCode;
 
@@ -168,6 +149,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         public void ForceOpen()
         {
             _door.Open();
+        }
+
+        public bool IsUnlocked()
+        {
+            return unlocked;
         }
     }
 }

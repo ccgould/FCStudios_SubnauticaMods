@@ -1,4 +1,6 @@
-﻿using FCS_AlterraHub.Helpers;
+﻿using System.Collections;
+using System.Collections.Generic;
+using FCS_AlterraHub.Helpers;
 using FCSCommon.Helpers;
 using UnityEngine;
 
@@ -6,35 +8,64 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Model
 {
     internal class EffectsManager : MonoBehaviour
     {
-        private GameObject _bubbles;
-        private GameObject _smoke;
+        private HashSet<ParticleSystem> _smokeParticleEmitters = new();
+        private HashSet<ParticleSystem> _bubblesParticleEmitters = new();
         private bool _isUnderwater;
 
         internal void Initialize(bool isUnderWater)
         {
-            _bubbles = GameObjectHelpers.FindGameObject(gameObject, "xBubbles");
-            _smoke = GameObjectHelpers.FindGameObject(gameObject, "WhiteSmoke");
+            _smokeParticleEmitters.Add(gameObject.transform.Find("WhiteSmoke").GetComponent<ParticleSystem>());
+            _smokeParticleEmitters.Add(gameObject.transform.Find("WhiteSmoke_1").GetComponent<ParticleSystem>());
+            _bubblesParticleEmitters.Add(gameObject.transform.Find("xBubbles").GetComponent<ParticleSystem>());
+            _bubblesParticleEmitters.Add(gameObject.transform.Find("xBubbles_1").GetComponent<ParticleSystem>());
             _isUnderwater = isUnderWater;
         }
 
-        internal void ShowEffect()
+        private IEnumerator PlayFX()
+        {
+            EmitterState(true);
+            yield return new WaitForSeconds(1f);
+            EmitterState(false);
+        }
+
+
+        private void EmitterState(bool state)
         {
             if (_isUnderwater)
             {
-                _bubbles.SetActive(true);
-                _smoke.SetActive(false);
+                foreach (ParticleSystem emitter in _bubblesParticleEmitters)
+                {
+                    if (state)
+                    {
+                        emitter.Play();
+                    }
+                    else
+                    {
+                        emitter.Stop();
+                    }
+                }
             }
             else
             {
-                _bubbles.SetActive(false);
-                _smoke.SetActive(true);
+                foreach (ParticleSystem emitter in _smokeParticleEmitters)
+                {
+                    if (state)
+                    {
+                        emitter.Play();
+                    }
+                    else
+                    {
+                        emitter.Stop();
+                    }
+                }
             }
+
+
         }
 
-        internal void HideEffect()
+        public void TriggerFX()
         {
-            _bubbles.SetActive(false);
-            _smoke.SetActive(false);
+            StartCoroutine(PlayFX());
         }
     }
 }

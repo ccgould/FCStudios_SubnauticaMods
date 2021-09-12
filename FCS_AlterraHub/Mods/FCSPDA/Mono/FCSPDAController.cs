@@ -352,20 +352,19 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
 
         public bool Open()
         {
-            _timesOpen++;
+            if (_timesOpen > 0 && !CardSystem.main.HasBeenRegistered() && !Mod.GamePlaySettings.IsPDAOpenFirstTime && Mod.GamePlaySettings.IsPDAUnlocked)
+            {
+                VoiceNotificationSystem.main.Play("PDA_Account_Instructions_key");
+            }
 
             if (Mod.GamePlaySettings.IsPDAOpenFirstTime && Mod.GamePlaySettings.IsPDAUnlocked)
             {
                 VoiceNotificationSystem.main.Play("PDA_Instructions_key");
                 Mod.GamePlaySettings.IsPDAOpenFirstTime = false;
+                _timesOpen++;
                 Mod.SaveGamePlaySettings();
             }
-
-            if (_timesOpen > 1 && !CardSystem.main.HasBeenRegistered() && !Mod.GamePlaySettings.IsPDAOpenFirstTime && Mod.GamePlaySettings.IsPDAUnlocked)
-            {
-                VoiceNotificationSystem.main.Play("PDA_Account_Instructions_key");
-            }
-
+            
             _404?.SetActive(!Mod.GamePlaySettings.IsPDAUnlocked);
             
             Player main = Player.main;

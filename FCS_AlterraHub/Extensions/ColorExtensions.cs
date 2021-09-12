@@ -81,9 +81,9 @@ namespace FCS_AlterraHub.Extensions
         {
             return new ColorTemplateSave
             {
-                PrimaryColor = template.PrimaryColor.ColorToVector4(),
-                SecondaryColor = template.SecondaryColor.ColorToVector4(),
-                EmissionColor = template.EmissionColor.ColorToVector4(),
+                PrimaryColor = template?.PrimaryColor.ColorToVector4() ?? Color.white.ColorToVector4(),
+                SecondaryColor = template?.SecondaryColor.ColorToVector4() ?? Color.white.ColorToVector4(),
+                EmissionColor = template?.EmissionColor.ColorToVector4() ?? Color.cyan.ColorToVector4(),
             };
         }
 
