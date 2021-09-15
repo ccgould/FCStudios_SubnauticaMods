@@ -142,7 +142,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 var amount = _craftingOperation.IsRecursive ? "\u221E" : _craftingOperation.Amount.ToString();
                 _sb.Append($"Amount: {amount}");
                 _sb.Append(Environment.NewLine);
-                _sb.Append($"Is Operational: {_craftingOperation.IsOperational}");
+                _sb.Append($"Is Being Crafted: {_craftingOperation.IsBeingCrafted}");
                 _sb.Append(Environment.NewLine);
                 return _sb.ToString();
             }

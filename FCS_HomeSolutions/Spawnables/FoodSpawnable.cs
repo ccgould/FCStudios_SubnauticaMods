@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using FCS_AlterraHub.Buildables;
+using FCS_AlterraHub.Helpers;
 using FCS_HomeSolutions.Configuration;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Assets;
@@ -16,11 +18,21 @@ namespace FCS_HomeSolutions.Spawnables
         private PeeperBarFoodItemData _foodItemData;
         public override string AssetsFolder => Mod.GetAssetPath();
         public decimal Cost { get; set; }
+
         public FoodSpawnable(PeeperBarFoodItemData foodItem) : base(foodItem.ClassId, foodItem.Friendly, foodItem.Description)
         {
             _foodItemData = foodItem;
             Cost = foodItem.Cost;
-            OnFinishedPatching += () => {  };
+            OnFinishedPatching += () =>
+            {
+                // Add the new TechType to Hand Equipment type.
+                SMLHelper.V2.Handlers.CraftDataHandler.SetEquipmentType(this.TechType, EquipmentType.Hand);
+
+                // Set quick slot type.
+                SMLHelper.V2.Handlers.CraftDataHandler.SetQuickSlotType(this.TechType, QuickSlotType.Selectable);
+            };
+
+
         }
 
         public override GameObject GetGameObject()
@@ -30,6 +42,8 @@ namespace FCS_HomeSolutions.Spawnables
                 if (_foodItemData.Prefab == null)
                 {
                     _foodItemData.Prefab = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    //Set collider
+                    _foodItemData.Prefab.EnsureComponent<BoxCollider>();
                 }
 
                 var prefab = GameObject.Instantiate(_foodItemData.Prefab);
@@ -38,9 +52,6 @@ namespace FCS_HomeSolutions.Spawnables
                 prefab.AddComponent<TechTag>().type = TechType;
 
                 var rigidBody = prefab.EnsureComponent<Rigidbody>();
-
-                // Set collider
-                prefab.EnsureComponent<BoxCollider>();
 
                 var pickUp = prefab.AddComponent<Pickupable>();
                 pickUp.randomizeRotationWhenDropped = true;
@@ -66,7 +77,33 @@ namespace FCS_HomeSolutions.Spawnables
                 var foodItem = prefab.AddComponent<Eatable>();
                 foodItem.waterValue = _foodItemData.Water;
                 foodItem.foodValue = _foodItemData.Food;
-                
+
+                var placeTool = prefab.AddComponent<PlaceTool>();
+                placeTool.allowedInBase = true;
+                placeTool.allowedOnBase = false;
+                placeTool.allowedOnCeiling = false;
+                placeTool.allowedOnConstructable = true;
+                placeTool.allowedOnGround = true;
+                placeTool.allowedOnRigidBody = true;
+                placeTool.allowedOnWalls = false;
+                placeTool.allowedOutside = true;
+                placeTool.rotationEnabled = true;
+                placeTool.enabled = true;
+                placeTool.hasAnimations = false;
+                placeTool.hasBashAnimation = false;
+                placeTool.hasFirstUseAnimation = false;
+                placeTool.mainCollider = prefab.GetComponentInChildren<Collider>();
+                placeTool.pickupable = pickUp;
+                placeTool.drawTime = 0.5f;
+                placeTool.dropTime = 1;
+                placeTool.holsterTime = 0.35f;
+
+                // Set large world entity
+                var lwe = prefab.AddComponent<LargeWorldEntity>();
+                lwe.cellLevel = LargeWorldEntity.CellLevel.Near;
+
+                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, prefab, Color.cyan);
+
                 return prefab;
             }
             catch (Exception e)

@@ -354,12 +354,12 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         {
             if (_timesOpen > 0 && !CardSystem.main.HasBeenRegistered() && !Mod.GamePlaySettings.IsPDAOpenFirstTime && Mod.GamePlaySettings.IsPDAUnlocked)
             {
-                VoiceNotificationSystem.main.Play("PDA_Account_Instructions_key");
+                VoiceNotificationSystem.main.Play("PDA_Account_Instructions_key",26);
             }
 
             if (Mod.GamePlaySettings.IsPDAOpenFirstTime && Mod.GamePlaySettings.IsPDAUnlocked)
             {
-                VoiceNotificationSystem.main.Play("PDA_Instructions_key");
+                VoiceNotificationSystem.main.Play("PDA_Instructions_key",26);
                 Mod.GamePlaySettings.IsPDAOpenFirstTime = false;
                 _timesOpen++;
                 Mod.SaveGamePlaySettings();

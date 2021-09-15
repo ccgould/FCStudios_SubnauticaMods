@@ -96,7 +96,7 @@ namespace FCS_HomeSolutions.Patches
 			GameObject ghostModel = (GameObject)_ghostModel.GetValue(null);
             QuickLogger.Debug($"SetPlaceOnbSurface : {hit.collider?.gameObject?.name} | {ghostModel.name}", true);
 			// If object being built is our Outdoor Ladder.
-			if (ghostModel?.name != null && ghostModel.name.StartsWith("model"))
+			if (ghostModel?.name != null && ghostModel.name.StartsWith("StairsModel"))
 			{
                 QuickLogger.Debug("Is Stairs SETP", true);
 				// If our Outdoor Ladder is being placed on a Foundation.
@@ -119,7 +119,7 @@ namespace FCS_HomeSolutions.Patches
 			if (!__result)
 			{
 				// If there's a hit and object being built is our Outdoor Ladder.
-				if (ghostModel?.name != null && ghostModel.name.StartsWith("model"))
+				if (ghostModel?.name != null && ghostModel.name.StartsWith("StairsModel"))
 				{
 					QuickLogger.Debug("Is Stairs",true);
 					Transform aimTransform = Builder.GetAimTransform();
@@ -141,27 +141,18 @@ namespace FCS_HomeSolutions.Patches
 			}
             else
             {
-                if (ghostModel?.name != null && ghostModel.name.StartsWith("model"))
+                if (ghostModel?.name != null && ghostModel.name.StartsWith("StairsModel"))
                 {
                     QuickLogger.Debug("Is Stairs", true);
                     Transform aimTransform = Builder.GetAimTransform();
                     float pmd = (float)_placeMaxDistance.GetValue(null);
                     LayerMask lm = (LayerMask)_placeLayerMask.GetValue(null);
-                    bool allowed = false;
                     // If our Outdoor Ladder is being placed on a foundation.
                     if (Physics.Raycast(aimTransform.position, aimTransform.forward, out RaycastHit hit, pmd, lm.value, QueryTriggerInteraction.Ignore))
-                        if (hit.collider?.gameObject != null && hit.collider.gameObject.name.StartsWith("hatch_end_anim") && !hit.collider.gameObject.name.StartsWith("hatch_side_anim"))
+                        if (hit.collider?.gameObject != null && !hit.collider.gameObject.name.StartsWith("hatch_end_anim") && !hit.collider.gameObject.name.StartsWith("hatch_side_anim"))
                         {
-                            QuickLogger.Debug("Allowed to build", true);
-                            allowed = true;
-                            __result = true;
+                            __result = false;
                         }
-                    if (!allowed)
-                        __result = false;
-
-
-
-
                 }
             }
         }

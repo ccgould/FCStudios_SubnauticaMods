@@ -26,7 +26,7 @@ namespace FCS_HomeSolutions.Mods.Stairs.Buildable
         private GameObject _prefab;
         internal const string StairsClassID = "FCSStairs";
         internal const string StairsFriendly = "Door Stairs";
-        internal const string StairsDescription = "N/A";
+        internal const string StairsDescription = "Convenient stairs to help you get to the high hatches. Build on a hatch and watch me grow.";
         internal const string StairsPrefabName = "Small_PlatformDoorStairs";
         internal const string StairsKitClassID = "Stairs_Kit";
         internal const string StairsTabID = "DST";
@@ -63,7 +63,7 @@ namespace FCS_HomeSolutions.Mods.Stairs.Buildable
                 var lwe = prefab.AddComponent<LargeWorldEntity>();
                 lwe.cellLevel = LargeWorldEntity.CellLevel.Near;
 
-                var model = prefab.FindChild("model");
+                var model = prefab.FindChild("StairsModel");
 
                 SkyApplier skyApplier = prefab.AddComponent<SkyApplier>();
                 skyApplier.renderers = model.GetComponentsInChildren<MeshRenderer>();
@@ -75,20 +75,22 @@ namespace FCS_HomeSolutions.Mods.Stairs.Buildable
 
                 // Add constructible
                 var constructable = prefab.AddComponent<Constructable>();
-                constructable.allowedInBase = true;
-                constructable.allowedInSub = true;
+                constructable.allowedInBase = false;
+                constructable.allowedInSub = false;
                 constructable.allowedOutside = true;
                 constructable.allowedOnCeiling = false;
-                constructable.allowedOnGround = true;
-                constructable.allowedOnConstructables = true;
+                constructable.allowedOnGround = false;
+                constructable.allowedOnConstructables = false;
                 constructable.controlModelState = true;
                 constructable.deconstructionAllowed = true;
-                constructable.rotationEnabled = true;
+                constructable.rotationEnabled = false;
                 constructable.model = model;
                 constructable.techType = base.TechType;
                 constructable.surfaceType = VFXSurfaceTypes.metal;
                 constructable.placeMinDistance = 0.6f;
+                constructable.placeMaxDistance = 30f;
                 constructable.surfaceType = VFXSurfaceTypes.metal;
+                constructable.forceUpright = true;
 
                 PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = ClassID;

@@ -159,17 +159,18 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
 
                 if (!PlayerInteractionHelper.HasItem(FCSAlterraHubService.PublicAPI.AccountSystem.CardTechType))
                 {
-                    //QuickLogger.ModMessage(AlterraHub.CardNotDetected());
+                    QuickLogger.ModMessage(AlterraHub.CardNotDetected());
                     PlayAudioTrack("PLB_NoCardDetected");
                     return;
                 }
 
                 if (!FCSAlterraHubService.PublicAPI.AccountSystem.HasEnough(_food.Value))
                 {
-                    //QuickLogger.ModMessage("Not enough credit");
+                    QuickLogger.ModMessage("Not enough credit");
                     PlayAudioTrack("PLB_NotEnoughCredit");
                     return;
                 }
+
                 PlayAudioTrack("PLB_ThankYou");
                 FCSAlterraHubService.PublicAPI.AccountSystem.RemoveFinances(_food.Value);
                 PlayerInteractionHelper.GivePlayerItem(_food.Key);
@@ -306,7 +307,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
             {
                 var clip = FindAudioClip(trackName);
                 Subtitles.main.Add(clip.Message, null);
-                AudioTrack = AudioUtils.PlaySound(clip.Sound, SoundChannel.Voice);
+                AudioTrack = AudioUtils.PlaySound(clip.Sound, SoundChannel.Master);
                 
             }
         }

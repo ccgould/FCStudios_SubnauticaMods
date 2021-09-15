@@ -378,7 +378,7 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
 
         public override bool CanDeconstruct(out string reason)
         {
-            if (_oreQueue.Any())
+            if (_oreQueue != null && _oreQueue.Any())
             {
                 reason = AlterraHub.NotEmpty();
                 return false;

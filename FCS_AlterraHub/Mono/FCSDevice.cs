@@ -8,6 +8,7 @@ using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mods.FCSPDA.Mono;
 using FCS_AlterraHub.Registration;
+using FCS_AlterraHub.Structs;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -175,9 +176,9 @@ namespace FCS_AlterraHub.Mono
         /// Gets the body color of the device
         /// </summary>
         /// <param name="color"></param>
-        public virtual void GetBodyColor(Color color, ColorTargetMode mode)
+        public virtual ColorTemplate GetBodyColor()
         {
-            QuickLogger.Debug("This device hasnt set this method");
+            return _colorManager?.GetTemplate() ?? new ColorTemplate();
         }
 
         /// <summary>
@@ -354,6 +355,17 @@ namespace FCS_AlterraHub.Mono
             }
 
             return _constructable;
+        }
+
+        public virtual FCSDeviceInformation GetDeviceInformation()
+        {
+            return new FCSDeviceInformation
+            {
+                UnitID = UnitID,
+                IsVisibleToNetwork = IsVisible,
+                IsOperational = IsOperational,
+                PrefabID = GetPrefabID()
+            };
         }
     }
 

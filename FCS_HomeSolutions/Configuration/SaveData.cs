@@ -28,6 +28,8 @@ namespace FCS_HomeSolutions.Configuration
     internal class StairsDataEntry : DecorationDataEntry
     {
         public int ChildCount { get; set; }
+        public float FloorDistance { get; set; } = -1;
+        public float FloorDistance2 { get; set; } = -1;
     }
 
     [Serializable]

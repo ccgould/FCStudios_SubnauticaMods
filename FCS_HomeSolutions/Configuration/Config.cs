@@ -91,6 +91,9 @@ namespace FCS_HomeSolutions.Configuration
         [Keybind("[Paint Tool] Select Color Back",Tooltip = "Selects the previous color on the paint tool")]
         public KeyCode PaintToolSelectColorBackKeyCode = KeyCode.LeftArrow;
 
+        [Keybind("[Paint Tool] Sample Color Template", Tooltip = "Gets the color template from the object in view.")]
+        public KeyCode PaintToolColorSampleKeyCode = KeyCode.P;
+
         public List<AdditionalColor> PaintToolAdditionalPaintColors = new List<AdditionalColor>
         {
             new AdditionalColor
@@ -240,6 +243,14 @@ namespace FCS_HomeSolutions.Configuration
         public KeyCode LEDLightNightSensorToggleKeyCode = KeyCode.K;
 
         #endregion
+
+
+        [Toggle("[Stairs] Is Mod Enabled", Tooltip = "Enables/Disables Elevator from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        public bool IsStairsEnabled { get; set; }
+
+        [Toggle("[Stairs] Ignore Base Pieces", Tooltip = "Allows the stairs to build sections on base pieces (May cut though objects if disabled)")]
+
+        public bool StairsIgnoreBasePieces { get; set; } = false;
 
 
         #region JukeBox

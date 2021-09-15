@@ -190,6 +190,7 @@
     <Compile Include="Patches\EquipmentPatcher.cs" />
     <Compile Include="Patches\PDAEncyclopedia_Patches.cs" />
     <Compile Include="Patches\SubnautiaMap_Patches.cs" />
+    <Compile Include="Structs\FCSDeviceInformation.cs" />
     <Compile Include="Structs\ModPackData.cs" />
     <Compile Include="Structs\TrackedLight.cs" />
     <Compile Include="Objects\ColorList.cs" />

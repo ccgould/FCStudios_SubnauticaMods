@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Reflection;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Model.GUI;
@@ -12,12 +10,10 @@ using FCS_EnergySolutions.Mods.AlterraGen.Buildables;
 using FCS_EnergySolutions.Mods.JetStreamT242.Buildables;
 using FCS_EnergySolutions.Mods.PowerStorage.Buildable;
 using FCS_EnergySolutions.Mods.Spawnables;
-using FCS_EnergySolutions.Mods.TelepowerPylon.Mono;
 using FCS_EnergySolutions.Mods.UniversalCharger.Buildable;
 using FCS_EnergySolutions.Mods.WindSurfer.Buildables;
 using FCS_EnergySolutions.Spawnables;
 using FCS_EnergySolutions.TelepowerPylon.Buildables;
-using FCSCommon.Utilities;
 using HarmonyLib;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
@@ -116,20 +112,20 @@ namespace FCS_EnergySolutions
                 }
             }
 
-            if (Configuration.IsWindSurferEnabled)
-            {
-                CraftTreeHandler.AddTabNode(CraftTree.Type.Constructor, "FCSWindSurfer", "Wind Surfer",
-                    ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), $"{Mod.WindSurferClassName}.png")));
+            //if (Configuration.IsWindSurferEnabled)
+            //{
+            //    CraftTreeHandler.AddTabNode(CraftTree.Type.Constructor, "FCSWindSurfer", "Wind Surfer",
+            //        ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), $"{Mod.WindSurferClassName}.png")));
 
-                var windSurferOperator = new WindSurferOperatorBuildable();
-                windSurferOperator.Patch();
+            //    var windSurferOperator = new WindSurferOperatorBuildable();
+            //    windSurferOperator.Patch();
 
-                var windSurfer = new WindSurferSpawnable();
-                windSurfer.Patch();
+            //    var windSurfer = new WindSurferSpawnable();
+            //    windSurfer.Patch();
 
-                var windSurferPlatform = new WindSurferPlatformSpawnable();
-                windSurferPlatform.Patch();
-            }
+            //    var windSurferPlatform = new WindSurferPlatformSpawnable();
+            //    windSurferPlatform.Patch();
+            //}
 
 
             //Register debug commands

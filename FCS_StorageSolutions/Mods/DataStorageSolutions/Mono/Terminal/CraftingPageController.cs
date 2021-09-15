@@ -5,6 +5,7 @@ using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.Controllers;
+using FCS_AlterraHub.Structs;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal.Enumerators;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -90,7 +91,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 
                 for (int i = data.StartPosition; i < data.EndPosition; i++)
                 {
-                    _trackedCrafterListItem[w++].Set(grouped.ElementAt(i).UnitID);
+                    _trackedCrafterListItem[w++].Set(grouped.ElementAt(i));
                 }
 
                 _grid.UpdaterPaginator(grouped.Count);
@@ -109,18 +110,29 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         {
             private bool _isInitialized;
             private Text _title;
+            private FcsDevice _crafter;
 
             private void Initialize()
             {
                 if (_isInitialized) return;
                 _title = gameObject.GetComponentInChildren<Text>();
                 _isInitialized = true;
+                InvokeRepeating(nameof(UpdateStatus),1f,1f);
             }
 
-            internal void Set(string name)
+            private void UpdateStatus()
+            {
+                if (_title != null && _crafter != null)
+                {
+                    var info = _crafter.GetDeviceInformation();
+                    _title.text = $"{info.UnitID} - {info.Status}";
+                }
+            }
+            
+            internal void Set(FcsDevice device)
             {
                 Initialize();
-                _title.text = name;
+                _crafter = device;
                 gameObject.SetActive(true);
             }
 

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using FCS_AlterraHub.Helpers;
+using UnityEngine;
 
 namespace FCS_HomeSolutions.Mods.Elevator.Mono
 {
@@ -6,6 +7,8 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
     {
         private Transform _platFormTrans;
         private FCSElevatorController _controller;
+        private Rigidbody _target;
+        private Collider _cachedTarget;
         public bool IsPlayerInside { get;private set; }
         public void Initialize(FCSElevatorController controller)
         {
@@ -15,21 +18,35 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
 
         private void OnTriggerEnter(Collider collider)
         {
-            if (collider.gameObject.layer != 19 || IsPlayerInside || _controller == null || !_controller.IsOperational)
-            {
-                Player.main.transform.parent = null;
-                return;
-            }
-
-            Player.main.transform.parent = _platFormTrans;
+            var go = WorldHelpers.GetRoot(collider.gameObject);
+            _cachedTarget = collider;
+            _target = go.GetComponent<Rigidbody>();
             IsPlayerInside = true;
         }
 
         private void OnTriggerExit(Collider collider)
         {
-            if (collider.gameObject.layer != 19) return;
-            Player.main.transform.parent = null;
+            if (_cachedTarget != collider)
+            {
+                return;
+            }
+            _cachedTarget = null;
+            _target = null; 
             IsPlayerInside = false;
         }
+
+        private void FixedUpdate()
+        {
+            if (!_target || !_controller.IsMoving())
+            {
+                return;
+            }
+            if (!_target.isKinematic)
+            {
+                _target.AddForce((_target.transform.position - base.transform.position).normalized * _pushStrength, ForceMode.Acceleration);
+            }
+        }
+
+        private float _pushStrength = 1f;
     }
 }

@@ -41,11 +41,11 @@ namespace FCS_AlterraHub.Mono
             {
                 case ColorTargetMode.Primary:
                 case ColorTargetMode.Both:
-                    return _currentColor;
+                    return _currentTemplate?.PrimaryColor ?? Color.white;
                 case ColorTargetMode.Secondary:
-                    return _currentSecondaryColor;
+                    return _currentTemplate?.SecondaryColor ?? Color.white;
                 case ColorTargetMode.Emission:
-                    return _currentLumColor;
+                    return _currentTemplate?.EmissionColor ?? Color.white;
             }
             return _currentColor;
         }

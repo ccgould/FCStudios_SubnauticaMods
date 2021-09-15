@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using FCSCommon.Utilities;
 using FMOD;
 using SMLHelper.V2.Utility;
 using UnityEngine;
@@ -61,24 +62,28 @@ namespace FCS_AlterraHub.Systems
 
         private void CheckPendingMessages()
         {
+            QuickLogger.Debug($"Pending Message count: {_queue.Count} | Can Play: {GetCanPlay()}", true);
             if (!GetCanPlay() || !_queue.Any()) return;
             var notification = _queue.Dequeue();
-            Play(notification.Key, notification.Args);
+            Play(notification.Key, notification.Seconds);
         }
 
         public bool GetCanPlay()
         {
-            _currentChannel.isPlaying(out bool isPlaying);
-            return isPlaying;
+            return DayNightCycle.main.timePassedAsFloat >= this.timeNextPlay;
         }
-
-        public bool Play(string notificationKey, params object[] args)
+        
+        public bool Play(string notificationKey, float seconds = 0f, params object[] args)
         {
+            QuickLogger.Debug($"Attempting to play track: {notificationKey} | Is found {_voiceNotifications.ContainsKey(notificationKey)}", true);
+
             if (!GetCanPlay())
             {
-                AddToQueue(notificationKey, args);
+                QuickLogger.Debug("aDDING VOICE TO QUEUE", true);
+                AddToQueue(notificationKey, seconds);
                 return false;
             }
+
             if (_voiceNotifications.ContainsKey(notificationKey))
             {
                 var sound = _voiceNotifications[notificationKey].Sound;
@@ -89,9 +94,10 @@ namespace FCS_AlterraHub.Systems
                     Subtitles.main.Add(text, args);
                 }
                 _currentChannel = AudioUtils.PlaySound(sound, SoundChannel.Master);
+                timeNextPlay = DayNightCycle.main.timePassedAsFloat + seconds;
                 return true;
             }
-            
+
             return false;
         }
 
@@ -100,14 +106,14 @@ namespace FCS_AlterraHub.Systems
             return 1f / speed;
         }
         public float speed = 15f;
-        private void AddToQueue(string notificationKey, object[] args)
+        private void AddToQueue(string notificationKey, float args)
         {
             if (_queue.Any(x => x.Key.Equals(notificationKey))) return;
 
             _queue.Enqueue(new PendingNotification
             {
                 Key = notificationKey,
-                Args = args
+                Seconds = args
             });
         }
 
@@ -144,6 +150,7 @@ namespace FCS_AlterraHub.Systems
     {
         public string Key { get; set; }
         public object[] Args { get; set; }
+        public float Seconds { get; set; }
     }
 
     internal struct VoiceData

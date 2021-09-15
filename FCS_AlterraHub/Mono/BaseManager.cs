@@ -1501,6 +1501,7 @@ namespace FCS_AlterraHub.Mono
 
         public void RemoveCraftingOperation(CraftingOperation operation)
         {
+            operation.OnOperationDeleted?.Invoke(operation);
             _craftingOperations.Remove(operation);
         }
 

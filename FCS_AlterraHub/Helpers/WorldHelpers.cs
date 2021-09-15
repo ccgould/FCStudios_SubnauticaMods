@@ -465,6 +465,17 @@ namespace FCS_AlterraHub.Helpers
         {
             return a.x < b.x + 0.1f && a.x > b.x - 0.1f && a.y < b.y + 0.1f && a.y > b.y - 0.1f && a.z < b.z + 0.1f && a.z > b.z - 0.1f;
         }
+
+        public static GameObject GetRoot(GameObject go)
+        {
+            GameObject gameObject = UWE.Utils.GetEntityRoot(go);
+            if (!gameObject)
+            {
+                gameObject = go;
+            }
+
+            return gameObject;
+        }
     }
 
     public struct PickReturnsData

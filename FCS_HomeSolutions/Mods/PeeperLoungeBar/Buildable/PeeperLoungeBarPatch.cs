@@ -276,6 +276,123 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
             Mod.PeeperBarFoods.Add(alterraScotch.TechType, alterraScotch.Cost);
 
 
+            var coffeePackage = new FoodSpawnable(new PeeperBarFoodItemData
+            {
+                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("CoffeePackage", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                ClassId = "CoffeePackage",
+                Friendly = "Coffee Package",
+                Description = "N/A",
+                Cost = 300,
+                Food = 2,
+                Water = 0
+            });
+            coffeePackage.Patch();
+            Mod.PeeperBarFoods.Add(coffeePackage.TechType, coffeePackage.Cost);
+
+            var carolinaPeeperBalls = new FoodSpawnable(new PeeperBarFoodItemData
+            {
+                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("SpicyCheeseBalls", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                ClassId = "CarolinaPeeperBalls",
+                Friendly = "Carolina Peeper Balls",
+                Description = "N/A",
+                Cost = 300,
+                Food = 20,
+                Water = -5
+            });
+            carolinaPeeperBalls.Patch();
+            Mod.PeeperBarFoods.Add(carolinaPeeperBalls.TechType, carolinaPeeperBalls.Cost);
+
+            var alterraMug01 = new FoodSpawnable(new PeeperBarFoodItemData
+            {
+                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("AlterraMug01", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                ClassId = "AlterraCoffeeMug",
+                Friendly = "Alterra Coffee (Mug)",
+                Description = "N/A",
+                Cost = 300,
+                Food = 0,
+                Water = 50
+            });
+            alterraMug01.Patch();
+            Mod.PeeperBarFoods.Add(alterraMug01.TechType, alterraMug01.Cost);
+
+            var alterraMug02 = new FoodSpawnable(new PeeperBarFoodItemData
+            {
+                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("AlterraMug02", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                ClassId = "FCSCoffeeMug",
+                Friendly = "FCS Coffee (Mug)",
+                Description = "N/A",
+                Cost = 300,
+                Food = 0,
+                Water = 50
+            });
+            alterraMug02.Patch();
+            Mod.PeeperBarFoods.Add(alterraMug02.TechType, alterraMug02.Cost);
+
+            var alterraMug03 = new FoodSpawnable(new PeeperBarFoodItemData
+            {
+                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("AlterraMug03", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                ClassId = "MrSpicyCoffeeMug",
+                Friendly = "MrSpicy Coffee (Mug)",
+                Description = "N/A",
+                Cost = 300,
+                Food = 0,
+                Water = 50
+            });
+            alterraMug03.Patch();
+            Mod.PeeperBarFoods.Add(alterraMug03.TechType, alterraMug03.Cost);
+
+            var alterraMug04 = new FoodSpawnable(new PeeperBarFoodItemData
+            {
+                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("AlterraMug04", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                ClassId = "Z1GamingCoffeeMug",
+                Friendly = "Z1 Gaming Coffee (Mug)",
+                Description = "N/A",
+                Cost = 300,
+                Food = 0,
+                Water = 50
+            });
+            alterraMug04.Patch();
+            Mod.PeeperBarFoods.Add(alterraMug04.TechType, alterraMug04.Cost);
+
+            var alterraMug05 = new FoodSpawnable(new PeeperBarFoodItemData
+            {
+                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("AlterraMug05", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                ClassId = "MonikaCinnyRollCoffeeMug",
+                Friendly = "Monika C.R. Coffee (Mug)",
+                Description = "N/A",
+                Cost = 300,
+                Food = 0,
+                Water = 50
+            });
+            alterraMug05.Patch();
+            Mod.PeeperBarFoods.Add(alterraMug05.TechType, alterraMug05.Cost);
+
+            var alterraMug06 = new FoodSpawnable(new PeeperBarFoodItemData
+            {
+                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("AlterraMug06", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                ClassId = "AlterraCoffeeMug02",
+                Friendly = "Alterra Coffee (Mug) 2",
+                Description = "N/A",
+                Cost = 300,
+                Food = 0,
+                Water = 50
+            });
+            alterraMug06.Patch();
+            Mod.PeeperBarFoods.Add(alterraMug06.TechType, alterraMug06.Cost);
+
+            var alterraMug07 = new FoodSpawnable(new PeeperBarFoodItemData
+            {
+                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("AlterraMug07", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                ClassId = "PeeperCoffeeMug",
+                Friendly = "Peeper Coffee (Mug)",
+                Description = "N/A",
+                Cost = 300,
+                Food = 0,
+                Water = 50
+            });
+            alterraMug07.Patch();
+            Mod.PeeperBarFoods.Add(alterraMug07.TechType, alterraMug07.Cost);
+
             Mod.PeeperBarFoods.Add(TechType.NutrientBlock, 100);
         }
 

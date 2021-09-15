@@ -170,11 +170,11 @@ namespace FCS_HomeSolutions
             sink.Patch();
 
 
-            var jukeBox = new JukeBoxBuildable();
-            jukeBox.Patch();
+            //var jukeBox = new JukeBoxBuildable();
+            //jukeBox.Patch();
 
-            var jukeboxSpeaker = new JukeBoxSpeakerBuildable();
-            jukeboxSpeaker.Patch();
+            //var jukeboxSpeaker = new JukeBoxSpeakerBuildable();
+            //jukeboxSpeaker.Patch();
 
             var stairs = new StairsBuildable();
             stairs.Patch();
@@ -568,6 +568,25 @@ namespace FCS_HomeSolutions
                     GroupForPDA = TechGroup.InteriorModules
                 });
             neonTable02.Patch();
+
+            var rug = new DecorationEntryPatch("FCSRug", "Rug", "N/A",
+                ModelPrefab.GetPrefabFromGlobal("FCS_Rug01"),
+                new Settings
+                {
+                    KitClassID = "rug_kit",
+                    AllowedInBase = true,
+                    AllowedOutside = false,
+                    AllowedOnGround = true,
+                    AllowedInSub = true,
+                    AllowedOnConstructables = true,
+                    RotationEnabled = true,
+                    Cost = 1500,
+                    Center = new Vector3(0, 0f, 0f),
+                    Size = new Vector3(0f, 0f, 0f),
+                    CategoryForPDA = TechCategory.InteriorModule,
+                    GroupForPDA = TechGroup.InteriorModules
+                });
+            rug.Patch();
         }
 
         private static void PatchRailings()

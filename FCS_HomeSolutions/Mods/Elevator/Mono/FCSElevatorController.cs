@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Helpers;
@@ -73,6 +74,11 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
                     _currentFloor.LevelObject.transform.position.y - 0.25f,
                     _currentFloor.LevelObject.transform.position.z);
                 _platFormTrans.position = Vector3.MoveTowards(pos, Vector3.Lerp(pos, target, LerpTime), _speed * Time.deltaTime);
+
+                if (IsMoving())
+                {
+                    Physics.SyncTransforms();
+                }
             }
         }
         
@@ -157,6 +163,9 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
                 _audio = gameObject.GetComponentInChildren<AudioSource>();
                 _lowPassFilter = gameObject.GetComponentInChildren<AudioLowPassFilter>();
             }
+
+            GameObjectHelpers.FindGameObject(gameObject, "TriggerBox").AddComponent<FloorTriggerBox>();
+            GameObjectHelpers.FindGameObject(gameObject, "TriggerBox_1").AddComponent<FloorTriggerBox>();
 
             InvokeRepeating(nameof(UpdateAudioCheck), 1f, 1f);
 
@@ -370,6 +379,9 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
                 floorTrans.SetParent(_floorsContainer.transform);
                 floorTrans.localPosition = new Vector3(0, meters, 0);
                 floorTrans.rotation = _platFormTrans.rotation;
+                GameObjectHelpers.FindGameObject(floorPrefab, "TriggerBox").AddComponent<FloorTriggerBox>();
+                GameObjectHelpers.FindGameObject(floorPrefab, "TriggerBox_1").AddComponent<FloorTriggerBox>();
+
                 MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, floorPrefab, Color.cyan);
             }
             else
@@ -430,6 +442,7 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
 
         public void GoToFloor(string floorId)
         {
+            if(string.IsNullOrWhiteSpace(floorId)) return;
             if (_floorData.ContainsKey(floorId))
             {
                 _currentFloor = _floorData[floorId];
@@ -538,15 +551,15 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
 
             var data = new[]
             {
-                message,
+                /*message,*/
                 AlterraHub.PowerPerMinute(GetPowerUsage())
             };
             data.HandHoverPDAHelperEx(GetTechType(),HandReticle.IconType.Info);
             
-            if (GameInput.GetButtonDown(GameInput.Button.Reload))
-            {
-                GoToFloor("base");
-            }
+            //if (GameInput.GetButtonDown(GameInput.Button.Reload))
+            //{
+            //    GoToFloor("base");
+            //}
 
         }
 
@@ -583,6 +596,29 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
         public int GetFloorCount()
         {
             return _floorData?.Count ?? ElevatorHUD.Main.MAX_FLOOR_LEVELS;
+        }
+
+        public void GoToFloor(GameObject floorObject)
+        {
+            GoToFloor(_floorData.FirstOrDefault(x=>x.Value.LevelObject == floorObject).Value?.FloorId ?? "base");
+        }
+    }
+
+    internal class FloorTriggerBox : MonoBehaviour
+    {
+        private FCSElevatorController _controller;
+
+        private void Start()
+        {
+            _controller = GetComponentInParent<FCSElevatorController>();
+
+
+        }
+
+        private void OnTriggerEnter(Collider collider)
+        {
+            if (collider.gameObject.layer != 19 || _controller == null) return;
+            _controller.GoToFloor(gameObject.transform.parent.gameObject);
         }
     }
 }

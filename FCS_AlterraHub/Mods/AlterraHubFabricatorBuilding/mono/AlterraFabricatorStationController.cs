@@ -368,6 +368,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             TurnOnScreens();
             TurnOnKeyPads();
             _keyPads[2].Unlock();
+            _keyPads[2].ForceOpen();
             _motor.StartMotor();
             Mod.GamePlaySettings.BreakerOn = true;
         }

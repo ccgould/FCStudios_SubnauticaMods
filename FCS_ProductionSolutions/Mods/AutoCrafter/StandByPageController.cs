@@ -58,11 +58,23 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             _toggle = GameObjectHelpers.FindGameObject(gameObject, "Toggle").GetComponent<Toggle>();
             _toggle.onValueChanged.AddListener((state =>
             {
-                if (_mono.GetController().CraftManager.IsRunning())
+                if (state)
                 {
-                    _toggle.SetIsOnWithoutNotify(false);
-                    _mono.GetController().ShowMessage("Autocrafter is currently crafting. Please wait until complete before trying to enable standby");
-                    return;
+                    if (_mono.GetController().CraftManager.IsRunning())
+                    {
+                        _toggle.SetIsOnWithoutNotify(false);
+                        _mono.GetController().ShowMessage("Autocrafter is currently crafting. Please wait until complete before trying to enable standby");
+                        return;
+                    }
+                }
+                
+                if (!state)
+                {
+                    foreach (var autoCrafterItem in _autocrafterToggles)
+                    {
+                        if(autoCrafterItem.GetState())
+                            autoCrafterItem.SetState(false);
+                    }
                 }
             }));
 
@@ -77,6 +89,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 foreach (var selectedCrafter in _selectedCrafters)
                 {
                     var crafter = (DSSAutoCrafterController)_mono.GetController().Manager.FindDeviceById(selectedCrafter);
+                    crafter.DisplayManager.GoToPage(AutoCrafterPages.Automatic);
                     crafter.AddConnectedCrafter(_mono.GetController().UnitID);
                 }
 

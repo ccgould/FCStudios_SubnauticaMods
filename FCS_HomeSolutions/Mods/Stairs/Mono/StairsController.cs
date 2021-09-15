@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
@@ -101,6 +102,8 @@ namespace FCS_HomeSolutions.Mods.Stairs.Mono
 			_savedData.Id = GetPrefabID();
 			_savedData.ColorTemplate = _colorManager.SaveTemplate();
             _savedData.ChildCount = _childCount;
+            _savedData.FloorDistance = _cachedFloorDistance;
+            _savedData.FloorDistance2 = _cachedFloorDistance2;
 			QuickLogger.Debug($"Saving ID {_savedData.Id}");
 			newSaveData.StairsEntries.Add(_savedData);
 		}
@@ -149,54 +152,79 @@ namespace FCS_HomeSolutions.Mods.Stairs.Mono
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DecorationItemTabId, Mod.ModPackID);
 			traceStart = GameObjectHelpers.FindGameObject(gameObject, "RayCast_Point").transform;
             stepPrefab = ModelPrefab.GetPrefab("SmallPlatformStairs_Extension");
-            BuildGeometry(Manager?.BaseComponent, false);
-			if(_savedData != null)
+            
+			if(_savedData != null && !Mathf.Approximately(_savedData.FloorDistance,-1))
             {
-                BuildStairs(_savedData.ChildCount, false, false, false);
-
+                BuildStairsFromSave();
+            }
+            else
+            {
+                BuildGeometry(Manager?.BaseComponent, false);
 			}
 		}
 
-		private void BuildGeometry(Base baseComp, bool disableColliders)
-		{
-			if (stairsParent)
-			{
-				cachedSteps.Clear();
-				foreach (Transform child in stairsParent.transform)
-				{
-					cachedSteps.Add(child.gameObject);
-				}
-			}
-			stairsParent = new GameObject();
-			stairsParent.transform.parent = transform;
+        private void BuildStairsFromSave()
+        {
+            BuildGeometry(Manager?.BaseComponent,false,_savedData.FloorDistance,_savedData.FloorDistance2);
+        }
 
-			Vector3 a = traceStart.transform.up * -0.15f;
+        private void BuildGeometry(Base baseComp, bool disableColliders)
+		{
+            Vector3 a = traceStart.transform.up * -0.15f;
 			float floorDistance = GetFloorDistance(a + traceStart.position - traceStart.right * 0.7f, traceStart.forward, maxLength, gameObject);
 			float floorDistance2 = GetFloorDistance(a + traceStart.position + traceStart.right * 0.7f, traceStart.forward, maxLength, gameObject);
-			float num;
-			float num2;
-			if (floorDistance > floorDistance2)
-			{
-				num = floorDistance;
-				num2 = floorDistance2;
-			}
-			else
-			{
-				num = floorDistance2;
-				num2 = floorDistance;
-			}
-			if (num > 0f)
-			{
-				BuildStairs(num, baseComp?.isGhost ?? false, disableColliders);
-				constructableBounds.bounds.extents = new Vector3(1.4f, 0.01f, (num2 - 0.5f) / 2f);
-				constructableBounds.bounds.position = a + new Vector3(0f, 0.01f, (num2 - 0.5f) / 2f);
-				return;
-			}
-			constructableBounds.bounds.extents = Vector3.zero;
-			constructableBounds.bounds.position = Vector3.zero;
-		}
+			BuildGeometry(baseComp, disableColliders, floorDistance, floorDistance2);
+        }
 
-		private GameObject CreateStep()
+        private void BuildGeometry(Base baseComp, bool disableColliders, float floorDistance, float floorDistance2)
+        {
+            if (stairsParent)
+            {
+                cachedSteps.Clear();
+                foreach (Transform child in stairsParent.transform)
+                {
+                    cachedSteps.Add(child.gameObject);
+                }
+            }
+            stairsParent = new GameObject();
+            stairsParent.transform.parent = transform;
+
+            Vector3 a = traceStart.transform.up * -0.15f;
+
+            BuildStairsFromDistance(baseComp, disableColliders, floorDistance, floorDistance2, a);
+        }
+
+        private void BuildStairsFromDistance(Base baseComp, bool disableColliders, float floorDistance, float floorDistance2, Vector3 a)
+        {
+            float num;
+            float num2;
+            if (floorDistance > floorDistance2)
+            {
+                num = floorDistance;
+                num2 = floorDistance2;
+            }
+            else
+            {
+                num = floorDistance2;
+                num2 = floorDistance;
+            }
+
+            _cachedFloorDistance = floorDistance;
+            _cachedFloorDistance2 = floorDistance2;
+
+			if (num > 0f)
+            {
+                BuildStairs(num, baseComp?.isGhost ?? false, disableColliders);
+                constructableBounds.bounds.extents = new Vector3(1.4f, 0.01f, (num2 - 0.5f) / 2f);
+                constructableBounds.bounds.position = a + new Vector3(0f, 0.01f, (num2 - 0.5f) / 2f);
+                return;
+            }
+
+            constructableBounds.bounds.extents = Vector3.zero;
+            constructableBounds.bounds.position = Vector3.zero;
+        }
+
+        private GameObject CreateStep()
 		{
 			if (cachedSteps.Count > 0)
 			{
@@ -218,8 +246,7 @@ namespace FCS_HomeSolutions.Mods.Stairs.Mono
             {
                 num = (int)length;
             }
-			
-
+            
             for (int i = 0; i < num; i++)
 			{
 				GameObject step = CreateStep();
@@ -227,8 +254,10 @@ namespace FCS_HomeSolutions.Mods.Stairs.Mono
 				step.transform.rotation = transform.rotation;
                 step.SetActive(true);
                 MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, step, Color.cyan);
+                MaterialHelpers.ChangeMaterialColor(AlterraHub.BasePrimaryCol, step, _colorManager.GetColor(ColorTargetMode.Primary));
                 _childCount++;
 			}
+
 			Collider[] componentsInChildren = stairsParent.GetComponentsInChildren<Collider>();
             for (int j = 0; j < componentsInChildren.Length; j++)
 			{
@@ -250,6 +279,8 @@ namespace FCS_HomeSolutions.Mods.Stairs.Mono
 
 		private static List<GameObject> cachedSteps = new();
         private int _childCount;
+        private float _cachedFloorDistance;
+        private float _cachedFloorDistance2;
 
         private static bool IsDestroyed(GameObject gameObject)
 		{
@@ -286,9 +317,9 @@ namespace FCS_HomeSolutions.Mods.Stairs.Mono
 			for (int i = 0; i < num3; i++)
 			{
 				RaycastHit raycastHit = UWE.Utils.sharedHitBuffer[i];
-				if (/*raycastHit.collider.gameObject.layer != LayerID.Player &&*/ !IsBaseGhost(raycastHit.collider.gameObject) && !IsDestroyed(raycastHit.collider.gameObject))
+				if (raycastHit.collider.gameObject.layer != LayerID.Player && !IsBaseGhost(raycastHit.collider.gameObject) && !IsDestroyed(raycastHit.collider.gameObject))
 				{
-					if (IsOtherBasePiece(raycastHit.collider.gameObject, ignoreObject))
+					if (IsOtherBasePiece(raycastHit.collider.gameObject, ignoreObject) && QPatch.Configuration.StairsIgnoreBasePieces)
 					{
 						if (num == -1f || num > raycastHit.distance)
 						{

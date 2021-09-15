@@ -9,6 +9,7 @@ using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
+using FCS_AlterraHub.Structs;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCSCommon.Helpers;
@@ -42,7 +43,6 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         private InterfaceInteraction _interactionHelper;
 
         private List<TechType> _modCraftables => Mod.Craftables;
-
 
         #region Unit Methods
 
@@ -149,19 +149,19 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             }
         }
         
-        private void CheckStatus()
+        private AutocrafterStatus CheckStatus()
         {
-            if (CurrentCrafterMode == AutoCrafterMode.StandBy)
+            switch (CurrentCrafterMode)
             {
-                UpdateStatus(AutocrafterStatus.StandBy);
-            }
-            else if (CurrentCrafterMode == AutoCrafterMode.Automatic && CraftManager.IsRunning())
-            {
-                UpdateStatus(AutocrafterStatus.Working);
-            }
-            else
-            {
-                UpdateStatus(AutocrafterStatus.Waiting);
+                case AutoCrafterMode.StandBy:
+                    UpdateStatus(AutocrafterStatus.StandBy);
+                    return AutocrafterStatus.StandBy;
+                case AutoCrafterMode.Automatic when CraftManager.IsRunning():
+                    UpdateStatus(AutocrafterStatus.Working);
+                    return AutocrafterStatus.Working;
+                default:
+                    UpdateStatus(AutocrafterStatus.Waiting);
+                    return AutocrafterStatus.Waiting;
             }
         }
 
@@ -356,17 +356,13 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 
         private void CheckForAvailableCrafts()
         {
-            QuickLogger.Debug("1");
             if (Manager == null || CraftManager.IsRunning() || CurrentCrafterMode != AutoCrafterMode.Automatic) return;
-            QuickLogger.Debug("3");
             //Check if already has operation
             var operation = Manager.GetBaseCraftingOperations().FirstOrDefault(x => x.Devices.Contains(UnitID));
-            QuickLogger.Debug("4");
+
             if (operation != null)
             {
-                QuickLogger.Debug("5");
                 CraftItem(operation);
-                QuickLogger.Debug("6");
                 return;
             }
 
@@ -384,23 +380,16 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         {
             try
             {
-                QuickLogger.Debug($"Crafting Item {Language.main.Get(operation.TechType)}");
                 //Check if craftable
                 GetCraftables();
-                QuickLogger.Debug($"Contains Item: {Mod.Craftables.Contains(operation.TechType)}");
                 if (!Mod.Craftables.Contains(operation.TechType)) return;
-                QuickLogger.Debug($"Crafting Item 1");
                 //Check for additional help
                 DistributeLoad(operation,operation.Amount);
-                QuickLogger.Debug($"Crafting Item 2");
                 CraftManager.StartOperation(operation);
-                QuickLogger.Debug($"Crafting Item 3");
                 DisplayManager.LoadCraft(operation);
-                QuickLogger.Debug($"Crafting Item 4");
                 operation.IsBeingCrafted = true;
-                QuickLogger.Debug($"Crafting Item 5");
                 operation.Mount(this);
-                QuickLogger.Debug($"Crafting Item 6");
+                operation.OnOperationDeleted += OnOperationDeleted;
             }
             catch (Exception e)
             {
@@ -408,6 +397,16 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 QuickLogger.DebugError(e.StackTrace);
             }
         }
+
+        private void OnOperationDeleted(CraftingOperation operation)
+        {
+            if (CraftManager.GetCraftingOperation() == operation)
+            {
+                operation.OnOperationDeleted -= OnOperationDeleted;
+                CancelOperation();
+            }
+        }
+
 
         private void DistributeLoad(CraftingOperation operation, int originalAmount)
         {
@@ -720,6 +719,19 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         {
             
         }
+
+        public override FCSDeviceInformation GetDeviceInformation()
+        {
+            return new FCSDeviceInformation
+            {
+                UnitID = UnitID,
+                IsVisibleToNetwork = IsVisible,
+                IsOperational = IsOperational,
+                PrefabID = GetPrefabID(),
+                Status = CheckStatus().ToString()
+            };
+        }
+    }
     }
 
     internal enum AutocrafterStatus
@@ -736,4 +748,3 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         Manual = 1,
         StandBy = 2
     }
-}

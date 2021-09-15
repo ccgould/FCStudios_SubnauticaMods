@@ -6,8 +6,6 @@ using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
-using FCS_AlterraHub.Objects;
-using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Mods.PaintTool.Mono;
 using FCS_HomeSolutions.Mods.PaintTool.Spawnable;
@@ -169,6 +167,16 @@ namespace FCS_HomeSolutions.Mods.PaintTool
 
                     ChangeColor(_currentTemplates.ElementAt(_currentTemplateIndex));
                 }
+                else if(base.isDrawn && Input.GetKeyDown(QPatch.Configuration.PaintToolColorSampleKeyCode))
+                {
+                    var device = GetFCSDeviceFromTarget();
+                    if (device != null)
+                    {
+                        var index = GetCurrentSelectedTemplateIndex();
+                        _currentTemplates[index] = device.GetBodyColor();
+                        ChangeColor(device.GetBodyColor());
+                    }
+                }
                 RefreshUI();
             }
         }
@@ -189,11 +197,7 @@ namespace FCS_HomeSolutions.Mods.PaintTool
 
         private void Paint()
         {
-            Vector3 vector = default;
-            GameObject go = null;
-            UWE.Utils.TraceFPSTargetPosition(Player.main.gameObject, Range, ref go, ref vector, false);
-            QuickLogger.Debug($"Painter Hit: {go?.name} || Layer: {go?.layer}",true);
-            var fcsDevice = go?.GetComponentInParent<FcsDevice>();
+            var fcsDevice = GetFCSDeviceFromTarget();
             if (fcsDevice != null)
             {
                 var result = fcsDevice.ChangeBodyColor(_currentTemplate);
@@ -209,6 +213,16 @@ namespace FCS_HomeSolutions.Mods.PaintTool
             }
         }
 
+        private FcsDevice GetFCSDeviceFromTarget()
+        {
+            Vector3 vector = default;
+            GameObject go = null;
+            UWE.Utils.TraceFPSTargetPosition(Player.main.gameObject, Range, ref go, ref vector, false);
+            QuickLogger.Debug($"Painter Hit: {go?.name} || Layer: {go?.layer}", true);
+            var fcsDevice = go?.GetComponentInParent<FcsDevice>();
+            return fcsDevice;
+        }
+        
         private void RefreshUI()
         {
             if (!IsInitialized) return;
@@ -356,7 +370,7 @@ namespace FCS_HomeSolutions.Mods.PaintTool
 
         public override string GetCustomUseText()
         {
-            return $"Press Change Colors ({QPatch.Configuration.PaintToolSelectColorBackKeyCode})/({QPatch.Configuration.PaintToolSelectColorForwardKeyCode}) | Use Paint Can: {GameInput.GetBindingName(GameInput.Button.Reload, GameInput.BindingSet.Primary)} | Change Template: {GameInput.GetBindingName(GameInput.Button.AltTool, GameInput.BindingSet.Primary)}";
+            return $"Press Change Colors ({QPatch.Configuration.PaintToolSelectColorBackKeyCode})/({QPatch.Configuration.PaintToolSelectColorForwardKeyCode}) | Use Paint Can: {GameInput.GetBindingName(GameInput.Button.Reload, GameInput.BindingSet.Primary)} | Change Template: {GameInput.GetBindingName(GameInput.Button.AltTool, GameInput.BindingSet.Primary)} | Color Sample {QPatch.Configuration.PaintToolColorSampleKeyCode}";
         }
 
         public List<ColorTemplate> GetTemplates()

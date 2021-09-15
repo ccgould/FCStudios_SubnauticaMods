@@ -441,6 +441,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             _homeObj.SetActive(false);
             _filterSettingList.Hide();
             _networkBTN.Hide();
+            _craftingController.Hide();
         }
 
         public void OpenTransceiverDialog(FcsDevice fcsDevice)
