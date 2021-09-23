@@ -26,7 +26,7 @@ namespace FCS_HomeSolutions.Mods.Stove.Buildable
     {
         internal const string StoveClassID = "FCSStove";
         internal const string StoveFriendly = "Stove";
-        internal const string StoveDescription = "N/A";
+        internal const string StoveDescription = "Cook a simple meal or an entire banquet";
         internal const string StovePrefabName = "FCS_Stove";
         internal static string StoveKitClassID = $"{StoveClassID}_Kit";
         internal const string StoveTabID = "STV";

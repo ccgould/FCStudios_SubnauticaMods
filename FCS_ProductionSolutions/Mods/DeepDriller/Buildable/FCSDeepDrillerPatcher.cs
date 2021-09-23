@@ -61,7 +61,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Buildable
                 constructable.allowedInBase = false;
                 constructable.allowedOnCeiling = false;
                 constructable.allowedOutside = true;
-                constructable.model = prefab.FindChild("model");
+                constructable.model = prefab.FindChild("DrillModel");
                 constructable.techType = TechType;
                 constructable.rotationEnabled = true;
                 constructable.forceUpright = true;
@@ -72,8 +72,11 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Buildable
                 var lwe = prefab.AddComponent<LargeWorldEntity>();
                 lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
 
-                var center = new Vector3(-2.384186e-07f, 2.500637f, -0.007555246f);
-                var size = new Vector3(5.605133f, 8.229565f, 5.689059f);
+                //var center = new Vector3(-2.384186e-07f, 2.500637f, -0.007555246f);
+                //var size = new Vector3(5.605133f, 8.229565f, 5.689059f);
+
+                var center = new Vector3(-0.0168829f, 3.009828f, 0.03002357f);
+                var size = new Vector3(4.291656f, 5.013103f, 4.075207f);
 
                 GameObjectHelpers.AddConstructableBounds(prefab, size,center);
 

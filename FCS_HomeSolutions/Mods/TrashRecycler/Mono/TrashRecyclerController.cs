@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
@@ -129,11 +130,11 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Mono
             _statusLabel = GameObjectHelpers.FindGameObject(gameObject, "StatusLabel")?.GetComponent<Text>();
             _statusLabel.text = TrashRecyclerPatch.RecyclerFriendly;
             _percentageLabel = GameObjectHelpers.FindGameObject(gameObject, "Percentage")?.GetComponent<Text>();
-            
+
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol);
             }
 
             if (_dumpContainer == null)
@@ -182,6 +183,9 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Mono
             InterfaceHelpers.CreateButton(GameObjectHelpers.FindGameObject(gameObject, "AddBTN"),
                 "AddBTN", InterfaceButtonMode.Background, OnButtonClicked, Color.gray, Color.white, 5,
                 "Add to item to recycler");
+
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
+
 
             IsInitialized = true;
             QuickLogger.Debug($"Initialization Complete: {GetPrefabID()} | ID {UnitID}", true);

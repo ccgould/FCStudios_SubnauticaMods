@@ -91,7 +91,8 @@ namespace FCS_HomeSolutions.Patches
         [HarmonyPatch(nameof(Builder.SetPlaceOnSurface))]
         [HarmonyPrefix]
         public static bool SetPlaceOnSurface_Prefix(RaycastHit hit, ref Vector3 position, ref Quaternion rotation)
-		{
+        {
+            if (!QPatch.Configuration.IsHatchStairwayEnabled) return true;
 
 			GameObject ghostModel = (GameObject)_ghostModel.GetValue(null);
             QuickLogger.Debug($"SetPlaceOnbSurface : {hit.collider?.gameObject?.name} | {ghostModel.name}", true);
@@ -114,6 +115,8 @@ namespace FCS_HomeSolutions.Patches
         [HarmonyPostfix]
         public static void CheckSurfaceType_Postfix(ref bool __result, SurfaceType surfaceType)
 		{
+            if (!QPatch.Configuration.IsHatchStairwayEnabled) return ;
+
             QuickLogger.Debug($"CheckSurfaceType_Postfix : {__result}", true);
             GameObject ghostModel = (GameObject)_ghostModel.GetValue(null);
 			if (!__result)

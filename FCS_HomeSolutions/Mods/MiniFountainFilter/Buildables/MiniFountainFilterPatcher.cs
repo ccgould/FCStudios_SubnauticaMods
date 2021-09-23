@@ -27,7 +27,7 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Buildables
     {
         internal const string MiniFountainFilterClassID = "MiniFountainFilter";
         internal const string MiniFountainFilterFriendly = "Mini Filter & Fountain";
-        internal const string MiniFountainFilterDescription = "A smaller water filtration system for your base or cyclops.";
+        internal const string MiniFountainFilterDescription = "Small, wall-mounted water filtration system for your base or cyclops";
         internal const string MiniFountainFilterPrefabName = "FCS_MiniFountainFilter";
         internal static string MiniFountainFilterKitClassID = $"{MiniFountainFilterClassID}_Kit";
         private readonly GameObject _prefab;

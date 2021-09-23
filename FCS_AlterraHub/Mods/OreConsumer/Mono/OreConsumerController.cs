@@ -178,7 +178,7 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
 
                     AppendMoney(GetOreValue());
                     _oreQueue.Dequeue();
-                    _timeLeft = CalculateTargetTime();
+                    CalculateTimeLeft();
                     OnProcessingCompleted?.Invoke();
                 }
             }
@@ -188,7 +188,12 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
                 MainCameraControl.main.ShakeCamera(.3f);
             }
         }
-        
+
+        private void CalculateTimeLeft()
+        {
+            _timeLeft = CalculateTargetTime();
+        }
+
         private float CalculateTargetTime()
         {
             return OreConsumerPatcher.OreProcessingTime / (int)_currentSpeedMode;
@@ -332,6 +337,8 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
             }
 
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.yellow);
+
+            CalculateTimeLeft();
 
             InvokeRepeating(nameof(UpdateVisibleElements),1,1);
 
@@ -549,6 +556,13 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
         public void OnHandClick(GUIHand hand)
         {
             if (!IsInitialized || !IsConstructed) return;
+
+            if (!CardSystem.main.HasBeenRegistered())
+            {
+                //QuickLogger.ModMessage(AlterraHub.AccountNotFoundFormat());
+                Subtitles.main.Add(AlterraHub.AccountNotFoundFormat());
+                return;
+            }
             OreConsumerHUD.Main.Show(this);
         }
 
@@ -566,6 +580,8 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
             else
             {
                 _pendingSpeedMode = _currentSpeedMode = value;
+                CalculateTimeLeft();
+                CalculateTargetTime();
             }
         }
 

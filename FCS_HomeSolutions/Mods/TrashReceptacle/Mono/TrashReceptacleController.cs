@@ -1,6 +1,8 @@
 ﻿using System;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
+using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
@@ -100,8 +102,10 @@ namespace FCS_HomeSolutions.Mods.TrashReceptacle.Mono
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject,ModelPrefab.BodyMaterial,ModelPrefab.SecondaryMaterial);
+                _colorManager.Initialize(gameObject,AlterraHub.BasePrimaryCol,AlterraHub.BaseSecondaryCol);
             }
+
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
 
             IsInitialized = true;
         }

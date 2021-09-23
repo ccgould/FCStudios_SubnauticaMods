@@ -9,7 +9,7 @@ namespace FCS_HomeSolutions.Mods.Sofas.Buildable
     {
         internal const string NeonBarStoolClassID = "NeonBarStool";
         internal const string NeonBarStoolFriendly = "NeonBarStool";
-        internal const string NeonBarStoolDescription = "N/A";
+        internal const string NeonBarStoolDescription = "Companion seating for the Peeper Lounge. Seatbelt not included.";
         internal const string NeonBarStoolPrefabName = "FCS_NeonBarStool";
         internal const string NeonBarStoolKitClassID = "NeonBarStool_Kit";
 

@@ -157,7 +157,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
 
         public override float GetPowerUsage()
         {
-            if (!IsOperational || _replicatorSlot == null || !_replicatorSlot.IsOccupied) return 0f;
+            if (!IsOperational || _replicatorSlot == null || !_replicatorSlot.IsOccupied || _replicatorSlot.IsFull) return 0f;
 
             switch (_replicatorSlot.CurrentHarvesterSpeedMode)
             {

@@ -18,12 +18,53 @@ namespace FCS_HomeSolutions.Mods.Microwave.Mono
         private StorageContainer _storageContainer;
         private HashSet<TechType> _allowedTech;
         private readonly Dictionary<TechType, CookingItem> _knownCookingData = new();
+        private Queue<CookingItem> _pendingItems = new();
         private CookingItem _pendingItem;
         private float _cookingTime = -1;
         private InterfaceInteraction _interfaceInteraction;
         private Text _textDisplay;
         public CookingMode CookingMode;
         public GameObject DummyFoodObject;
+        private const float MAX_COOKING_TIME = 60f;
+        public int SlotCountX;
+        public int SlotCountY;
+        private float _maxCookingTime;
+
+        private HashSet<TechType> _rawTechTypes = new HashSet<TechType>
+        {
+            TechType.Bladderfish,
+            TechType.Boomerang,
+            TechType.Eyeye,
+            TechType.GarryFish,
+            TechType.HoleFish,
+            TechType.Hoopfish,
+            TechType.Hoverfish,
+            TechType.LavaBoomerang,
+            TechType.Oculus,
+            TechType.Peeper,
+            TechType.LavaEyeye,
+            TechType.Reginald,
+            TechType.Spadefish,
+            TechType.Spinefish
+        };
+
+        private HashSet<TechType> _curedTechTypes = new HashSet<TechType>
+        {
+            TechType.CuredBladderfish,
+            TechType.CuredBoomerang,
+            TechType.CuredEyeye,
+            TechType.CuredGarryFish,
+            TechType.CuredHoleFish,
+            TechType.CuredHoopfish,
+            TechType.CuredHoverfish,
+            TechType.CuredLavaBoomerang,
+            TechType.CuredOculus,
+            TechType.CuredPeeper,
+            TechType.CuredLavaEyeye,
+            TechType.CuredReginald,
+            TechType.CuredSpadefish,
+            TechType.CuredSpinefish,
+        };
 
         private void Update()
         {
@@ -36,12 +77,20 @@ namespace FCS_HomeSolutions.Mods.Microwave.Mono
             {
                 _storageContainer.enabled = false;
                 _cookingTime -= Time.deltaTime;
-                _textDisplay.text = TimeConverters.SecondsToMS(_cookingTime);
+                _maxCookingTime -= Time.deltaTime;
+                UpdateTimerUI(_maxCookingTime);
                 if (_cookingTime <= 0 && _pendingItem.ReturnItem != TechType.None && _pendingItem.TechType != TechType.None)
                 {
                     _storageContainer.container.DestroyItem(_pendingItem.TechType);
                     _storageContainer.container.UnsafeAdd(_pendingItem.ReturnItem.ToInventoryItemLegacy());
                     _pendingItem = new CookingItem();
+                    _storageContainer.container.DestroyItem(TechType.Salt);
+                    if (_pendingItems.Any())
+                    {
+                        _pendingItem = _pendingItems.Dequeue();
+                        _cookingTime = MAX_COOKING_TIME;
+                        return;
+                    }
                     _storageContainer.enabled = true;
                 }
             }
@@ -55,18 +104,36 @@ namespace FCS_HomeSolutions.Mods.Microwave.Mono
             _storageContainer.container.allowedTech = GetAllowedTech();
             _storageContainer.container.onAddItem += Container_onAddItem;
             _storageContainer.container.onRemoveItem += Container_onRemoveItem;
-
+            _storageContainer.container.Resize(SlotCountX,SlotCountY);
+            
             var startBTN = GameObjectHelpers.FindGameObject(gameObject, "StartBTN").GetComponent<Button>();
             _textDisplay = GameObjectHelpers.FindGameObject(gameObject, "InputField").GetComponentInChildren<Text>();
-            _textDisplay.text = TimeConverters.SecondsToMS(0);
+            UpdateTimerUI(0);
 
             startBTN.onClick.AddListener((() =>
             {
                 if (_storageContainer.container.Any())
                 {
-                    _cookingTime = 60f; //GetCookingTime();
-                    _textDisplay.text = TimeConverters.SecondsToMS(_cookingTime);
-                    _pendingItem = GetCookingItemData(_storageContainer.container.ElementAt(0).item.GetTechType());
+                    //Check if enough salt
+                    var saltCount = _storageContainer.container.GetCount(TechType.Salt);
+                    var rawItemsCount = GetRawItemsCount(); 
+
+                    if (saltCount >= rawItemsCount)
+                    {
+                        foreach (InventoryItem item in _storageContainer.container)
+                        {
+                            if(item.item.GetTechType() == TechType.Salt) continue;
+                            _pendingItems.Enqueue(GetCookingItemData(item.item.GetTechType()));
+                        }
+                        _cookingTime = MAX_COOKING_TIME;
+                        _maxCookingTime = MAX_COOKING_TIME * rawItemsCount;
+                        UpdateTimerUI(_maxCookingTime);
+                        _pendingItem = _pendingItems.Dequeue();
+                    }
+                    else
+                    {
+                        QuickLogger.ModMessage("Please add more salt to start curing.");
+                    }
                 }
             }));
 
@@ -78,13 +145,47 @@ namespace FCS_HomeSolutions.Mods.Microwave.Mono
                 _cookingTime = 0;
                 _storageContainer.enabled = true;
                 _storageContainer.Open(Player.main.transform);
-                _textDisplay.text = TimeConverters.SecondsToMS(0);
+                UpdateTimerUI(0);
             }));
+            DummyFoodObject?.SetActive(false);
+        }
+
+        private int GetCuredItemsCount()
+        {
+            int amount = 0;
+            foreach (InventoryItem item in _storageContainer.container)
+            {
+                if (_curedTechTypes.Contains(item.item.GetTechType()))
+                {
+                    amount++;
+                }
+            }
+
+            return amount;
+        }
+
+        private int GetRawItemsCount()
+        {
+            int amount = 0;
+            foreach (InventoryItem item in _storageContainer.container)
+            {
+                if (_rawTechTypes.Contains(item.item.GetTechType()))
+                {
+                    amount++;
+                }
+            }
+
+            return amount;
+        }
+
+        private void UpdateTimerUI(float seconds)
+        {
+            _textDisplay.text = TimeConverters.SecondsToMS(seconds);
         }
 
         private void Container_onRemoveItem(InventoryItem item)
         {
-            if (!_storageContainer.container.Any())
+            if (GetRawItemsCount() <= 0 && GetCuredItemsCount() <= 0)
             {
                 DummyFoodObject?.SetActive(false);
             }
@@ -92,7 +193,10 @@ namespace FCS_HomeSolutions.Mods.Microwave.Mono
 
         private void Container_onAddItem(InventoryItem item)
         {
-            DummyFoodObject?.SetActive(true);
+            if (_rawTechTypes.Contains(item.item.GetTechType()))
+            {
+                DummyFoodObject?.SetActive(true);
+            }
         }
 
         public CookingItem GetCookingItemData(TechType techType)
@@ -170,7 +274,8 @@ namespace FCS_HomeSolutions.Mods.Microwave.Mono
                     TechType.LavaEyeye,
                     TechType.Reginald,
                     TechType.Spadefish,
-                    TechType.Spinefish
+                    TechType.Spinefish,
+                    TechType.Salt
                 };
 #endif
 

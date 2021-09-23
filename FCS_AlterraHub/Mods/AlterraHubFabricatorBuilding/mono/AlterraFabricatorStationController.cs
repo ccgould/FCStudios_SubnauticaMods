@@ -252,7 +252,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         {
             if (_ping == null)
             {
-                _ping = gameObject.GetComponentInChildren<PingInstance>();
+                _ping = gameObject?.GetComponentInChildren<PingInstance>();
             }
 
 

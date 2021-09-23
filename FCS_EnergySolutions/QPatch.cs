@@ -112,20 +112,20 @@ namespace FCS_EnergySolutions
                 }
             }
 
-            //if (Configuration.IsWindSurferEnabled)
-            //{
-            //    CraftTreeHandler.AddTabNode(CraftTree.Type.Constructor, "FCSWindSurfer", "Wind Surfer",
-            //        ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), $"{Mod.WindSurferClassName}.png")));
+            if (Configuration.IsWindSurferEnabled)
+            {
+                CraftTreeHandler.AddTabNode(CraftTree.Type.Constructor, "FCSWindSurfer", "Wind Surfer",
+                    ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), $"{Mod.WindSurferClassName}.png")));
 
-            //    var windSurferOperator = new WindSurferOperatorBuildable();
-            //    windSurferOperator.Patch();
+                var windSurferOperator = new WindSurferOperatorBuildable();
+                windSurferOperator.Patch();
 
-            //    var windSurfer = new WindSurferSpawnable();
-            //    windSurfer.Patch();
+                var windSurfer = new WindSurferSpawnable();
+                windSurfer.Patch();
 
-            //    var windSurferPlatform = new WindSurferPlatformSpawnable();
-            //    windSurferPlatform.Patch();
-            //}
+                var windSurferPlatform = new WindSurferPlatformSpawnable();
+                windSurferPlatform.Patch();
+            }
 
 
             //Register debug commands

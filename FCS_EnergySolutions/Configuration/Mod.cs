@@ -1,4 +1,4 @@
-﻿using System;
+﻿ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -92,7 +92,7 @@ namespace FCS_EnergySolutions.Configuration
         internal static string JetStreamT242PrefabName => JetStreamT242ModName;
 
         internal const string PowerStorageTabID = "PS";
-        internal const string PowerStorageDescription = "Drains cell when Base Power is low, Recharges cells when Base Power is plentiful.";
+        internal const string PowerStorageDescription = "Zero maintenance power backup. Stores energy when Base Power is plentiful, discharges energy when Base Power is low.";
         internal const string PowerStorageFriendlyName = "PowerStorage";
         internal const string PowerStorageModName = "PowerStorage";
         internal const string PowerStorageClassName = "PowerStorage";
@@ -100,7 +100,7 @@ namespace FCS_EnergySolutions.Configuration
         internal static string PowerStoragePrefabName => PowerStorageModName;
 
         internal const string UniversalChargerTabID = "UC";
-        internal const string UniversalChargerDescription = "Zero maintenance power backup. Stores energy when Base Power is plentiful, discharges energy when Base Power is low.";
+        internal const string UniversalChargerDescription = "Holds up to 10 Power Cells or 10 Batteries and recharges them when Base Power is plentiful";
         internal const string UniversalChargerFriendlyName = "Universal Charger";
         internal const string UniversalChargerModName = "UniversalCharger";
         internal const string UniversalChargerClassName = "UniversalCharger";

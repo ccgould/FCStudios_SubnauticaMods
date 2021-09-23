@@ -24,7 +24,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
     {
         internal const string PeeperLoungeBarClassId = "PeeperLoungeBar";
         internal const string PeeperLoungeBarFriendly = "Peeper Lounge Bar";
-        internal const string PeeperLoungeBarDescription = "All drinks on the house.";
+        internal const string PeeperLoungeBarDescription = "AI-driven specialty food and drinks kiosk with small aquarium.";
         internal const string PeeperLoungeBarPrefabName = "PeeperLoungeBar";
         internal static string PeeperLoungeBarKitClassID = $"{PeeperLoungeBarClassId}_Kit";
 

@@ -10,7 +10,7 @@ namespace FCS_HomeSolutions.Mods.Sofas.Buildable
     {
         internal const string Sofa2ClassID = "Sofa2";
         internal const string Sofa2Friendly = "Sofa 2";
-        internal const string Sofa2Description = "Don’t put butt on the floor, put it on this lovely shelf!";
+        internal const string Sofa2Description = "Don’t put butt on the floor, put it on this comfy people-shelf!";
         internal const string Sofa2PrefabName = "Sofia02";
         internal const string Sofa2KitClassID = "Sofa2_Kit";
 

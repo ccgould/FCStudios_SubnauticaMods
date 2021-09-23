@@ -28,8 +28,7 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Buildable
         internal const string FireExtinguisherRefuelerClassID = "FireExtinguisherRefueler";
         internal const string FireExtinguisherRefuelerFriendly = "Fire Extinguisher Refueler";
 
-        internal const string FireExtinguisherRefuelerDescription =
-            "Use the Fire Extinguisher Refueler to refill any fire extinguisher";
+        internal const string FireExtinguisherRefuelerDescription = "Keep your habitat safe! Holds and recharges Fire Extinguishers. Wall-mounted.";
 
         internal const string FireExtinguisherRefuelerPrefabName = "FCS_FireExtinguisherRefueler";
         internal const string FireExtinguisherRefuelerKitClassID = "FireExtinguisherRefueler_Kit";

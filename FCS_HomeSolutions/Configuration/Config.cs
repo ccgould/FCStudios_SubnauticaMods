@@ -31,7 +31,7 @@ namespace FCS_HomeSolutions.Configuration
 
         #region Stove
 
-        [Toggle("[Stove] Is Mod Enabled", Tooltip = "Enables/Disables Alien Chef from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        [Toggle("[Stove] Is Mod Enabled", Order = 1, Tooltip = "Enables/Disables Alien Chef from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsStoveEnabled = true;
 
         #endregion
@@ -39,11 +39,12 @@ namespace FCS_HomeSolutions.Configuration
         #region Mini Fountain Filter
 
 
-        [Toggle("[Mini Fountain Filter] Is Mod Enabled", Tooltip = "Enables/Disables Mini Fountain Filter from your game (*Note: Game must be restarted for changes to take effect. Its best to destroys all objects before disabling a mod)")]
+        [Toggle("[Mini Fountain Filter] Is Mod Enabled", Order = 2, Tooltip = "Enables/Disables Mini Fountain Filter from your game (*Note: Game must be restarted for changes to take effect. Its best to destroys all objects before disabling a mod)")]
         public bool IsMiniFountainFilterEnabled = true;
 
-        [Toggle("[Mini Fountain Filter] Enable/Disable SoundFX")]
+        [Toggle("[Mini Fountain Filter] Enable/Disable SoundFX", Order = 2)]
         public bool MiniFountainFilterPlaySFX = true;
+
         public float MiniFountainFilterTankCapacity = 100f;
         public float MiniFountainFilterEnergyPerSec = 0.425f;
         public int MiniFountainFilterStorageWidth = 3;
@@ -55,13 +56,13 @@ namespace FCS_HomeSolutions.Configuration
 
         #region SeaBreeze
 
-        [Toggle("[SeaBreeze] Is Mod Enabled", Tooltip="Enables/Disables SeaBreeze from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        [Toggle("[SeaBreeze] Is Mod Enabled", Order = 3, Tooltip ="Enables/Disables SeaBreeze from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsSeaBreezeEnabled = true;
         public int SeaBreezeStorageLimit = 100;
         public float SeaBreezePowerUsage = 0.5066666666666667f;
         public bool SeaBreezeUseBasePower = true;
 
-        [Choice("[SeaBreeze] Game Mode"), OnChange(nameof(ChangeGameModeEvent))]
+        [Choice("[SeaBreeze] Game Mode", Order = 3), OnChange(nameof(ChangeGameModeEvent))]
         public FCSGameMode SeaBreezeModMode = FCSGameMode.HardCore;
 
         private void ChangeGameModeEvent(ChoiceChangedEventArgs e)
@@ -75,23 +76,21 @@ namespace FCS_HomeSolutions.Configuration
             "CF3mod",
             "CookFab"
         };
-
         
-
         #endregion
 
         #region Paint Tool
 
-        [Toggle("[Paint Tool] Is Mod Enabled", Tooltip="Enables/Disables Paint Tool from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        [Toggle("[Paint Tool] Is Mod Enabled", Order = 4, Tooltip ="Enables/Disables Paint Tool from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsPaintToolEnabled = true;
 
-        [Keybind("[Paint Tool] Select Color Forward",Tooltip = "Selects the next color on the paint tool")]
+        [Keybind("[Paint Tool] Select Color Forward", Order = 4, Tooltip = "Selects the next color on the paint tool")]
         public KeyCode PaintToolSelectColorForwardKeyCode = KeyCode.RightArrow;
 
-        [Keybind("[Paint Tool] Select Color Back",Tooltip = "Selects the previous color on the paint tool")]
+        [Keybind("[Paint Tool] Select Color Back", Order = 4, Tooltip = "Selects the previous color on the paint tool")]
         public KeyCode PaintToolSelectColorBackKeyCode = KeyCode.LeftArrow;
 
-        [Keybind("[Paint Tool] Sample Color Template", Tooltip = "Gets the color template from the object in view.")]
+        [Keybind("[Paint Tool] Sample Color Template", Order = 4, Tooltip = "Gets the color template from the object in view.")]
         public KeyCode PaintToolColorSampleKeyCode = KeyCode.P;
 
         public List<AdditionalColor> PaintToolAdditionalPaintColors = new List<AdditionalColor>
@@ -106,10 +105,10 @@ namespace FCS_HomeSolutions.Configuration
         #endregion
 
         #region Quantum Teleporter
-        [Toggle("[Quantum Teleporter] Is Mod Enabled",Tooltip = "Enables/Disables Quantum Teleporter from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        [Toggle("[Quantum Teleporter] Is Mod Enabled", Order = 5, Tooltip = "Enables/Disables Quantum Teleporter from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsQuantumTeleporterEnabled = true;
-        [Slider("[Quantum Teleporter] Portal Trail Brightness",0,1, Step = 0.1f, Format="{0:F2}", DefaultValue = 1,
-         Tooltip="Allows you to adjust the brightness of the trail effect in the teleporter effects."),OnChange(nameof(PortalBrightnessChangeEvent))]
+        [Slider("[Quantum Teleporter] Portal Trail Brightness",0,1, Step = 0.1f, Format="{0:F2}", DefaultValue = 1, Order = 5,
+         Tooltip ="Allows you to adjust the brightness of the trail effect in the teleporter effects."),OnChange(nameof(PortalBrightnessChangeEvent))]
         public float QuantumTeleporterPortalTrailBrightness = 1;
 
         private static void PortalBrightnessChangeEvent(SliderChangedEventArgs e)
@@ -124,13 +123,13 @@ namespace FCS_HomeSolutions.Configuration
 
         #region Televisions
 
-        [Toggle("[Smart Televisions] Is Mod Enabled",Tooltip="Enables/Disables Smart Televisions from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        [Toggle("[Smart Televisions] Is Mod Enabled", Order = 6, Tooltip ="Enables/Disables Smart Televisions from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsSmartTelevisionEnabled = true;
 
-        [Keybind("[Smart Televisions] Volume Up", Tooltip="Changes the keybind for the volume up for the tv.")]
+        [Keybind("[Smart Televisions] Volume Up", Order = 6, Tooltip ="Changes the keybind for the volume up for the tv.")]
         public KeyCode SmartTelevisionsVolumeUp = KeyCode.UpArrow;
 
-        [Keybind("[Smart Televisions] Volume Down", Tooltip="Changes the keybind for the volume down for the tv.")]
+        [Keybind("[Smart Televisions] Volume Down", Order = 6, Tooltip ="Changes the keybind for the volume down for the tv.")]
         public KeyCode SmartTelevisionsVolumeDown = KeyCode.DownArrow;
 
         //[Keybind("[Smart Televisions] Channel Up", Tooltip="Changes the keybind for the channel up for the tv.")]
@@ -139,118 +138,117 @@ namespace FCS_HomeSolutions.Configuration
         //[Keybind("[Smart Televisions] Channel Down",Tooltip="Changes the keybind for the channel down for the tv.")]
         //public KeyCode SmartTelevisionsChannelDown = KeyCode.LeftArrow;
 
-        [Keybind("[Smart Televisions] Turn On/Off Tv", Tooltip="Changes the keybind for turning the tv on or off.")]
+        [Keybind("[Smart Televisions] Turn On/Off Tv", Order = 6, Tooltip ="Changes the keybind for turning the tv on or off.")]
         public KeyCode SmartTelevisionsToggleTv = KeyCode.F;
 
         #endregion
 
         #region Railings
 
-        [Toggle("[Railings] Is Mod Enabled",Tooltip="Enables/Disables railings from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        [Toggle("[Railings] Is Mod Enabled", Order = 7, Tooltip ="Enables/Disables railings from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsRailingsEnabled = true;
 
         #endregion
 
         #region Peeper Lounge Bar
 
-        [Toggle("[Peeper Lounge Bar] Is Mod Enabled",Tooltip = "Enables/Disables Peeper Lounge Bar from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        [Toggle("[Peeper Lounge Bar] Is Mod Enabled", Order = 8, Tooltip = "Enables/Disables Peeper Lounge Bar from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsPeeperLoungeBarEnabled = true;
 
-        [Slider("[Peeper Lounge Bar] Turn speed.", 0, 5, Step = 0.1f, Format = "{0:F2}", DefaultValue = 5,Order = 1, Tooltip = "Allows you to adjust the turn speed.")]
+        [Slider("[Peeper Lounge Bar] Turn speed.", 0, 5, Step = 0.1f, Format = "{0:F2}", DefaultValue = 5,Order = 8, Tooltip = "Allows you to adjust the turn speed.")]
         public float PeeperLoungeBarTurnSpeed = 5;
 
-        [Toggle("[Peeper Lounge Bar] Play SFX", Tooltip = "Enables/Disables Peeper Lounger Bar voice from playing")]
+        [Toggle("[Peeper Lounge Bar] Play SFX", Order = 8, Tooltip = "Enables/Disables Peeper Lounger Bar voice from playing")]
         public bool PeeperLoungeBarPlayVoice { get; set; } = true;
 
-        [Toggle("[Elevator] Is Mod Enabled", Tooltip = "Enables/Disables Elevator from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        [Toggle("[Elevator] Is Mod Enabled", Order = 8, Tooltip = "Enables/Disables Elevator from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsElevatorEnabled { get; set; } = true;
         
         #endregion
 
         #region Neon Planter
 
-        [Toggle("[Neon Planter] Is Mod Enabled",Tooltip="Enables/Disables Smart OutDoor Planter from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        [Toggle("[Neon Planter] Is Mod Enabled", Order = 9, Tooltip ="Enables/Disables Smart OutDoor Planter from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsNeonPlanterEnabled = true;
 
         #endregion
 
         #region Fire Extinguisher Refueler
 
-        [Toggle("[Fire Extinguisher Refueler] Is Mod Enabled",Tooltip="Enables/Disables Fire Extinguisher Refueler from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        [Toggle("[Fire Extinguisher Refueler] Is Mod Enabled",Order = 10,Tooltip="Enables/Disables Fire Extinguisher Refueler from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsFireExtinguisherRefuelerEnabled = true;
 
         #endregion
 
         #region Trash Receptacle
 
-        [Toggle("[Trash Receptacle] Is Mod Enabled", Tooltip="Enables/Disables Trash Receptacle from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        [Toggle("[Trash Receptacle] Is Mod Enabled", Order = 11, Tooltip ="Enables/Disables Trash Receptacle from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsTrashReceptacleEnabled = true;
 
         #endregion                
         
         #region Trash Recycler
 
-        [Toggle("[Trash Recycler] Is Mod Enabled", Tooltip="Enables/Disables Trash Recycler from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        [Toggle("[Trash Recycler] Is Mod Enabled", Order = 12, Tooltip ="Enables/Disables Trash Recycler from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsTrashRecyclerEnabled = true;
 
         #endregion        
         
         #region Curtain
 
-        [Toggle("[Curtain] Is Mod Enabled",Tooltip="Enables/Disables Curtain from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        [Toggle("[Curtain] Is Mod Enabled", Order = 13, Tooltip ="Enables/Disables Curtain from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsCurtainEnabled = true;
 
         #endregion
         
         #region Shower
 
-        [Toggle("[Shower] Is Mod Enabled",Tooltip="Enables/Disables Mini Bathroom from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        [Toggle("[Shower] Is Mod Enabled", Order = 14, Tooltip ="Enables/Disables Mini Bathroom from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsShowerEnabled = true;
 
         #endregion
 
         #region Wall Signs
 
-        [Toggle("[Wall Signs] Is Mod Enabled",Tooltip="Enables/Disables Wall Signs from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        [Toggle("[Wall Signs] Is Mod Enabled", Order = 15, Tooltip ="Enables/Disables Wall Signs from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsWallSignsEnabled = true;
 
         #endregion
 
         #region Cabinets
 
-        [Toggle("[Cabinets] Is Mod Enabled",Tooltip="Enables/Disables Cabinets from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        [Toggle("[Cabinets] Is Mod Enabled", Order = 15, Tooltip ="Enables/Disables Cabinets from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsCabinetsEnabled = true;
 
         #endregion        
         
         #region Shelves and Tables
 
-        [Toggle("[Shelves and Tables] Is Mod Enabled",Tooltip="Enables/Disables Shelves and Tables from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        [Toggle("[Shelves and Tables] Is Mod Enabled", Order = 15, Tooltip ="Enables/Disables Shelves and Tables from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsShelvesAndTablesEnabled = true;
 
         #endregion
 
         #region LED Lights
 
-        [Toggle("[LED Lights] Is Mod Enabled",Tooltip="Enables/Disables LED Lights and Tables from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        [Toggle("[LED Lights] Is Mod Enabled", Order = 16, Tooltip ="Enables/Disables LED Lights and Tables from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsLEDLightsEnabled = true;
 
-        [Keybind("[LED Lights] Decrease Light Intensity", Tooltip="Changes how bright the light is.")]
+        [Keybind("[LED Lights] Decrease Light Intensity", Order = 16, Tooltip ="Changes how bright the light is.")]
         public KeyCode LEDLightBackwardKeyCode = KeyCode.LeftArrow;
-        [Keybind("[LED Lights] Increase Light Intensity", Tooltip="Changes how bright the light is.")]
+        [Keybind("[LED Lights] Increase Light Intensity", Order = 16, Tooltip ="Changes how bright the light is.")]
         public KeyCode LEDLightForwardKeyCode = KeyCode.RightArrow;
-        [Keybind("[LED Lights] Increase Light Intensity", Tooltip="Enables/Disables the night sensor which turns the light off during the day and on in the night")]
+        [Keybind("[LED Lights] Increase Light Intensity", Order = 16, Tooltip ="Enables/Disables the night sensor which turns the light off during the day and on in the night")]
         public KeyCode LEDLightNightSensorToggleKeyCode = KeyCode.K;
 
         #endregion
 
 
-        [Toggle("[Stairs] Is Mod Enabled", Tooltip = "Enables/Disables Elevator from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
-        public bool IsStairsEnabled { get; set; }
+        [Toggle("[Hatch Stairway] Is Mod Enabled", Order = 17, Tooltip = "Enables/Disables Hatch Stairway from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        public bool IsHatchStairwayEnabled { get; set; } = true;
 
-        [Toggle("[Stairs] Ignore Base Pieces", Tooltip = "Allows the stairs to build sections on base pieces (May cut though objects if disabled)")]
-
-        public bool StairsIgnoreBasePieces { get; set; } = false;
+        [Toggle("[Hatch Stairway] Limit length over base", Order = 18, Tooltip = "Enabled: always builds short stairs for hatch directly on platform. Disabled: builds full length stairs which will penetrate base objects.")]
+        public bool StairsLimitLengthOverBasePieces { get; set; } = false;
 
 
         #region JukeBox

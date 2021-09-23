@@ -37,6 +37,7 @@ namespace FCS_AlterraHub.Systems
 
         public AccountDetails(AccountDetails accountDetails)
         {
+            if (accountDetails == null) return;
             FullName = accountDetails.FullName;
             Username = accountDetails.Username;
             Password = accountDetails.Password;

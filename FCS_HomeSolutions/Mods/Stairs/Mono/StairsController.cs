@@ -151,7 +151,8 @@ namespace FCS_HomeSolutions.Mods.Stairs.Mono
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DecorationItemTabId, Mod.ModPackID);
 			traceStart = GameObjectHelpers.FindGameObject(gameObject, "RayCast_Point").transform;
-            stepPrefab = ModelPrefab.GetPrefab("SmallPlatformStairs_Extension");
+
+            stepPrefab = ModelPrefab.GetPrefab("FCS_DoorStairsExtension_Small");
             
 			if(_savedData != null && !Mathf.Approximately(_savedData.FloorDistance,-1))
             {
@@ -171,10 +172,22 @@ namespace FCS_HomeSolutions.Mods.Stairs.Mono
         private void BuildGeometry(Base baseComp, bool disableColliders)
 		{
             Vector3 a = traceStart.transform.up * -0.15f;
-			float floorDistance = GetFloorDistance(a + traceStart.position - traceStart.right * 0.7f, traceStart.forward, maxLength, gameObject);
-			float floorDistance2 = GetFloorDistance(a + traceStart.position + traceStart.right * 0.7f, traceStart.forward, maxLength, gameObject);
+			float floorDistance = GetFloorDistance(a + traceStart.position - traceStart.right * StartOffset, traceStart.forward, maxLength, gameObject);
+			float floorDistance2 = GetFloorDistance(a + traceStart.position + traceStart.right * StartOffset, traceStart.forward, maxLength, gameObject);
 			BuildGeometry(baseComp, disableColliders, floorDistance, floorDistance2);
         }
+
+        private void Refresh()
+        {
+            foreach (Transform stair in stairsParent.transform)
+            {
+                Destroy(stair.gameObject);
+            }
+            Vector3 a = traceStart.transform.up * -0.15f;
+            float floorDistance = GetFloorDistance(a + traceStart.position - traceStart.right * StartOffset, traceStart.forward, maxLength, gameObject);
+            float floorDistance2 = GetFloorDistance(a + traceStart.position + traceStart.right * StartOffset, traceStart.forward, maxLength, gameObject);
+			BuildStairsFromDistance(Manager?.BaseComponent,false,floorDistance,floorDistance2,a);
+		}
 
         private void BuildGeometry(Base baseComp, bool disableColliders, float floorDistance, float floorDistance2)
         {
@@ -240,7 +253,7 @@ namespace FCS_HomeSolutions.Mods.Stairs.Mono
             int num;
             if (calculateAmount)
             {
-                num = Mathf.RoundToInt(length / stepLength + 1.5f);
+                num = Mathf.RoundToInt((length / stepLength + 1.5f) - 1);
 			}
             else
             {
@@ -271,11 +284,13 @@ namespace FCS_HomeSolutions.Mods.Stairs.Mono
 
 		public ConstructableBounds constructableBounds;
 
-		private const float stepLength = 1.671628f;
+		private const float stepLength = 0.752f; //1.671628f;
 
 		private const float maxLength = 10f;
 
 		private GameObject stairsParent;
+
+        private float StartOffset = 0.7f;
 
 		private static List<GameObject> cachedSteps = new();
         private int _childCount;
@@ -319,7 +334,7 @@ namespace FCS_HomeSolutions.Mods.Stairs.Mono
 				RaycastHit raycastHit = UWE.Utils.sharedHitBuffer[i];
 				if (raycastHit.collider.gameObject.layer != LayerID.Player && !IsBaseGhost(raycastHit.collider.gameObject) && !IsDestroyed(raycastHit.collider.gameObject))
 				{
-					if (IsOtherBasePiece(raycastHit.collider.gameObject, ignoreObject) && QPatch.Configuration.StairsIgnoreBasePieces)
+					if (IsOtherBasePiece(raycastHit.collider.gameObject, ignoreObject) && QPatch.Configuration.StairsLimitLengthOverBasePieces)
 					{
 						if (num == -1f || num > raycastHit.distance)
 						{

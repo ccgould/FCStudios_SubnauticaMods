@@ -103,7 +103,7 @@ namespace FCS_ProductionSolutions.Configuration
         [JsonProperty] internal HashSet<TechType> KnownCrafts { get; set; }
         [JsonProperty] internal List<TechType> StoredItems { get; set; }
         [JsonProperty] internal List<string> ConnectedDevices { get; set; }
-        [JsonProperty] internal StandByModes StandyMode { get; set; }
+        [JsonProperty] internal CrafterModes StandyMode { get; set; }
     }
 
     [Serializable]

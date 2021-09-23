@@ -164,22 +164,22 @@ namespace FCS_HomeSolutions
                 elevator.Patch();
                 AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "LiftSoundEffect.mp3"));
             }
-
-
+            
             var sink = new SinkBuildable();
             sink.Patch();
+            
+            var jukeBox = new JukeBoxBuildable();
+            jukeBox.Patch();
 
+            var jukeboxSpeaker = new JukeBoxSpeakerBuildable();
+            jukeboxSpeaker.Patch();
 
-            //var jukeBox = new JukeBoxBuildable();
-            //jukeBox.Patch();
-
-            //var jukeboxSpeaker = new JukeBoxSpeakerBuildable();
-            //jukeboxSpeaker.Patch();
-
-            var stairs = new StairsBuildable();
-            stairs.Patch();
-
-
+            if (Configuration.IsHatchStairwayEnabled)
+            {
+                var stairs = new StairsBuildable();
+                stairs.Patch();
+            }
+            
             var hologramPoster = new HologramPosterBuildable();
             hologramPoster.Patch();
 
@@ -216,8 +216,7 @@ namespace FCS_HomeSolutions
             toiletBuildable.Patch();
 
 
-            var microwave = new CookerPatch("fcsmicrowave", "Microwave", "N/A",
-                ModelPrefab.GetPrefabFromGlobal("FCS_Microwave"),
+            var microwave = new CookerPatch("fcsmicrowave", "Microwave", "Heat up a quick snack in seconds!", ModelPrefab.GetPrefabFromGlobal("FCS_Microwave"),
                 new Settings
                 {
                     KitClassID = "microwave_kit",
@@ -232,10 +231,10 @@ namespace FCS_HomeSolutions
                     Size = new Vector3(0.8795165f, 0.4697664f, 0.6358638f),
                     CategoryForPDA = TechCategory.InteriorModule,
                     GroupForPDA = TechGroup.InteriorModules
-                });
+                },new Vector2int(1,1));
             microwave.Patch();
 
-            var curingCabinet = new CookerPatch("fcsCuringCabinet", "Curing Cabinet", "N/A",
+            var curingCabinet = new CookerPatch("fcsCuringCabinet", "Curing Cabinet", "Take your meals with you. Quickly cooks and cures several meals.",
                 ModelPrefab.GetPrefabFromGlobal("FCS_CuringCabinet"),
                 new Settings
                 {
@@ -251,13 +250,13 @@ namespace FCS_HomeSolutions
                     Size = new Vector3(0.9137022f, 1.016351f, 0.587903f),
                     CategoryForPDA = TechCategory.InteriorModule,
                     GroupForPDA = TechGroup.InteriorModules
-                },CookingMode.Curing);
+                }, new Vector2int(4, 2), CookingMode.Curing);
             curingCabinet.Patch();
         }
 
         private void PatchComputers()
         {
-            var pcCPU = new DecorationEntryPatch("pccpu", "Computer CPU", "N/A",
+            var pcCPU = new DecorationEntryPatch("pccpu", "Computer CPU", "Suitable for all your local computing needs with festive local flare.",
                 FCSAssetBundlesService.PublicAPI.GetPrefabByName("FCS_PCCpu", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 new Settings
                 {
@@ -277,7 +276,7 @@ namespace FCS_HomeSolutions
             pcCPU.Patch();
 
 
-            var pcMonitor = new DecorationEntryPatch("pcmonitor", "Computer Monitor", "N/A",
+            var pcMonitor = new DecorationEntryPatch("pcmonitor", "Computer Monitor", "Suitable for keeping an eye on your Alterra Computer CPU.",
                 FCSAssetBundlesService.PublicAPI.GetPrefabByName("FCS_PCmonitor", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 new Settings
                 {
@@ -569,7 +568,7 @@ namespace FCS_HomeSolutions
                 });
             neonTable02.Patch();
 
-            var rug = new DecorationEntryPatch("FCSRug", "Rug", "N/A",
+            var rug = new DecorationEntryPatch("FCSRug", "Rug", "A stylish rug from the corporation that loves you. Requires floor.",
                 ModelPrefab.GetPrefabFromGlobal("FCS_Rug01"),
                 new Settings
                 {

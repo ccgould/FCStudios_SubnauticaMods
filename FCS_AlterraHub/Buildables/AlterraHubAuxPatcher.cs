@@ -16,7 +16,7 @@ namespace FCS_AlterraHub.Buildables
             { $"{ModKey}_CardNotInSystemSettingBalanceFormat", "This card number ({0}) wasn't found in the system. Setting balance to {1}." },
             { $"{ModKey}_ErrorHasOccured", "An error has occurred please let FCStudios in the Alterra Corp. know about this error. Thank you and sorry for the inconvenience." },
             { $"{ModKey}_NotEnoughMoneyOnAccount", "There is not enough money on card to perform this transaction." },
-            { $"{ModKey}_AccountNotFoundFormat", "There is no account found for you please register an account in the Alterra Hub" },
+            { $"{ModKey}_AccountNotFoundFormat", "Unable to locate your AlterraHub Account. Please consult your FCStudios PDA." },
             { $"{ModKey}_CardReader", "Card Reader" },
             { $"{ModKey}_AccountBalanceFormat", "Account Balance: {0}" },
             { $"{ModKey}_DebtBalanceFormat", "Debt Balance: {0}" },

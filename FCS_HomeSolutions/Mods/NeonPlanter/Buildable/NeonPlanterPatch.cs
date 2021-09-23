@@ -27,7 +27,7 @@ namespace FCS_HomeSolutions.Mods.NeonPlanter.Buildable
         private Settings _settings;
         internal const string NeonPlanterClassID = "NeonPlanter";
         internal const string NeonPlanterFriendly = "Neon Planter";
-        internal const string NeonPlanterDescription = "A planter that can be placed outside with color changing.";
+        internal const string NeonPlanterDescription = "Indoor planter to grow your favorite things";
         internal const string NeonPlanterPrefabName = "FCS_NeonPlanter";
         internal static string NeonPlanterKitClassID = $"{NeonPlanterClassID}_Kit";
         internal const string NeonPlanterTabID = "NOP";

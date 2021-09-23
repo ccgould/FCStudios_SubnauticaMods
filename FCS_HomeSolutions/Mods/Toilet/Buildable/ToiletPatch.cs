@@ -10,7 +10,7 @@ namespace FCS_HomeSolutions.Mods.Toilet.Buildable
     {
         internal const string ToiletClassID = "FCSToilet";
         internal const string ToiletFriendly = "Toilet";
-        internal const string ToiletDescription = "N/A";
+        internal const string ToiletDescription = "A simple toilet for convenient hygiene. (Privacy not included)";
         internal const string ToiletPrefabName = "FCS_Toilet";
         internal const string ToiletKitClassID = "Toilet_Kit";
         public ToiletBuildable() : base(ToiletClassID, ToiletFriendly, ToiletDescription, ToiletKitClassID, ToiletPrefabName, 9000)

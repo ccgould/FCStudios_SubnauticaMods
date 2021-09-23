@@ -25,7 +25,7 @@ namespace FCS_HomeSolutions.Mods.Stairs.Buildable
     {
         private GameObject _prefab;
         internal const string StairsClassID = "FCSStairs";
-        internal const string StairsFriendly = "Door Stairs";
+        internal const string StairsFriendly = "Hatch Stairway";
         internal const string StairsDescription = "Convenient stairs to help you get to the high hatches. Build on a hatch and watch me grow.";
         internal const string StairsPrefabName = "Small_PlatformDoorStairs";
         internal const string StairsKitClassID = "Stairs_Kit";
