@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using FCS_AlterraHub.Helpers;
 using FCSCommon.Utilities;
 using FMOD;
 using SMLHelper.V2.Utility;
@@ -33,13 +34,13 @@ namespace FCS_AlterraHub.Systems
         {
            _currentChannel.isPlaying(out bool isPlaying);
 
-            if (Time.timeScale <= 0f && isPlaying)
+            if (WorldHelpers.CheckIfPaused() && isPlaying)
             {
                 _currentChannel.setPaused(true);
                 _wasPlaying = true;
             }
 
-            if (Time.timeScale > 0 && _wasPlaying)
+            if (!WorldHelpers.CheckIfPaused() && _wasPlaying)
             {
                 _currentChannel.setPaused(false);
                 _wasPlaying = false;

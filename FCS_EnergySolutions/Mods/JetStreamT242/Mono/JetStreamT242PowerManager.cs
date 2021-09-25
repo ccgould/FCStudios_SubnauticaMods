@@ -64,7 +64,7 @@ namespace FCS_EnergySolutions.Mods.JetStreamT242.Mono
 
         private void ProducePower()
         {
-            if (Time.timeScale <= 0f)
+            if (WorldHelpers.CheckIfPaused())
             {
                 return;
             }

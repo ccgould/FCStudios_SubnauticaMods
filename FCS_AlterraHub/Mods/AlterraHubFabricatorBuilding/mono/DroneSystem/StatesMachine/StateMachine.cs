@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FCS_AlterraHub.Helpers;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.StatesMachine
@@ -19,7 +20,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Stat
 
         private void Update()
         {
-            if (Time.timeScale <= 0f)
+            if (WorldHelpers.CheckIfPaused())
             {
                 return;
             }

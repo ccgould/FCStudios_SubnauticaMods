@@ -476,6 +476,11 @@ namespace FCS_AlterraHub.Helpers
 
             return gameObject;
         }
+
+        public static bool CheckIfPaused()
+        {
+            return Time.timeScale <= 0;
+        }
     }
 
     public struct PickReturnsData

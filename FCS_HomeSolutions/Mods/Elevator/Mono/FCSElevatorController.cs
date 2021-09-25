@@ -186,7 +186,7 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
                     : 22000f;
 
 
-            if (_audio.isPlaying && Mathf.Approximately(Time.timeScale, 0f) || !Manager.HasEnoughPower(POWERUSAGE))
+            if (_audio.isPlaying && WorldHelpers.CheckIfPaused() || !Manager.HasEnoughPower(POWERUSAGE))
             {
                 _audio.Pause();
                 return;

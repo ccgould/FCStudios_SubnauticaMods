@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
+using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mono;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -123,7 +124,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
 
         private bool CheckIfPaused()
         {
-            var gamePaused = Mathf.Approximately(Time.timeScale, 0f);
+            var gamePaused = WorldHelpers.CheckIfPaused();
             var audioSource = _trackedDevice?.GetAudioSource();
 
             if (audioSource != null && audioSource.isPlaying && gamePaused)

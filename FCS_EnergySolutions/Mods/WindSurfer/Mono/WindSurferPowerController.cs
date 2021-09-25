@@ -1,4 +1,5 @@
-﻿using FCS_EnergySolutions.Configuration;
+﻿using FCS_AlterraHub.Helpers;
+using FCS_EnergySolutions.Configuration;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Mono;
 using UnityEngine;
 
@@ -44,7 +45,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
 
         private void ProducePower()
         {
-            if (Time.timeScale <= 0f)
+            if (WorldHelpers.CheckIfPaused())
             {
                 return;
             }

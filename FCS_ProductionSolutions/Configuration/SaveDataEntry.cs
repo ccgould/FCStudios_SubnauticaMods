@@ -92,18 +92,16 @@ namespace FCS_ProductionSolutions.Configuration
     }
 
     [Serializable]
-    internal class DSSAutoCrafterDataEntry
+    internal class AutoCrafterDataEntry
     {
         [JsonProperty] internal string ID { get; set; }
         [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
         [JsonProperty] internal ColorTemplateSave ColorTemplate { get; set; }
         [JsonProperty] internal ObservableCollection<CraftingOperation> CurrentProcess { get; set; }
         public bool IsRunning { get; set; }
-        [JsonProperty] internal AutoCrafterMode CurrentCrafterMode { get; set; }
         [JsonProperty] internal HashSet<TechType> KnownCrafts { get; set; }
         [JsonProperty] internal List<TechType> StoredItems { get; set; }
         [JsonProperty] internal List<string> ConnectedDevices { get; set; }
-        [JsonProperty] internal CrafterModes StandyMode { get; set; }
     }
 
     [Serializable]
@@ -113,7 +111,7 @@ namespace FCS_ProductionSolutions.Configuration
         [JsonProperty] internal List<MatterAnalyzerDataEntry> MatterAnalyzerEntries = new();
         [JsonProperty] internal List<DeepDrillerSaveDataEntry> DeepDrillerMk2Entries = new();
         [JsonProperty] internal List<ReplicatorDataEntry> ReplicatorEntries = new();
-        [JsonProperty] internal List<DSSAutoCrafterDataEntry> DSSAutoCrafterDataEntries = new();
+        [JsonProperty] internal List<AutoCrafterDataEntry> AutoCrafterDataEntries = new();
 
         [JsonProperty] internal List<DNASampleData> HydroponicHarvesterKnownTech { get; set; } = new();
     }

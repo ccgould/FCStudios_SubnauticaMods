@@ -1,16 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Helpers;
-using FCS_ProductionSolutions.Buildable;
-using FCSCommon.Helpers;
-using FCSCommon.Utilities;
 using UnityEngine;
 
-namespace FCS_ProductionSolutions.Mods.AutoCrafter
+namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
 {
-    public class DSSAutoCrafterCrateController : MonoBehaviour
+    internal class AutoCrafterCrateController : MonoBehaviour
     {
-
         // Array of waypoints to walk from one to the next one
         [SerializeField]
         private Transform[] waypoints;
@@ -38,13 +38,13 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         // Index of current waypoint from which Enemy walks
         // to the next one
         private int waypointIndex = 0;
-        private DSSAutoCrafterController _controller;
+        private AutoCrafterController _controller;
         //private TechType _techType;
         public int Amount { get; set; }
-        
+
 
         // Use this for initialization
-        internal void Initialize( Transform[] newWaypoints,DSSAutoCrafterController controller,TechType techType)
+        internal void Initialize(Transform[] newWaypoints, AutoCrafterController controller, TechType techType)
         {
             _controller = controller;
             waypoints = newWaypoints;

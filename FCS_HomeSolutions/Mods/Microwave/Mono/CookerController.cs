@@ -68,7 +68,7 @@ namespace FCS_HomeSolutions.Mods.Microwave.Mono
 
         private void Update()
         {
-            if (Time.timeScale <= 0 || _interfaceInteraction == null || _storageContainer == null ||
+            if (WorldHelpers.CheckIfPaused() || _interfaceInteraction == null || _storageContainer == null ||
                 _storageContainer.container == null) return;
 
             _storageContainer.enabled = !_interfaceInteraction.IsInRange;

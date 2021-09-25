@@ -77,13 +77,13 @@ namespace FCS_AlterraHub.Patches
             {
                 FCSPDA.AudioTrack.isPlaying(out bool isPlaying);
                 
-                if (isPlaying && Mathf.Approximately(Time.timeScale, 0f))
+                if (isPlaying && WorldHelpers.CheckIfPaused())
                 {
                     FCSPDA.AudioTrack.setPaused(true);
                     _wasPlaying = true;
                 }
 
-                if (_wasPlaying && Time.timeScale > 0)
+                if (_wasPlaying && !WorldHelpers.CheckIfPaused())
                 {
                     FCSPDA.AudioTrack.setPaused(false);
                     FCSPDA.AudioTrack.setVolume(SoundSystem.voiceVolume);

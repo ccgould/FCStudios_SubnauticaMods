@@ -1347,7 +1347,7 @@ namespace FCS_AlterraHub.Mono
         public void ConsumeIngredientsFor(TechType techType)
         {
             var techData = CraftDataHandler.GetTechData(techType);
-            QuickLogger.Debug($"TechData: {techData?.ingredientCount}", true);
+            QuickLogger.Debug($"TechData: {techData?.ingredientCount} | {Language.main.Get(techType)}", true);
 
 
             if (techData != null)
@@ -1356,7 +1356,15 @@ namespace FCS_AlterraHub.Mono
                 {
                     for (int i = 0; i < ingredient.amount; i++)
                     {
-                        GameObject.Destroy(TakeItem(ingredient.techType).gameObject);
+                        var item = TakeItem(ingredient.techType);
+                        if (item != null)
+                        {
+                            GameObject.Destroy(item.gameObject);
+                        }
+                        else
+                        {
+                            QuickLogger.Error($"Failed to pull item {Language.main.Get(techType)} from TakeItem()");
+                        }
                     }
                 }
             }

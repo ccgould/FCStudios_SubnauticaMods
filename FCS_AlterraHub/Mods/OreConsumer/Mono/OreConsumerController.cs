@@ -151,13 +151,13 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
 
             if (_drillSound != null && _drillSound.isPlaying)
             {
-                if (Mathf.Approximately(Time.timeScale, 0f))
+                if (WorldHelpers.CheckIfPaused())
                 {
                     _drillSound.Pause();
                     _wasDrillSoundPlaying = true;
                 }
 
-                if (_wasDrillSoundPlaying && Time.timeScale > 0)
+                if (_wasDrillSoundPlaying && !WorldHelpers.CheckIfPaused())
                 {
                     _drillSound.Play();
                     _wasDrillSoundPlaying = false;

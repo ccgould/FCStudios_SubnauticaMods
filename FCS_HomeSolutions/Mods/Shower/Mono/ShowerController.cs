@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using FCS_AlterraHub.Helpers;
+using UnityEngine;
 
 namespace FCS_HomeSolutions.Mods.Shower.Mono
 {
@@ -15,13 +16,13 @@ namespace FCS_HomeSolutions.Mods.Shower.Mono
             if (_showerFx != null)
             {
 
-                if (_showerFx.isPlaying && Mathf.Approximately(Time.timeScale, 0f))
+                if (_showerFx.isPlaying && WorldHelpers.CheckIfPaused())
                 {
                     _showerFx.Pause();
                     _wasPlaying = true;
                 }
 
-                if (_wasPlaying && Time.timeScale > 0)
+                if (_wasPlaying && !WorldHelpers.CheckIfPaused())
                 {
                     _showerFx.Play();
                     _wasPlaying = false;

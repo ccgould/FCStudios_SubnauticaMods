@@ -7,8 +7,7 @@ using FCS_AlterraHub.Mods.Global.Spawnables;
 using FCS_AlterraHub.Registration;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
-using FCS_ProductionSolutions.Mods.AutoCrafter;
-using FCSCommon.Helpers;
+using FCS_ProductionSolutions.Mods.AutoCrafter.Mono;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
@@ -18,21 +17,33 @@ using RecipeData = SMLHelper.V2.Crafting.TechData;
 using Sprite = Atlas.Sprite;
 #endif
 
-namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
+namespace FCS_ProductionSolutions.Mods.AutoCrafter.Buildable
 {
-    internal class DSSAutoCrafterPatch : SMLHelper.V2.Assets.Buildable
+    internal class AutoCrafterPatch : SMLHelper.V2.Assets.Buildable
     {
+        private readonly GameObject _prefab;
+
+        internal const string AutoCrafterTabID = "ACU";
+        private const string AutoCrafterFriendlyName = "Auto Crafter";
+        private const string AutoCrafterClassName = "AutoCrafter";
+        private const string AutoCrafterPrefabName = "AutoCraftMachine";
+        private static string AutoCrafterKitClassID => $"{AutoCrafterClassName}_Kit";
+        private const string AutoCrafterDescription = "Avoid long hours in front of the Fabricator. Queue up a list of multiple items or just keep yourself automatically stocked on an important one.";
+
         public override TechGroup GroupForPDA => TechGroup.Miscellaneous;
         public override TechCategory CategoryForPDA => TechCategory.Misc;
         public override string AssetsFolder => Mod.GetAssetPath();
 
-        public DSSAutoCrafterPatch() : base(Mod.DSSAutoCrafterClassName, Mod.DSSAutoCrafterFriendlyName, Mod.DSSAutoCrafterDescription)
+        public AutoCrafterPatch() : base(AutoCrafterClassName, AutoCrafterFriendlyName, AutoCrafterDescription)
         {
+
+            _prefab = ModelPrefab.GetPrefab(AutoCrafterPrefabName);
+
             OnFinishedPatching += () =>
             {
-                var dssAutoCrafterKit = new FCSKit(Mod.DSSAutoCrafterKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
-                dssAutoCrafterKit.Patch();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.DSSAutoCrafterKitClassID.ToTechType(), 236250, StoreCategory.Production);
+                var AutoCrafterKit = new FCSKit(AutoCrafterKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
+                AutoCrafterKit.Patch();
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, AutoCrafterKitClassID.ToTechType(), 236250, StoreCategory.Production);
             };
         }
 
@@ -40,7 +51,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
         {
             try
             {
-                var prefab = GameObject.Instantiate(ModelPrefab.DSSAutoCrafterPrefab);
+                var prefab = GameObject.Instantiate(_prefab);
 
                 var center = new Vector3(0f, 1.33581f, 0.1292717f);
                 var size = new Vector3(1.87915f, 2.327191f, 1.775631f);
@@ -79,11 +90,13 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
                 lw.cellLevel = LargeWorldEntity.CellLevel.Global;
 
                 prefab.AddComponent<TechTag>().type = TechType;
-                prefab.AddComponent<DSSAutoCrafterController>();
+                var craftMachine = prefab.AddComponent<CraftMachine>();
+                var controller = prefab.AddComponent<AutoCrafterController>();
+                craftMachine._mono = controller; 
 
                 //Apply the glass shader here because of autosort lockers for some reason doesn't like it.
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
-                MaterialHelpers.ApplyShaderToMaterial(prefab, "DSS_ConveyorBelt");
+                MaterialHelpers.ApplyShaderToMaterial(prefab, "_ConveyorBelt");
 
                 return prefab;
             }
@@ -97,7 +110,14 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
 
         protected override RecipeData GetBlueprintRecipe()
         {
-            return Mod.DSSAutoCrafterIngredients;
+            return new RecipeData
+            {
+                craftAmount = 1,
+                Ingredients =
+                {
+                    new Ingredient(AutoCrafterKitClassID.ToTechType(), 1),
+                }
+            };
         }
 
         protected override Sprite GetItemSprite()

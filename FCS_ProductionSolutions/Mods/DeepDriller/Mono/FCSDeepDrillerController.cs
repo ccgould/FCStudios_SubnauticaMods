@@ -175,13 +175,13 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Mono
                 }
 
 
-                if (_audio.isPlaying && Mathf.Approximately(Time.timeScale, 0f))
+                if (_audio.isPlaying && WorldHelpers.CheckIfPaused())
                 {
                     _audio.Pause();
                     _wasPlaying = true;
                 }
 
-                if (_wasPlaying && Time.timeScale > 0)
+                if (_wasPlaying && !WorldHelpers.CheckIfPaused())
                 {
                     _audio.Play();
                     _wasPlaying = false;

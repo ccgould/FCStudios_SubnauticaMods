@@ -6,12 +6,12 @@ using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Mods.Replicator.Buildables;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
+using FCS_ProductionSolutions.Mods.AutoCrafter.Buildable;
 using FCS_ProductionSolutions.Mods.DeepDriller.Buildable;
 using FCS_ProductionSolutions.Mods.DeepDriller.Craftable;
 using FCS_ProductionSolutions.Mods.DeepDriller.Ores;
 using FCS_ProductionSolutions.Mods.HydroponicHarvester.Buildable;
 using FCS_ProductionSolutions.Mods.MatterAnalyzer.Buildable;
-using FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable;
 using FCSCommon.Utilities;
 using HarmonyLib;
 using QModManager.API.ModLoading;
@@ -75,7 +75,7 @@ namespace FCS_ProductionSolutions
 
             if (Configuration.IsAutocrafterEnabled)
             {
-                var dssAutoCrafter = new DSSAutoCrafterPatch();
+                var dssAutoCrafter = new AutoCrafterPatch();
                 dssAutoCrafter.Patch();
             }
 

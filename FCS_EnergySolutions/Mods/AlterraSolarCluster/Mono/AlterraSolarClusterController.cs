@@ -67,7 +67,7 @@ namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
 
         private void Update()
         {
-            if (Time.timeScale <= 0f)
+            if (WorldHelpers.CheckIfPaused())
             {
                 return;
             }

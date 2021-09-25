@@ -230,7 +230,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
             
             if (CheckIfPlayingTrack())
             {
-                AudioTrack.setPaused(Time.timeScale <= 0f);
+                AudioTrack.setPaused(WorldHelpers.CheckIfPaused());
             }
 
             if (WorldHelpers.CheckIfInRange(Player.main.gameObject, gameObject, 5) && !uGUI.isLoading)
