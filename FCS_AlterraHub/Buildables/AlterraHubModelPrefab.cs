@@ -226,7 +226,9 @@ namespace FCS_AlterraHub.Buildables
             encyclopediaEntryPrefab.SetActive(false);
             var listEntry = encyclopediaEntryPrefab.AddComponent<uGUI_ListEntry>();
             listEntry.layoutElement = encyclopediaEntryPrefab.FindChild("ImageContainer").GetComponentInChildren<LayoutElement>();
+#if SUBNAUTICA
             listEntry.text = encyclopediaEntryPrefab.GetComponentInChildren<Text>();
+#endif
             listEntry.icon = encyclopediaEntryPrefab.FindChild("ImageContainer").FindChild("Arrow").GetComponent<Image>();
             listEntry.background = encyclopediaEntryPrefab.GetComponent<Image>();
             encyclopediaEntryPrefab.SetActive(true);

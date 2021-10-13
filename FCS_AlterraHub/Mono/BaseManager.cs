@@ -1112,7 +1112,13 @@ namespace FCS_AlterraHub.Mono
 
             var validServers = new List<ISlotController>();
 
-            if (CraftData.cookedCreatureList.ContainsValue(techType))
+#if SUBNAUTICA
+            var techDataResult = CraftData.cookedCreatureList.ContainsValue(techType) || WorldHelpers.Eatables.Contains(techType);
+#else
+            var techDataResult = WorldHelpers.Eatables.Contains(techType);
+#endif
+
+            if (techDataResult)
             {
                 QuickLogger.ModMessage(Buildables.AlterraHub.FoodItemsNotAllowed());
                 return false;
@@ -1182,7 +1188,7 @@ namespace FCS_AlterraHub.Mono
                 {
 
                     var sizes = new List<Vector2int>();
-                    var size = CraftData.GetItemSize(techType);
+                    var size = TechDataHelpers.GetItemSize(techType);
 
                     for (int i = 0; i < amount; i++)
                     {
@@ -1509,8 +1515,11 @@ namespace FCS_AlterraHub.Mono
 
         public void RemoveCraftingOperation(CraftingOperation operation)
         {
-            operation.OnOperationDeleted?.Invoke(operation);
-            _craftingOperations.Remove(operation);
+            if (operation == null)
+            {
+                operation.OnOperationDeleted?.Invoke(operation);
+                _craftingOperations.Remove(operation);
+            }
         }
 
         //private void ProcessCraftingOperation()

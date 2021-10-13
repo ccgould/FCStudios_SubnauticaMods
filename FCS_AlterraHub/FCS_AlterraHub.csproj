@@ -25,6 +25,7 @@
     <Compile Include="Buildables\AlterraHubModelPrefab.cs" />
     <Compile Include="Enumerators\SpeedModes.cs" />
     <Compile Include="Helpers\FModHelpers.cs" />
+    <Compile Include="Helpers\TechTypeHelpers.cs" />
     <Compile Include="Managers\PortManager.cs" />
     <Compile Include="Model\ColorTemplate.cs" />
     <Compile Include="Model\GUI\EquipmentConfiguration.cs" />

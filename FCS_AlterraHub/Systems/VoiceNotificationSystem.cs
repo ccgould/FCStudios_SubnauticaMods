@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using FCS_AlterraHub.Helpers;
 using FCSCommon.Utilities;
 using FMOD;
@@ -92,7 +93,7 @@ namespace FCS_AlterraHub.Systems
 
                 if (!string.IsNullOrEmpty(text))
                 {
-                    Subtitles.main.Add(text, args);
+                    DisplayMessage(text);
                 }
                 _currentChannel = AudioUtils.PlaySound(sound, SoundChannel.Master);
                 timeNextPlay = DayNightCycle.main.timePassedAsFloat + seconds;
@@ -132,7 +133,7 @@ namespace FCS_AlterraHub.Systems
                 this.timeNextPlay = timePassedAsFloat + this.minInterval;
                 if (!string.IsNullOrEmpty(customString))
                 {
-                    Subtitles.main.Add(customString, args);
+                    DisplayMessage(customString);
                 }
                 AudioUtils.PlaySound(sound, SoundChannel.Voice);
                 return true;
@@ -143,7 +144,16 @@ namespace FCS_AlterraHub.Systems
 
         public void DisplayMessage(string text, object[] args = null)
         {
-            Subtitles.main.Add(text, args);
+            DisplayMessage(text);
+        }
+
+        public void ShowSubtitle(string message)
+        {
+#if SUBNAUTICA
+            Subtitles.main.Add(message, null);
+#else
+            Subtitles.main.AddRawLongInternal(0, new StringBuilder(message), 0, -1, -1);
+#endif
         }
     }
 

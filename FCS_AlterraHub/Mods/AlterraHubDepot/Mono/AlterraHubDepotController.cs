@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
@@ -18,6 +19,7 @@ using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
+using UWE;
 
 namespace FCS_AlterraHub.Mods.AlterraHubDepot.Mono
 {
@@ -154,7 +156,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Mono
             switch (arg1)
             {
                 case "InventoryBTN":
+#if SUBNAUTICA
                     var size = CraftData.GetItemSize((TechType)arg2);
+#else
+                    var size = TechData.GetItemSize((TechType)arg2);
+#endif
                     if (Inventory.main.HasRoomFor(size.x, size.y))
                     {
                         PlayerInteractionHelper.GivePlayerItem(RemoveItemFromContainer((TechType)arg2));
@@ -163,6 +169,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Mono
             }
         }
 
+#if SUBNAUTICA
         public override Pickupable RemoveItemFromContainer(TechType techType)
         {
             if (!_storage.ContainsKey(techType)) return null;
@@ -172,8 +179,28 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Mono
                 _storage.Remove(techType);
             }
             _inventoryGrid.DrawPage();
+
             return techType.ToPickupable();
         }
+#else
+        public override IEnumerator RemoveItemFromContainer(TechType techType, Action<Pickupable> callBack)
+        {
+            if (!_storage.ContainsKey(techType)) yield break;
+            _storage[techType] -= 1;
+            if (_storage[techType] <= 0)
+            {
+                _storage.Remove(techType);
+            }
+            _inventoryGrid.DrawPage();
+
+            CoroutineHost.StartCoroutine(TechTypeHelpers.ConvertToPickupable(techType, pickupable =>
+            {
+                callBack?.Invoke(pickupable);
+            }));
+
+            yield break;
+        }
+#endif
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {

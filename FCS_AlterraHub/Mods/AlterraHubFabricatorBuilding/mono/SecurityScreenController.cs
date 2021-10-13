@@ -22,11 +22,13 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         private Player _player;
         private bool _previousBobbingSetting;
         private SecurityBoxTrigger _securityBoxTrigger;
+        private RectTransform _rt;
 
 
         public override void Awake()
         {
             base.Awake();
+            _rt = GetComponentInParent<RectTransform>();
             _clock = GameObjectHelpers.FindGameObject(gameObject, "Clock").GetComponent<Text>();
             _messageBox = GameObjectHelpers.FindGameObject(gameObject, "MessageBox").AddComponent<FCSMessageBox>();
             _ancTextEditorDialog = GameObjectHelpers.FindGameObject(gameObject, "ANCTextEditorDialog");
@@ -45,7 +47,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             if (_clock != null)
                 _clock.text = WorldHelpers.GetGameTimeFormat();
 
-            if (focused && _player != null && (_player.transform.position - rt.position).sqrMagnitude >= _terminationSqrDistance)
+            if (focused && _player != null && (_player.transform.position - _rt.position).sqrMagnitude >= _terminationSqrDistance)
             {
                 Deselect();
             }
@@ -144,14 +146,17 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         {
             if (!_securityBoxTrigger.IsPlayerInRange)
             {
-                HandReticle.main.SetUseText(string.Empty);
                 HandReticle.main.SetIcon(HandReticle.IconType.Default);
                 return;
             }
 
             if (enabled && !selected)
             {
+#if SUBNAUTICA
                 HandReticle.main.SetInteractText("Click to interact");
+#else
+                HandReticle.main.SetText(HandReticle.TextType.Hand, "Click to interact", false);
+#endif
                 HandReticle.main.SetIcon(HandReticle.IconType.Interact);
             }
         }

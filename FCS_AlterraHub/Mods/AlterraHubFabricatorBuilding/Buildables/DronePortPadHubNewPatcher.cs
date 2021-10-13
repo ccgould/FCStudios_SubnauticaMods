@@ -2,19 +2,18 @@
 using System.Collections.Generic;
 using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem;
 using SMLHelper.V2.Crafting;
-
-#if SUBNAUTICA
 using System;
+using System.Collections;
 using System.IO;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Utility;
 using UnityEngine;
-using RecipeData = SMLHelper.V2.Crafting.TechData;
+#if SUBNAUTICA
 using Sprite = Atlas.Sprite;
+using RecipeData = SMLHelper.V2.Crafting.TechData;
 #endif
-
 
 namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Buildables
 {
@@ -95,12 +94,12 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Buildables
 #else
         public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
         {
-                var prefab = GameObject.Instantiate(AlterraHub.DronePortPadHubNewPrefab);
+                var prefab = GameObject.Instantiate(FCS_AlterraHub.Buildables.AlterraHub.DronePortPadHubNewPrefab);
 
                 var size = new Vector3(6.70943f, 4.943072f, 8.8695f);
                 var center = new Vector3(0f, 2.756582f, 0.6690737f);
 
-                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
+            GameObjectHelpers.AddConstructableBounds(prefab, size, center);
 
                 var model = prefab.FindChild("model");
 
@@ -127,15 +126,16 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Buildables
                 constructable.allowedInSub = false;
                 constructable.allowedOnConstructables = false;
                 constructable.model = model;
+                constructable.placeMaxDistance = 10f;
+                constructable.placeDefaultDistance = 5f;
                 constructable.techType = TechType;
 
-                PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
+            PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = ClassID;
 
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<AlterraDronePortController>();
-                //prefab.AddComponent<FCSGameLoadUtil>();
-            gameObject.Set(prefab);
+                gameObject.Set(prefab);
             yield break;
         }
 #endif

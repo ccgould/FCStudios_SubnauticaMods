@@ -92,7 +92,8 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Buildable
                 prefab.AddComponent<TechTag>().type = TechType;
                 var craftMachine = prefab.AddComponent<CraftMachine>();
                 var controller = prefab.AddComponent<AutoCrafterController>();
-                craftMachine._mono = controller; 
+                craftMachine._mono = controller;
+                controller.Storage =  UWEHelpers.CreateStorageContainer(prefab, null, ClassID, string.Empty, 4, 8);
 
                 //Apply the glass shader here because of autosort lockers for some reason doesn't like it.
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);

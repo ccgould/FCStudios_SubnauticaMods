@@ -1,4 +1,10 @@
-﻿using UnityEngine;
+﻿using FCSCommon.Utilities;
+using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Handlers;
+using UnityEngine;
+#if SUBNAUTICA
+using RecipeData = SMLHelper.V2.Crafting.TechData;
+#endif
 
 namespace FCS_AlterraHub.Helpers
 {
@@ -41,6 +47,56 @@ namespace FCS_AlterraHub.Helpers
             prefab.SetActive(true);
 
             return storage;
+        }
+
+
+        /// <summary>
+        /// Removes ingredients from the <see cref="ItemsContainer"/>  and destroys it.
+        /// </summary>
+        /// <param name="container"></param>
+        /// <param name="techType"></param>
+        public static bool ConsumeIngredientsFor(ItemsContainer container, TechType techType)
+        {
+            var techData = CraftDataHandler.GetTechData(techType);
+            QuickLogger.Debug($"TechData: {techData?.ingredientCount} | {Language.main.Get(techType)}", true);
+
+            var result = CheckIfAllIngredientsAreAvailable(container, techData);
+            
+            if(!result)
+                goto end_operation;
+
+            if (techData != null)
+            {
+                foreach (Ingredient ingredient in techData.Ingredients)
+                {
+                    for (int i = 0; i < ingredient.amount; i++)
+                    {
+                        var item = container.DestroyItem(ingredient.techType);
+                        if (item) continue;
+                        QuickLogger.Error($"Failed to pull item {Language.main.Get(techType)} from storage container");
+                        goto end_operation;
+                    }
+                }
+
+                return true;
+            }
+
+            end_operation:
+
+            return false;
+
+        }
+
+        public static bool CheckIfAllIngredientsAreAvailable(ItemsContainer container, RecipeData techData)
+        {
+            foreach (Ingredient ingredient in techData.Ingredients)
+            {
+                if (container.GetCount(ingredient.techType) < ingredient.amount)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

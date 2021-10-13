@@ -12,6 +12,10 @@ using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 using UnityEngine.UI;
+#if SUBNAUTICA
+using Sprite = Atlas.Sprite;
+using RecipeData = SMLHelper.V2.Crafting.TechData;
+#endif
 
 namespace FCS_AlterraHub.Helpers
 {
@@ -184,6 +188,58 @@ namespace FCS_AlterraHub.Helpers
                 TechType.JeweledDiskPiece, new PickReturnsData { ReturnType = TechType.JeweledDiskPiece, IsLandPlant = false }
             },
         };
+
+        public static HashSet<TechType> Eatables = new HashSet<TechType>
+        {
+            TechType.CookedPeeper,
+            TechType.CookedHoleFish,
+            TechType.CookedGarryFish,
+            TechType.CookedReginald,
+            TechType.CookedBladderfish,
+            TechType.CookedHoverfish,
+            TechType.CookedSpadefish,
+            TechType.CookedBoomerang,
+            TechType.CookedEyeye,
+            TechType.CookedOculus,
+            TechType.CookedHoopfish,
+            TechType.CookedSpinefish,
+            TechType.CookedLavaEyeye,
+            TechType.CookedLavaBoomerang,
+#if BELOWZERO
+            TechType.CookedSpinnerfish,
+            TechType.CookedSymbiote,
+            TechType.CookedArcticPeeper,
+            TechType.CookedArrowRay,
+            TechType.CookedNootFish,
+            TechType.CookedTriops,
+            TechType.CookedFeatherFish,
+            TechType.CookedFeatherFishRed,
+            TechType.CookedDiscusFish,
+            TechType.CuredSpinnerfish,
+            TechType.CuredSymbiote,
+            TechType.CuredArcticPeeper,
+            TechType.CuredArrowRay,
+            TechType.CuredNootFish,
+            TechType.CuredTriops,
+            TechType.CuredFeatherFish,
+            TechType.CuredFeatherFishRed,
+            TechType.CuredDiscusFish,
+#endif
+            TechType.CuredPeeper,
+            TechType.CuredHoleFish,
+            TechType.CuredGarryFish,
+            TechType.CuredReginald,
+            TechType.CuredBladderfish,
+            TechType.CuredHoverfish,
+            TechType.CuredSpadefish,
+            TechType.CuredBoomerang,
+            TechType.CuredEyeye, 
+            TechType.CuredOculus,
+            TechType.CuredHoopfish,
+            TechType.CuredSpinefish,
+            TechType.CuredLavaEyeye,
+            TechType.CuredLavaBoomerang,
+        };
         public static string GetGameTimeFormat()
         {
             string period = string.Empty;
@@ -280,6 +336,7 @@ namespace FCS_AlterraHub.Helpers
             return Vector3.Distance(mainGameObject.transform.position, gameObject.transform.position) <= range;
         }
 
+#if SUBNAUTICA
         public static PingType CreatePingType(string id, string pingName, Atlas.Sprite pingSprite)
         {
             SpriteHandler.RegisterSprite(SpriteManager.Group.Pings, id, pingSprite);
@@ -293,6 +350,21 @@ namespace FCS_AlterraHub.Helpers
 
             return pingType;
         }
+#else
+        public static PingType CreatePingType(string id, string pingName, Sprite pingSprite)
+        {
+            SpriteHandler.RegisterSprite(SpriteManager.Group.Pings, id, pingSprite);
+
+            var pingType = PingHandler.RegisterNewPingType(pingName, pingSprite);
+
+            if (!FCSAlterraHubService.InternalAPI.PingTypes.ContainsKey(pingType))
+            {
+                FCSAlterraHubService.InternalAPI.PingTypes.Add(pingType, pingName);
+            }
+
+            return pingType;
+        }
+#endif
 
 #if SUBNAUTICA
         public static float GetDepth(GameObject gameObject)
@@ -412,7 +484,7 @@ namespace FCS_AlterraHub.Helpers
             {
                 if (!QModServices.Main.ModPresent("UITweaks"))
                 {
-                    TechData data = GetData(techType);
+                    RecipeData data = GetData(techType);
                     int ingredientCount = data?.ingredientCount ?? 0;
                     for (int i = 0; i < ingredientCount; i++)
                     {
@@ -456,7 +528,7 @@ namespace FCS_AlterraHub.Helpers
             return true;
         }
 
-        internal static TechData GetData(TechType techType)
+        internal static RecipeData GetData(TechType techType)
         {
             return CraftDataHandler.GetTechData(techType);
         }
@@ -480,6 +552,15 @@ namespace FCS_AlterraHub.Helpers
         public static bool CheckIfPaused()
         {
             return Time.timeScale <= 0;
+        }
+
+        public static float GetOceanDepth()
+        {
+#if SUBNAUTICA
+            return Ocean.main.GetOceanLevel();
+#else
+            return Ocean.GetOceanLevel();
+#endif
         }
     }
 

@@ -250,6 +250,9 @@ namespace FCS_HomeSolutions.Configuration
         [Toggle("[Hatch Stairway] Limit length over base", Order = 18, Tooltip = "Enabled: always builds short stairs for hatch directly on platform. Disabled: builds full length stairs which will penetrate base objects.")]
         public bool StairsLimitLengthOverBasePieces { get; set; } = false;
 
+        [Toggle("Developer Mode", Order = 0, Tooltip = "For use by FCStudios Developers.")]
+        public bool DeveloperModeEnabled { get; set; } = false;
+
 
         #region JukeBox
 

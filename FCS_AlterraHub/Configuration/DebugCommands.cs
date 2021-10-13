@@ -33,24 +33,6 @@ namespace FCS_AlterraHub.Configuration
             return $"Parameters: {amount}";
         }
         
-        [ConsoleCommand("TeleportEffects")]
-        public static string TeleportPlayerCommand(bool activate)
-        {
-            if (_teleportEffects == null)
-            {
-                _teleportEffects = Player.main.camRoot.mainCam.GetComponentInChildren<TeleportScreenFXController>();
-            }
-            if (activate)
-            {
-                _teleportEffects.StartTeleport();
-            }
-            else
-            {
-                _teleportEffects.StopTeleport();
-            }
-            return $"Parameters: {activate}";
-        }        
-        
         [ConsoleCommand("OrePrices")]
         public static void OrePricesCommand()
         {

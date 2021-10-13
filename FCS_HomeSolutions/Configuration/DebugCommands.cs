@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Buildable;
@@ -7,6 +8,7 @@ using FCS_HomeSolutions.Mods.QuantumTeleporter.Mono;
 using FCS_HomeSolutions.Mods.SeaBreeze.Buildable;
 using FCS_HomeSolutions.Mods.SeaBreeze.Mono;
 using FCSCommon.Utilities;
+using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Commands;
 using UnityEngine;
 
@@ -42,6 +44,15 @@ namespace FCS_HomeSolutions.Configuration
                 controller.IsGlobal = setGlobal;
             }
             return $"Parameters: {setGlobal}";
+        }
+
+        [ConsoleCommand("saveprefabids")]
+        public static string SavePrefabIDS()
+        {
+            var fp = @"f:\Subnautica_Prefab_IDS_Saves.json";
+            // serialize JSON to a string and then write string to a file
+            File.WriteAllText(fp, JsonConvert.SerializeObject(Mod.PrefabClassIDS));
+            return $"Prefab IDS Saved to {fp}";
         }
 
         [ConsoleCommand("showBuilderPaths")]

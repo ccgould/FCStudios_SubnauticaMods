@@ -6,7 +6,6 @@ using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mono;
 using FCS_ProductionSolutions.Buildable;
-using FCS_ProductionSolutions.Configuration;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
@@ -19,13 +18,17 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
         internal bool IsOccupied { get; private set; }
         public int CrafterID { get; set; }
         internal Action<CraftingOperation> OnComplete { get; set; }
+        public Action OnItemCrafted { get; set; }
+        public Func<bool> OnNeededItemFound { get; set; }
+
         private int _goal;
         public AutoCrafterController _mono;
         private Dictionary<TechType, int> _neededItems = new();
 
-        private int _testTechType = 34;//11371;
-        //private Dictionary<TechType,bool> _ingredients = new();
-        private  float MAXTIME = 7f;
+        private int _testTechType = 34; //11371;
+                                        //private Dictionary<TechType,bool> _ingredients = new();
+
+        private float MAXTIME = 7f;
         private readonly Queue<TechType> _craftingQueue = new();
         private CraftingOperation _operation;
         private bool _isInitialized;
@@ -35,6 +38,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
         private int _itemsOnBelt;
         private float _checkWaitPeriod = 1f;
         private bool _isCrafting;
+        private bool _bypassCraftingQueue;
 
         private void Start()
         {
@@ -53,7 +57,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
             OnComplete += item =>
             {
                 if (item == null) return;
-                
+
                 if (!item.IsRecursive)
                 {
                     _mono.Manager.RemoveCraftingOperation(item);
@@ -63,6 +67,8 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
                     _mono.Manager.NotifyByID("DTC", "RefreshCraftingGrid");
                 }
             };
+
+            InvokeRepeating(nameof(CollectItems), 1f, 1f);
 
             _isInitialized = true;
         }
@@ -74,11 +80,11 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
 
         private void Test()
         {
-            StartCrafting(new CraftingOperation
-            {
-                Amount = 1, 
-                TechType = (TechType)_testTechType
-            });
+            //StartCrafting(new CraftingOperation
+            //{
+            //    Amount = 5,
+            //    TechType = (TechType)_testTechType
+            //});
 
             //_neededItems = new Dictionary<TechType,int>();
             //GetRequiredItems((TechType)_testTechType);
@@ -91,11 +97,13 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
             if (craftingItem == null) return;
 
             _operation = craftingItem;
-            //GetIngredients(craftingItem.TechType);
-            GetRequiredItems(craftingItem.TechType);
 
+            DistributeLoad(craftingItem);
+
+            //GetIngredients(craftingItem.TechType);
+            GetRequiredItems(craftingItem.TechType); 
+            //CollectItems();
             //Now that we got the items try craft the missing Items
-            
 
             //_mono.CraftManager.GetCraftingOperation().IsBeingCrafted = true;
 
@@ -105,14 +113,105 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
             IsOccupied = true;
         }
 
+
+        private void DistributeLoad(CraftingOperation operation)
+        {
+            if (_operation.Amount > 1 || _operation.IsRecursive)
+            {
+                _mono.DistributeLoad(operation);
+            }
+        }
+
+        private void CollectItems()
+        {
+
+            if (!_neededItems.Any()) return;
+
+            //Check if the requiredItems is in the system
+
+            //foreach (TechType techType in _craftingQueue)
+            //{
+            //    if (_mono.Manager.HasItem(techType))
+            //    {
+            //        _mono.Storage.container.UnsafeAdd(_mono.Manager.TakeItem(techType).inventoryItem);
+            //        _craftingQueue.Dequeue();
+            //        var techData = CraftDataHandler.GetTechData(techType);
+            //        foreach (Ingredient ingredient in techData.Ingredients)
+            //        {
+            //            RemoveNeededItemFromList(ingredient.techType);
+            //        }
+            //    }
+            //}
+
+            for (var i = _neededItems.Count - 1; i >= 0; i--)
+            {
+                var currentItem = _neededItems.ElementAt(i);
+
+                if (_mono.Manager.HasItem(currentItem.Key))
+                {
+                    var amount = _mono.Manager.GetItemCount(currentItem.Key);
+
+                    var takeAmount = amount >= currentItem.Value ? currentItem.Value : amount;
+
+                    for (int j = 0; j < takeAmount; j++)
+                    {
+                        var item = _mono.Manager.TakeItem(currentItem.Key);
+
+                        QuickLogger.Debug($"Is Item Null {item is null}",true);
+
+                        if (item != null)
+                        {
+                            _mono.Storage.container.UnsafeAdd(item.ToInventoryItem());
+                            RemoveNeededItemFromList(currentItem.Key);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void RemoveNeededItemFromList(TechType techType)
+        {
+            _neededItems[techType] -= 1;
+            if (_neededItems[techType] <= 0)
+            {
+                _neededItems.Remove(techType);
+            }
+            OnNeededItemFound?.Invoke();
+        }
+
         private IEnumerator TryCraftRequiredItems()
         {
-            if (_craftingQueue.Any() && !IsCrafting())
+            if (_bypassCraftingQueue && !_isCrafting)
             {
                 while (!CheckIfAllItemsAvailable())
                 {
-                    QuickLogger.Debug($"{_mono.UnitID} : All item not available to complete craft.",true);
+                    QuickLogger.Debug($"{_mono.UnitID} : All item not available to complete craft.", true);
                     _isCrafting = false;
+                    OnNeededItemFound?.Invoke();
+                    yield return new WaitForSeconds(_checkWaitPeriod);
+                    yield return null;
+                }
+
+                CraftItem(_operation.TechType,true);
+                yield return new WaitForSeconds(MAXTIME);
+
+                if (_operation.IsComplete)
+                {
+                    OnComplete?.Invoke(_operation);
+                }
+                else
+                {
+                    _isCrafting = false;
+                    //StartCrafting(_operation);
+                }
+            }
+            else if (_craftingQueue.Any() && !_isCrafting)
+            {
+                while (!CheckIfAllItemsAvailable())
+                {
+                    QuickLogger.Debug($"{_mono.UnitID} : All item not available to complete craft.", true);
+                    _isCrafting = false;
+                    OnNeededItemFound?.Invoke();
                     yield return new WaitForSeconds(_checkWaitPeriod);
                     yield return null;
                 }
@@ -121,7 +220,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
 
                 for (int i = 0; i < _craftingQueue.Count; i++)
                 {
-                    CraftItem(_craftingQueue.Dequeue());
+                    CraftItem(_craftingQueue.Dequeue(), false);
                     yield return new WaitForSeconds(MAXTIME);
                 }
 
@@ -132,10 +231,20 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
                 }
                 else
                 {
-                    CraftItem(_operation.TechType,true);
-                    OnComplete?.Invoke(_operation);
+                    CraftItem(_operation.TechType, true);
+
+                    if (_operation.IsComplete)
+                    {
+                        OnComplete?.Invoke(_operation);
+                    }
+                    else
+                    {
+                        _isCrafting = false;
+                        StartCrafting(_operation);
+                    }
                 }
             }
+
             yield break;
         }
 
@@ -143,7 +252,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
         {
             foreach (KeyValuePair<TechType, int> item in _neededItems)
             {
-                if (_mono.Manager.GetItemCount(item.Key) < item.Value)
+                if (_mono.Storage.container.GetCount(item.Key) < item.Value)
                 {
                     return false;
                 }
@@ -152,20 +261,17 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
             return true;
         }
 
-        private void CraftItem(TechType techType,bool isComplete)
+        private void CraftItem(TechType techType, bool isComplete)
         {
-            var amount = _operation.ReturnAmount;
 
-            if (!_mono.Manager.IsAllowedToAdd(techType, 1, true, false))
-            {
-                _mono.ShowMessage($"{Language.main.Get(techType)} is not allowed in your system. Please add a server that can store this item or add an unformatted server.");
-                return;
-            }
+            QuickLogger.Debug($"CraftItem: TechType:{Language.main.Get(techType)} | IsComplete: {isComplete}", true);
 
-            if (_mono.Manager.HasIngredientsFor(techType))
+            var result = UWEHelpers.ConsumeIngredientsFor(_mono.Storage.container, techType); // turn into coroutine
+            
+            QuickLogger.Debug($"Result:  {result}", true);
+            
+            if (result)
             {
-                _mono.Manager.ConsumeIngredientsFor(techType);
-                AttemptToAddToNetwork(techType);
                 var techData = CraftDataHandler.GetTechData(techType);
 
                 foreach (Ingredient ingredient in techData.Ingredients)
@@ -179,18 +285,40 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
                         }
                     }
                 }
-
             }
             else
             {
                 QuickLogger.Debug($"All items not crafted for {Language.main.Get(techType)}. Re-adding to the bottom of the queue and crafting next in queue.", true);
                 _craftingQueue.Enqueue(techType);
                 if (_craftingQueue.Count > 1)
-                    CraftItem(_craftingQueue.Dequeue(),false);
+                    CraftItem(_craftingQueue.Dequeue(), false);
                 return;
             }
 
+
+            if (isComplete)
+            {
+                for (int i = 0; i < _operation.ReturnAmount; i++)
+                {
+                    if (_mono.Manager.IsAllowedToAdd(techType, 1, true))
+                    {
+                        AttemptToAddToNetwork(techType);
+                    }
+                    else
+                    {
+                        _mono.AddItemToStorage(techType);
+                    }
+                }
+                _operation.AppendCompletion();
+
+            }
+            else
+            {
+                _mono.Storage.container.UnsafeAdd(techType.ToInventoryItem());
+            }
+
             SpawnBeltItem(techType);
+            OnItemCrafted?.Invoke();
         }
 
         private void SpawnBeltItem(TechType techType)
@@ -213,9 +341,9 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
             if (_itemsOnBelt < 0) _itemsOnBelt = 0;
         }
 
-        private bool IsCrafting()
+        internal bool IsCrafting()
         {
-            return _isCrafting;
+            return _neededItems.Any() || _craftingQueue.Any();
         }
 
         public int GetGoal()
@@ -225,7 +353,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
 
         private void Update()
         {
-            if(WorldHelpers.CheckIfPaused())  return;
+            //if (WorldHelpers.CheckIfPaused()) return;
 
 
 
@@ -296,9 +424,9 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
             //}
         }
 
-        private void AttemptToAddToNetwork(TechType techType)
+        private bool AttemptToAddToNetwork(TechType techType)
         {
-            var inventoryItem = techType.ToInventoryItemLegacy();
+            var inventoryItem = techType.ToInventoryItem();
 
             QuickLogger.Debug($"InventoryItemLegacy returned: {Language.main.Get(inventoryItem.item.GetTechType())}");
 
@@ -310,6 +438,8 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
                 _mono.AddItemToStorage(techType);
                 Destroy(inventoryItem.item.gameObject);
             }
+
+            return result;
         }
 
         //private void GetIngredients(TechType techType)
@@ -345,11 +475,16 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
                 }
                 else
                 {
-                    AppendIngredient(ingredient.techType,ingredient.amount);
+                    AppendIngredient(ingredient.techType, ingredient.amount);
                 }
-                
+
                 //NotMetIngredients.Add(ingredient.techType, ingredient.amount);
                 //_mono.AddMissingItem(Language.main.Get(ingredient.techType), ingredient.amount);
+            }
+
+            if (!_craftingQueue.Any() && _neededItems.Any())
+            {
+                _bypassCraftingQueue = true;
             }
         }
 
@@ -361,7 +496,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
             }
             else
             {
-                _neededItems.Add(techType,amount);   
+                _neededItems.Add(techType, amount);
             }
         }
 
@@ -375,6 +510,38 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
             //    _goal = 0;
             //}
             //_startBuffer = 0;
+        }
+
+        public CraftingOperation GetOperation()
+        {
+            return _operation;
+        }
+
+        public IEnumerable<TechType> GetPendingItems()
+        {
+            return _craftingQueue;
+        }
+
+        public IEnumerable<TechType> GetNeededItems()
+        {
+            return _neededItems.Keys;
+        }
+
+        public void CancelOperation()
+        {
+            _neededItems.Clear();
+            _craftingQueue.Clear();
+            _mono.Manager.RemoveCraftingOperation(_operation);
+            OnComplete?.Invoke(_operation);
+            OnItemCrafted?.Invoke();
+            OnNeededItemFound?.Invoke();
+            _operation = null;
+            _isCrafting = false;
+            foreach (InventoryItem inventoryItem in _mono.Storage.container)
+            {
+                _mono.AddItemToStorage(inventoryItem.item.GetTechType());
+            }
+            _mono.Storage.container.Clear();
         }
     }
 }

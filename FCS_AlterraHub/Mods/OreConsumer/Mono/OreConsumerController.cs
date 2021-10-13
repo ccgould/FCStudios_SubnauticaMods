@@ -560,7 +560,7 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
             if (!CardSystem.main.HasBeenRegistered())
             {
                 //QuickLogger.ModMessage(AlterraHub.AccountNotFoundFormat());
-                Subtitles.main.Add(AlterraHub.AccountNotFoundFormat());
+                VoiceNotificationSystem.main.ShowSubtitle(AlterraHub.AccountNotFoundFormat());
                 return;
             }
             OreConsumerHUD.Main.Show(this);

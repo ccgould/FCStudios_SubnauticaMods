@@ -3,5 +3,6 @@
 
   <PropertyGroup>
     <CommonDir>C:\Games\SteamLibrary\steamapps\common\</CommonDir>
+    <CommonDirBz>C:\Games\EpicGames\</CommonDirBz>
   </PropertyGroup>
 </Project>

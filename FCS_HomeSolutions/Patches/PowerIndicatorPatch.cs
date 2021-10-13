@@ -73,6 +73,7 @@ namespace FCS_HomeSolutions.Patches
         internal Action onFloorAdded;
         internal Action onFloorRemoved;
         internal Action onFloorLevelChanged;
+        private ToggleGroup _toggleGroup;
 
         public override void Update()
         {
@@ -178,6 +179,7 @@ namespace FCS_HomeSolutions.Patches
                 var currentElement = data.ElementAt(i);
                 var uGUI = floorItemPrefab.AddComponent<ElevatorFloorItem_uGUI>();
                 uGUI.Initialize(_currentController, currentElement.Value.FloorIndex, currentElement.Value.Meters, currentElement.Value.FloorName, currentElement.Key);
+
             }
 
         }

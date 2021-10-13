@@ -11,6 +11,9 @@ using HarmonyLib;
 using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
+#if SUBNAUTICA
+using Sprite = Atlas.Sprite;
+#endif
 
 namespace FCS_AlterraHub.Patches
 {
@@ -64,9 +67,9 @@ namespace FCS_AlterraHub.Patches
 
     public class ImageSelectorHUD : uGUI_InputGroup, uGUI_IButtonReceiver
     {
-        private System.Action<Texture2D, Atlas.Sprite> _callback;
+        private System.Action<Texture2D, Sprite> _callback;
         private ToggleGroup _toggleGroup;
-        private Dictionary<Texture2D, Atlas.Sprite> _images;
+        private Dictionary<Texture2D, Sprite> _images;
         public static ImageSelectorHUD Main;
 
         private List<ImageSelectorItem_uGUI> _currentButtons = new();
@@ -132,7 +135,7 @@ namespace FCS_AlterraHub.Patches
             Deselect();
         }
 
-        public void Show(Dictionary<Texture2D, Atlas.Sprite> images, Texture2D selectedImage, System.Action<Texture2D, Atlas.Sprite> onDoneClicked)
+        public void Show(Dictionary<Texture2D, Sprite> images, Texture2D selectedImage, System.Action<Texture2D, Sprite> onDoneClicked)
         {
             if (Time.timeSinceLevelLoad < 1f)
             {
@@ -400,10 +403,10 @@ namespace FCS_AlterraHub.Patches
     {
         private uGUI_Icon _icon;
         private Texture2D _texture;
-        private Atlas.Sprite _sprite;
+        private Sprite _sprite;
         private Toggle _toggle;
 
-        public void Initialize(Texture2D texture, Atlas.Sprite sprite)
+        public void Initialize(Texture2D texture, Sprite sprite)
         {
             _toggle = gameObject.GetComponent<Toggle>();
             _icon = GameObjectHelpers.FindGameObject(gameObject, "Background").AddComponent<uGUI_Icon>();
@@ -417,7 +420,7 @@ namespace FCS_AlterraHub.Patches
             return _texture;
         }
 
-        public Atlas.Sprite GetSprite()
+        public Sprite GetSprite()
         {
             return _sprite;
         }

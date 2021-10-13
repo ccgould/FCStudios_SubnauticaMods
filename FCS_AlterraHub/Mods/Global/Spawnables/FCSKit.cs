@@ -7,6 +7,9 @@ using SMLHelper.V2.Assets;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 using UnityEngine.UI;
+#if SUBNAUTICA
+using Sprite = Atlas.Sprite;
+#endif
 
 namespace FCS_AlterraHub.Mods.Global.Spawnables
 {
@@ -116,9 +119,9 @@ namespace FCS_AlterraHub.Mods.Global.Spawnables
             prefab.GetComponentInChildren<Text>().text = FriendlyName;
         }
 
-        protected override Atlas.Sprite GetItemSprite()
+        protected override Sprite GetItemSprite()
         {
-            return new Atlas.Sprite(ImageUtils.LoadTextureFromFile(_iconPath));
+            return ImageUtils.LoadSpriteFromTexture(ImageUtils.LoadTextureFromFile(_iconPath));
         }
     }
 }

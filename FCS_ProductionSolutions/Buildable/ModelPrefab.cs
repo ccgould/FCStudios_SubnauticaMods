@@ -69,6 +69,12 @@ namespace FCS_ProductionSolutions.Buildable
             }
         }
 
+        internal static GameObject GetPrefabFromGlobal(string prefabName)
+        {
+            return FCSAssetBundlesService.PublicAPI.GetPrefabByName(prefabName,
+                FCSAssetBundlesService.PublicAPI.GlobalBundleName);
+        }
+
         internal static Sprite GetSprite(string spriteName)
         {
             return ModBundle.LoadAsset<Sprite>(spriteName);

@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using FCSCommon.Utilities;
+using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
 using UnityEngine;
+
 
 namespace FCS_AlterraHub.Helpers
 {
@@ -12,7 +14,7 @@ namespace FCS_AlterraHub.Helpers
         private static HashSet<TechType> batteryTech;
         private static HashSet<TechType> powercellTech;
         private static HashSet<TechType> cellConcatTech;
-        private static List<IIngredient> _ingredients = new List<IIngredient>();
+        private static List<Ingredient> _ingredients = new List<Ingredient>();
 
         public static HashSet<TechType> CellConcatTech
         {
@@ -111,10 +113,10 @@ namespace FCS_AlterraHub.Helpers
             return _knownIngredientCounts[techType];
         }
 
-        private static int CalculateIngredientCount(List<IIngredient> ingredients)
+        private static int CalculateIngredientCount(List<Ingredient> ingredients)
         {
             int total = 0;
-            foreach (IIngredient ingredient in ingredients)
+            foreach (Ingredient ingredient in ingredients)
             {
                 total += ingredient.amount;
             }
@@ -122,21 +124,21 @@ namespace FCS_AlterraHub.Helpers
             return total;
         }
 
-        public static List<IIngredient> GetIngredientsWithOutBatteries(TechType techType)
+        public static List<Ingredient> GetIngredientsWithOutBatteries(TechType techType)
         {
             _ingredients.Clear();
-
-            var it = CraftData.Get(techType);
+            
+            var it = CraftDataHandler.GetTechData(techType);
 
             if (it != null)
             {
-                List<IIngredient> readOnlyCollection = new List<IIngredient>();
+                List<Ingredient> readOnlyCollection = new List<Ingredient>();
                 for (int i = 0; i < it.ingredientCount; i++)
                 {
-                    readOnlyCollection.Add(it.GetIngredient(i));
+                    readOnlyCollection.Add((Ingredient)it.GetIngredient(i));
                 }
 
-                foreach (IIngredient ingredient in readOnlyCollection)
+                foreach (Ingredient ingredient in readOnlyCollection)
                 {
                     if (CellConcatTech.Contains(techType) || !CellConcatTech.Contains(ingredient.techType))
                     {
@@ -148,7 +150,7 @@ namespace FCS_AlterraHub.Helpers
             return _ingredients;
         }
 
-        public static List<IIngredient> GetIngredients(TechType techType)
+        public static List<Ingredient> GetIngredients(TechType techType)
         {
             _ingredients.Clear();
 
@@ -156,13 +158,13 @@ namespace FCS_AlterraHub.Helpers
 
             if (it != null)
             {
-                List<IIngredient> readOnlyCollection = new List<IIngredient>();
+                List<Ingredient> readOnlyCollection = new List<Ingredient>();
                 for (int i = 0; i < it.ingredientCount; i++)
                 {
-                    readOnlyCollection.Add(it.GetIngredient(i));
+                    readOnlyCollection.Add((Ingredient)it.GetIngredient(i));
                 }
 
-                foreach (IIngredient ingredient in readOnlyCollection)
+                foreach (Ingredient ingredient in readOnlyCollection)
                 {
                     _ingredients.Add(ingredient);
                 }
@@ -175,6 +177,16 @@ namespace FCS_AlterraHub.Helpers
         {
             if (PowerCellCharger.compatibleTech.Contains(techType)) return;
             PowerCellCharger.compatibleTech.Add(techType);
+        }
+
+        internal static Vector2int GetItemSize(TechType techType)
+        {
+#if SUBNAUTICA
+            var size =  CraftData.GetItemSize(techType);
+#else
+            var size = TechData.GetItemSize(techType);
+#endif
+            return size;
         }
     }
 }

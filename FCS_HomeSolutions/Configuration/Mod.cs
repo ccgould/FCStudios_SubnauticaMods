@@ -9,6 +9,7 @@ using FCS_AlterraHub.Model.Utilities;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Mods.PaintTool;
+using FCS_HomeSolutions.Mods.PaintTool.Mono;
 using FCS_HomeSolutions.Structs;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
@@ -200,6 +201,7 @@ namespace FCS_HomeSolutions.Configuration
         internal static string SaveDataFilename => $"{ModPackID}SaveData.json";
 
         public static TechType CurtainTechType { get; internal set; }
+        public static Dictionary<string, string> PrefabClassIDS { get; set; } = new Dictionary<string, string>();
 
 
         public static Dictionary<TechType, decimal> PeeperBarFoods = new Dictionary<TechType, decimal>();

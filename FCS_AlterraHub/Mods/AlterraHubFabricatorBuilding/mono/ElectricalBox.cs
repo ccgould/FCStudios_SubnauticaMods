@@ -74,7 +74,9 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             _spark?.SetActive(false);
             if (forceFullHealth)
             {
+#if SUBNAUTICA
                 _liveMixin.initialHealth = 1;
+#endif
                 _liveMixin.health = 100;
             }
         }
@@ -83,7 +85,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         {
             if (_liveMixin.health < _liveMixin.maxHealth)
             {
+#if SUBNAUTICA
                 HandReticle.main.SetInteractTextRaw(Language.main.Get("DamagedWires"), Language.main.Get("WeldToFix"));
+#else
+                HandReticle.main.SetText(HandReticle.TextType.Hand, $"{Language.main.Get("DamagedWires")}\n{Language.main.Get("WeldToFix")}", false);
+#endif
             }
         }
 

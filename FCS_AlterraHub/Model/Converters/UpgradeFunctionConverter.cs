@@ -1,7 +1,6 @@
 ﻿using System;
-using Oculus.Newtonsoft.Json;
 #if SUBNAUTICA_STABLE
-
+using Oculus.Newtonsoft.Json;
 #else
 using Newtonsoft.Json;
 #endif

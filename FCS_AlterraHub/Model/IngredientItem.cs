@@ -1,6 +1,7 @@
 ﻿using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mono;
 using FCSCommon.Helpers;
+using SMLHelper.V2.Crafting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -46,7 +47,7 @@ namespace FCS_AlterraHub.Model
         }
 
         //Continue to set up the crafting item icon amount and hover
-        public void Set(IIngredient ingredient, BaseManager baseManager)
+        public void Set(Ingredient ingredient, BaseManager baseManager)
         {
             Initialize();
             _baseManager = baseManager;

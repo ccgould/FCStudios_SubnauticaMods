@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Interfaces
@@ -18,6 +20,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Inte
         int GetPortID();
         string GetPrefabID();
         DroneController SpawnDrone();
+        IEnumerator SpawnDrone(Action<DroneController> callback);
         Transform GetEntryPoint();
         string GetBaseID();
     }

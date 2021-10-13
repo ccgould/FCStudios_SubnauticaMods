@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using FCS_AlterraHub.Extensions;
+using FCS_AlterraHub.Helpers;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Mods.MiniFountainFilter.Buildables;
 using FCS_HomeSolutions.Mods.MiniFountainFilter.Mono;
@@ -147,22 +148,30 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Managers
         {
             if (_mono.TankManager.TankLevel >= 50)
             {
-                var pickup = TechType.BigFilteredWater.ToPickupable();
-
-                if (Inventory.main.HasRoomFor(1, 1))
+                var techType = TechType.BigFilteredWater;
+                var result = PlayerInteractionHelper.GivePlayerItem(techType);
+                if (result)
                 {
-                    _mono.TankManager.RemoveWater(50);
-                    
-                    Inventory.main.container.UnsafeAdd(pickup.ToInventoryItem());
-
-                    uGUI_IconNotifier.main.Play(TechType.BigFilteredWater, uGUI_IconNotifier.AnimationType.From, null);
-
-                    pickup.PlayPickupSound();
+                    uGUI_IconNotifier.main.Play(techType, uGUI_IconNotifier.AnimationType.From, null);
+                    FMODUWE.PlayOneShot(CraftData.GetPickupSound(techType), Player.main.transform.position, 1f);
                 }
-                else
-                {
-                    GameObject.Destroy(pickup);
-                }
+
+                //var pickup = TechType.BigFilteredWater.ToPickupable();
+
+                //if (Inventory.main.HasRoomFor(1, 1))
+                //{
+                //    _mono.TankManager.RemoveWater(50);
+
+                //    Inventory.main.container.UnsafeAdd(pickup.ToInventoryItem());
+
+                //    uGUI_IconNotifier.main.Play(TechType.BigFilteredWater, uGUI_IconNotifier.AnimationType.From, null);
+
+                //    pickup.PlayPickupSound();
+                //}
+                //else
+                //{
+                //    GameObject.Destroy(pickup);
+                //}
             }
             else
             {

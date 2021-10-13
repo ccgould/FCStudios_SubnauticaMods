@@ -4,6 +4,9 @@ using FCSCommon.Helpers;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+#if SUBNAUTICA
+using Sprite = Atlas.Sprite;
+#endif
 
 namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Model
 {
@@ -17,7 +20,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Model
         private FCSPDAController _controller;
 
 
-        public void Initialize(FCSPDAController controller, Text pLabel, Atlas.Sprite pIcon, Text pageLabel, string buttonName,PDAPages page)
+        public void Initialize(FCSPDAController controller, Text pLabel, Sprite pIcon, Text pageLabel, string buttonName,PDAPages page)
         {
             Hover = GameObjectHelpers.FindGameObject(gameObject, "Backer");
             Icon = gameObject.FindChild("Icon").AddComponent<uGUI_Icon>();

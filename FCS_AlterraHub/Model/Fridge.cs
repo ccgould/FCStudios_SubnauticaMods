@@ -95,112 +95,7 @@ namespace FCS_AlterraHub.Model
             OnContainerAddItem?.Invoke(_mono,item.item.GetTechType());
             Destroy(item.item.gameObject);
         }
-
-
-
-#if SUBNAUTICA_STABLE
-        public void RemoveItem(TechType techType, EatableType eatableType)
-        {
-
-            var pickupable = techType.ToPickupable();
-
-            if (pickupable == null)
-            {
-                QuickLogger.Error("Failed to convert food item to pickupable");
-                return;
-            }
-
-
-            if (Inventory.main.HasRoomFor(pickupable))
-            {
-                EatableEntities match = FindMatch(techType, eatableType);
-
-                if (match != null)
-                {
-                    var go = GameObject.Instantiate(CraftData.GetPrefabForTechType(techType));
-                    var eatable = go.GetComponent<Eatable>();
-                    var pickup = go.GetComponent<Pickupable>();
-
-                    match.UnpauseDecay();
-                    eatable.timeDecayStart = match.TimeDecayStart;
-
-                    if (Inventory.main.Pickup(pickup))
-                    {
-                        QuickLogger.Debug($"Removed Match Before || Fridge Count {FridgeItems.Count}");
-                        FridgeItems.Remove(match);
-                        QuickLogger.Debug($"Removed Match || Fridge Count {FridgeItems.Count}");
-                    }
-                    else
-                    {
-                        QuickLogger.Message(LanguageHelpers.GetLanguage("InventoryFull"), true);
-                    }
-                    GameObject.Destroy(pickupable);
-                    OnContainerUpdate?.Invoke(NumberOfItems, _itemLimit);
-                    OnContainerRemoveItem?.Invoke(_mono, techType);
-                }
-            }
-            else
-            {
-                Destroy(pickupable);
-            }
-        }
-#else
-
-        public void RemoveItem(TechType techType, EatableType eatableType)
-        {
-            
-            var pickupable = techType.ToPickupable();
-
-            if (Inventory.main.HasRoomFor(pickupable))
-            {
-                EatableEntities match = FindMatch(techType,eatableType);
-
-                if (match != null)
-                {
-                    StartCoroutine(AttemptToRemoveAsync(techType, match, pickupable));
-                }
-            }
-            else
-            {
-                Destroy(pickupable);
-            }
-        }
-
-        private IEnumerator AttemptToRemoveAsync(TechType techType, EatableEntities match, Pickupable pickupable)
-        {
-            var prefabForTechType = CraftData.GetPrefabForTechTypeAsync(techType, false);
-            yield return prefabForTechType;
-
-            var prefabResult = prefabForTechType.GetResult();
-
-            var go = GameObject.Instantiate(prefabResult);
-            var eatable = go.GetComponent<Eatable>();
-            var pickup = go.GetComponent<Pickupable>();
-
-            match.UnpauseDecay();
-            eatable.timeDecayStart = match.TimeDecayStart;
-
-            TaskResult<bool> pickupResult = new TaskResult<bool>();
-            yield return Inventory.main.PickupAsync(pickup, pickupResult);
-
-            if (pickupResult.Get())
-            {
-                QuickLogger.Debug($"Removed Match Before || Fridge Count {FridgeItems.Count}");
-                FridgeItems.Remove(match);
-                QuickLogger.Debug($"Removed Match || Fridge Count {FridgeItems.Count}");
-            }
-            else
-            {
-                QuickLogger.Message(LanguageHelpers.GetLanguage("InventoryFull"), true);
-            }
-
-            Destroy(pickupable);
-            OnContainerUpdate?.Invoke(NumberOfItems, _itemLimit);
-            OnContainerRemoveItem?.Invoke(_mono, techType);
-            yield break;
-        }
-#endif
-
+        
         public bool IsEmpty()
         {
             return NumberOfItems <= 0;
@@ -360,7 +255,112 @@ namespace FCS_AlterraHub.Model
             //return pickup;
             return null;
         }
-        
+
+
+#if SUBNAUTICA_STABLE
+        public void RemoveItem(TechType techType, EatableType eatableType)
+        {
+
+            var pickupable = techType.ToPickupable();
+
+            if (pickupable == null)
+            {
+                QuickLogger.Error("Failed to convert food item to pickupable");
+                return;
+            }
+
+
+            if (Inventory.main.HasRoomFor(pickupable))
+            {
+                EatableEntities match = FindMatch(techType, eatableType);
+
+                if (match != null)
+                {
+                    var go = GameObject.Instantiate(CraftData.GetPrefabForTechType(techType));
+                    var eatable = go.GetComponent<Eatable>();
+                    var pickup = go.GetComponent<Pickupable>();
+
+                    match.UnpauseDecay();
+                    eatable.timeDecayStart = match.TimeDecayStart;
+
+                    if (Inventory.main.Pickup(pickup))
+                    {
+                        QuickLogger.Debug($"Removed Match Before || Fridge Count {FridgeItems.Count}");
+                        FridgeItems.Remove(match);
+                        QuickLogger.Debug($"Removed Match || Fridge Count {FridgeItems.Count}");
+                    }
+                    else
+                    {
+                        QuickLogger.Message(LanguageHelpers.GetLanguage("InventoryFull"), true);
+                    }
+                    GameObject.Destroy(pickupable);
+                    OnContainerUpdate?.Invoke(NumberOfItems, _itemLimit);
+                    OnContainerRemoveItem?.Invoke(_mono, techType);
+                }
+            }
+            else
+            {
+                Destroy(pickupable);
+            }
+        }
+#else
+
+        public void RemoveItem(TechType techType, EatableType eatableType)
+        {
+            
+            var pickupable = techType.ToPickupable();
+
+            if (Inventory.main.HasRoomFor(pickupable))
+            {
+                EatableEntities match = FindMatch(techType,eatableType);
+
+                if (match != null)
+                {
+                    StartCoroutine(AttemptToRemoveAsync(techType, match, pickupable));
+                }
+            }
+            else
+            {
+                Destroy(pickupable);
+            }
+        }
+
+        private IEnumerator AttemptToRemoveAsync(TechType techType, EatableEntities match, Pickupable pickupable)
+        {
+            var prefabForTechType = CraftData.GetPrefabForTechTypeAsync(techType, false);
+            yield return prefabForTechType;
+
+            var prefabResult = prefabForTechType.GetResult();
+
+            var go = GameObject.Instantiate(prefabResult);
+            var eatable = go.GetComponent<Eatable>();
+            var pickup = go.GetComponent<Pickupable>();
+
+            match.UnpauseDecay();
+            eatable.timeDecayStart = match.TimeDecayStart;
+
+            TaskResult<bool> pickupResult = new TaskResult<bool>();
+            yield return Inventory.main.PickupAsync(pickup, pickupResult);
+
+            if (pickupResult.Get())
+            {
+                QuickLogger.Debug($"Removed Match Before || Fridge Count {FridgeItems.Count}");
+                FridgeItems.Remove(match);
+                QuickLogger.Debug($"Removed Match || Fridge Count {FridgeItems.Count}");
+            }
+            else
+            {
+                QuickLogger.Message(LanguageHelpers.GetLanguage("InventoryFull"), true);
+            }
+
+            Destroy(pickupable);
+            OnContainerUpdate?.Invoke(NumberOfItems, _itemLimit);
+            OnContainerRemoveItem?.Invoke(_mono, techType);
+            yield break;
+        }
+#endif
+
+
         public Dictionary<TechType, int> GetItemsWithin()
         {
             var lookup = FridgeItems?.Where(x => x != null).ToLookup(x => x.TechType).ToArray();

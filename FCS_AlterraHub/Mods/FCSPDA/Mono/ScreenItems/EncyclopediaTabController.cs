@@ -201,6 +201,11 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
             return true;
         }
 
+        public void OnProgress(string key, float progress)
+        {
+            
+        }
+
         public void SelectItem(object item)
         {
             selectedItem = item;
@@ -397,8 +402,12 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
             {
                 entry.timeCapsuleId = null;
             }
+
+#if SUBNAUTICA
             if (entryData == null || entryData.timeCapsule) return null;
-            
+#else
+            if (entryData == null) return null;
+#endif
             CraftNode parent = PDAEncyclopedia.GetParent(entryData, true);
             if (parent[entryData.key] is not null) return null;
             

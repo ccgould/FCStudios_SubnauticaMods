@@ -2,14 +2,17 @@
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+#if SUBNAUTICA
+using Sprite = Atlas.Sprite;
+#endif
 
 namespace FCS_AlterraHub.Model.GUI
 {
-    class uGUI_FCSDisplayItem :MonoBehaviour
+    public class uGUI_FCSDisplayItem :MonoBehaviour
     {
         private uGUI_Icon _icon;
         private Texture2D _texture;
-        private Atlas.Sprite _sprite;
+        private Sprite _sprite;
         private Toggle _toggle;
         private Button _button;
         private TechType _techType;
@@ -98,6 +101,29 @@ namespace FCS_AlterraHub.Model.GUI
         {
             _icon.sprite = SpriteManager.Get(techType);
             _techType = techType;
+        }
+
+        public void SetInteractable(bool value)
+        {
+            if (_toggle != null)
+            {
+                _toggle.interactable = value;
+            }
+
+            if (_button != null)
+            {
+                _button.interactable = value;
+            }
+        }
+
+        public void Hide()
+        {
+            gameObject.SetActive(false);
+        }
+
+        public void Show()
+        {
+            gameObject.SetActive(true);
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
@@ -7,6 +9,7 @@ using FCS_AlterraHub.Registration;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Buildable;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Helpers;
+using FCS_ProductionSolutions.Mods.AutoCrafter.Patches;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -16,7 +19,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
     /// <summary>
     /// Controller for the Autocrafter handles initializations, loading from saves and main controls.
     /// </summary>
-    internal class AutoCrafterController : FcsDevice, IFCSSave<SaveData>
+    internal class AutoCrafterController : FcsDevice, IFCSSave<SaveData>, IHandTarget
     {
         private IEnumerable<Material> _materials;
         private const float _beltSpeed = 0.01f;
@@ -26,6 +29,14 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
         private List<TechType> _storedItems = new List<TechType>();
         private AutoCrafterDataEntry _saveData;
         private bool _moveBelt;
+        public StorageContainer Storage;
+        public CrafterMode _mode = CrafterMode.Normal;
+        private HashSet<string> _linkedChildDevices = new HashSet<string>();
+        private string _parentCrafter;
+        private bool _isStandBy;
+
+        public CraftMachine CraftMachine { get; private set; }
+
 
         #region Unity Methods
 
@@ -116,11 +127,28 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
                 _colorManager.ChangeColor(new ColorTemplate());
             }
 
+            if (Storage == null)
+            {
+                Storage = GetComponent<StorageContainer>();
+            }
+
+            if (CraftMachine == null)
+            {
+                CraftMachine = GetComponent<CraftMachine>();
+            }
+
+            Storage.enabled = false;
+
             IsInitialized = true;
 
             QuickLogger.Debug($"Initializing Completed");
         }
 
+        public override bool ChangeBodyColor(ColorTemplate template)
+        {
+            return _colorManager.ChangeColor(template);
+        }
+        
         #endregion
 
         #region IProtoEventListener
@@ -208,9 +236,31 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
             QuickLogger.Debug(message);
         }
 
+        internal void AddLinkedDevice(AutoCrafterController childDeviceID)
+        {
+            _linkedChildDevices.Add(childDeviceID.UnitID);
+            childDeviceID.SetParentCrafter(this);
+        }
+        
+        internal void RemoveLinkedDevice(AutoCrafterController childDeviceID)
+        {
+            _linkedChildDevices.Remove(childDeviceID.UnitID);
+            childDeviceID.ClearParentController();
+        }
+
         #endregion
 
         #region Private Method
+
+        private void ClearParentController()
+        {
+            _parentCrafter = String.Empty;
+        }
+
+        private void SetParentCrafter(AutoCrafterController crafter)
+        {
+            _parentCrafter = crafter.UnitID;
+        }
 
         private void ReadySaveData()
         {
@@ -258,5 +308,68 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
         }
 
         #endregion
+
+        public void DistributeLoad(CraftingOperation operation)
+        {
+            foreach (string deviceUnitID in _linkedChildDevices)
+            {
+                var device = FCSAlterraHubService.PublicAPI.FindDevice(deviceUnitID);
+                if (device.Value != null)
+                {
+                    var crafter = (AutoCrafterController) device.Value;
+
+                    if (!crafter.CraftMachine.IsCrafting())
+                    {
+                        crafter.CraftMachine.StartCrafting(operation);
+                    }
+                }
+            }
+        }
+
+        public override void OnHandHover(GUIHand hand)
+        {
+            if (!IsConstructed || !IsInitialized) return;
+
+            base.OnHandHover(hand);
+
+            var data = new[]
+            {
+                $"UnitID: {UnitID}"
+            };
+
+
+            if (Input.GetKeyDown(KeyCode.F))
+            {
+                AutocrafterHUD.Main.Show(this);
+            }
+
+            data.HandHoverPDAHelperEx(GetTechType());
+        }
+
+        public void OnHandClick(GUIHand hand)
+        {
+            
+        }
+
+        public void SetIsStandBy(bool value)
+        {
+            _isStandBy = value;
+        }
+
+        public bool GetIsStandBy()
+        {
+            return _isStandBy;
+        }
+
+        public IEnumerable<string> GetConnectedCrafters()
+        {
+            return _linkedChildDevices;
+        }
+    }
+
+    internal enum CrafterMode
+    {
+        Normal,
+        LoadSharing
     }
 }

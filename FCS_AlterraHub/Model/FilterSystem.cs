@@ -178,7 +178,9 @@ namespace FCS_AlterraHub.Model
             TechType.Coffee,
             TechType.DisinfectedWater,
             TechType.FilteredWater,
-            TechType.StillsuitWater,
+#if SUBNAUTICA
+                  TechType.StillsuitWater,      
+#endif
         };
 
         public static List<TechType> ScannerRoomUpgrades = new List<TechType> {
@@ -241,7 +243,9 @@ namespace FCS_AlterraHub.Model
             TechType.RadiationSuit,
             TechType.ReinforcedDiveSuit,
             TechType.ReinforcedGloves,
-            TechType.Stillsuit,
+#if SUBNAUTICA
+                  TechType.Stillsuit,      
+#endif
             TechType.SwimChargeFins,
             TechType.Tank,
             TechType.UltraGlideFins,

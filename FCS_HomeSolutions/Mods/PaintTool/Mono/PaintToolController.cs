@@ -7,13 +7,12 @@ using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_HomeSolutions.Configuration;
-using FCS_HomeSolutions.Mods.PaintTool.Mono;
 using FCS_HomeSolutions.Mods.PaintTool.Spawnable;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace FCS_HomeSolutions.Mods.PaintTool
+namespace FCS_HomeSolutions.Mods.PaintTool.Mono
 {
     internal class PaintToolController: PlayerTool,IProtoEventListener, IFCSSave<SaveData>
     {
@@ -217,12 +216,32 @@ namespace FCS_HomeSolutions.Mods.PaintTool
         {
             Vector3 vector = default;
             GameObject go = null;
+            FcsDevice fcsDevice = null;
             UWE.Utils.TraceFPSTargetPosition(Player.main.gameObject, Range, ref go, ref vector, false);
-            QuickLogger.Debug($"Painter Hit: {go?.name} || Layer: {go?.layer}", true);
-            var fcsDevice = go?.GetComponentInParent<FcsDevice>();
+            
+            if (go != null)
+            {
+                var objRoot = UWE.Utils.GetEntityRoot(go);
+                QuickLogger.Debug($"Painter Hit: {objRoot.name} || Layer: {go.layer}", true);
+                SavePrefabClassId(objRoot);
+                fcsDevice = go.GetComponentInParent<FcsDevice>();
+            }
             return fcsDevice;
         }
-        
+
+        private void SavePrefabClassId(GameObject objRoot)
+        {
+            if (QPatch.Configuration.EnableDebugLogs && QPatch.Configuration.DeveloperModeEnabled)
+            {
+                if (!Mod.PrefabClassIDS.ContainsKey(objRoot.name))
+                {
+                    var classId = objRoot.GetComponentInChildren<PrefabIdentifier>()?.ClassId;
+                    Mod.PrefabClassIDS.Add(objRoot.name, classId);
+                    QuickLogger.Debug($"Added {objRoot.name} | {classId} to prefab List");
+                }
+            }
+        }
+
         private void RefreshUI()
         {
             if (!IsInitialized) return;
@@ -365,6 +384,7 @@ namespace FCS_HomeSolutions.Mods.PaintTool
             {
                 Paint();
             }
+
             return true;
         }
 
@@ -386,7 +406,7 @@ namespace FCS_HomeSolutions.Mods.PaintTool
         {
             if (_currentTemplates.Count < templateIndex + 1)
             {
-                var amountToCreate = templateIndex + 1 -  _currentTemplates.Count;
+                var amountToCreate = templateIndex + 1 - _currentTemplates.Count;
                 for (int i = 0; i < amountToCreate; i++)
                 {
                     _currentTemplates.Add(new ColorTemplate());

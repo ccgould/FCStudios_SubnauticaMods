@@ -70,7 +70,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             HandReticle main = HandReticle.main;
             if (!AllowBatteryReplacement)
             {
-                main.SetInteractText(AlterraHub.CannotRemovePowercell()); 
+#if SUBNAUTICA
+                main.SetInteractText(AlterraHub.CannotRemovePowercell());
+#else
+                main.SetText(HandReticle.TextType.Hand,AlterraHub.CannotRemovePowercell(),false);
+#endif
                 main.SetIcon(HandReticle.IconType.HandDeny);
                 return;
             }
@@ -93,7 +97,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             {
                 text2 = Language.main.Get("PowerSourceUnloaded");
             }
+#if SUBNAUTICA
             main.SetInteractText(text2, text, false, false, true);
+#else
+            main.SetText(HandReticle.TextType.Hand,$"{Language.main.Get(text2)}\n{Language.main.Get(text)}", false);
+#endif
             main.SetIcon(HandReticle.IconType.Hand, 1f);
         }
 

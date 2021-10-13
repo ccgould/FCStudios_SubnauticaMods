@@ -104,7 +104,7 @@
     <Compile Include="Mods\TV\Mono\TVController.cs" />
     <Compile Include="Mods\TV\Mono\VideoSectionController.cs" />
     <Compile Include="Mods\NeonPlanter\Mono\NeonPlanterController.cs" />
-    <Compile Include="Mods\PaintTool\PaintToolController.cs" />
+    <Compile Include="Mods\PaintTool\Mono\PaintToolController.cs" />
     <Compile Include="Patches\Builder_Patches.cs" />
     <Compile Include="Patches\OSubmarinHelper.cs" />
     <Compile Include="Patches\Player_Patches.cs" />

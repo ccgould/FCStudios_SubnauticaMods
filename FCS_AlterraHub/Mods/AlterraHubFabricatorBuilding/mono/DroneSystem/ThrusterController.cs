@@ -70,7 +70,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
         private bool IsUnderwater()
         {
-            return _trans.position.y < Ocean.main.GetOceanLevel();
+            return _trans.position.y < WorldHelpers.GetOceanDepth();
         }
     }
 }

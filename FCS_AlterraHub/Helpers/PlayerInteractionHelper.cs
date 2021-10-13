@@ -12,7 +12,7 @@ namespace FCS_AlterraHub.Helpers
         public static bool GivePlayerItem(TechType techType)
         {
             QuickLogger.Debug($"Giving Player Item: {Language.main.Get(techType)}",true);
-            var size = CraftData.GetItemSize(techType);
+            var size = TechDataHelpers.GetItemSize(techType);
             if (Player.main.HasInventoryRoom(size.x,size.y))
             {
                 CraftData.AddToInventory(techType, 1, false, false);
@@ -21,43 +21,26 @@ namespace FCS_AlterraHub.Helpers
             return false;
         }
 
-        public static bool GivePlayerItemV2(TechType techType,int amount)
+        public static bool GivePlayerItem(TechType techType,int amount)
         {
-            if (amount > 0)
+            for (int i = 0; i < amount; i++)
             {
-                var sizes = new List<Vector2int>();
-                for (int i = 0; i < amount; i++)
+                QuickLogger.Debug($"Giving Player Item: {Language.main.Get(techType)}", true);
+                var size = TechDataHelpers.GetItemSize(techType);
+                if (Player.main.HasInventoryRoom(size.x, size.y))
                 {
-                    sizes.Add(CraftData.GetItemSize(techType));
+                    CraftData.AddToInventory(techType, 1, false, false);
                 }
-                
-                if (Inventory.main.container.HasRoomFor(sizes))
+                else
                 {
-                    if (CraftData.IsAllowed(techType))
-                    {
-                        for (int i = 0; i < amount; i++)
-                        {
-                            GameObject gameObject = CraftData.InstantiateFromPrefab(techType, false);
-                            if (gameObject != null)
-                            {
-                                gameObject.transform.position = MainCamera.camera.transform.position + MainCamera.camera.transform.forward * 3f;
-                                CrafterLogic.NotifyCraftEnd(gameObject, techType);
-                                Pickupable component = gameObject.GetComponent<Pickupable>();
-                                if (component != null && !Inventory.main.Pickup(component, false))
-                                {
-                                    ErrorMessage.AddError(Language.main.Get("InventoryFull"));
-                                }
-                            }
-                        }
-                        return true;
-                    }
+                    return false;
                 }
             }
 
-            return false;
+            return true;
         }
+        
 
-#if SUBNAUTICA_STABLE
         public static void GivePlayerItem(InventoryItem inventoryItem)
         {
             if (inventoryItem == null) return;
@@ -77,29 +60,7 @@ namespace FCS_AlterraHub.Helpers
                 Inventory.main.Pickup(pickupable);
             }
         }
-#else
-        public static void GivePlayerItem(InventoryItem inventoryItem)
-        {
-            if (inventoryItem == null) return;
-            
-            if (Player.main.HasInventoryRoom(inventoryItem.item))
-            {
-                TaskResult<bool> pickupResult = new TaskResult<bool>();
-                CoroutineHost.StartCoroutine(Inventory.main.PickupAsync(inventoryItem.item, pickupResult));
-            }
-        }
 
-        public static void GivePlayerItem(Pickupable pickupable)
-        {
-            if (pickupable == null) return;
-
-            if (Player.main.HasInventoryRoom(pickupable))
-            {
-                TaskResult<bool> pickupResult = new TaskResult<bool>();
-                CoroutineHost.StartCoroutine(Inventory.main.PickupAsync(pickupable, pickupResult));
-            }
-        }
-#endif
 
         public static bool HasCard()
         {
@@ -108,7 +69,7 @@ namespace FCS_AlterraHub.Helpers
 
         public static bool CanPlayerHold(TechType techType)
         {
-            var size = CraftData.GetItemSize(techType);
+            var size = TechDataHelpers.GetItemSize(techType);
             return Inventory.main.HasRoomFor(size.x, size.y);
         }
 

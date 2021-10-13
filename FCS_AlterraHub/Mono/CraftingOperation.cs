@@ -18,7 +18,7 @@ namespace FCS_AlterraHub.Mono
         public bool IsBeingCrafted { get; set; }
         public bool IsOperational { get; set; }
         public HashSet<string> Devices { get; set; } = new HashSet<string>();
-        [JsonIgnore]public HashSet<FcsDevice> MountedBy { get; set; } = new HashSet<FcsDevice>();
+        [JsonIgnore] public HashSet<FcsDevice> MountedBy { get; set; } = new HashSet<FcsDevice>();
         public int AmountCompleted { get; set; }
         public TechType TechType { get; set; }
         public bool IsComplete => GetIsComplete();
@@ -40,7 +40,11 @@ namespace FCS_AlterraHub.Mono
         {
             TechType = techType;
             Amount = amount;
+#if SUBNAUTICA
             var returnAmount = CraftDataHandler.Main.GetTechData(techType)?.craftAmount ?? 1;
+#else
+            var returnAmount = CraftDataHandler.Main.GetRecipeData(techType)?.craftAmount ?? 1;
+#endif
             ReturnAmount = returnAmount == 0 ? 1 : returnAmount;
             IsRecursive = isRecursive;
         }

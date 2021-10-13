@@ -1,19 +1,19 @@
 ﻿
-using SMLHelper.V2.Crafting;
-#if SUBNAUTICA
 using System;
+using System.Collections;
+using SMLHelper.V2.Crafting;
 using System.IO;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mods.OreConsumer.Mono;
-using FCS_AlterraHub.Mono;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Utility;
 using UnityEngine;
+
+#if SUBNAUTICA
 using RecipeData = SMLHelper.V2.Crafting.TechData;
 using Sprite = Atlas.Sprite;
-
 #endif
 
 namespace FCS_AlterraHub.Mods.OreConsumer.Buildable
@@ -108,12 +108,12 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Buildable
 #else
         public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
         {
-                var prefab = GameObject.Instantiate(AlterraHub.OreConsumerPrefab);
+                var prefab = GameObject.Instantiate(_prefab);
 
-                var size = new Vector3(1.353966f, 2.503282f, 1.006555f);
-                var center = new Vector3(0.006554961f, 1.394679f, 0.003277525f);
+                var center = new Vector3(0f, 3.477769f, 0f);
+                var size = new Vector3(6.227153f, 6.457883f, 5.26316f);
 
-                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
+            GameObjectHelpers.AddConstructableBounds(prefab, size, center);
 
                 var model = prefab.FindChild("model");
 
@@ -141,16 +141,19 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Buildable
                 constructable.allowedOnConstructables = false;
                 constructable.model = model;
                 constructable.techType = TechType;
+                constructable.forceUpright = true;
+                constructable.placeDefaultDistance = 5;
+                constructable.placeMinDistance = 5;
+                constructable.placeMaxDistance = 10;
 
-                PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
+            PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = ClassID;
 
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<OreConsumerController>();
-                //prefab.AddComponent<FCSGameLoadUtil>();
 
                 //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
-                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
+                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
             gameObject.Set(prefab);
             yield break;
         }

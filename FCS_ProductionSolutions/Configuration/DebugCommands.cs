@@ -1,8 +1,12 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using FCS_AlterraHub.Extensions;
+using FCS_AlterraHub.Helpers;
 using FCS_ProductionSolutions.HydroponicHarvester.Mono;
+using FCS_ProductionSolutions.Mods.AutoCrafter.Buildable;
+using FCS_ProductionSolutions.Mods.AutoCrafter.Mono;
 using FCS_ProductionSolutions.Mods.DeepDriller.Mono;
 using FCS_ProductionSolutions.Mods.HydroponicHarvester.Enumerators;
 using FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono;
@@ -126,6 +130,58 @@ namespace FCS_ProductionSolutions.Configuration
                 return $"{Language.main.Get(techType)} is not scannable by the Matter Analyzer.";
             }
             return $"Could not parse {techTypeAsString} as TechType";
+        }
+
+
+        [ConsoleCommand("LinkCrafter")]
+        public static string LinkCrafterCommand(int parentCrafter, int childCrafter)
+        {
+            QuickLogger.Debug($"Executing Command Add Harvester", true);
+
+            var unitName1 = $"{AutoCrafterPatch.AutoCrafterTabID}{parentCrafter:D3}";
+            var unitName2 = $"{AutoCrafterPatch.AutoCrafterTabID}{childCrafter:D3}";
+
+            var crafters = GameObject.FindObjectsOfType<AutoCrafterController>();
+            
+            foreach (AutoCrafterController controller in crafters)
+            {
+                if (controller.UnitID.Equals(unitName1, StringComparison.OrdinalIgnoreCase))
+                {
+                    controller.AddLinkedDevice(crafters.FirstOrDefault(x=>x.UnitID == unitName2));
+                    break;
+                }
+            }
+            return $"Parameters: {parentCrafter} {childCrafter}";
+        }
+
+        [ConsoleCommand("UnLinkCrafter")]
+        public static string UnLinkCrafterCommand(int parentCrafter, int childCrafter)
+        {
+            QuickLogger.Debug($"Executing Command Add Harvester", true);
+
+            var unitName1 = $"{AutoCrafterPatch.AutoCrafterTabID}{parentCrafter:D3}";
+            var unitName2 = $"{AutoCrafterPatch.AutoCrafterTabID}{childCrafter:D3}";
+
+            var crafters = GameObject.FindObjectsOfType<AutoCrafterController>();
+
+            foreach (AutoCrafterController controller in crafters)
+            {
+                if (controller.UnitID.Equals(unitName1, StringComparison.OrdinalIgnoreCase))
+                {
+                    controller.RemoveLinkedDevice(crafters.FirstOrDefault(x => x.UnitID == unitName2));
+                    break;
+                }
+            }
+            return $"Parameters: {parentCrafter} {childCrafter}";
+        }
+
+        [ConsoleCommand("CrafterSet1")]
+        public static void CrafterSet1Command()
+        {
+            PlayerInteractionHelper.GivePlayerItem(TechType.Copper,2);
+            PlayerInteractionHelper.GivePlayerItem(TechType.Silver,2);
+            PlayerInteractionHelper.GivePlayerItem(TechType.JeweledDiskPiece,2);
+            PlayerInteractionHelper.GivePlayerItem(TechType.Gold,3);
         }
 
         //[ConsoleCommand("testMe")]

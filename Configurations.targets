@@ -3,11 +3,11 @@
 
   <PropertyGroup Condition="'$(Configuration)' == 'BZ_Stable'">
     <DefineConstants>TRACE;BELOWZERO;BELOWZERO_STABLE</DefineConstants>
-    <GameDir>$(CommonDir)SubnauticaZero.Stable</GameDir>
+    <GameDir>$(CommonDirBz)SubnauticaBelowZero</GameDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'BZ_Exp'">
     <DefineConstants>TRACE;BELOWZERO;BELOWZERO_EXP</DefineConstants>
-    <GameDir>$(CommonDir)SubnauticaZero.Exp</GameDir>
+    <GameDir>$(CommonDirBz)SubnauticaBelowZero.Exp</GameDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'SN_Stable'">
     <DefineConstants>TRACE;SUBNAUTICA;SUBNAUTICA_STABLE</DefineConstants>

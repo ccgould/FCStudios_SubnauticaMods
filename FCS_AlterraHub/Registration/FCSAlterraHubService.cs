@@ -11,9 +11,13 @@ using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Structs;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
-using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Handlers;
 using UnityEngine;
+#if SUBNAUTICA_STABLE
+using Oculus.Newtonsoft.Json;
+#else
+using Newtonsoft.Json;
+#endif
 
 namespace FCS_AlterraHub.Registration
 {
@@ -371,7 +375,9 @@ namespace FCS_AlterraHub.Registration
                             key = data.Key,
                             nodes = PDAEncyclopedia.ParsePath(entryData.Path),
                             path = entryData.Path,
-                            timeCapsule = false,
+#if SUBNAUTICA
+                            timeCapsule = false,                            
+#endif
                             unlocked = entryData.Unlocked
                         });
 

@@ -16,6 +16,7 @@ using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Objects;
 using FCS_AlterraHub.Registration;
+using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -132,7 +133,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
             AlterraFabricatorStationController.Main.ClearCurrentOrder();
 
-            Subtitles.main.Add($"Your order has being shipped to base {GetBaseName()}", null);
+            VoiceNotificationSystem.main.DisplayMessage( $"Your order has being shipped to base {GetBaseName()}");
         }
 
         private static void OffloadItemsInBase(Shipment order, IEnumerable<FcsDevice> devices)
@@ -187,7 +188,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             if (devices == null)
             {
                 QuickLogger.ModMessage($"Failed to find any Hub Depots giving a refund.");
-                Subtitles.main.Add($"Your order has been refunded. Please report to FCStudios", null);
+                VoiceNotificationSystem.main.DisplayMessage($"Your order has been refunded. Please report to FCStudios");
                 foreach (CartItemSaveData cartItem in order.CartItems)
                 {
                     cartItem.Refund();
@@ -306,12 +307,27 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             return _colorManager.ChangeColor(template);
         }
 
+
+
         public DroneController SpawnDrone()
         {
-            var drone = GameObject.Instantiate(CraftData.GetPrefabForTechType(Mod.AlterraTransportDroneTechType), _spawnPoint.transform.position, _spawnPoint.transform.rotation);
-            _assignedDrone = drone.GetComponent<DroneController>();
+#if SUBNAUTICA
+            var drone = Instantiate(CraftData.GetPrefabForTechType(Mod.AlterraTransportDroneTechType), _spawnPoint.transform.position, _spawnPoint.transform.rotation);
+            _assignedDrone  = drone.GetComponent<DroneController>();
+#endif
             return _assignedDrone;
         }
+
+        public IEnumerator SpawnDrone(Action<DroneController> callback)
+        {
+            var task = CraftData.GetPrefabForTechTypeAsync(Mod.AlterraTransportDroneTechType, false);
+            yield return task;
+
+            var prefab = task.GetResult();
+            _assignedDrone = prefab.GetComponent<DroneController>();
+            callback?.Invoke(_assignedDrone);
+        }
+
 
         internal void OpenDoors()
         {

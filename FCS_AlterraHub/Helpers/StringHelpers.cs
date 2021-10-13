@@ -2,7 +2,6 @@
 using System.Text;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Mods.FCSPDA.Mono;
-using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
 using FCSCommon.Utilities;
 
 namespace FCS_AlterraHub.Helpers
@@ -45,7 +44,12 @@ namespace FCS_AlterraHub.Helpers
 
             if (strings == null || main == null) return;
             CreateText(strings);
+#if SUBNAUTICA
             main.SetInteractTextRaw(Sb.ToString(), AlterraHub.ViewInPDA());
+#else
+            main.SetTextRaw(HandReticle.TextType.Hand , $"{Sb}/n {AlterraHub.ViewInPDA()}");
+#endif
+
         }
 
         public static void HandHoverPDAHelperEx(this string[] strings,TechType techType, HandReticle.IconType icon = HandReticle.IconType.Info, float progess = 0f)
@@ -63,7 +67,13 @@ namespace FCS_AlterraHub.Helpers
 
             CreateText(strings);
 
-            main.SetInteractTextRaw(Sb.ToString(), pda?.CheckIfPDAHasEntry(techType) ?? false ? AlterraHub.ViewInPDA() : string.Empty);
+            var text = pda?.CheckIfPDAHasEntry(techType) ?? false ? AlterraHub.ViewInPDA() : string.Empty;
+#if SUBNAUTICA
+            main.SetInteractTextRaw(Sb.ToString(), text);
+#else
+            main.SetTextRaw(HandReticle.TextType.Count, $"{Sb}/n {text}");
+#endif
+
 
             if (icon == HandReticle.IconType.Progress)
             {

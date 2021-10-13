@@ -158,6 +158,12 @@ namespace FCS_AlterraHub.Mono
 
         public abstract void OnProtoDeserialize(ProtobufSerializer serializer);
 
+        public bool IsDeconstructionObstacle()
+        {
+            QuickLogger.Debug("I Dont know what this does in BZ Check it if something is wrong with building IsDeconstructionObstacle()");
+            return true;
+        }
+
         public abstract bool CanDeconstruct(out string reason);
 
         public abstract void OnConstructedChanged(bool constructed);
@@ -366,6 +372,11 @@ namespace FCS_AlterraHub.Mono
                 IsOperational = IsOperational,
                 PrefabID = GetPrefabID()
             };
+        }
+
+        public virtual IEnumerator RemoveItemFromContainer(TechType techType, Action<Pickupable> callBack)
+        {
+            return null;
         }
     }
 

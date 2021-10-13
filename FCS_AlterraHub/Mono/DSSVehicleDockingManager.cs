@@ -42,7 +42,11 @@ namespace FCS_AlterraHub.Mono
 
             foreach (var vehicle in localVehicles)
             {
+#if SUBNAUTICA
                 var vehicleName = vehicle.GetName();
+#else
+                var vehicleName = vehicle.vehicleName;
+#endif
                 var vehicleContainers = GetVehicleContainers(vehicle);
 
 #if DEBUG
@@ -67,7 +71,7 @@ namespace FCS_AlterraHub.Mono
                             {
                                 if (_extractingItems == false)
                                 {
-                                    QuickLogger.ModMessage($"Extracting items from {vehicle.GetName()} storage...");
+                                    QuickLogger.ModMessage($"Extracting items from {vehicleName} storage...");
                                 }
                                 _extractingItems = true;
                                 yield return new WaitForSeconds(ExtractInterval);
@@ -128,7 +132,11 @@ namespace FCS_AlterraHub.Mono
             Vehicles.Clear();
             foreach (var dockingBay in DockingBays)
             {
+#if SUBNAUTICA
                 var vehicle = dockingBay.GetDockedVehicle();
+#else
+                var vehicle = dockingBay._dockedObject.vehicle;
+#endif
                 if (vehicle != null)
                 {
                     vehicle.modules.onRemoveItem += ModulesOnRemoveItem;
@@ -166,11 +174,17 @@ namespace FCS_AlterraHub.Mono
 
                 if (container?.tr == null) continue;
 
+#if SUBNAUTICA
+                        var vehicleName = v.GetName();
+#else
+                var vehicleName = v.vehicleName;
+#endif
+
                 if (subscribing)
                 {
                     if (!Subscibers.ContainsKey(container.tr.GetInstanceID()))
                     {
-                        QuickLogger.Debug($"Subscribing vehicle {v.GetName()} {container.tr.GetInstanceID()}", true);
+                        QuickLogger.Debug($"Subscribing vehicle {vehicleName} {container.tr.GetInstanceID()}", true);
                         container.onAddItem += ContainerOnOnAddItem;
                         container.onRemoveItem += ContainerOnOnRemoveItem;
                         Subscibers.Add(container.tr.GetInstanceID(), v.GetInstanceID());
@@ -178,7 +192,7 @@ namespace FCS_AlterraHub.Mono
                 }
                 else
                 {
-                    QuickLogger.Debug($"Un-Subscribing vehicle {v.GetName()} {container.tr.GetInstanceID()}", true);
+                    QuickLogger.Debug($"Un-Subscribing vehicle {vehicleName} {container.tr.GetInstanceID()}", true);
                     container.onAddItem -= ContainerOnOnAddItem;
                     container.onRemoveItem -= ContainerOnOnRemoveItem;
                     Subscibers.Clear();
@@ -223,7 +237,11 @@ namespace FCS_AlterraHub.Mono
                 Player main = Player.main;
                 PDA pda = main.GetPDA();
                 Inventory.main.SetUsedStorage(container);
+#if SUBNAUTICA
                 pda.Open(PDATab.Inventory, null, null, 4f);
+#else
+                pda.Open(PDATab.Inventory);
+#endif
                 break;
             }
         }

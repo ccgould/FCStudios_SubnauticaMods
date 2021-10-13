@@ -14,13 +14,18 @@ using FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
+using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
-using Oculus.Newtonsoft.Json;
 using rail;
 using SMLHelper.V2.Json.ExtensionMethods;
 using Steamworks;
 using Story;
 using UnityEngine;
+#if SUBNAUTICA_STABLE
+using Oculus.Newtonsoft.Json;
+#else
+using Newtonsoft.Json;
+#endif
 
 namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 {
@@ -466,7 +471,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                         _currentOrder = purchase.Value;
                         _pendingPurchase.Remove(purchase.Key);
 
-                        Subtitles.main.Add($"Your order is now being shipped to base {purchase.Value.Port.GetBaseName()}", null);
+                        VoiceNotificationSystem.main.ShowSubtitle($"Your order is now being shipped to base {purchase.Value.Port.GetBaseName()}");
+
 
                         Mod.GamePlaySettings.CurrentOrder = _currentOrder;
                     }
@@ -505,9 +511,17 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 
                     for (int i = 0; i < MAXDRONECOUNT; i++)
                     {
+#if SUBNAUTICA
                         var drone = _ports.ElementAt(i).Value.SpawnDrone();
                         _drones.Add(drone);
                         drone.LoadData();
+#else
+                        _ports.ElementAt(i).Value.SpawnDrone(drone =>
+                        {
+                            _drones.Add(drone);
+                            drone.LoadData();
+                        });
+#endif
                     }
 
                     Mod.GamePlaySettings.TransDroneSpawned = true;

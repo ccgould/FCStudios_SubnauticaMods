@@ -1,9 +1,9 @@
 ﻿using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Mono;
 using FCSCommon.Utilities;
-using Oculus.Newtonsoft.Json;
 using UnityEngine.UI;
 #if SUBNAUTICA_STABLE
+using Oculus.Newtonsoft.Json;
 #else
 using Newtonsoft.Json;
 #endif

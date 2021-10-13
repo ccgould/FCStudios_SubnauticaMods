@@ -1,4 +1,5 @@
-﻿using FCSCommon.Utilities;
+﻿using System.Collections;
+using FCSCommon.Utilities;
 using SMLHelper.V2.Handlers;
 using UnityEngine;
 using UWE;
@@ -49,7 +50,6 @@ namespace FCS_AlterraHub.Extensions
             return item;
         }
 
-#if SUBNAUTICA_STABLE
         public static InventoryItem ToInventoryItemLegacy(this TechType techType)
         {
             GameObject prefabForTechType = CraftData.GetPrefabForTechType(techType, false);
@@ -58,23 +58,7 @@ namespace FCS_AlterraHub.Extensions
             var pickupable = gameObject.GetComponent<Pickupable>();
             return new InventoryItem(pickupable.Pickup(false));
         }
-#else
-        public static IEnumerable ToInventoryItemLegacy(TechType techType, IOut<InventoryItem> result)
-        {
-            var prefabForTechType = CraftData.GetPrefabForTechTypeAsync(techType, false);
-            yield return prefabForTechType;
 
-            var prefabResult = prefabForTechType.GetResult();
-
-            GameObject gameObject = (prefabResult != null) ? Utils.SpawnFromPrefab(prefabResult, null) : Utils.CreateGenericLoot(techType);
-            gameObject.transform.position = gameObject.transform.position;
-            var pickupable = gameObject.GetComponent<Pickupable>();
-
-            TaskResult<Pickupable> pickupResult = new TaskResult<Pickupable>();
-            yield return pickupable.PickupAsync(pickupResult, false);
-            result.Set(new InventoryItem(pickupResult.Get()));
-            yield break;
-        }
 #endif
 
         public static InventoryItem ToInventoryItem(this Pickupable pickupable)
@@ -87,49 +71,6 @@ namespace FCS_AlterraHub.Extensions
             }
             return item;
         }
-
-#if SUBNAUTICA_STABLE
-
-#else
-        public static IEnumerator AddToContainerAsync(TechType techType, ItemsContainer container)
-        {
-            TaskResult<InventoryItem> taskResult = new TaskResult<InventoryItem>();
-            yield return AsyncExtensions.ToInventoryItemLegacyAsync(techType, taskResult);
-            container.UnsafeAdd(taskResult.Get());
-            yield break;
-        }
-#endif
-
-#elif BELOWZERO
-        public static Pickupable ToPickupable(this TechType techType)
-        {
-            Pickupable pickupable = null;
-            var prefab = CraftData.GetPrefabForTechType(techType);
-            if (prefab != null)
-            {
-                var go = GameObject.Instantiate(prefab);
-                pickupable = go.GetComponent<Pickupable>();
-                pickupable.Pickup(false);
-            }
-
-            return pickupable;
-        }
-
-        public static InventoryItem ToInventoryItem(this TechType techType)
-        {
-            InventoryItem item = null;
-            var prefab = CraftData.GetPrefabForTechType(techType);
-            if (prefab != null)
-            {
-                var go = GameObject.Instantiate(prefab);
-                var pickupable = go.GetComponent<Pickupable>();
-                pickupable.Pickup(false);
-                item = new InventoryItem(pickupable);
-            }
-            return item;
-        }
-
-#endif
 
         public static TechType ToTechType(this string value)
         {
