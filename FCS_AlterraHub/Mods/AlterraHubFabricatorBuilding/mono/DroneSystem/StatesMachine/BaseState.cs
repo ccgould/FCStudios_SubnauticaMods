@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.StatesMachine
 {
-    public abstract class BaseState
+    internal abstract class BaseState
     {
         public abstract string Name { get; }
 

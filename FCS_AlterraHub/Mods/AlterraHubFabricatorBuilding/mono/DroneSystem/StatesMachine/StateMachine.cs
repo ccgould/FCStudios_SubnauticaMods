@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.StatesMachine.States;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.StatesMachine
@@ -10,10 +11,10 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Stat
     {
         private Dictionary<Type, BaseState> _avaliableStates;
 
-        public BaseState CurrentState { get; private set; }
-        public event Action<BaseState> OnStateChanged;
+        internal BaseState CurrentState { get; private set; }
+        internal event Action<BaseState> OnStateChanged;
 
-        public void SetStates(Dictionary<Type, BaseState> states)
+        internal void SetStates(Dictionary<Type, BaseState> states)
         {
             _avaliableStates = states;
         }

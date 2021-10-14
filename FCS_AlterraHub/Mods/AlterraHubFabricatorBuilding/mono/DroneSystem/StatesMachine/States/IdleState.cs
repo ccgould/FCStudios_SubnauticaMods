@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.StatesMachine.States
 {
-    public class IdleState : BaseState
+    internal class IdleState : BaseState
     {
         private readonly DroneController _drone;
         private float _timeRemaining = 5f;

@@ -9,6 +9,7 @@ using FCS_AlterraHub.Registration;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Buildable;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Helpers;
+using FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Patches;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -132,9 +133,22 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
                 Storage = GetComponent<StorageContainer>();
             }
 
+            if (StateMachine == null)
+            {
+                StateMachine = gameObject.AddComponent<CrafterStateManager>();
+                StateMachine.Crafter = this;
+            }
+
+            if (CrafterBelt == null)
+            {
+                CrafterBelt = gameObject.AddComponent<CrafterBeltController>();
+                CrafterBelt.Crafter = this;
+            }
+
             if (CraftMachine == null)
             {
                 CraftMachine = GetComponent<CraftMachine>();
+                CraftMachine.Crafter = this;
             }
 
             Storage.enabled = false;
@@ -143,6 +157,10 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
 
             QuickLogger.Debug($"Initializing Completed");
         }
+
+        public CrafterBeltController CrafterBelt { get; set; }
+
+        public CrafterStateManager StateMachine { get; set; }
 
         public override bool ChangeBodyColor(ColorTemplate template)
         {

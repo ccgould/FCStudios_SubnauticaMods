@@ -24,8 +24,14 @@
     <Compile Include="Mods\AutoCrafter\Helpers\CompatiblityMethods.cs" />
     <Compile Include="Mods\AutoCrafter\Helpers\CrafterLogicHelper.cs" />
     <Compile Include="Mods\AutoCrafter\Models\PendingIngredient.cs" />
+    <Compile Include="Mods\AutoCrafter\Models\StateMachine\CrafterBaseState.cs" />
+    <Compile Include="Mods\AutoCrafter\Models\StateMachine\CrafterStateManager.cs" />
+    <Compile Include="Mods\AutoCrafter\Models\StateMachine\States\CrafterCheckForItemsState.cs" />
+    <Compile Include="Mods\AutoCrafter\Models\StateMachine\States\CrafterCraftingState.cs" />
+    <Compile Include="Mods\AutoCrafter\Models\StateMachine\States\CrafterIdleState.cs" />
     <Compile Include="Mods\AutoCrafter\Mono\AutoCrafterController.cs" />
     <Compile Include="Mods\AutoCrafter\Mono\AutoCrafterCrateController.cs" />
+    <Compile Include="Mods\AutoCrafter\Mono\CrafterBeltController.cs" />
     <Compile Include="Mods\AutoCrafter\Mono\CraftMachine.cs" />
     <Compile Include="Mods\AutoCrafter\Patches\PowerIndicatorPatch.cs" />
     <Compile Include="Mods\DeepDriller\Patchers\OSubmarinHelper.cs" />
