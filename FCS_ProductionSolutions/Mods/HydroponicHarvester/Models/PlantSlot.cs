@@ -175,14 +175,20 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Models
             if (CurrentHarvesterSpeedMode == HarvesterSpeedModes.Off)
                 return;// Powered off, can't start a new clone
 
-            if (!IsFull && GenerationProgress == -1f)
+            if (IsFull)
+            {
+                QuickLogger.Debug("Cannot start another clone, container is full", true);
+                return;
+            }
+
+            if (Mathf.Approximately( GenerationProgress, -1f)) 
             {
                 QuickLogger.Debug("[Hydroponic Harvester] Generating", true);
                 GenerationProgress = 0f;
             }
             else
             {
-                QuickLogger.Debug("Cannot start another clone, container is full", true);
+                QuickLogger.Debug("Cannot start another clone", true);
             }
         }
 

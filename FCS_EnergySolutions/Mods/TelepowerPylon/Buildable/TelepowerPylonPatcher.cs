@@ -9,7 +9,6 @@ using FCS_AlterraHub.Registration;
 using FCS_EnergySolutions.Buildable;
 using FCS_EnergySolutions.Configuration;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Mono;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
@@ -20,10 +19,9 @@ using Sprite = Atlas.Sprite;
 
 #endif
 
-namespace FCS_EnergySolutions.TelepowerPylon.Buildables
+namespace FCS_EnergySolutions.Mods.TelepowerPylon.Buildable
 {
-    using SMLHelper.V2.Assets;
-    internal partial class TelepowerPylonBuildable : Buildable
+    internal partial class TelepowerPylonBuildable : SMLHelper.V2.Assets.Buildable
     {
         private GameObject _prefab;
         public override TechGroup GroupForPDA => TechGroup.ExteriorModules;
@@ -31,20 +29,28 @@ namespace FCS_EnergySolutions.TelepowerPylon.Buildables
         private string _assetFolder => Mod.GetAssetFolder();
         public override string AssetsFolder => _assetFolder;
 
-        public TelepowerPylonBuildable() : base(Mod.TelepowerPylonClassName, Mod.TelepowerPylonFriendlyName, Mod.TelepowerPylonDescription)
+        internal const string TelepowerPylonTabID = "TP";
+        internal const string TelepowerPylonFriendlyName = "Telepower Pylon";
+        internal const string TelepowerPylonModName = "TelepowerPylon";
+        internal const string TelepowerPylonDescription = "With a Telepower Pylon, you can send or receive energy wirelessly across vast distances. Requires one to Send / Push and another to Receive / Pull.";
+        internal static string TelepowerPylonKitClassID => $"{TelepowerPylonModName}_Kit";
+        internal static string TelepowerPylonClassName => TelepowerPylonModName;
+        internal static string TelepowerPylonPrefabName => TelepowerPylonModName;
+
+        public TelepowerPylonBuildable() : base(TelepowerPylonClassName, TelepowerPylonFriendlyName, TelepowerPylonDescription)
         {
-            _prefab = ModelPrefab.GetPrefab(Mod.TelepowerPylonPrefabName, true);
+            _prefab = ModelPrefab.GetPrefab(TelepowerPylonPrefabName, true);
 
             OnStartedPatching += () =>
             {
-                var telepowerPylonKit = new FCSKit(Mod.TelepowerPylonKitClassID, Mod.TelepowerPylonFriendlyName,
+                var telepowerPylonKit = new FCSKit(TelepowerPylonKitClassID, TelepowerPylonFriendlyName,
                     Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 telepowerPylonKit.Patch();
             };
             
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.TelepowerPylonKitClassID.ToTechType(), 120000, StoreCategory.Energy);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, AsyncExtensions.ToTechType(TelepowerPylonKitClassID), 120000, StoreCategory.Energy);
             };
         }
 
@@ -204,7 +210,7 @@ namespace FCS_EnergySolutions.TelepowerPylon.Buildables
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(Mod.TelepowerPylonKitClassID.ToTechType(),1)
+                    new Ingredient(AsyncExtensions.ToTechType(TelepowerPylonKitClassID),1)
                 }
             };
             return customFabRecipe;

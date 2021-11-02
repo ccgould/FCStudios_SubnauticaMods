@@ -8,6 +8,7 @@ using FCS_AlterraHub.Mods.OreConsumer.Model;
 using FCS_AlterraHub.Objects;
 using FCS_AlterraHub.Registration;
 using FCS_EnergySolutions.Configuration;
+using FCS_EnergySolutions.Mods.TelepowerPylon.Buildable;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -45,7 +46,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
             _pole2AnimationCurve = new AnimationCurve(new Keyframe(0, 1.841746f), new Keyframe(1, _pole2Max));
             _pole3AnimationCurve = new AnimationCurve(new Keyframe(0, 1.397793f), new Keyframe(1, _pole3Max));
             MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, gameObject, 4f);
-            Manager.NotifyByID(Mod.TelepowerPylonTabID, "PylonBuilt");
+            Manager.NotifyByID(TelepowerPylonBuildable.TelepowerPylonTabID, "PylonBuilt");
         }
 
         private void OnEnable()

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using FCS_AlterraHub.Mono;
+using FCS_EnergySolutions.Mods.TelepowerPylon.Buildable;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Json;
 using SMLHelper.V2.Options;
@@ -103,7 +104,7 @@ namespace FCS_EnergySolutions.Configuration
 
         private static void TelepowerPylonBrightnessChangeEvent(SliderChangedEventArgs e)
         {
-            BaseManager.GlobalNotifyByID(Mod.TelepowerPylonTabID, "UpdateEffects");
+            BaseManager.GlobalNotifyByID(TelepowerPylonBuildable.TelepowerPylonTabID, "UpdateEffects");
         }
 
         private static void EnableDisableLightToggleEvent(ToggleChangedEventArgs e)

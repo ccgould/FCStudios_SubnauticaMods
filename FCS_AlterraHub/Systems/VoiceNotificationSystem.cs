@@ -64,7 +64,7 @@ namespace FCS_AlterraHub.Systems
 
         private void CheckPendingMessages()
         {
-            QuickLogger.Debug($"Pending Message count: {_queue.Count} | Can Play: {GetCanPlay()}", true);
+            //QuickLogger.Debug($"Pending Message count: {_queue.Count} | Can Play: {GetCanPlay()}", true);
             if (!GetCanPlay() || !_queue.Any()) return;
             var notification = _queue.Dequeue();
             Play(notification.Key, notification.Seconds);

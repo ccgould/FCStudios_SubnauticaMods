@@ -67,5 +67,10 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
                 _toggleBtn?.SetIsOnWithoutNotify(true);
             }
         }
+
+        public bool IsChecked()
+        {
+            return _toggleBtn != null && _toggleBtn.isOn;
+        }
     }
 }

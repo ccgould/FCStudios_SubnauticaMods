@@ -76,7 +76,7 @@ namespace FCS_EnergySolutions.Mods.JetStreamT242.Buildables
                 var constructable = prefab.AddComponent<Constructable>();
 
                 constructable.allowedOutside = true;
-                constructable.allowedInBase = true;
+                constructable.allowedInBase = false;
                 constructable.allowedOnGround = true;
                 constructable.allowedOnWall = false;
                 constructable.rotationEnabled = true;

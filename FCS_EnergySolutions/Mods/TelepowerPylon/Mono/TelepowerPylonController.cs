@@ -12,6 +12,7 @@ using FCS_AlterraHub.Mono.Controllers;
 using FCS_AlterraHub.Registration;
 using FCS_EnergySolutions.Buildable;
 using FCS_EnergySolutions.Configuration;
+using FCS_EnergySolutions.Mods.TelepowerPylon.Buildable;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Model;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -60,6 +61,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         private GameObject _pushGrid;
         private GameObject _pullGridContent;
         private GameObject _pushGridContent;
+        private bool _allowedToInteract;
         private const int DEFAULT_CONNECTIONS_LIMIT = 6;
         private GameObject inputDummy
         {
@@ -81,7 +83,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.TelepowerPylonTabID, Mod.ModPackID);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, TelepowerPylonBuildable.TelepowerPylonTabID, Mod.ModPackID);
 
             if (Manager == null)
             {
@@ -92,7 +94,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             }
 
             InvokeRepeating(nameof(CheckTeleportationComplete), 0.2f, 0.2f);
-            Manager.NotifyByID(Mod.TelepowerPylonTabID, "PylonBuilt");
+            Manager.NotifyByID(TelepowerPylonBuildable.TelepowerPylonTabID, "PylonBuilt");
         }
 
         private void CheckTeleportationComplete()
@@ -180,7 +182,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
                 }
             }
 
-            Manager?.NotifyByID(Mod.TelepowerPylonTabID, "PylonDestroy");
+            Manager?.NotifyByID(TelepowerPylonBuildable.TelepowerPylonTabID, "PylonDestroy");
 
         }
 
@@ -478,7 +480,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
        
         private bool FindOtherPylonWithConnection(KeyValuePair<string, FcsDevice> unit)
         {
-            var devices = Manager.GetDevices(Mod.TelepowerPylonTabID).ToArray();
+            var devices = Manager.GetDevices(TelepowerPylonBuildable.TelepowerPylonTabID).ToArray();
 
             QuickLogger.Debug($"Devices Found: {devices.Length}",true);
 
@@ -540,7 +542,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
 
         private void RefreshPylonList()
         {
-            foreach (var fcsDeviceKey in FCSAlterraHubService.PublicAPI.GetRegisteredDevicesOfId(Mod.TelepowerPylonTabID))
+            foreach (var fcsDeviceKey in FCSAlterraHubService.PublicAPI.GetRegisteredDevicesOfId(TelepowerPylonBuildable.TelepowerPylonTabID))
             {
                 if (fcsDeviceKey.Value is not ITelepowerPylonConnection pylon) continue;
 
@@ -637,15 +639,15 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             if (_attemptedToLoadConnections) return;
 
             QuickLogger.Debug("OnWorld Settled",true);
-
+            RefreshPylonList();
             if (_savedData?.CurrentConnections != null)
             {
                 foreach (string connection in _savedData.CurrentConnections)
                 {
-                    if(_currentConnections.ContainsKey(connection)) continue;
+                    QuickLogger.Debug($"Does Current Connections Contain Key: {connection} = {_currentConnections.ContainsKey(connection)}");
                     
-                    RefreshPylonList();
-                    var item = _trackedPullFrequencyItem.SingleOrDefault(x => x.Key.Equals(connection));
+                    if (!_currentConnections.ContainsKey(connection)) continue;
+                        var item = _trackedPullFrequencyItem.SingleOrDefault(x => x.Key.Equals(connection));
                     if (item.Value != null)
                     {
                         item.Value.Check(true);
@@ -813,6 +815,10 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         {
             foreach (KeyValuePair<string, ITelepowerPylonConnection> connection in _currentConnections)
             {
+                var item = _trackedPullFrequencyItem.Any(x => x.Key.Equals(connection.Key) && x.Value.IsChecked());
+
+                if(!item) continue;
+
                 yield return connection.Key;
             }
         }
@@ -871,9 +877,15 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             if (_isInRange)
             {
                 var additionalInformation = Manager == null ? "\nMust be built on platform." : string.Empty;
+                var message = hand.IsTool()
+                    ? $"Clear Hands to interact with {TelepowerPylonBuildable.TelepowerPylonFriendlyName}"
+                    : $"Click to use configure {TelepowerPylonBuildable.TelepowerPylonFriendlyName}";
+
+                _allowedToInteract = !hand.IsTool();
+
                 var data = new[]
                 {
-                    $"Unit ID: {UnitID} {additionalInformation} \nClick to use configure Telepower Pylon |",
+                    $"Unit ID: {UnitID} {additionalInformation} \n {message} |",
                     AlterraHub.PowerPerMinute(CalculatePowerUsage() * 60)
                 };
                 data.HandHoverPDAHelperEx(GetTechType(), Manager == null ? HandReticle.IconType.HandDeny : HandReticle.IconType.Info);
@@ -882,7 +894,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         
         public void OnHandClick(GUIHand hand)
         {
-            if (!IsInitialized || !IsConstructed || Manager== null)
+            if (!IsInitialized || !IsConstructed || Manager== null || !_allowedToInteract)
             {
                 return;
             }
@@ -893,10 +905,12 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
                 _isInUse = true;
                 var hudCameraPos = _cameraPosition.transform.position;
                 var hudCameraRot = _cameraPosition.transform.rotation;
+
                 Player.main.SetPosition(new Vector3(hudCameraPos.x, Player.main.transform.position.y, hudCameraPos.z), hudCameraRot);
                 _playerBody.SetActive(false);
                 SNCameraRoot.main.transform.position = hudCameraPos;
                 SNCameraRoot.main.transform.rotation = hudCameraRot;
+
             }
         }
         

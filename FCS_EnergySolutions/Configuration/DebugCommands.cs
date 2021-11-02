@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_EnergySolutions.Mods.JetStreamT242.Mono;
+using FCS_EnergySolutions.Mods.TelepowerPylon.Buildable;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Mono;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Commands;
@@ -33,7 +34,7 @@ namespace FCS_EnergySolutions.Configuration
         [ConsoleCommand("clearpylonconnections")]
         public static string ClearPylonConnectionCommand(int unitID)
         {
-            var unitName = $"{Mod.TelepowerPylonTabID}{unitID:D3}";
+            var unitName = $"{TelepowerPylonBuildable.TelepowerPylonTabID}{unitID:D3}";
 
             QuickLogger.Debug($"Trying to find device: {unitName} || Count of Devices: {FCSAlterraHubService.PublicAPI.GetRegisteredDevices()?.Count}", true);
             foreach (KeyValuePair<string, FcsDevice> device in FCSAlterraHubService.PublicAPI.GetRegisteredDevices())

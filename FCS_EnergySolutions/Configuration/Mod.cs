@@ -28,15 +28,7 @@ namespace FCS_EnergySolutions.Configuration
         internal static string ModPackID => "FCSEnergySolutions";
         internal static string SaveDataFilename => $"FCSEnergySolutionsSaveData.json";
         internal const string ModBundleName = "fcsenergysolutionsbundle";
-
-        internal const string TelepowerPylonTabID = "TP";
-        internal const string TelepowerPylonFriendlyName = "Telepower Pylon";
-        internal const string TelepowerPylonModName = "TelepowerPylon";
-        internal const string TelepowerPylonDescription = "With a Telepower Pylon, you can send or receive energy wirelessly across vast distances. Requires one to Send / Push and another to Receive / Pull.";
-        internal static string TelepowerPylonKitClassID => $"{TelepowerPylonModName}_Kit";
-        internal static string TelepowerPylonClassName => TelepowerPylonModName;
-        internal static string TelepowerPylonPrefabName => TelepowerPylonModName;
-
+        
         internal const string WindSurferOperatorTabID = "WSO";
         internal const string WindSurferOperatorFriendlyName = "Wind Surfer Operator";
         internal const string WindSurferOperatorModName = "WindSurferOperator";

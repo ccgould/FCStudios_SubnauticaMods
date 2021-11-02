@@ -21,19 +21,36 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine
 
         public event Action<CrafterBaseState> OnStateChanged;
 
-        public void SetStates(Dictionary<Type, CrafterBaseState> states)
+        public void SetStates()
         {
-            _avaliableStates = states;
+            if (_avaliableStates != null) return;
+
+            _avaliableStates = new Dictionary<Type, CrafterBaseState>()
+            {
+                {typeof(CrafterIdleState), new CrafterIdleState(this)},
+                {typeof(CrafterCraftingState), new CrafterCraftingState(this)}
+            };
+        }
+
+        public void LoadFromSave(CrafterCraftingState craftingData)
+        {
+            SetStates();
+            if (_avaliableStates[typeof(CrafterCraftingState)] is CrafterCraftingState t)
+            {
+                t._timeLeft = craftingData._timeLeft;
+                t._consumable = craftingData._consumable;
+                t._crafted = craftingData._crafted;
+                t._operation = craftingData._operation;
+                CurrentState = t;
+                Crafter.CraftMachine.SetOperation(craftingData._operation);
+            }
+
+            QuickLogger.Debug($"Current After Load: {CurrentState}");
         }
 
         private void Start()
         {
-            _avaliableStates = new Dictionary<Type, CrafterBaseState>()
-            {
-                {typeof(CrafterIdleState), new CrafterIdleState(this)},
-                {typeof(CrafterCraftingState), new CrafterCraftingState(this)},
-                {typeof(CrafterCheckForItemsState), new CrafterCheckForItemsState(this)},
-            };
+            SetStates();
         }
 
         private void Update()
@@ -59,6 +76,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine
 
         public void SwitchToNewState(Type nextState)
         {
+            QuickLogger.Debug("Switch to new state");
             CurrentState = _avaliableStates[nextState];
             CurrentState.EnterState();
             OnStateChanged?.Invoke(CurrentState);
@@ -67,6 +85,13 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine
         public CraftingOperation GetOperation()
         {
             return Crafter.CraftMachine.GetOperation();
+        }
+
+        public void Reset()
+        {
+            NeededItems.Clear();
+            QueuedItems.Clear();
+            BypassCraftingQueue = false;
         }
     }
 }

@@ -5,6 +5,8 @@ using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_ProductionSolutions.Mods.AutoCrafter;
+using FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine;
+using FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States;
 using FCS_ProductionSolutions.Mods.DeepDriller.Configuration;
 using FCS_ProductionSolutions.Mods.DeepDriller.Structs;
 using FCS_ProductionSolutions.Mods.HydroponicHarvester.Enumerators;
@@ -98,10 +100,12 @@ namespace FCS_ProductionSolutions.Configuration
         [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
         [JsonProperty] internal ColorTemplateSave ColorTemplate { get; set; }
         [JsonProperty] internal ObservableCollection<CraftingOperation> CurrentProcess { get; set; }
-        public bool IsRunning { get; set; }
         [JsonProperty] internal HashSet<TechType> KnownCrafts { get; set; }
         [JsonProperty] internal List<TechType> StoredItems { get; set; }
         [JsonProperty] internal List<string> ConnectedDevices { get; set; }
+        [JsonProperty] internal CrafterCraftingState StateData { get; set; }
+        [JsonProperty] internal List<string> ParentDevices { get; set; }
+        [JsonProperty] internal bool IsStandBy { get; set; }
     }
 
     [Serializable]

@@ -74,5 +74,12 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Helpers
         {
             return CraftDataHandler.GetTechData(techType);
         }
+
+        public static void Inc<T>(this Dictionary<T, int> dictionary, T key, int value = 1)
+        {
+            int num;
+            dictionary.TryGetValue(key, out num);
+            dictionary[key] = num + value;
+        }
     }
 }

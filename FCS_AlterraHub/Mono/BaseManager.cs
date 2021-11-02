@@ -74,7 +74,8 @@ namespace FCS_AlterraHub.Mono
             "powerstorage",
             "recycler",
             "alterrahubdepot",
-            "neonplanter"
+            "neonplanter",
+            "autocrafter"
         };
         public readonly HashSet<StorageContainer> BaseStorageLockers = new();
         public readonly HashSet<FcsDevice> BaseServers = new();
@@ -1272,6 +1273,7 @@ namespace FCS_AlterraHub.Mono
                 if (baseRack.ItemAllowed(item.item.GetTechType(), out var server))
                 {
                     server?.AddItemToMountedServer(item);
+                    QuickLogger.Debug($"Added item {Language.main.Get(item.item.GetTechType())} to base rack {baseRack.UnitID}",true);
                     return true;
                 }
             }
@@ -1281,6 +1283,7 @@ namespace FCS_AlterraHub.Mono
                 if(locker.container.HasRoomFor(item.item))
                 {
                     locker.container.UnsafeAdd(item);
+                    QuickLogger.Debug($"Added item {Language.main.Get(item.item.GetTechType())} to locker {locker.storageRoot.Id}", true);
                     return true;
                 }
             }
@@ -1290,6 +1293,8 @@ namespace FCS_AlterraHub.Mono
                 if (fcsDevice.CanBeStored(1, item.item.GetTechType()))
                 {
                     fcsDevice.AddItemToContainer(item);
+                    QuickLogger.Debug($"Added item {Language.main.Get(item.item.GetTechType())} to Alterra Storage {fcsDevice.UnitID}", true);
+
                     return true;
                 }
             }
@@ -1515,7 +1520,7 @@ namespace FCS_AlterraHub.Mono
 
         public void RemoveCraftingOperation(CraftingOperation operation)
         {
-            if (operation == null)
+            if (operation != null)
             {
                 operation.OnOperationDeleted?.Invoke(operation);
                 _craftingOperations.Remove(operation);
@@ -1584,6 +1589,16 @@ namespace FCS_AlterraHub.Mono
         public PowerRelay GetPowerRelay()
         {
             return Habitat.powerRelay;
+        }
+
+        public void DestroyItemsFromBase(TechType techType, int value)
+        {
+            for (int i = 0; i < value; i++)
+            {
+                var item = TakeItem(techType);
+                if(item == null) return;
+                GameObject.Destroy(item.gameObject);
+            }
         }
     }
 

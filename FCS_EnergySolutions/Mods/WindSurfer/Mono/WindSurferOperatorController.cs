@@ -10,6 +10,7 @@ using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_EnergySolutions.Buildable;
 using FCS_EnergySolutions.Configuration;
+using FCS_EnergySolutions.Mods.TelepowerPylon.Buildable;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Model;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Mono;
 using FCS_EnergySolutions.Mods.WindSurfer.Enums;
@@ -116,7 +117,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
         public override void OnDestroy()
         {
             base.OnDestroy();
-            Manager?.NotifyByID(Mod.TelepowerPylonTabID, "PylonDestroy");
+            Manager?.NotifyByID(TelepowerPylonBuildable.TelepowerPylonTabID, "PylonDestroy");
         }
 
         public void SubConstructionComplete()

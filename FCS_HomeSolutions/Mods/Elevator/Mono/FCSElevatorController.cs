@@ -545,9 +545,9 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
 
             var key = GameInput.GetBindingName(GameInput.Button.Reload, GameInput.BindingSet.Primary);
 
-            var message = hand.IsTool()
-                ? "Please clear hand to call elevator"
-                : $"Press ({key}) to call elevator back to home.";
+            //var message = hand.IsTool()
+            //    ? "Please clear hand to call elevator"
+            //    : $"Press ({key}) to call elevator back to home.";
 
             var data = new[]
             {

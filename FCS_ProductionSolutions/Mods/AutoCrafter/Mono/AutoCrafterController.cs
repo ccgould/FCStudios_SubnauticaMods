@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
@@ -10,6 +11,7 @@ using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Buildable;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Helpers;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine;
+using FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Patches;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -27,13 +29,13 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
         private bool _runStartUpOnEnable;
         private bool _fromSave;
         private float _transferTimer;
-        private List<TechType> _storedItems = new List<TechType>();
+        private List<TechType> _storedItems = new();
         private AutoCrafterDataEntry _saveData;
         private bool _moveBelt;
         public StorageContainer Storage;
         public CrafterMode _mode = CrafterMode.Normal;
-        private HashSet<string> _linkedChildDevices = new HashSet<string>();
-        private string _parentCrafter;
+        private HashSet<string> _linkedChildDevices = new();
+        private HashSet<string> _parentCrafters = new();
         private bool _isStandBy;
 
         public CraftMachine CraftMachine { get; private set; }
@@ -62,6 +64,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
         {
             return _moveBelt;
         }
+        
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, AutoCrafterPatch.AutoCrafterTabID, Mod.ModPackID);
@@ -91,12 +94,28 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
 
             if (_fromSave)
             {
+                QuickLogger.Debug($"------------------------------------------");
+                QuickLogger.Debug($"Loading {UnitID} from save.");
+
                 _colorManager.LoadTemplate(_saveData.ColorTemplate);
+
+                _isStandBy = _saveData.IsStandBy;
 
                 if (_saveData.StoredItems != null)
                 {
                     _storedItems = _saveData.StoredItems;
                 }
+
+                if (_saveData.StateData != null)
+                {
+                    StateMachine.LoadFromSave(_saveData.StateData);
+                }
+
+                if(_saveData.ConnectedDevices != null) _linkedChildDevices = new HashSet<string>(_saveData.ConnectedDevices);
+                if(_saveData.ParentDevices != null) _parentCrafters = new HashSet<string>(_saveData.ParentDevices);
+                QuickLogger.Debug($"------------------------------------------");
+
+
                 _fromSave = false;
             }
         }
@@ -179,16 +198,21 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
                 return;
             }
 
-            if (_saveData == null)
+            if (_saveData == null) 
             {
                 _saveData = new AutoCrafterDataEntry();
             }
-
-
+            
             QuickLogger.Message($"SaveData = {_saveData}", true);
 
             _saveData.ID = GetPrefabID();
             _saveData.ColorTemplate = _colorManager.SaveTemplate();
+            _saveData.StateData = StateMachine.CurrentState.GetType() == typeof(CrafterCraftingState)
+                ? StateMachine.CurrentState as CrafterCraftingState
+                : null;
+            _saveData.ConnectedDevices = _linkedChildDevices.ToList();
+            _saveData.ParentDevices = _parentCrafters.ToList();
+            _saveData.IsStandBy = _isStandBy; 
             saveDataList.AutoCrafterDataEntries.Add(_saveData);
         }
 
@@ -244,9 +268,19 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
         #endregion
 
         #region Internal Methods
-        internal void AddItemToStorage(TechType techType)
+        internal bool AddItemToStorage(TechType techType)
         {
-            _storedItems.Add(techType);
+            try
+            {
+                _storedItems.Add(techType);
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Debug(e.Message);
+                QuickLogger.Debug(e.StackTrace);
+                return false;
+            }
+            return true;
         }
 
         internal void ShowMessage(string message)
@@ -257,29 +291,45 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
         internal void AddLinkedDevice(AutoCrafterController childDeviceID)
         {
             _linkedChildDevices.Add(childDeviceID.UnitID);
-            childDeviceID.SetParentCrafter(this);
+            childDeviceID.AddParentCrafter(this);
         }
         
         internal void RemoveLinkedDevice(AutoCrafterController childDeviceID)
         {
             _linkedChildDevices.Remove(childDeviceID.UnitID);
-            childDeviceID.ClearParentController();
+            childDeviceID.RemoveParentCrafter(this);
+        }
+
+        internal void AddParentCrafter(AutoCrafterController parentDeviceID)
+        {
+            _parentCrafters.Add(parentDeviceID.UnitID);
+        }
+
+        internal void RemoveParentCrafter(AutoCrafterController parentDeviceID)
+        {
+            _parentCrafters.Remove(parentDeviceID.UnitID);
+        }
+
+        internal void CancelLinkedCraftersOperations()
+        {
+            foreach (string childDevice in _linkedChildDevices)
+            {
+                var device = FCSAlterraHubService.PublicAPI.FindDevice(childDevice);
+                if (device.Value != null)
+                {
+                    var crafter = device.Value.gameObject.GetComponent<AutoCrafterController>();
+                    if (crafter != null)
+                    {
+                        crafter.CraftMachine.CancelOperation();
+                    }
+                }
+            }
         }
 
         #endregion
 
         #region Private Method
-
-        private void ClearParentController()
-        {
-            _parentCrafter = String.Empty;
-        }
-
-        private void SetParentCrafter(AutoCrafterController crafter)
-        {
-            _parentCrafter = crafter.UnitID;
-        }
-
+        
         private void ReadySaveData()
         {
             QuickLogger.Debug("In OnProtoDeserialize");
@@ -350,13 +400,18 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
 
             base.OnHandHover(hand);
 
+
+            var message = hand.IsTool()
+                ? $"Please clear hand to use {AutoCrafterPatch.AutoCrafterFriendlyName}."
+                : $"Press {KeyCode.F} to interact with {AutoCrafterPatch.AutoCrafterFriendlyName}.";
+
             var data = new[]
             {
+                message,
                 $"UnitID: {UnitID}"
             };
-
-
-            if (Input.GetKeyDown(KeyCode.F))
+            
+            if (Input.GetKeyDown(KeyCode.F) && !hand.IsTool())
             {
                 AutocrafterHUD.Main.Show(this);
             }
@@ -379,9 +434,9 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
             return _isStandBy;
         }
 
-        public IEnumerable<string> GetConnectedCrafters()
+        public IEnumerable<string> GetParentCrafters()
         {
-            return _linkedChildDevices;
+            return _parentCrafters;
         }
     }
 

@@ -24,7 +24,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Buildable
         private readonly GameObject _prefab;
 
         internal const string AutoCrafterTabID = "ACU";
-        private const string AutoCrafterFriendlyName = "Auto Crafter";
+        internal const string AutoCrafterFriendlyName = "Auto Crafter";
         private const string AutoCrafterClassName = "AutoCrafter";
         private const string AutoCrafterPrefabName = "AutoCraftMachine";
         private static string AutoCrafterKitClassID => $"{AutoCrafterClassName}_Kit";
