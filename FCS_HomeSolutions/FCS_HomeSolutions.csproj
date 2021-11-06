@@ -31,6 +31,7 @@
     <Compile Include="Mods\PaintTool\Mono\HSVControl.cs" />
     <Compile Include="Mods\PaintTool\Mono\uGUI_PaintToolColorPicker.cs" />
     <Compile Include="Mods\PaintTool\Mono\uGUI_PaintToolColorPickerEditor.cs" />
+    <Compile Include="Mods\PartitionWalls\Patches\OSubmarinHelper.cs" />
     <Compile Include="Mods\Sink\Buildable\SinkPrefab.cs" />
     <Compile Include="Mods\Sink\Mono\SinkController.cs" />
     <Compile Include="Mods\Sofas\Buildable\NeonBarStool.cs" />
@@ -105,6 +106,7 @@
     <Compile Include="Mods\TV\Mono\VideoSectionController.cs" />
     <Compile Include="Mods\NeonPlanter\Mono\NeonPlanterController.cs" />
     <Compile Include="Mods\PaintTool\Mono\PaintToolController.cs" />
+    <Compile Include="Mono\DataCollectors\PatreonCollector.cs" />
     <Compile Include="Patches\Builder_Patches.cs" />
     <Compile Include="Patches\OSubmarinHelper.cs" />
     <Compile Include="Patches\Player_Patches.cs" />

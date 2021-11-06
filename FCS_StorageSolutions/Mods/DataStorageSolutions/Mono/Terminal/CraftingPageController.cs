@@ -20,7 +20,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         private GridHelperV2 _grid;
         private readonly List<CrafterListItem> _trackedCrafterListItem = new List<CrafterListItem>();
         private PaginatorController _paginatorController;
-        private CrafterSectionController _crafterSection;
 
         public void Initialize(DSSTerminalDisplayManager mono)
         {
@@ -47,9 +46,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             _grid = craftersSideBarGrid.EnsureComponent<GridHelperV2>();
             _grid.OnLoadDisplay += OnLoadCraftersGrid;
             _grid.Setup(8, gameObject, Color.gray, Color.white, null, "CraftersSideBarGrid");
-            
-            _crafterSection = GameObjectHelpers.FindGameObject(gameObject, "CrafterSection").AddComponent<CrafterSectionController>();
-            _crafterSection.Initialize(mono);
         }
 
         public void Show()
@@ -65,7 +61,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
         public void Refresh()
         {
-            _crafterSection?.Refresh();
             _grid.DrawPage();
         }
 

@@ -50,7 +50,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         private TerminalConfigurationPageController _terminalConfigurationPage;
         private MoonPoolPageController _moonPoolController;
         private FilterSettingDialog _filterSettingList;
-        private CraftingPageController _craftingController;
         private DumpContainerSimplified _dumpContainer;
         private FCSMessageBox _messageBox;
 
@@ -176,10 +175,10 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             _itemTransceiverPage?.RefreshList();
         }
 
-        internal void RefreshCraftingGrid()
-        {
-            _craftingController?.Refresh();
-        }
+        //internal void RefreshCraftingGrid()
+        //{
+        //    _craftingController?.Refresh();
+        //}
 
         public override bool FindAllComponents()
         {
@@ -257,9 +256,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 _moonPoolController = GameObjectHelpers.FindGameObject(gameObject, "MoonPool").AddComponent<MoonPoolPageController>();
                 _moonPoolController.Initialize(this);
                 
-                _craftingController = GameObjectHelpers.FindGameObject(gameObject, "Crafting").AddComponent<CraftingPageController>();
-                _craftingController.Initialize(this);
-
                 var powerButton = GameObjectHelpers.FindGameObject(_powerOffScreen, "PowerBTN");
                 InterfaceHelpers.CreateButton(powerButton, "PowerBTN", InterfaceButtonMode.Background,
                     OnButtonClick, Color.white, new Color(0, 1, 1, 1), 2.5f, AuxPatchers.PowerOnOff());
@@ -422,10 +418,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                     HideAllPages();
                     _terminalConfigurationPage.Show();
                     break;
-                case TerminalPages.Crafting:
-                    HideAllPages();
-                    _craftingController.Show();
-                    break;
             }
 
             //Always should hide these when not focused
@@ -441,7 +433,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             _homeObj.SetActive(false);
             _filterSettingList.Hide();
             _networkBTN.Hide();
-            _craftingController.Hide();
         }
 
         public void OpenTransceiverDialog(FcsDevice fcsDevice)

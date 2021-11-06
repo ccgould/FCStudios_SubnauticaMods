@@ -32,6 +32,7 @@ using FCS_HomeSolutions.Mods.Toilet.Buildable;
 using FCS_HomeSolutions.Mods.TrashReceptacle.Buildable;
 using FCS_HomeSolutions.Mods.TrashRecycler.Buildable;
 using FCS_HomeSolutions.Mods.TV.Buildable;
+using FCS_HomeSolutions.Mono.DataCollectors;
 using FCSCommon.Utilities;
 using HarmonyLib;
 using QModManager.API.ModLoading;
@@ -203,11 +204,35 @@ namespace FCS_HomeSolutions
 
             PatchMiscItems();
 
+            PatchWalls();
+
             var harmony = new Harmony("com.homesolutions.fstudios");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
             
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
+
+            PatreonCollector.GetData();
+        }
+
+        private void PatchWalls()
+        {
+            var partitionWall = new DecorationEntryPatch( "partitionWall", "Partition Wall", "N/A",
+                ModelPrefab.GetPrefab("FCS_PartitionWall01_Ext"),
+                new Settings
+                {
+                    KitClassID = "partitionWall_kit",
+                    AllowedInBase = true,
+                    AllowedOutside = false,
+                    AllowedOnGround = true,
+                    RotationEnabled = false,
+                    Cost = 3750,
+                    CategoryForPDA = TechCategory.InteriorModule,
+                    GroupForPDA = TechGroup.InteriorModules,
+                    Size = new Vector3(3.152112f, 2.799904f, 0.09183404f),
+                    Center = new Vector3(0.01306957f, 1.48099f, -0.004798554f)
+                });
+            partitionWall.Patch();
         }
 
         private void PatchMiscItems()

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -23,6 +24,10 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             HOVER_COLOR = new Color(0.181f, 0.652f, 0.708f, 1);
             _title = gameObject.GetComponentInChildren<Text>();
             _settingsBTN = gameObject.GetComponentInChildren<Button>();
+            var toolTip = _settingsBTN.gameObject.AddComponent<FCSToolTip>();
+            toolTip.Tooltip = "No transciever found in base.";
+            toolTip.RequestPermission += () => !_manager.HasTransceiverConnected();
+
             _settingsBTN.onClick.AddListener(() =>
             {
                 //Open the Transceiver Dialog

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mono;
+using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Mono;
 using FCSCommon.Utilities;
@@ -40,7 +41,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine
                 t._timeLeft = craftingData._timeLeft;
                 t._consumable = craftingData._consumable;
                 t._crafted = craftingData._crafted;
-                t._operation = craftingData._operation;
+                t._operation = Mod.FindCraftingOperation(craftingData._operation.ParentMachineUnitID);
                 CurrentState = t;
                 Crafter.CraftMachine.SetOperation(craftingData._operation);
             }

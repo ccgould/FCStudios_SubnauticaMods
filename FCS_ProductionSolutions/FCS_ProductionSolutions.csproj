@@ -24,6 +24,7 @@
     <Compile Include="Mods\AutoCrafter\Helpers\CompatiblityMethods.cs" />
     <Compile Include="Mods\AutoCrafter\Helpers\CrafterLogicHelper.cs" />
     <Compile Include="Mods\AutoCrafter\Models\CrafterHelpers.cs" />
+    <Compile Include="Mods\AutoCrafter\Models\CraftingOperation.cs" />
     <Compile Include="Mods\AutoCrafter\Models\PendingIngredient.cs" />
     <Compile Include="Mods\AutoCrafter\Models\StateMachine\CrafterBaseState.cs" />
     <Compile Include="Mods\AutoCrafter\Models\StateMachine\CrafterStateManager.cs" />

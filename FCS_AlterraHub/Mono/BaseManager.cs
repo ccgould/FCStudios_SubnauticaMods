@@ -51,7 +51,6 @@ namespace FCS_AlterraHub.Mono
         private BaseSaveData _savedData;
         private bool _hasBreakerTripped;
         private Dictionary<string, BaseOperationObject> _baseOperationObjects = new();
-        private HashSet<CraftingOperation> _craftingOperations = new();
         private List<BaseTransferOperation> _baseOperations  = new();
         
         public string BaseID { get; set; }
@@ -135,12 +134,14 @@ namespace FCS_AlterraHub.Mono
 
         private void PerformOperations()
         {
-            if (_registeredDevices == null || _baseOperationObjects == null)
+            if (_registeredDevices == null || _baseOperationObjects == null || !_baseOperationObjects.Any())
             {
                 if (_baseOperationObjects == null)
                 {
                     _baseOperationObjects = new Dictionary<string, BaseOperationObject>();
                 }
+
+
                 return;
             }
 
@@ -213,11 +214,6 @@ namespace FCS_AlterraHub.Mono
                     _savedData.Version == "1.0")
                 {
                     _baseOperations = _savedData.BaseOperations;
-                }
-
-                if (_savedData.CraftingOperations != null)
-                {
-                    _craftingOperations = _savedData.CraftingOperations;
                 }
             }
 
@@ -1319,14 +1315,8 @@ namespace FCS_AlterraHub.Mono
                     HasBreakerTripped = baseManager.HasBreakerTripped,
                     BlackList = baseManager.DockingBlackList,
                     BaseOperations = baseManager.GetBaseOperations(),
-                    CraftingOperations = baseManager.GetCraftingOperations()
                 };
             }
-        }
-
-        private HashSet<CraftingOperation> GetCraftingOperations()
-        {
-            return _craftingOperations;
         }
 
         public bool GetBreakerState()
@@ -1464,11 +1454,6 @@ namespace FCS_AlterraHub.Mono
             if (!_baseOperationObjects.ContainsKey(operationObject.GetPrefabId())) return;
             
             _baseOperationObjects.Remove(operationObject.GetPrefabId());
-
-            if (_baseOperations.Any())
-            {
-                _baseOperations.RemoveRange(Math.Max(0, _baseOperations.Count - 10), 10);
-            }
             
             GlobalNotifyByID("DTC", "RefreshTransceiverData");
             QuickLogger.Debug("Removed Transmitter to from base", true);
@@ -1504,55 +1489,6 @@ namespace FCS_AlterraHub.Mono
             return null;
         }
 
-        public HashSet<CraftingOperation> GetBaseCraftingOperations()
-        {
-            return _craftingOperations;
-        }
-
-        public void AddCraftingOperation(CraftingOperation operation)
-        {
-            //var isCreated = _craftingOperations.Any(x => x.IsSame(operation));
-            //if (!isCreated)
-            //{
-                _craftingOperations.Add(operation);
-            //}
-        }
-
-        public void RemoveCraftingOperation(CraftingOperation operation)
-        {
-            if (operation != null)
-            {
-                operation.OnOperationDeleted?.Invoke(operation);
-                _craftingOperations.Remove(operation);
-            }
-        }
-
-        //private void ProcessCraftingOperation()
-        //{
-        //    var devices = GetDevices("ACU");
-        //    foreach (var operation in _craftingOperations)
-        //    {
-        //        if (operation.IsRecursive && operation.Devices.Any() && !operation.IsMounted())
-        //        {
-        //            foreach (string device in operation.Devices)
-        //            {
-        //                var machine = devices.FirstOrDefault(x => x.UnitID.Equals(device));
-        //                if (machine != null)
-        //                {
-        //                    machine
-        //                }
-        //            }
-        //        }
-        //    }
-
-        //    foreach (var device in _registeredDevices)
-        //    {
-        //        if (device.Value.TabID == "ACU")
-        //        {
-                    
-        //        }
-        //    }
-        //}
         public FcsDevice FindDeviceById(string deviceID)
         {
             if (_registeredDevices.ContainsKey(deviceID))

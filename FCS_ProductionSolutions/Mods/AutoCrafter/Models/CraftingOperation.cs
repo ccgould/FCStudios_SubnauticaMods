@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Extensions;
-using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Mono;
+using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Handlers;
 #if SUBNAUTICA_STABLE
-using Oculus.Newtonsoft.Json;
+
 #else
 using Newtonsoft.Json;
 #endif
-namespace FCS_AlterraHub.Mono
+namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models
 {
     public class CraftingOperation
     {
@@ -24,6 +25,7 @@ namespace FCS_AlterraHub.Mono
         public bool IsComplete => GetIsComplete();
         public int ReturnAmount { get; set; }
         public Action<CraftingOperation> OnOperationDeleted { get; set; }
+        public string ParentMachineUnitID { get; set; }
 
         private bool GetIsComplete()
         {
@@ -36,8 +38,9 @@ namespace FCS_AlterraHub.Mono
             
         }
 
-        public CraftingOperation(TechType techType, int amount, bool isRecursive)
+        public CraftingOperation(string unitID, TechType techType, int amount, bool isRecursive)
         {
+            ParentMachineUnitID = unitID;
             TechType = techType;
             Amount = amount;
 #if SUBNAUTICA

@@ -10,6 +10,7 @@ using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Buildable;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Helpers;
+using FCS_ProductionSolutions.Mods.AutoCrafter.Models;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Mono;
 using FCSCommon.Utilities;
 using HarmonyLib;
@@ -161,12 +162,10 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Patches
             {
                 if (_sender != null)
                 {
-                    _sender.CraftMachine.StartCrafting(new CraftingOperation(_currentTechType,
-                        Int32.Parse(_amountInput.text), _isRecursive));
+                    _sender.CraftMachine.StartCrafting(new CraftingOperation(_sender.UnitID,_currentTechType, Int32.Parse(_amountInput.text), _isRecursive));
                     _craftBTN.interactable = !_sender.CraftMachine.IsCrafting();
                     _operation = _sender.CraftMachine.GetOperation();
                     GenerateNeededItemsList();
-                    //GeneratePendingItemsList();
                     UpdateAmountLabel();
                 }
             }));
@@ -258,6 +257,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Patches
             {
                 _cancelBtn.interactable = false;
                 _isRecursiveToggle.interactable = false;
+                _isRecursiveToggle.SetIsOnWithoutNotify(false);
             }
             else
             {

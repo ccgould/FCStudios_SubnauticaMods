@@ -10,6 +10,7 @@ using FCS_AlterraHub.Registration;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Buildable;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Helpers;
+using FCS_ProductionSolutions.Mods.AutoCrafter.Models;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Patches;

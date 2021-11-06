@@ -130,16 +130,16 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                     _display.Refresh();
                 }
 
-                if (s.Equals("DeviceBuiltUpdate"))
-                {
-                    _display.Refresh();
-                    _display.RefreshCraftingGrid();
-                }
+                //if (s.Equals("DeviceBuiltUpdate"))
+                //{
+                //    _display.Refresh();
+                //    _display.RefreshCraftingGrid();
+                //}
 
-                if (s.Equals("RefreshCraftingGrid"))
-                {
-                    _display.RefreshCraftingGrid();
-                }
+                //if (s.Equals("RefreshCraftingGrid"))
+                //{
+                //    _display.RefreshCraftingGrid();
+                //}
             };
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
 

@@ -10,6 +10,7 @@ using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Mods.PaintTool;
 using FCS_HomeSolutions.Mods.PaintTool.Mono;
+using FCS_HomeSolutions.Mono.DataCollectors;
 using FCS_HomeSolutions.Structs;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
@@ -308,6 +309,7 @@ namespace FCS_HomeSolutions.Configuration
         internal static void LoadData()
         {
             QuickLogger.Info("Loading Save Data...");
+            
             ModUtils.LoadSaveData<SaveData>(SaveDataFilename, GetSaveFileDirectory(), (data) =>
             {
                 _saveData = data;

@@ -2,12 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model.Utilities;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
+using FCS_ProductionSolutions.Mods.AutoCrafter.Models;
 using FCS_ProductionSolutions.Structs;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
@@ -112,6 +114,7 @@ namespace FCS_ProductionSolutions.Configuration
                     }
                 }
 
+                newSaveData.CraftingOperations = CraftingOperations;
                 newSaveData.HydroponicHarvesterKnownTech = _hydroponicKnownTech;
 
                 _saveData = newSaveData;
@@ -131,6 +134,7 @@ namespace FCS_ProductionSolutions.Configuration
             ModUtils.LoadSaveData<SaveData>(SaveDataFilename, GetSaveFileDirectory(), (data) =>
             {
                 _saveData = data;
+                CraftingOperations = _saveData.CraftingOperations;
                 _hydroponicKnownTech = _saveData.HydroponicHarvesterKnownTech;
                 QuickLogger.Info("Save Data Loaded");
                 OnDataLoaded?.Invoke(_saveData);
@@ -359,5 +363,24 @@ namespace FCS_ProductionSolutions.Configuration
             _hydroponicKnownTech = new List<DNASampleData>();
 
         }
+
+        public static void RemoveCraftingOperation(string unitID)
+        {
+            CraftingOperations.Remove(unitID);
+        }
+
+        public static bool AddCraftingOperation(CraftingOperation operation)
+        {
+            if(CraftingOperations.ContainsKey(operation.ParentMachineUnitID)) return false;
+            CraftingOperations.Add(operation.ParentMachineUnitID, operation);
+            return true;
+        }
+
+        public static CraftingOperation FindCraftingOperation(string unitID)
+        {
+            return !CraftingOperations.ContainsKey(unitID) ? null : CraftingOperations[unitID];
+        }
+
+        private static Dictionary<string, CraftingOperation> CraftingOperations = new();
     }
 }

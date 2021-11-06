@@ -5,6 +5,7 @@ using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_ProductionSolutions.Mods.AutoCrafter;
+using FCS_ProductionSolutions.Mods.AutoCrafter.Models;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States;
 using FCS_ProductionSolutions.Mods.DeepDriller.Configuration;
@@ -116,7 +117,7 @@ namespace FCS_ProductionSolutions.Configuration
         [JsonProperty] internal List<DeepDrillerSaveDataEntry> DeepDrillerMk2Entries = new();
         [JsonProperty] internal List<ReplicatorDataEntry> ReplicatorEntries = new();
         [JsonProperty] internal List<AutoCrafterDataEntry> AutoCrafterDataEntries = new();
-
         [JsonProperty] internal List<DNASampleData> HydroponicHarvesterKnownTech { get; set; } = new();
+        [JsonProperty] internal Dictionary<string, CraftingOperation> CraftingOperations { get; set; } = new();
     }
 }

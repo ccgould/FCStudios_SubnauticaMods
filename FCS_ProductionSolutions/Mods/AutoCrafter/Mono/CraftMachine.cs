@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using FCS_AlterraHub.Mono;
+using FCS_ProductionSolutions.Configuration;
+using FCS_ProductionSolutions.Mods.AutoCrafter.Models;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -32,11 +33,14 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
         public void StartCrafting(CraftingOperation craftingItem)
         {
             QuickLogger.Debug("Start Crafting");
+
             //Check if crafter and operation is null
             if (craftingItem == null || Crafter == null) return;
 
             //Set Operation
             _operation = craftingItem;
+
+            Mod.AddCraftingOperation(_operation);
             
             QuickLogger.Debug("Start Crafting changing state to: CrafterCheckForItemsState",true);
 
@@ -50,7 +54,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
 
         public CraftingOperation GetOperation()
         {
-            // this is not filled in on load from save resulkting in ui not updating 
+            // this is not filled in on load from save resulting in UI not updating 
             return _operation;
         }
         
@@ -74,16 +78,24 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
         {
             Crafter.StateMachine.NeededItems.Clear();
             Crafter.StateMachine.QueuedItems.Clear();
-            Crafter.Manager.RemoveCraftingOperation(_operation);
-            OnComplete?.Invoke(_operation);
-            OnItemCrafted?.Invoke();
-            _operation = null;
+            
+            if (_operation != null)
+            {
+                Mod.RemoveCraftingOperation(_operation.ParentMachineUnitID);
+            }
+            
             foreach (InventoryItem inventoryItem in Crafter.Storage.container)
             {
                 Crafter.AddItemToStorage(inventoryItem.item.GetTechType());
             }
+            
             Crafter.Storage.container.Clear();
-            Crafter.StateMachine.SwitchToNewState(typeof(CrafterIdleState)); 
+            Crafter.StateMachine.SwitchToNewState(typeof(CrafterIdleState));
+
+            OnComplete?.Invoke(_operation);
+            OnItemCrafted?.Invoke();
+
+            _operation = null;
         }
 
         public void SetOperation(CraftingOperation operation)

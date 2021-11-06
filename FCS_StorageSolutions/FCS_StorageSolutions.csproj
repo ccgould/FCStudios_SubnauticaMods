@@ -50,8 +50,6 @@
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\BaseListController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\BulkMultipliers.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\TerminalConfigurationPageController.cs" />
-    <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\CrafterSectionController.cs" />
-    <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\CraftingDialogController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\CraftingPageController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\DeviceItem.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\DeviceTransceiverDialog.cs" />
@@ -84,6 +82,10 @@
       <Project>{1a17b4ba-aae5-41c2-924a-ce05dc74efe8}</Project>
       <Name>FCS_AlterraHub</Name>
       <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\FCS_ProductionSolutions\FCS_ProductionSolutions.csproj">
+      <Project>{2B878BAA-1C0B-4623-A599-506A58C0DE32}</Project>
+      <Name>FCS_ProductionSolutions</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
