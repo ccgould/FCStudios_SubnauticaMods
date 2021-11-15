@@ -7,9 +7,9 @@ using FCS_HomeSolutions.Mods.Replicator.Buildables;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Buildable;
-using FCS_ProductionSolutions.Mods.DeepDriller.Buildable;
 using FCS_ProductionSolutions.Mods.DeepDriller.Craftable;
-using FCS_ProductionSolutions.Mods.DeepDriller.Ores;
+using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Buildable;
+using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Ores;
 using FCS_ProductionSolutions.Mods.HydroponicHarvester.Buildable;
 using FCS_ProductionSolutions.Mods.MatterAnalyzer.Buildable;
 using FCSCommon.Utilities;
@@ -18,6 +18,7 @@ using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
+using FCSDeepDrillerBuildable = FCS_ProductionSolutions.Mods.DeepDriller.LightDuty.Buildable.FCSDeepDrillerBuildable;
 
 namespace FCS_ProductionSolutions
 {

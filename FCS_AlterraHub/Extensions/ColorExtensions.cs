@@ -31,13 +31,23 @@ namespace FCS_AlterraHub.Extensions
         }
 
         /// <summary>
-        /// Converts a <see cref="Vec3"/> to a <see cref="Vector3"/>
+        /// Converts a <see cref="Vec3"/> to a <see cref="Color"/>
         /// </summary>
         /// <param name="vec3"></param>
         /// <returns></returns>
         public static Color Vec3ToColor(this Vec3 vec3)
         {
             return new Color(vec3.X, vec3.Y, vec3.Z);
+        }
+
+        /// <summary>
+        /// Converts a <see cref="Vec3"/> to a <see cref="Vector3"/>
+        /// </summary>
+        /// <param name="vec3"></param>
+        /// <returns></returns>
+        public static Vector3 Vec3ToVector3(this Vec3 vec3)
+        {
+            return new Vector3(vec3.X, vec3.Y, vec3.Z);
         }
 
         /// <summary>

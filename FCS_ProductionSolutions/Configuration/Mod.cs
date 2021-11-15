@@ -382,5 +382,24 @@ namespace FCS_ProductionSolutions.Configuration
         }
 
         private static Dictionary<string, CraftingOperation> CraftingOperations = new();
+
+        public static DeepDrillerLightDutySaveDataEntry GetDeepDrillerLightDutySaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.DeepDrillerLightDutyEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new DeepDrillerLightDutySaveDataEntry() { Id = id };
+        }
     }
 }

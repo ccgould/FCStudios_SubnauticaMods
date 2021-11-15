@@ -174,6 +174,8 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty] internal float Intensity { get; set; }
         [JsonProperty] internal bool NightSensor { get; set; }
         [JsonProperty] internal bool LightState { get; set; }
+        [JsonProperty] internal Vec3 RotorRot { get; set; }
+        [JsonProperty] internal Vec3 TilerRot { get; set; }
     }
 
     [Serializable]

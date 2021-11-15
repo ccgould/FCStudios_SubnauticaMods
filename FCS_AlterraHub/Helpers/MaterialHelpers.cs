@@ -937,5 +937,34 @@ namespace FCS_AlterraHub.Helpers
                 }
             }
         }
+
+        public static void CreateFloodLightCone(GameObject gameObject)
+        {
+            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
+            foreach (Renderer renderer in renderers)
+            {
+                foreach (Material material in renderer.materials)
+                {
+                    if (RemoveClone(material.name).Trim().Equals("x_TechLight_Cone", StringComparison.OrdinalIgnoreCase))
+                    {
+                        material.shader = Shader.Find("UWE/Particles/UBER");
+                        material.SetColor("_Color", new Color(0.37f, 0.4599999f, 0.5f, 1f));
+                        material.SetFloat("_Mode", 3f);
+                        material.SetFloat("_SrcBlend", 1f);
+                        material.SetFloat("_DstBlend", 1f);
+                        material.SetFloat("_SrcBlend2", 0f);
+                        material.SetFloat("_DstBlend2", 10f);
+                        material.SetFloat("_ZOffset", 0f);
+                        material.SetFloat("_Cutoff", 0f);
+                        material.SetVector("_ColorStrength", new Vector4(1f, 1f, 1f, 1f));
+                        material.SetVector("_Scale", new Vector4(0f, 1f, 0f, 0f));
+                        material.SetVector("_Frequency", new Vector4(0.5f, 0.5f, 0.5f, 0f));
+                        material.SetVector("_Speed", new Vector4(0f, 0f, 0f, 0f));
+                        material.SetFloat("_MyCullVariable", 0f);
+
+                    }
+                }
+            }
+        }
     }
 }

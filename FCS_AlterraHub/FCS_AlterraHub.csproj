@@ -23,6 +23,7 @@
     <Compile Include="API\FCSAssetBundlesService.cs" />
     <Compile Include="Buildables\AlterraHubAuxPatcher.cs" />
     <Compile Include="Buildables\AlterraHubModelPrefab.cs" />
+    <Compile Include="DataCollectors\PatreonCollector.cs" />
     <Compile Include="Enumerators\SpeedModes.cs" />
     <Compile Include="Helpers\FModHelpers.cs" />
     <Compile Include="Helpers\TechTypeHelpers.cs" />
@@ -149,6 +150,8 @@
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\PowercellSlot.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\SecurityScreenController.cs" />
     <Compile Include="Mods\OreConsumer\Mono\PistonController.cs" />
+    <Compile Include="Mods\PatreonStatue\Buildable\PatreonStatuePatcher.cs" />
+    <Compile Include="Mods\PatreonStatue\Mono\PatreonStatueController.cs" />
     <Compile Include="Mono\BaseManager.cs" />
     <Compile Include="Mono\BaseSaveData.cs" />
     <Compile Include="Mono\BaseTransferOperation.cs" />

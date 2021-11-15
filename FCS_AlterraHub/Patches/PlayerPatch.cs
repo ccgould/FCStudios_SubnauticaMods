@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
+using FCS_AlterraHub.DataCollectors;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono;
 using FCS_AlterraHub.Mods.FCSPDA.Mono;
@@ -56,9 +57,10 @@ namespace FCS_AlterraHub.Patches
 
 
             CoroutineHost.StartCoroutine(CreateFcsPda(__instance));
+            PatreonCollector.GetData();
             //var shouldPlay = (bool)_shouldPlayIntro.GetValue(__instance.GetPDA());
 
-            
+
 
             //Mod.OnGamePlaySettingsLoaded += settings =>
             //{

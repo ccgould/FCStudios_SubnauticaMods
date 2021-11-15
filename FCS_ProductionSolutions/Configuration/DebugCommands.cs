@@ -7,7 +7,7 @@ using FCS_AlterraHub.Helpers;
 using FCS_ProductionSolutions.HydroponicHarvester.Mono;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Buildable;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Mono;
-using FCS_ProductionSolutions.Mods.DeepDriller.Mono;
+using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono;
 using FCS_ProductionSolutions.Mods.HydroponicHarvester.Enumerators;
 using FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono;
 using FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono;

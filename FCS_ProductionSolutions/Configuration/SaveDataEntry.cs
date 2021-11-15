@@ -3,13 +3,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Model;
-using FCS_AlterraHub.Mono;
-using FCS_ProductionSolutions.Mods.AutoCrafter;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Models;
-using FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States;
 using FCS_ProductionSolutions.Mods.DeepDriller.Configuration;
-using FCS_ProductionSolutions.Mods.DeepDriller.Structs;
+using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Structs;
 using FCS_ProductionSolutions.Mods.HydroponicHarvester.Enumerators;
 using FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono;
 using FCS_ProductionSolutions.Structs;
@@ -92,6 +89,30 @@ namespace FCS_ProductionSolutions.Configuration
         [JsonProperty] internal bool IsBrakeSet { get; set; }
         [JsonProperty] internal string BeaconName { get; set; }
         [JsonProperty] internal bool IsPingVisible { get; set; }
+    }    
+    
+    
+    [Serializable]
+    internal class DeepDrillerLightDutySaveDataEntry
+    {
+        [JsonProperty] internal float Health { get; set; }
+
+        [JsonProperty] internal string Id { get; set; }
+
+        [JsonProperty] internal FCSPowerStates PowerState { get; set; }
+
+        [JsonProperty] internal Dictionary<TechType, int> Items { get; set; }
+
+        [JsonProperty] internal DeepDrillerPowerData PowerData { get; set; }
+
+        [JsonProperty] internal string Biome { get; set; }
+
+        [JsonProperty] internal float OilTimeLeft { get; set; }
+
+        [JsonProperty] internal ColorTemplateSave ColorTemplate { get; set; }
+        [JsonProperty] internal string BeaconName { get; set; }
+        [JsonProperty] internal bool IsPingVisible { get; set; }
+        public bool IsBrakeSet { get; set; }
     }
 
     [Serializable]
@@ -115,6 +136,7 @@ namespace FCS_ProductionSolutions.Configuration
         [JsonProperty] internal List<HydroponicHarvesterDataEntry> HydroponicHarvesterEntries = new();
         [JsonProperty] internal List<MatterAnalyzerDataEntry> MatterAnalyzerEntries = new();
         [JsonProperty] internal List<DeepDrillerSaveDataEntry> DeepDrillerMk2Entries = new();
+        [JsonProperty] internal List<DeepDrillerLightDutySaveDataEntry> DeepDrillerLightDutyEntries = new();
         [JsonProperty] internal List<ReplicatorDataEntry> ReplicatorEntries = new();
         [JsonProperty] internal List<AutoCrafterDataEntry> AutoCrafterDataEntries = new();
         [JsonProperty] internal List<DNASampleData> HydroponicHarvesterKnownTech { get; set; } = new();

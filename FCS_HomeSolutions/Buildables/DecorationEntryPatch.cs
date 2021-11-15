@@ -60,7 +60,7 @@ namespace FCS_HomeSolutions.Buildables
 
                 GameObjectHelpers.AddConstructableBounds(prefab, _settings.Size, _settings.Center);
 
-                var model = prefab.FindChild("model");
+                var model = prefab.FindChild(_settings.ModelName);
 
                 //========== Allows the building animation and material colors ==========// 
                 Shader shader = Shader.Find("MarmosetUBER");

@@ -74,7 +74,7 @@ namespace FCS_HomeSolutions.Mods.LedLights.Buildable
                 constructable.allowedInBase = _data.allowedInBase;
                 constructable.allowedOnGround = _data.allowedOnGround;
                 constructable.allowedOnWall = _data.allowedOnWall;
-                constructable.rotationEnabled = false;
+                constructable.rotationEnabled = true;
                 constructable.allowedOnCeiling = false;
                 constructable.allowedInSub = _data.allowedInSub;
                 constructable.allowedOnConstructables = true;

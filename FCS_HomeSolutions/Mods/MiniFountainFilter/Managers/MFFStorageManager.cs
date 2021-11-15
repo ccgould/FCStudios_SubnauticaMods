@@ -152,8 +152,9 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Managers
                 var result = PlayerInteractionHelper.GivePlayerItem(techType);
                 if (result)
                 {
-                    uGUI_IconNotifier.main.Play(techType, uGUI_IconNotifier.AnimationType.From, null);
+                    //uGUI_IconNotifier.main.Play(techType, uGUI_IconNotifier.AnimationType.From, null);
                     FMODUWE.PlayOneShot(CraftData.GetPickupSound(techType), Player.main.transform.position, 1f);
+                    _mono.TankManager.RemoveWater(50);
                 }
 
                 //var pickup = TechType.BigFilteredWater.ToPickupable();

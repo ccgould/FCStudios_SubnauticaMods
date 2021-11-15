@@ -59,6 +59,14 @@ namespace FCS_AlterraHub.Configuration
         public string State { get; set; }
     }
 
+    internal class PatreonStatueDataEntry : ISaveDataEntry
+    {
+        public string Id { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
+        public string BaseId { get; set; }
+
+    }
+
     [Serializable]
     internal class FCSPDAEntry
     {
@@ -70,6 +78,7 @@ namespace FCS_AlterraHub.Configuration
     {
         [JsonProperty] internal float SaveVersion { get; set; } = 1.0f;
         [JsonProperty] internal List<OreConsumerDataEntry> OreConsumerEntries = new();
+        [JsonProperty] internal List<PatreonStatueDataEntry> PatreonStatueEntries = new();
         [JsonProperty] internal FCSPDAEntry FCSPDAEntry = new();
         [JsonProperty(PropertyName = "Acc")] internal AccountDetails AccountDetails { get; set; }
         [JsonProperty] internal List<AlterraHubDepotEntry> AlterraHubDepotEntries { get; set; } = new();

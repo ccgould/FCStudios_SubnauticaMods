@@ -2,7 +2,7 @@
 
 namespace FCS_HomeSolutions.Buildables
 {
-    internal struct Settings
+    internal class Settings
     {
         internal bool AllowedOutside;
         internal bool AllowedInBase;
@@ -19,5 +19,6 @@ namespace FCS_HomeSolutions.Buildables
         internal TechCategory CategoryForPDA;
         internal decimal Cost;
         internal string IconName;
+        public string ModelName = "model";
     }
 }

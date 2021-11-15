@@ -79,6 +79,12 @@ namespace FCS_AlterraHub.Buildables
 
         public const string TBaseDetail = "fcs01_D";
         public const string TBaseNormal = "fcs01_N";
+        public const string TBaseSpec = "fcs01_s";        
+        
+        public const string TBaseColorDetail = "fcs01_BaseColor_D";
+        public const string TBaseColorNormal = "fcs01_BaseColor_N";
+        public const string TBaseColorSpec = "fcs01_BaseColor_S";
+
         public const string TBaseEmission = "fcs01_E";
         public const string TFloorDetail = "fcs01_Floor01_D";
         public const string TFloorNormal = "fcs01_Floor01_N";
@@ -86,9 +92,8 @@ namespace FCS_AlterraHub.Buildables
         public const string TFloor2Spec = "fcs01_Floor02_S";
         public const string TFloorEmission = "fcs01_Floor01_E";
         public const string TEmissionInterior = "fcs01_E_Interior";
-        public const string TBaseSpec = "fcs01_s";
 
-        
+
         internal static string BodyMaterial => $"fcs{Mod.ModPackID}_COL";
         internal static string DecalMaterial => $"fcs{Mod.ModPackID}_DECALS";
         internal static string DetailsMaterial => $"fcs{Mod.ModPackID}_DETAILS";
@@ -321,13 +326,17 @@ namespace FCS_AlterraHub.Buildables
         public static void ApplyShadersV2(GameObject prefab, AssetBundle bundle)
         {
             #region BasePrimaryCol
-            MaterialHelpers.ApplyNormalShader(BasePrimaryCol, TBaseNormal, prefab, bundle);
+            MaterialHelpers.ApplyNormalShader(BasePrimaryCol, TBaseColorNormal, prefab, bundle);
+            MaterialHelpers.ApplySpecShader(BasePrimaryCol, TBaseColorSpec, prefab, 1, 3, bundle);
+
             #endregion
 
             #region BaseSecondaryCol
-            MaterialHelpers.ApplyNormalShader(BaseSecondaryCol, TBaseNormal, prefab, bundle);
+            MaterialHelpers.ApplyNormalShader(BaseSecondaryCol, TBaseColorNormal, prefab, bundle);
+            MaterialHelpers.ApplySpecShader(BaseSecondaryCol, TBaseColorSpec, prefab, 1, 3, bundle);
+
             #endregion
-            
+
             #region BaseTexDecals
             MaterialHelpers.ApplyNormalShader(BaseTexDecals, TBaseNormal, prefab, bundle);
             MaterialHelpers.ApplyAlphaShader(BaseTexDecals, prefab);
@@ -417,13 +426,16 @@ namespace FCS_AlterraHub.Buildables
 
             #region BasePrimaryCol
             Material basePrimaryCol = QPatch.GlobalBundle.LoadAsset<Material>(BasePrimaryCol);
-            MaterialHelpers.CreateV2NormalMaterial(basePrimaryCol, TBaseNormal, QPatch.GlobalBundle);
+            MaterialHelpers.CreateV2NormalMaterial(basePrimaryCol, TBaseColorNormal, QPatch.GlobalBundle);
+            MaterialHelpers.CreateV2Specular(basePrimaryCol, TBaseColorSpec, 1, 3, QPatch.GlobalBundle);
             _v2Materials.Add(BasePrimaryCol, basePrimaryCol);
             #endregion
 
             #region BaseSecondaryCol
             Material baseSecondaryCol = QPatch.GlobalBundle.LoadAsset<Material>(BaseSecondaryCol);
-            MaterialHelpers.CreateV2NormalMaterial(baseSecondaryCol, TBaseNormal, QPatch.GlobalBundle);
+            MaterialHelpers.CreateV2NormalMaterial(baseSecondaryCol, TBaseColorNormal, QPatch.GlobalBundle);
+            MaterialHelpers.CreateV2Specular(baseSecondaryCol, TBaseColorSpec, 1, 3, QPatch.GlobalBundle);
+
             _v2Materials.Add(BaseSecondaryCol, baseSecondaryCol);
             #endregion
             

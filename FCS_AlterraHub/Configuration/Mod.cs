@@ -584,6 +584,25 @@ namespace FCS_AlterraHub.Configuration
             VoiceNotificationSystem.RegisterVoice(Path.Combine(Mod.GetAssetPath(), "Audio", "PDA_Account_Created.mp3"), @"Thank you for creating a temporary Alterra Account. You can now order goods and services from enabled AlterraHub Catalogs. Ores deposited in an Alterra Ore Consumer will add credits to your account. The Alterra Depot holds your deliveries for pickup so a convenient location is preferable. The Alterra Transport Drone Terminal recharges the Transport Drone while it delivers your order. Please route base traffic accordingly. Please contact your Project Supervisor if any of these items are not available. For more information on these devices, please see the AlterraHub Encyclopedia on the FCStudios PDA.");
             VoiceNotificationSystem.RegisterVoice(Path.Combine(Mod.GetAssetPath(), "Audio", "PDA_Drone_Instructions.mp3"), "An Alterra Transport Drone Terminal and Alterra Depot are necessary for orders to be delivered. Please notify your Project Supervisor.");
         }
+
+        public static PatreonStatueDataEntry GetPatreonStatueEntrySaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.PatreonStatueEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new PatreonStatueDataEntry() { Id = id };
+        }
     }
 
 

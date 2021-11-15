@@ -10,7 +10,6 @@ using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Mods.PaintTool;
 using FCS_HomeSolutions.Mods.PaintTool.Mono;
-using FCS_HomeSolutions.Mono.DataCollectors;
 using FCS_HomeSolutions.Structs;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
@@ -156,6 +155,7 @@ namespace FCS_HomeSolutions.Configuration
                 new Ingredient("LedLightStickWall_Kit".ToTechType(), 1)
             }
         };
+
 
 #if SUBNAUTICA
         internal static TechData MiniFountainFilterKitIngredients => new TechData

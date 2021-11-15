@@ -24,6 +24,7 @@
     <Compile Include="Buildables\ModelPrefab.cs" />
     <Compile Include="Enums\CookingMode.cs" />
     <Compile Include="Mods\CrewLocker\Buildable\CrewLockerPatch.cs" />
+    <Compile Include="Mods\LedLights\Buildable\FloodLEDLight.cs" />
     <Compile Include="Mods\Microwave\Buildable\CookerPatch.cs" />
     <Compile Include="Mods\Microwave\Mono\CookerController.cs" />
     <Compile Include="Mods\NeonPlanter\Buildable\NeonPlanterPatch.cs" />
@@ -106,7 +107,7 @@
     <Compile Include="Mods\TV\Mono\VideoSectionController.cs" />
     <Compile Include="Mods\NeonPlanter\Mono\NeonPlanterController.cs" />
     <Compile Include="Mods\PaintTool\Mono\PaintToolController.cs" />
-    <Compile Include="Mono\DataCollectors\PatreonCollector.cs" />
+    <Compile Include="Patches\BaseDecontructable_Patches.cs" />
     <Compile Include="Patches\Builder_Patches.cs" />
     <Compile Include="Patches\OSubmarinHelper.cs" />
     <Compile Include="Patches\Player_Patches.cs" />

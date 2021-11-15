@@ -4,6 +4,7 @@ using System.Reflection;
 using FCS_AlterraHub.API;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
+using FCS_AlterraHub.DataCollectors;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mods.AlterraHubDepot.Buildable;
@@ -12,6 +13,7 @@ using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Buildables;
 using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Spawnables;
 using FCS_AlterraHub.Mods.Global.Spawnables;
 using FCS_AlterraHub.Mods.OreConsumer.Buildable;
+using FCS_AlterraHub.Mods.PatreonStatue.Buildable;
 using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Systems;
@@ -174,6 +176,9 @@ namespace FCS_AlterraHub
 
             var dronePortBuilable = new DronePortPadHubNewPatcher();
             dronePortBuilable.Patch();
+
+            var patreonStatueBuilable = new PatreonStatuePatcher();
+            patreonStatueBuilable.Patch();
         }
     }
 }
