@@ -1,4 +1,8 @@
-﻿using FCS_AlterraHub.Enumerators;
+﻿using FCS_AlterraHub.Configuration;
+using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Interfaces;
+using FCS_AlterraHub.Model;
+using FCSCommon.Interfaces;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Managers
@@ -44,6 +48,31 @@ namespace FCS_AlterraHub.Managers
         {
             consumed = 0f;
             return false;
+        }
+
+        public virtual bool HasEnoughPowerToOperate()
+        {
+            return false;   
+        }
+
+        public virtual void SetPowerRelay(PowerRelay powerRelay)
+        {
+            
+        }
+
+        public virtual bool IsPowerAvailable()
+        {
+            return false;
+        }
+
+        public virtual PowercellData GetBatteryPowerData()
+        {
+            return null;
+        }
+
+        public virtual float GetPowerUsage()
+        {
+            return 0f;
         }
     }
 }

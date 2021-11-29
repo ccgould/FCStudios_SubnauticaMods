@@ -156,6 +156,7 @@
     <Compile Include="Mono\BaseSaveData.cs" />
     <Compile Include="Mono\BaseTransferOperation.cs" />
     <Compile Include="Mono\ColorItemButton.cs" />
+    <Compile Include="Mono\Controllers\BatteryMeterController.cs" />
     <Compile Include="Mono\Controllers\NameController.cs" />
     <Compile Include="Mono\Controllers\PaginatorController.cs" />
     <Compile Include="Mono\CustomToggle.cs" />

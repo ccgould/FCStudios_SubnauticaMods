@@ -108,6 +108,7 @@ namespace FCS_AlterraHub.Buildables
         internal static GameObject PDARadialMenuEntryPrefab { get; set; }
         internal static GameObject PDAShipmentItemPrefab { get; set; }
         internal static GameObject PDAShipmentItemNodePrefab { get; set; }
+        internal static GameObject PDATeleportItemPrefab { get; set; }
         public static GameObject MissionMessageBoxPrefab { get; set; }
         public static GameObject AlterraHubDepotPrefab { get; set; }
         public static GameObject AlterraHubDepotItemPrefab { get; set; }
@@ -179,10 +180,15 @@ namespace FCS_AlterraHub.Buildables
                     if (!LoadAsset("PDAShipmentItem", QPatch.GlobalBundle, out var pdaShipmentItemPrefab,false)) return false;
                      PDAShipmentItemPrefab = pdaShipmentItemPrefab;
 
+
                      if (!LoadAsset("PDAShipmentItemNode", QPatch.GlobalBundle, out var pdaShipmentItemNodePrefab, false)) return false;
                      PDAShipmentItemNodePrefab = pdaShipmentItemNodePrefab;
 
-                     if (!LoadAsset("AlterraHubDepotItem", QPatch.GlobalBundle, out var alterraHubDepotItemPrefab)) return false;
+                    if (!LoadAsset("PDATeleportItem", QPatch.GlobalBundle, out var pdaTeleportItemPrefab, false)) return false;
+                     PDATeleportItemPrefab = pdaTeleportItemPrefab;
+
+
+                    if (!LoadAsset("AlterraHubDepotItem", QPatch.GlobalBundle, out var alterraHubDepotItemPrefab)) return false;
                     AlterraHubDepotItemPrefab = alterraHubDepotItemPrefab;                    
                     
                     if (!LoadAsset("uGUI_PDAScreen", QPatch.GlobalBundle, out var pdaCanvas)) return false;

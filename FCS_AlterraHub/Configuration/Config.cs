@@ -61,7 +61,7 @@ namespace FCS_AlterraHub.Configuration
 
         private void PDAKeyCodeChangedEvent(KeybindChangedEventArgs e)
         {
-            uGUI_PowerIndicator_Initialize_Patch.MissionHUD?.UpdateButtonPressLabel();
+            //uGUI_PowerIndicator_Initialize_Patch.MissionHUD?.UpdateButtonPressLabel();
         }
 
         private void ChangeGameModeEvent(ChoiceChangedEventArgs e)

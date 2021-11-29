@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Objects;
+using FCS_HomeSolutions.Mods.DisplayBoard.Mono;
 using FCS_HomeSolutions.Mods.Elevator.Mono;
 using FCS_HomeSolutions.Mods.NeonPlanter.Mono;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Enumerators;
@@ -106,10 +108,28 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty] internal bool IsLinked { get; set; }
     }
 
+    internal class QuantumTeleporterVehiclePadDataEntry
+    {
+        [JsonProperty] internal string Id { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
+        [JsonProperty] internal string OccupiedVehicleID  { get; set; }
+    }
+
     internal class BaseOperatorDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
         public ColorTemplateSave ColorTemplate { get; set; }
+    }      
+    
+    internal class DisplayBoardDataEntry :ISaveDataEntry
+    {
+        public string Id { get; set; }
+        public string BaseId { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
+        public Tuple<string, DisplayMode> Display1 { get; set; }
+        public Tuple<string, DisplayMode> Display2 { get; set; }
+        public Tuple<string, DisplayMode> Display3 { get; set; }
+        public Tuple<string, DisplayMode> Display4 { get; set; }
     }       
     
     internal class ShowerDataEntry
@@ -212,20 +232,40 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty] internal string Id { get; set; }
         public ColorTemplateSave ColorTemplate { get; set; }
         [JsonProperty] internal Tuple<Queue<Cooker.CookingQueue>, float> QueuedItems { get; set; }
+    }    
+    
+    [Serializable]
+    internal class QuantumPowerBankDataEntry
+    {
+        [JsonProperty] internal string Id { get; set; }
+        [JsonProperty] internal float Charge { get; set; }
+    }    
+    
+    [Serializable]
+    internal class QuantumPowerBankChargerDataEntry
+    {
+        [JsonProperty] internal string Id { get; set; }
+        [JsonProperty] internal float Charge { get; set; }
+        [JsonProperty] internal ColorTemplateSave ColorTemplate { get; set; }
+        [JsonProperty] internal bool IsLocked { get; set; }
+        [JsonProperty] internal float PartialPower { get; set; }
     }
 
     [Serializable]
     internal class SaveData
     {
         [JsonProperty] internal float SaveVersion { get; set; } = 1.1f;
+        [JsonProperty] internal List<QuantumTeleporterVehiclePadDataEntry> QuantumTeleporterVehiclePadDataEntries = new();
+        [JsonProperty] internal List<QuantumPowerBankChargerDataEntry> QuantumPowerBankChargerDataEntries = new();
+        [JsonProperty] internal List<QuantumPowerBankDataEntry> QuantumPowerBankEntries = new();
         [JsonProperty] internal List<StoveDataEntry> StoveDataEntries = new();
-
         [JsonProperty] internal List<JukeBoxDataEntry> JukeBoxDataEntries = new();
         [JsonProperty] internal List<ElevatorDataEntry> ElevatorDataEntries = new();
         [JsonProperty] internal List<HologramDataEntry> HologramDataEntries = new();
         [JsonProperty] internal List<TrashReceptacleDataEntry> TrashReceptacleEntries = new();
         [JsonProperty] internal List<PeeperLoungeBarEntry> PeeperLoungeBarEntries = new();
         [JsonProperty] internal List<SeaBreezeDataEntry> SeaBreezeDataEntries = new();
+        [JsonProperty] internal List<DisplayBoardDataEntry> DisplayBoardDataEntries = new();
         [JsonProperty] internal List<SignDataEntry> SignDataEntries = new();
         [JsonProperty] internal List<DecorationDataEntry> DecorationEntries = new();
         [JsonProperty] internal List<PaintToolDataEntry> PaintToolEntries = new();

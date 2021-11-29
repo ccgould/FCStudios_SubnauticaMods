@@ -71,6 +71,7 @@ namespace FCS_HomeSolutions.Configuration
             { $"{ModKey}_DeleteLevelConfirmation","Are you sure you would like to delete level ({0})"},
             { $"{ModKey}_MovingTo","MOVING TO"},
             { $"{ModKey}_CurrentlyAt","CURRENTLY AT"},
+            { $"{ModKey}_QuantumPowerBankFull","Quantum Power Bank is already full"},
         };
 
         internal static void AdditionalPatching()
@@ -380,6 +381,11 @@ namespace FCS_HomeSolutions.Configuration
         public static string CurrentlyAt()
         {
             return GetLanguage($"{ModKey}_CurrentlyAt");
+        }
+
+        public static string QuantumPowerBankFull()
+        {
+            return GetLanguage($"{ModKey}_QuantumPowerBankFull");
         }
     }
 }

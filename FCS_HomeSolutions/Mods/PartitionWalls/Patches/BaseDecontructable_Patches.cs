@@ -11,6 +11,7 @@ namespace FCS_HomeSolutions.Patches
         [HarmonyPostfix]
         public static void Postfix(ref BaseDeconstructable __instance)
         {
+            if(!QPatch.Configuration.IsWallPartitionsEnabled) return;
             if (__instance.gameObject.activeSelf && __instance.gameObject.transform.position != Vector3.zero)
             {
                 if (__instance.gameObject.name.Equals("BaseRoom(Clone)"))

@@ -5,7 +5,6 @@ using FCS_AlterraHub.Mono;
 using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Buildable;
 using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono;
 using FCSCommon.Utilities;
-using FCSDeepDrillerBuildable = FCS_ProductionSolutions.Mods.DeepDriller.LightDuty.Buildable.FCSDeepDrillerBuildable;
 
 namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Models.Upgrades
 {

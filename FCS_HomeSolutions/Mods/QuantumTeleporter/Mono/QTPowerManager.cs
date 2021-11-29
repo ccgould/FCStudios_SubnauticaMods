@@ -1,11 +1,11 @@
-﻿using System;
-using FCS_HomeSolutions.Mods.QuantumTeleporter.Enumerators;
+﻿using FCS_HomeSolutions.Mods.QuantumTeleporter.Enumerators;
+using FCS_HomeSolutions.Mods.QuantumTeleporter.Interface;
 using FCSCommon.Utilities;
 using UnityEngine;
 
 namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
 {
-    internal class QTPowerManager
+    internal class QTPowerManager : IQTPower
     {
         private readonly float _interPowerUsage = QPatch.Configuration.QuantumTeleporterGlobalTeleportPowerUsage;
         private readonly float _intraPowerUsage = QPatch.Configuration.QuantumTeleporterInternalTeleportPowerUsage;
@@ -43,33 +43,31 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
             }
         }
         
-        internal bool TakePower(QTTeleportTypes type)
+        public bool TakePower(QTTeleportTypes type)
         {
             QuickLogger.Debug($"Available power {ConnectedRelay?.GetPower()}",true);
 
             if (HasEnoughPower(type))
             {
-                float amountConsumed;
+                float amountConsumed = 0;
                 switch (type)
                 {
                     case QTTeleportTypes.Global:
                         ConnectedRelay.ConsumeEnergy(_interPowerUsage, out amountConsumed);
-                        break;
+                        QuickLogger.Debug($"Consumed {amountConsumed} amount of power for this operation", true);
+
+                        return true;
                     case QTTeleportTypes.Intra:
                         ConnectedRelay.ConsumeEnergy(_intraPowerUsage, out amountConsumed);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(type), type, null);
+                        QuickLogger.Debug($"Consumed {amountConsumed} amount of power for this operation", true);
+                        return true;
                 }
-
-                QuickLogger.Debug($"Consumed {amountConsumed} amount of power for this operation",true);
-                return true;
             }
 
             return false;
         }
 
-        internal bool HasEnoughPower(QTTeleportTypes type)
+        public bool HasEnoughPower(QTTeleportTypes type)
         {
             bool requiresEnergy = GameModeUtils.RequiresPower();
 
@@ -90,6 +88,26 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
         public float PowerAvailable()
         {
             return Mathf.RoundToInt(_connectedRelay.GetPower());
+        }
+
+        public void FullReCharge()
+        {
+            
+        }
+
+        public void SetCharge(float charge)
+        {
+            
+        }
+
+        public void ModifyCharge(float amount)
+        {
+            
+        }
+
+        public bool IsFull()
+        {
+            return false;
         }
     }
 }

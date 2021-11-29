@@ -74,7 +74,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Buildables
                 GameObject rocketPlatformReference = CraftData.GetPrefabForTechType(TechType.RocketBase);
 
                 //Get the Transform of the models
-                Transform interiorModels = GameObjectHelpers.FindGameObject(prefab, "BuildingInsideMesh").transform;
+                //Transform interiorModels = GameObjectHelpers.FindGameObject(prefab, "BuildingInsideMesh").transform;
 
                 var lwe = prefab.AddComponent<LargeWorldEntity>();
                 lwe.cellLevel = LargeWorldEntity.CellLevel.Global; //You don't want your vehicles to disappear when out of range
@@ -131,11 +131,11 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Buildables
                     vfxSurface.surfaceType = VFXSurfaceTypes.metal;
                 }
 
-                //Sky appliers to make it look nicer. Not sure if it even makes a difference, but I'm sticking with it.
-                var skyApplierInterior = interiorModels.gameObject.AddComponent<SkyApplier>();
-                skyApplierInterior.renderers = interiorModels.GetComponentsInChildren<Renderer>();
-                skyApplierInterior.anchorSky = Skies.BaseInterior;
-                skyApplierInterior.SetSky(Skies.BaseInterior);
+                ////Sky appliers to make it look nicer. Not sure if it even makes a difference, but I'm sticking with it.
+                //var skyApplierInterior = interiorModels.gameObject.AddComponent<SkyApplier>();
+                //skyApplierInterior.renderers = interiorModels.GetComponentsInChildren<Renderer>();
+                //skyApplierInterior.anchorSky = Skies.BaseInterior;
+                //skyApplierInterior.SetSky(Skies.BaseInterior);
 
                 MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, prefab, Color.cyan);
                 MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseSecondaryCol, prefab, Color.black);

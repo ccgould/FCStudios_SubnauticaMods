@@ -58,15 +58,8 @@ namespace FCS_ProductionSolutions.Configuration
         internal static string ReplicatorClassName => ReplicatorModName;
         internal static string ReplicatorPrefabName => "Replica-Fabricator";
         
-        internal const string DeepDrillerMk3TabID = "DD";
-        internal const string DeepDrillerMk3FriendlyName = "Deep Driller MK3";
-        internal const string DeepDrillerMk3ModName = "DeepDrillerMK3";
-        internal static string DeepDrillerMk3KitClassID => $"{DeepDrillerMk3ClassName}_Kit";
-        internal const string DeepDrillerMk3ClassName = "DeepDrillerMk3";
-        internal const string DeepDrillerMk3PrefabName = "DeepDrillerMK3";
-        internal const string DeepDrillerMk3Description = "Automated drill platform suitable for all biomes with integrated solar and thermal generators. Requires lubricant.";
         internal const string SandSpawnableClassID = "Sand_DD";
-        
+
         internal static TechType GetSandBagTechType()
         {
             if (_sandBagTechType == TechType.None)

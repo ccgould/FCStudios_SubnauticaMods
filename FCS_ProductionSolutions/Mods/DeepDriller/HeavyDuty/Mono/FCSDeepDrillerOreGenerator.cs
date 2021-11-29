@@ -6,6 +6,7 @@ using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Models.Upgrades;
 using FCS_ProductionSolutions.Mods.DeepDriller.Interfaces;
+using FCS_ProductionSolutions.Mods.DeepDriller.Managers;
 using FCSCommon.Utilities;
 using UnityEngine;
 using Random = System.Random;
@@ -57,7 +58,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         private float _secondPerItem;
         private const float DayNight = 1200f;
         private int _oresPerDay = 12;
-        private IDeepDrillerController _mono;
+        private DrillSystem _mono;
         private bool _isFocused;
         private bool _blacklistMode;
 
@@ -74,7 +75,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         /// <summary>
         /// Sets up the ore generator
         /// </summary>
-        internal void Initialize(IDeepDrillerController mono)
+        internal void Initialize(DrillSystem mono)
         {
             _mono = mono;
             _random2 = new Random();
@@ -141,7 +142,11 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 
         private bool CheckUpgrades(TechType techType)
         {
-            foreach (var function in _mono.UpgradeManager.Upgrades)
+            var upgrades = _mono.GetUpgrades();
+            
+            if (upgrades == null) return false;
+
+            foreach (var function in upgrades)
             {
                 if (!function.IsEnabled) continue;
                 
@@ -163,8 +168,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 
         internal void SetAllowTick()
         {
-            if (_mono?.DeepDrillerPowerManager == null || _mono?.DeepDrillerContainer == null) return;
-
+            if (_mono == null) return;
             _allowTick = _mono.IsOperational;
         }
 
@@ -210,12 +214,6 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
             OnItemsPerDayChanged?.Invoke();
             QuickLogger.Info($"Deep Driller is now configured to drill {_oresPerDay} ores per day.", true);
         }
-
-        internal HashSet<TechType> GetFocuses()
-        {
-            return _focusOres;
-        }
-
         public void Load(HashSet<TechType> dataFocusOres)
         {
             if (dataFocusOres == null) return;

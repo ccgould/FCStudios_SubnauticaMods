@@ -23,7 +23,12 @@
     <Compile Include="Buildables\DecorationEntryPatch.cs" />
     <Compile Include="Buildables\ModelPrefab.cs" />
     <Compile Include="Enums\CookingMode.cs" />
+    <Compile Include="Mods\BunkBed\Buildable\CrewBunkBedPatcher.cs" />
     <Compile Include="Mods\CrewLocker\Buildable\CrewLockerPatch.cs" />
+    <Compile Include="Mods\DisplayBoard\Buildable\DisplayBoardPatcher.cs" />
+    <Compile Include="Mods\DisplayBoard\Mono\DisplayBoardController.cs" />
+    <Compile Include="Mods\DisplayBoard\Mono\DisplayScreenController.cs" />
+    <Compile Include="Mods\LedLights\Buildable\RingLEDLight.cs" />
     <Compile Include="Mods\LedLights\Buildable\FloodLEDLight.cs" />
     <Compile Include="Mods\Microwave\Buildable\CookerPatch.cs" />
     <Compile Include="Mods\Microwave\Mono\CookerController.cs" />
@@ -33,6 +38,15 @@
     <Compile Include="Mods\PaintTool\Mono\uGUI_PaintToolColorPicker.cs" />
     <Compile Include="Mods\PaintTool\Mono\uGUI_PaintToolColorPickerEditor.cs" />
     <Compile Include="Mods\PartitionWalls\Patches\OSubmarinHelper.cs" />
+    <Compile Include="Mods\QuantumTeleporter\Mono\QuantumTeleporterVehiclePadController.cs" />
+    <Compile Include="Mods\QuantumTeleporter\Interface\IQuantumTeleporter.cs" />
+    <Compile Include="Mods\QuantumTeleporter\Interface\IQTPower.cs" />
+    <Compile Include="Mods\QuantumTeleporter\Mono\QTVehiclePadPowerManager.cs" />
+    <Compile Include="Mods\QuantumTeleporter\Buildable\QuantumTeleporterVehiclePadPatcher.cs" />
+    <Compile Include="Mods\QuantumTeleporter\Enumerators\TeleportItemType.cs" />
+    <Compile Include="Mods\QuantumTeleporter\Mono\QuantumPowerBankChargerController.cs" />
+    <Compile Include="Mods\QuantumTeleporter\Buildable\QuantumPowerBankChargerPatcher.cs" />
+    <Compile Include="Mods\QuantumTeleporter\Patches\ToolTipFactory_Patch.cs" />
     <Compile Include="Mods\Sink\Buildable\SinkPrefab.cs" />
     <Compile Include="Mods\Sink\Mono\SinkController.cs" />
     <Compile Include="Mods\Sofas\Buildable\NeonBarStool.cs" />
@@ -107,7 +121,7 @@
     <Compile Include="Mods\TV\Mono\VideoSectionController.cs" />
     <Compile Include="Mods\NeonPlanter\Mono\NeonPlanterController.cs" />
     <Compile Include="Mods\PaintTool\Mono\PaintToolController.cs" />
-    <Compile Include="Patches\BaseDecontructable_Patches.cs" />
+    <Compile Include="Mods\PartitionWalls\Patches\BaseDecontructable_Patches.cs" />
     <Compile Include="Patches\Builder_Patches.cs" />
     <Compile Include="Patches\OSubmarinHelper.cs" />
     <Compile Include="Patches\Player_Patches.cs" />
@@ -133,6 +147,7 @@
     <Compile Include="Mods\SeaBreeze\Mono\SeaBreezeDisplay.cs" />
     <Compile Include="Mods\SeaBreeze\Mono\SeaBreezePowerManager.cs" />
     <Compile Include="Mods\SeaBreeze\Mono\SeaBreezeController.cs" />
+    <Compile Include="Mods\QuantumTeleporter\Spawnables\QuantumPowerBankSpawnable.cs" />
     <Compile Include="Structs\SoundEntry.cs" />
     <Compile Include="Spawnables\FoodSpawnable.cs" />
     <Compile Include="Mods\PaintTool\Spawnable\PaintCanSpawnable.cs" />

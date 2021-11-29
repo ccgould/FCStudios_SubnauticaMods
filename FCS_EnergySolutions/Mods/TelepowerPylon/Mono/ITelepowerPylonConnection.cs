@@ -9,9 +9,6 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         TelepowerPylonMode GetCurrentMode();
         string UnitID { get; set; }
         Action<ITelepowerPylonConnection> OnDestroyCalledAction { get; set; }
-        void AddItemToPullGrid(ITelepowerPylonConnection telepowerPylonConnection,bool isChecked = false);
-        void AddItemToPushGrid(ITelepowerPylonConnection telepowerPylonConnection,bool isChecked = false);
-        void AddPylonToPushGrid(ITelepowerPylonConnection telepowerPylonConnection);
         IPowerInterface GetPowerRelay();
         FcsDevice GetDevice();
         void DeleteFrequencyItemAndDisconnectRelay(string targetControllerUnitId);
@@ -19,5 +16,8 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         bool HasPowerRelayConnection(IPowerInterface getPowerRelay);
         IPylonPowerManager GetPowerManager();
         bool CanAddNewPylon();
+        void ActivateItemOnPushGrid(ITelepowerPylonConnection controller);
+        void ActivateItemOnPullGrid(ITelepowerPylonConnection controller);
+        bool CheckIsPullingFrom(ITelepowerPylonConnection controller);
     }
 }

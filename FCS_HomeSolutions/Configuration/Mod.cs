@@ -8,8 +8,8 @@ using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Model.Utilities;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
-using FCS_HomeSolutions.Mods.PaintTool;
 using FCS_HomeSolutions.Mods.PaintTool.Mono;
+using FCS_HomeSolutions.Mods.QuantumTeleporter.Spawnables;
 using FCS_HomeSolutions.Structs;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
@@ -24,6 +24,7 @@ namespace FCS_HomeSolutions.Configuration
         private static ModSaver _saveObject;
         private static SaveData _saveData;
         private static List<PaintToolController> _registeredPaintTool;
+        private static HashSet<QuantumPowerBankController> _registeredQuantumPowerBank = new();
 
         internal const string ModPackID = "FCSHomeSolutions";
         internal const string ModFriendlyName = "Home Solutions";
@@ -146,7 +147,7 @@ namespace FCS_HomeSolutions.Configuration
 #if SUBNAUTICA
         internal static TechData LedLightStickWallIngredients => new TechData
 #elif BELOWZERO
-                internal static RecipeData LedLightStickWallIngredients => new RecipeData
+                internal static RecipeData DeskLEDIngredients => new RecipeData
 #endif
         {
             craftAmount = 1,
@@ -283,6 +284,14 @@ namespace FCS_HomeSolutions.Configuration
                 if (_registeredPaintTool != null)
                 {
                     foreach (PaintToolController controller in _registeredPaintTool)
+                    {
+                        controller.Save(newSaveData, serializer);
+                    }
+                }
+
+                if (_registeredQuantumPowerBank != null)
+                {
+                    foreach (QuantumPowerBankController controller in _registeredQuantumPowerBank)
                     {
                         controller.Save(newSaveData, serializer);
                     }
@@ -836,6 +845,92 @@ namespace FCS_HomeSolutions.Configuration
             }
 
             return new StairsDataEntry() { Id = id };
+        }
+
+        public static DisplayBoardDataEntry DisplayBoardEntrySaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.DisplayBoardDataEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new DisplayBoardDataEntry() { Id = id };
+        }
+
+        public static QuantumPowerBankDataEntry GetQuantumPowerBankEntrySaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.QuantumPowerBankEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new QuantumPowerBankDataEntry() { Id = id };
+        }
+
+        public static void RegisterQuantumPowerBank(QuantumPowerBankController quantumPowerBankController)
+        {
+            _registeredQuantumPowerBank.Add(quantumPowerBankController);
+        }
+
+        public static void UnRegisterQuantumPowerBank(QuantumPowerBankController quantumPowerBankController)
+        {
+            _registeredQuantumPowerBank.Remove(quantumPowerBankController);
+        }
+
+        public static QuantumPowerBankChargerDataEntry GetQuantumPowerBankChargerSaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.QuantumPowerBankChargerDataEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new QuantumPowerBankChargerDataEntry() { Id = id };
+        }
+
+        public static QuantumTeleporterVehiclePadDataEntry GetQuantumTeleporterVehiclePadSaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.QuantumTeleporterVehiclePadDataEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new QuantumTeleporterVehiclePadDataEntry() { Id = id };
         }
     }
 }

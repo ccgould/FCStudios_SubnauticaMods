@@ -103,17 +103,22 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                 Destroy(_electList[index]);
             };
 
-            var antennaDoor = GameObjectHelpers.FindGameObject(gameObject, "LockedDoor02").AddComponent<DoorController>();
+            var antennaDoorMesh = GameObjectHelpers.FindGameObject(gameObject, "LockedDoor02");
+            var antennaDoor = GameObjectHelpers.FindGameObject(antennaDoorMesh, "anim_mesh_door").AddComponent<DoorController>();
             antennaDoor.doorOpenMethod = StarshipDoor.OpenMethodEnum.Manual;
 
-            var fabricatorDoor = GameObjectHelpers.FindGameObject(gameObject, "LockedDoor01").AddComponent<DoorController>();
+            var fabricatorDoorMesh = GameObjectHelpers.FindGameObject(gameObject, "LockedDoor01");
+            var fabricatorDoor = GameObjectHelpers.FindGameObject(fabricatorDoorMesh, "anim_mesh_door").AddComponent<DoorController>();
             fabricatorDoor.doorOpenMethod = StarshipDoor.OpenMethodEnum.Manual;
 
-            var transportDoor = GameObjectHelpers.FindGameObject(gameObject, "LockedDoor03").AddComponent<DoorController>();
+            var transportDoorMesh = GameObjectHelpers.FindGameObject(gameObject, "LockedDoor03");
+            var transportDoor = GameObjectHelpers.FindGameObject(transportDoorMesh, "anim_mesh_door").AddComponent<DoorController>();
             transportDoor.doorOpenMethod = StarshipDoor.OpenMethodEnum.Manual;
             transportDoor.ManualHoverText2 = "No Power.Please check generator";
 
-            var securityDoor = GameObjectHelpers.FindGameObject(gameObject, "LockedDoor04").AddComponent<DoorController>();
+
+            var securityDoorMesh = GameObjectHelpers.FindGameObject(gameObject, "LockedDoor04");
+            var securityDoor = GameObjectHelpers.FindGameObject(securityDoorMesh, "anim_mesh_door").AddComponent<DoorController>();
             securityDoor.doorOpenMethod = StarshipDoor.OpenMethodEnum.Manual;
             securityDoor.ManualHoverText2 = "Access to security booth needed to unlock.";
             
@@ -175,7 +180,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 
             WorldHelpers.CreateBeacon(gameObject, Mod.AlterraHubStationPingType, "Alterra Hub Station (320m)");
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseLightsEmissiveController, gameObject, Color.red);
-
+            
             OnGamePlaySettingsLoaded(Mod.GamePlaySettings);
 
             InvokeRepeating(nameof(CheckIfSecurityDoorCanUnlock),1f,1f);
@@ -185,7 +190,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         {
             if (_securityBoxTrigger == null) return;
 
-            if (Mod.GamePlaySettings.IsPDAUnlocked || _keyPads[4].IsUnlocked() || _keyPads[3].IsUnlocked())
+            if (Mod.GamePlaySettings.IsPDAUnlocked && _keyPads[4].IsUnlocked() && _keyPads[3].IsUnlocked())
             {
                 CancelInvoke(nameof(CheckIfSecurityDoorCanUnlock));
                 return;
@@ -265,7 +270,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             
             if (_ping != null)
             {
-                _ping.enabled = value;
+                //_ping.enabled = value;
                 _ping.visible = value;
             }
         }
@@ -311,12 +316,16 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             }
 
             _pendingPurchase = ConvertPendingPurchase(settings.PendingPurchases) ?? _pendingPurchase;
+            
             foreach (KeyValuePair<string, Shipment> shipment in _pendingPurchase)
             {
                 FCSPDAController.Main.AddShipment(shipment.Value);
             }
 
-            UpdateBeaconState(!settings.IsPDAUnlocked);
+            _ping.colorIndex = settings.FabStationBeaconColorIndex;
+            _ping.visible = settings.FabStationBeaconVisible;
+
+            //UpdateBeaconState(!settings.IsPDAUnlocked);
 
             InvokeRepeating(nameof(TryShip),1f,1f);
 
@@ -364,9 +373,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             if (IsPowerOn) return;
             Mod.GamePlaySettings.AlterraHubDepotPowercellSlot.Add(slot);
         }
-
-
-
+        
         internal void TurnOnBase()
         {
             TurnOnLights();
@@ -676,6 +683,10 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             return _currentOrder.OrderNumber.Equals(orderNumber);
         }
 
+        public PingInstance GetPing()
+        {
+            return _ping;
+        }
     }
 
     internal struct Shipment

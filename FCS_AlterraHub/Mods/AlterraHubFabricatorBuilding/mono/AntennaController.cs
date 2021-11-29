@@ -29,7 +29,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         {
             var electricalBoxes = GameObjectHelpers.FindGameObjects(controller.gameObject, "AlterraHubFabStationElectricalBox",SearchOption.StartsWith);
             var antennaSecurityScreen = GameObjectHelpers.FindGameObject(controller.gameObject, "AntennaSecurityScreen");
-            
+
             for (int i = 0; i < electricalBoxes.Count(); i++)
             {
                 var eBox = electricalBoxes.ElementAt(i).gameObject.AddComponent<ElectricalBox>();
@@ -42,13 +42,14 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 
             _messageBox = GameObjectHelpers.FindGameObject(antennaSecurityScreen, "MessageBox").AddComponent<FCSMessageBox>();
 
-            _antenna = GameObjectHelpers.FindGameObject(gameObject, "mesh_antenna").EnsureComponent<MotorHandler>();
+            _antenna = gameObject.EnsureComponent<MotorHandler>();
             _antenna.SetIncreaseRate(5);
             _antenna.Initialize(0);
 
             _powerIcon = GameObjectHelpers.FindGameObject(antennaSecurityScreen, "Image").GetComponent<Image>();
 
             _information = GameObjectHelpers.FindGameObject(antennaSecurityScreen, "Text").GetComponent<Text>();
+
             _reactiveBTN = antennaSecurityScreen.GetComponentInChildren<Button>();
             _reactiveBTN.onClick.AddListener(() =>
             {
@@ -59,10 +60,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                 }
                 Mod.GamePlaySettings.IsPDAUnlocked = true;
                 _numberField.gameObject.SetActive(false);
+                AlterraFabricatorStationController.Main.UpdateBeaconState(false);
                 FCSPDAController.ForceOpen();
             });
+            
             InvokeRepeating(nameof(UpdateScreen),1f,1f);
-
         }
 
         private bool IsPinValid()

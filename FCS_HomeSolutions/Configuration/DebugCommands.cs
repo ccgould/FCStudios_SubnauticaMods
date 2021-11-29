@@ -1,12 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using FCS_AlterraHub.Buildables;
+using FCS_AlterraHub.Extensions;
+using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Buildable;
+using FCS_HomeSolutions.Mods.QuantumTeleporter.Enumerators;
+using FCS_HomeSolutions.Mods.QuantumTeleporter.Interface;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Mono;
+using FCS_HomeSolutions.Mods.QuantumTeleporter.Spawnables;
 using FCS_HomeSolutions.Mods.SeaBreeze.Buildable;
 using FCS_HomeSolutions.Mods.SeaBreeze.Mono;
+using FCS_HomeSolutions.Spawnables;
 using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Commands;
@@ -46,6 +54,80 @@ namespace FCS_HomeSolutions.Configuration
             return $"Parameters: {setGlobal}";
         }
 
+        [ConsoleCommand("teleport")]
+        public static string OnTeleportCommand(string id)
+        {
+
+            if (!string.IsNullOrWhiteSpace(id))
+            {
+                var device = FCSAlterraHubService.PublicAPI.FindDevice(id);
+
+                if (device.Value != null)
+                {
+                    var destinationTeleporter = device.Value.gameObject.GetComponent<IQuantumTeleporter>();
+
+                    if (!destinationTeleporter.IsOperational)
+                    {
+                        return "This teleporter is not Operational.";
+                    }
+
+                    if (device.Value.Manager.IsSame(Player.main.GetCurrentSub()))
+                    {
+                        return $"Cannot teleport to the same base.";
+                    }
+
+                    var powerBankTechType = "QuantumPowerBank".ToTechType();
+
+                    if (PlayerInteractionHelper.HasItem(powerBankTechType))
+                    {
+                        var powerBanks = PlayerInteractionHelper.GetItemsOnPlayer(powerBankTechType);
+
+                        foreach (InventoryItem bank in powerBanks)
+                        {
+                            //Get power bank controller
+                            var bankController = bank.item.gameObject.GetComponent<QuantumPowerBankController>();
+
+                            //Check if the power bank has enough power
+                            if (!bankController.PowerManager.HasEnoughPower(Player.main.IsPiloting() ? QTTeleportTypes.Vehicle : QTTeleportTypes.Global)) continue;
+
+                            //Check if a valid destination
+                            if (!QuantumPowerBankSpawnable.ValidateDestination(destinationTeleporter, out string result)) return result;
+
+                            TeleportManager.TeleportPlayer(bankController, destinationTeleporter, Player.main.IsPiloting() ? QTTeleportTypes.Vehicle : QTTeleportTypes.Global);
+
+                            return "Teleport SuccessFull";
+                        }
+
+                        return "Power bank doesn't have enough power for teleporting";
+                    }
+
+                    return "Requires a Quantum Power Bank on person";
+                }
+
+                return $"Failed to find teleporter with the ID of : {id}";
+            }
+            
+            return $"Parameters: {id}";
+        }
+
+        [ConsoleCommand("rechargepowerbanks")]
+        public static string OnReChargeAllTeleportsCommand()
+        {
+            var powerBankTechType = "QuantumPowerBank".ToTechType();
+
+            var powerBanks = PlayerInteractionHelper.GetItemsOnPlayer(powerBankTechType);
+
+            if (powerBanks == null || !powerBanks.Any()) return "No power banks on player";
+
+            foreach (InventoryItem bank in powerBanks)
+            {
+                var controller = bank.item.GetComponent<QuantumPowerBankController>();
+                controller?.PowerManager?.FullReCharge();
+            }
+
+            return "Operation Successful";
+        }
+        
         [ConsoleCommand("saveprefabids")]
         public static string SavePrefabIDS()
         {
@@ -99,9 +181,7 @@ namespace FCS_HomeSolutions.Configuration
             }
             return $"Parameters: {value}";
         }
-
-
-
+        
         [ConsoleCommand("showBuilderBeamPoints")]
         public static string ShowBuilderBeamPoints(bool value)
         {

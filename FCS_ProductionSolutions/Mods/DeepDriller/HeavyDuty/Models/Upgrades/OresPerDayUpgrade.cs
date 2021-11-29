@@ -1,9 +1,9 @@
 ﻿using System;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Model;
+using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Buildable;
 using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono;
 using FCSCommon.Utilities;
-using FCSDeepDrillerBuildable = FCS_ProductionSolutions.Mods.DeepDriller.LightDuty.Buildable.FCSDeepDrillerBuildable;
 
 namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Models.Upgrades
 {
@@ -30,13 +30,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Models.Upgrades
 
         private float CalculatePowerUsage()
         {
-            if (OreCount == 12)
-            {
-                return 0;
-            }
-
-            return QPatch.Configuration.DDOrePerDayUpgradePowerUsage +
-                   (OreCount * QPatch.Configuration.DDOreReductionValue);
+            return QPatch.Configuration.DDOrePerDayUpgradePowerUsage + (OreCount * QPatch.Configuration.DDOreReductionValue);
         }
 
         public override float Damage { get; }

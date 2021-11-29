@@ -284,7 +284,8 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Mono
 
         public override bool CanDeconstruct(out string reason)
         {
-            if (_recycler.HasItems())
+
+            if (_recycler != null && _recycler.HasItems())
             {
                 reason = AuxPatchers.ModNotEmptyFormat(TrashRecyclerPatch.RecyclerFriendly);
                 return false;

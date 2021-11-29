@@ -26,6 +26,7 @@ namespace FCS_AlterraHub.Registration
         bool IsRegisteringEncyclopedia { get; set; }
         CardSystem AccountSystem { get; }
         Action OnPurge { get; set; }
+        Action<BaseManager> TeleportationIgnitiated { get; set; }
 
         void RegisterDevice(FcsDevice device, string tabID, string packageId);
         void RemoveDeviceFromGlobal(string unitID);
@@ -71,6 +72,7 @@ namespace FCS_AlterraHub.Registration
 
     public class FCSAlterraHubService : IFCSAlterraHubService, IFCSAlterraHubServiceInternal
     {
+        public Action<BaseManager> TeleportationIgnitiated { get; set; }
         private static readonly FCSAlterraHubService singleton = new();
         public static List<KnownDevice> knownDevices { get; set; }= new();
         private static readonly Dictionary<string, FcsDevice> GlobalDevices = new();
@@ -207,8 +209,7 @@ namespace FCS_AlterraHub.Registration
             }
             else
             {
-                QuickLogger.Debug(
-                    $"Failed to Setup the Base Manager for TechLight {device.gameObject.GetComponent<PrefabIdentifier>().Id}");
+                QuickLogger.Debug($"Failed to Setup the Base Manager for TechLight {device.gameObject.GetComponent<PrefabIdentifier>().Id}");
                 return;
             }
 

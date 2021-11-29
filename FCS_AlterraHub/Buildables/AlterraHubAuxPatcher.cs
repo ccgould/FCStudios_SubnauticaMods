@@ -77,6 +77,7 @@ namespace FCS_AlterraHub.Buildables
             { $"{ModKey}_ProcessingItem","Processing Item"},
             { $"{ModKey}_OreValue","Ore Value"},
             { $"{ModKey}_TimeLeft","Time Left"},
+            { $"{ModKey}_PleaseClearHands","Please clear hands (E) to use."},
         };
 
         private void AdditionalPatching()
@@ -439,6 +440,11 @@ namespace FCS_AlterraHub.Buildables
         public static string TimeLeft()
         {
             return GetLanguage($"{ModKey}_TimeLeft");
+        }
+
+        public static string PleaseClearHands()
+        {
+            return GetLanguage($"{ModKey}_PleaseClearHands");
         }
     }
 }

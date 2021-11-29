@@ -149,6 +149,14 @@ namespace FCS_AlterraHub.Configuration
             AlterraFabricatorStationController.Main.ResetDrones();
 
             return $"Drones reset!";
+        }        
+        
+        [ConsoleCommand("Evening")]
+        public static string OnEveningCommand()
+        {
+            DayNightCycle.main.SetDayNightTime(0.86f);
+
+            return $"Time Set to Evening";
         }
     }
 }

@@ -16,6 +16,7 @@ namespace FCS_AlterraHub.Model.GUI
         private Toggle _toggle;
         private Button _button;
         private TechType _techType;
+        private Text _itemCount;
 
         public void Initialize(TechType techType,bool isToggle = false,bool isButton = false)
         {
@@ -30,6 +31,7 @@ namespace FCS_AlterraHub.Model.GUI
             }
 
             _icon = GameObjectHelpers.FindGameObject(gameObject, "Icon").AddComponent<uGUI_Icon>();
+            _itemCount = GameObjectHelpers.FindGameObject(gameObject, "ItemCountLbl")?.GetComponent<Text>();
             Set(techType);
         }
 
@@ -124,6 +126,21 @@ namespace FCS_AlterraHub.Model.GUI
         public void Show()
         {
             gameObject.SetActive(true);
+        }
+
+        public bool IsValidAndActive(TechType techType)
+        {
+            return techType == _techType && gameObject.activeSelf;
+        }
+
+        public void UpdateAmount(int amount)
+        {
+            _itemCount.text = amount.ToString();
+        }
+
+        public bool IsChecked()
+        {
+            return _toggle?.isOn ?? false;
         }
     }
 }

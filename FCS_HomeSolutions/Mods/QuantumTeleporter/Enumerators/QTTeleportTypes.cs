@@ -3,6 +3,7 @@
     internal enum QTTeleportTypes
     {
         Global = 0,
-        Intra = 1
+        Intra = 1,
+        Vehicle = 2
     }
 }

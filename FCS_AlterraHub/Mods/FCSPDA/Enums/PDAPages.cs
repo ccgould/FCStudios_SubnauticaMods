@@ -15,5 +15,6 @@
         VehicleSolutions=10,
         MiscSolutions=11,
         Shipment = 12,
+        Teleportation = 13
     }
 }

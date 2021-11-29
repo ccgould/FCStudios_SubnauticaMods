@@ -52,8 +52,8 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         
         public void AddConnection(ITelepowerPylonConnection controller)
         {
-            if(!_connections.ContainsKey(controller.UnitID.ToLower()))
-                _connections?.Add(controller.UnitID.ToLower(),controller);
+            if (!_connections.ContainsKey(controller.UnitID.ToLower()))
+                _connections?.Add(controller.UnitID.ToLower(), controller);
         }
 
         public IPowerInterface GetPowerRelay()
@@ -73,6 +73,17 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             _connectedPowerSource.RemoveInboundPower(_connections[id.ToLower()].GetPowerRelay());
             _connections.Remove(id.ToLower());
             _pauseUpdates = false;
+        }
+
+        public Dictionary<string, ITelepowerPylonConnection> GetConnections()
+        {
+            return _connections;
+        }
+        
+        public bool HasConnection(string unitId)
+        {
+            if (string.IsNullOrWhiteSpace(unitId)) return false;
+            return _connections?.ContainsKey(unitId.ToLower()) ?? false;
         }
     }
 

@@ -9,7 +9,6 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
     {
         #region Private Methods
         //private AudioHandler _audioHandler;
-        private FCSDeepDrillerController _mono;
         private int _drillState;
         private MotorHandler _radarMotor;
         private MotorHandler _drillMotor;
@@ -42,7 +41,6 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
                 QuickLogger.Debug("Animator was disabled and now has been enabled");
                 this.Animator.enabled = true;
             }
-            _drillAnimationCurve = new AnimationCurve(new Keyframe(0, 1.686938f), new Keyframe(1, -0.581f));
         }
 
         private void Update()
@@ -92,7 +90,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         /// <param name="value">Float to set</param>
         internal void SetFloatHash(int stateHash, float value)
         {
-            this.Animator.SetFloat(stateHash, value);
+            this.Animator?.SetFloat(stateHash, value);
         }
 
         /// <summary>
@@ -107,7 +105,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
                 this.Animator = this.transform.GetComponent<Animator>();
             }
 
-            this.Animator.SetBool(stateHash, value);
+            this.Animator?.SetBool(stateHash, value);
         }
 
         /// <summary>
@@ -124,7 +122,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 
             if (Animator == null) return;
 
-            this.Animator.SetInteger(stateHash, value);
+            this.Animator?.SetInteger(stateHash, value);
         }
 
         internal int GetIntHash(int hash)
@@ -151,15 +149,15 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
             return this.Animator.GetBool(hash);
         }
 
-        internal void Initialize(FCSDeepDrillerController mono)
+        internal void Initialize(AnimationCurve drillBitAnimationCurve)
         {
-            _mono = mono;
+            _drillAnimationCurve = drillBitAnimationCurve;
 
             if (_radarMotor == null)
             {
-                _radarMotor = GameObjectHelpers.FindGameObject(gameObject, "radar").AddComponent<MotorHandler>();
-                _radarMotor.Initialize(30);
-                _radarMotor.StartMotor();
+                _radarMotor = GameObjectHelpers.FindGameObject(gameObject, "radar")?.AddComponent<MotorHandler>();
+                _radarMotor?.Initialize(30);
+                _radarMotor?.StartMotor();
             }
 
             if (_drillMotor == null)

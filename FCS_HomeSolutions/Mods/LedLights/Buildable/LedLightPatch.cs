@@ -77,7 +77,7 @@ namespace FCS_HomeSolutions.Mods.LedLights.Buildable
                 constructable.rotationEnabled = true;
                 constructable.allowedOnCeiling = false;
                 constructable.allowedInSub = _data.allowedInSub;
-                constructable.allowedOnConstructables = true;
+                constructable.allowedOnConstructables = _data.allowedOnContructables;
                 constructable.model = model;
                 constructable.techType = TechType;
 
@@ -131,5 +131,6 @@ namespace FCS_HomeSolutions.Mods.LedLights.Buildable
         public bool allowedInSub;
         public GameObject prefab;
         public TechData TechData;
+        public bool allowedOnContructables;
     }
 }

@@ -10,6 +10,7 @@ using FCS_ProductionSolutions.Mods.AutoCrafter.Buildable;
 using FCS_ProductionSolutions.Mods.DeepDriller.Craftable;
 using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Buildable;
 using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Ores;
+using FCS_ProductionSolutions.Mods.DeepDriller.LightDuty.Buildable;
 using FCS_ProductionSolutions.Mods.HydroponicHarvester.Buildable;
 using FCS_ProductionSolutions.Mods.MatterAnalyzer.Buildable;
 using FCSCommon.Utilities;
@@ -18,7 +19,6 @@ using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
-using FCSDeepDrillerBuildable = FCS_ProductionSolutions.Mods.DeepDriller.LightDuty.Buildable.FCSDeepDrillerBuildable;
 
 namespace FCS_ProductionSolutions
 {
@@ -72,6 +72,9 @@ namespace FCS_ProductionSolutions
                 
                 var deepDriller = new FCSDeepDrillerBuildable();
                 deepDriller.Patch();
+
+                var deepDrillerL = new DeepDrillerLightDutyBuildable();
+                deepDrillerL.Patch();
             }
 
             if (Configuration.IsAutocrafterEnabled)

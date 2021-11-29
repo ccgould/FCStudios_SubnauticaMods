@@ -253,6 +253,8 @@ namespace FCS_HomeSolutions.Configuration
         [Toggle("Developer Mode", Order = 0, Tooltip = "For use by FCStudios Developers.")]
         public bool DeveloperModeEnabled { get; set; } = false;
 
+        internal bool IsWallPartitionsEnabled { get; set; } = false;
+
 
         #region JukeBox
 

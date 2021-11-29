@@ -33,7 +33,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.LightDuty.Buildable
         internal const string DeepDrillerLightDutyModName = "DeepDrillerLightDuty";
         internal static string DeepDrillerLightDutyKitClassID => $"{DeepDrillerLightDutyClassName}_Kit";
         internal const string DeepDrillerLightDutyClassName = "DeepDrillerLightDuty";
-        internal const string DeepDrillerLightDutyPrefabName = "DeepDrillerLightDuty";
+        internal const string DeepDrillerLightDutyPrefabName = "FCS_DeepDrillerLightDuty";
         internal const string DeepDrillerLightDutyDescription = "Light Duty Automated drill platform suitable for all biome.";
 
 
@@ -46,7 +46,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.LightDuty.Buildable
             {
                 var deepDrillerLightDutyKit = new FCSKit(DeepDrillerLightDutyKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 deepDrillerLightDutyKit.Patch();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, deepDrillerLightDutyKit.TechType, 210000, StoreCategory.Production);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, deepDrillerLightDutyKit.TechType, 250000, StoreCategory.Production);
             };
         }
 
@@ -73,7 +73,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.LightDuty.Buildable
                 constructable.allowedInBase = false;
                 constructable.allowedOnCeiling = false;
                 constructable.allowedOutside = true;
-                constructable.model = prefab.FindChild("DrillModel");
+                constructable.model = prefab.FindChild("model");
                 constructable.techType = TechType;
                 constructable.rotationEnabled = true;
                 constructable.forceUpright = true;
@@ -84,11 +84,8 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.LightDuty.Buildable
                 var lwe = prefab.AddComponent<LargeWorldEntity>();
                 lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
 
-                //var center = new Vector3(-2.384186e-07f, 2.500637f, -0.007555246f);
-                //var size = new Vector3(5.605133f, 8.229565f, 5.689059f);
-
-                var center = new Vector3(-0.0168829f, 3.009828f, 0.03002357f);
-                var size = new Vector3(4.291656f, 5.013103f, 4.075207f);
+                var center = new Vector3(0f, 1.880612f, 0f);
+                var size = new Vector3(1.729009f, 3.01031f, 1.815033f);
 
                 GameObjectHelpers.AddConstructableBounds(prefab, size,center);
 
@@ -97,7 +94,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.LightDuty.Buildable
                 prefab.AddComponent<DeepDrillerLightDutyController>();
 
                 //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
-                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
+                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID/*,1f,2,.2f*/);
 
             }
             catch (Exception e)

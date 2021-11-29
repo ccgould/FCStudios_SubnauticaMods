@@ -10,7 +10,6 @@ using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Structs;
 using FCS_ProductionSolutions.Mods.DeepDriller.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
-using FCSDeepDrillerBuildable = FCS_ProductionSolutions.Mods.DeepDriller.LightDuty.Buildable.FCSDeepDrillerBuildable;
 
 namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 {
@@ -36,7 +35,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         internal void Initialize(FCSDeepDrillerController mono)
         {
             _mono = mono;
-
+            ImplementCommand("os.OresPerDay(12);");
         }
 
         private void ImplementCommand(string functionString, out UpgradeFunction upgrade)

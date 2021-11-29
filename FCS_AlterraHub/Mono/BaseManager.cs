@@ -52,7 +52,7 @@ namespace FCS_AlterraHub.Mono
         private bool _hasBreakerTripped;
         private Dictionary<string, BaseOperationObject> _baseOperationObjects = new();
         private List<BaseTransferOperation> _baseOperations  = new();
-        
+        private BaseHullStrength _baseHullStrength;
         public string BaseID { get; set; }
         public float ActiveBaseOxygenTankCount = 0;
         public readonly Dictionary<TechType, TrackedResource> TrackedResources = new();
@@ -107,6 +107,7 @@ namespace FCS_AlterraHub.Mono
             Habitat = habitat;
             
             BaseComponent = Habitat.GetComponent<Base>();
+            _baseHullStrength = Habitat.GetComponent<BaseHullStrength>();
             BaseID = habitat.gameObject.gameObject?.GetComponentInChildren<PrefabIdentifier>()?.Id;
 
             FCSAlterraHubService.PublicAPI.RegisterBase(this);
@@ -1535,6 +1536,50 @@ namespace FCS_AlterraHub.Mono
                 if(item == null) return;
                 GameObject.Destroy(item.gameObject);
             }
+        }
+
+        /// <summary>
+        /// Checks if the current base is the same as the passed in base
+        /// </summary>
+        /// <param name="sub"></param>
+        /// <returns></returns>
+        public bool IsSame(SubRoot sub)
+        {
+            return sub == Habitat;
+        }
+
+        public string GetBaseHullStrength()
+        {
+            return _baseHullStrength?.GetTotalStrength().ToString() ?? "0";
+        }
+
+        public static BaseManager GetPlayersCurrentBase()
+        {
+            if (Player.main == null || Player.main.currentSub == null) return null;
+
+            return Player.main.currentSub.isBase || Player.main.currentSub.isCyclops ? FindManager(Player.main.currentSub) : null;
+        }
+
+        public bool IsValidForTeleport()
+        {
+            if (Player.main == null) return false;
+
+            if (Player.main.IsPiloting())
+            {
+                foreach (KeyValuePair<string, FcsDevice> device in _registeredDevices)
+                {
+                    if (device.Key.ToLower().StartsWith("qvp") && device.Value.IsOperational) return true;
+                }
+            }
+            else
+            {
+                foreach (KeyValuePair<string, FcsDevice> device in _registeredDevices)
+                {
+                    if (device.Key.ToLower().StartsWith("qt") && device.Value.IsOperational && device.Value.IsVisible) return true;
+                }
+            }
+
+            return false;
         }
     }
 

@@ -6,6 +6,7 @@ using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
+using FCS_AlterraHub.Objects;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Configuration;
 using FCSCommon.Utilities;
@@ -174,8 +175,8 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
             _savedData.Id = GetPrefabID();
             _savedData.ColorTemplate = _colorManager.SaveTemplate();
             _savedData.Rotation = transform.rotation.QuaternionToVec4();
-            _savedData.RotorRot = _rotor.localEulerAngles.ToVec3();
-            _savedData.TilerRot = _tiler.localEulerAngles.ToVec3();
+            _savedData.RotorRot = _rotor?.localEulerAngles.ToVec3() ?? new Vec3();
+            _savedData.TilerRot = _tiler?.localEulerAngles.ToVec3() ?? new Vec3();
             _savedData.Intensity = _light[0].intensity;
             _savedData.NightSensor = _nightSensor;
             _savedData.LightState = _light[0].enabled;

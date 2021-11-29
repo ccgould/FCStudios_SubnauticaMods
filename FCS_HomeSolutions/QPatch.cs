@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using FCS_AlterraHub.API;
@@ -8,9 +9,11 @@ using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Enums;
+using FCS_HomeSolutions.Mods.BunkBed.Buildable;
 using FCS_HomeSolutions.Mods.Cabinets.Buildable;
 using FCS_HomeSolutions.Mods.CrewLocker.Buildable;
 using FCS_HomeSolutions.Mods.Curtains.Buildable;
+using FCS_HomeSolutions.Mods.DisplayBoard.Buildable;
 using FCS_HomeSolutions.Mods.Elevator.Buildable;
 using FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Buildable;
 using FCS_HomeSolutions.Mods.HologramPoster.Buildable;
@@ -22,6 +25,8 @@ using FCS_HomeSolutions.Mods.NeonPlanter.Buildable;
 using FCS_HomeSolutions.Mods.PaintTool.Spawnable;
 using FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Buildable;
+using FCS_HomeSolutions.Mods.QuantumTeleporter.Patches;
+using FCS_HomeSolutions.Mods.QuantumTeleporter.Spawnables;
 using FCS_HomeSolutions.Mods.SeaBreeze.Buildable;
 using FCS_HomeSolutions.Mods.Shower.Buildable;
 using FCS_HomeSolutions.Mods.Sink.Buildable;
@@ -32,6 +37,7 @@ using FCS_HomeSolutions.Mods.Toilet.Buildable;
 using FCS_HomeSolutions.Mods.TrashReceptacle.Buildable;
 using FCS_HomeSolutions.Mods.TrashRecycler.Buildable;
 using FCS_HomeSolutions.Mods.TV.Buildable;
+using FCS_HomeSolutions.Spawnables;
 using FCSCommon.Utilities;
 using HarmonyLib;
 using QModManager.API.ModLoading;
@@ -141,6 +147,17 @@ namespace FCS_HomeSolutions
                 //Patch Quantum Teleporter
                 var quantumTeleporter = new QuantumTeleporterBuildable();
                 quantumTeleporter.Patch();
+
+                var quantumBattery = new QuantumPowerBankSpawnable();
+                quantumBattery.OnEventListen();
+                quantumBattery.Patch();
+
+                var quantumBatteryCharger = new QuantumPowerBankChargerBuildable();
+                quantumBatteryCharger.Patch();
+
+                var quantumVehiclePad = new QuantumTeleporterVehiclePadBuildable();
+                quantumVehiclePad.Patch();
+
             }
 
             if (Configuration.IsStoveEnabled)
@@ -168,11 +185,11 @@ namespace FCS_HomeSolutions
             var sink = new SinkBuildable();
             sink.Patch();
             
-            var jukeBox = new JukeBoxBuildable();
-            jukeBox.Patch();
+            //var jukeBox = new JukeBoxBuildable();
+            //jukeBox.Patch();
 
-            var jukeboxSpeaker = new JukeBoxSpeakerBuildable();
-            jukeboxSpeaker.Patch();
+            //var jukeboxSpeaker = new JukeBoxSpeakerBuildable();
+            //jukeboxSpeaker.Patch();
 
             if (Configuration.IsHatchStairwayEnabled)
             {
@@ -203,11 +220,22 @@ namespace FCS_HomeSolutions
 
             PatchMiscItems();
 
-            PatchWalls();
+            if (Configuration.IsWallPartitionsEnabled)
+            {
+                //PatchWalls();
+            }
 
-            var harmony = new Harmony("com.homesolutions.fstudios");
+            var narrowBed = new CrewBunkBedPatcher("FCSCrewBunkBed", "Crew Bunk Bed", "N/A", "BunkBed_Kit", "FCS_CrewBunkerBed", 100000);
+            narrowBed.Patch();
+            
+            var displayBoard = new DisplayBoardBuildable();
+            displayBoard.Patch();
+
+            var harmony = new Harmony("com.homesolutions.fstudios"); 
             harmony.PatchAll(Assembly.GetExecutingAssembly());
             
+            PatchToolTipFactory(harmony);
+
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
         }
@@ -354,6 +382,9 @@ namespace FCS_HomeSolutions
 
             var floodLight = new FloodLEDLight();
             floodLight.Patch();
+
+            var RingLEDLight = new RingLEDLight();
+            RingLEDLight.Patch();
         }
 
         private void PatchShelvesAndTables()
@@ -853,6 +884,25 @@ namespace FCS_HomeSolutions
                     Center = new Vector3(0f, 0.5162937f, 0f)
                 });
             outsideSign.Patch();
+        }
+
+        private static void PatchToolTipFactory(Harmony harmony)
+        {
+            var toolTipFactoryType = Type.GetType("TooltipFactory, Assembly-CSharp");
+
+            if (toolTipFactoryType != null)
+            {
+                QuickLogger.Debug("Got TooltipFactory Type");
+
+                var inventoryItemViewMethodInfo = toolTipFactoryType.GetMethod("InventoryItem");
+
+                if (inventoryItemViewMethodInfo != null)
+                {
+                    QuickLogger.Info("Got Inventory Item View Method Info");
+                    var postfix = typeof(TooltipFactory_Patch).GetMethod("GetToolTip");
+                    harmony.Patch(inventoryItemViewMethodInfo, null, new HarmonyMethod(postfix));
+                }
+            }
         }
     }
 }

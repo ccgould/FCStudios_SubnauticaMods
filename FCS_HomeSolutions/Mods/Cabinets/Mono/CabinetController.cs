@@ -62,7 +62,7 @@ namespace FCS_HomeSolutions.Mods.Cabinets.Mono
             _saveData = Mod.GetCabinetSaveData(id);
         }
 
-        public void OnHandHover(GUIHand hand)
+        public override void OnHandHover(GUIHand hand)
         {
             if (!base.enabled)
                 return;

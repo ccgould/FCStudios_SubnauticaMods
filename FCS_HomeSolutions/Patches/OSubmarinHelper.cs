@@ -95,15 +95,14 @@ namespace FCS_HomeSolutions.Patches
             if (!QPatch.Configuration.IsHatchStairwayEnabled) return true;
 
 			GameObject ghostModel = (GameObject)_ghostModel.GetValue(null);
-            QuickLogger.Debug($"SetPlaceOnbSurface : {hit.collider?.gameObject?.name} | {ghostModel.name}", true);
 			// If object being built is our Outdoor Ladder.
 			if (ghostModel?.name != null && ghostModel.name.StartsWith("StairsModel"))
 			{
-                QuickLogger.Debug("Is Stairs SETP", true);
-				// If our Outdoor Ladder is being placed on a Foundation.
+                QuickLogger.Debug("Is Stairs", true);
+
+                // If our Outdoor Ladder is being placed on a Foundation.
                 if (hit.collider?.gameObject?.name != null && hit.collider.gameObject.name.StartsWith("hatch_end_anim") && !hit.collider.gameObject.name.StartsWith("hatch_side_anim"))
                 {
-                    QuickLogger.Debug("Is Hatch", true);
 					return PlaceOutdoorLadder(hit.collider.gameObject.transform?.parent?.parent?.gameObject, hit.point, ref position, ref rotation);
                 }
 			}
@@ -117,7 +116,6 @@ namespace FCS_HomeSolutions.Patches
 		{
             if (!QPatch.Configuration.IsHatchStairwayEnabled) return ;
 
-            QuickLogger.Debug($"CheckSurfaceType_Postfix : {__result}", true);
             GameObject ghostModel = (GameObject)_ghostModel.GetValue(null);
 			if (!__result)
 			{
@@ -134,7 +132,6 @@ namespace FCS_HomeSolutions.Patches
 					if (Physics.Raycast(aimTransform.position, aimTransform.forward, out RaycastHit hit, pmd, lm.value, QueryTriggerInteraction.Ignore))
                         if (hit.collider?.gameObject != null && hit.collider.gameObject.name.StartsWith("hatch_end_anim") && !hit.collider.gameObject.name.StartsWith("hatch_side_anim"))
                         {
-                            QuickLogger.Debug("Allowed to build", true);
 							allowed = true;
                             __result = true;
                         }

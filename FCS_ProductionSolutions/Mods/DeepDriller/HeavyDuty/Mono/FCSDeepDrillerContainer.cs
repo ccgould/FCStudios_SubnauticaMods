@@ -21,11 +21,17 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
        private int CalculateFreeSpace()
         {
             var total = GetContainerTotal();
-            return Mathf.Max(0, QPatch.Configuration.DDStorageSize - total);
+            return Mathf.Max(0, _storageSize - total);
         }
 
         public bool IsFull => IsContainerFull(); 
         private Dictionary<TechType,int> _container = new Dictionary<TechType, int>();
+        private int _storageSize = QPatch.Configuration.DDStorageSize;
+
+        internal void OverrideContainerSize(int newSize)
+        {
+            _storageSize = newSize;
+        }
 
         internal int GetContainerTotal()
         {
@@ -39,7 +45,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         /// <returns>Returns true if the container is full.</returns>
         private bool IsContainerFull()
         {
-            return GetContainerTotal() >= QPatch.Configuration.DDStorageSize;
+            return GetContainerTotal() >= _storageSize;
         }
 
         /// <summary>
@@ -119,7 +125,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
                     _container.Add(item,1);
                 }
 
-                OnContainerUpdate?.Invoke(GetContainerTotal(),QPatch.Configuration.DDStorageSize);
+                OnContainerUpdate?.Invoke(GetContainerTotal(), _storageSize);
             }
             catch (Exception e)
             {
@@ -155,7 +161,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
                             _container[item] -= 1;
                         }
 
-                        OnContainerUpdate?.Invoke(GetContainerTotal(), QPatch.Configuration.DDStorageSize);
+                        OnContainerUpdate?.Invoke(GetContainerTotal(), _storageSize);
                     }
                 }
             }
@@ -182,7 +188,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
                         _container[item] -= 1;
                     }
 
-                    OnContainerUpdate?.Invoke(GetContainerTotal(), QPatch.Configuration.DDStorageSize);
+                    OnContainerUpdate?.Invoke(GetContainerTotal(), _storageSize);
                 }
             }
             catch (Exception e)
@@ -229,12 +235,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         {
             return GetContainerTotal();
         }
-
-        public void Setup(FCSDeepDrillerController fcsDeepDrillerController)
-        {
-            
-        }
-
+        
         public bool HasItems()
         {
             return _container.Count > 0;
@@ -274,6 +275,11 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         public TechType GetRandomItem()
         {
             return _container.Keys.Count <= 0 ? TechType.None : _container.Keys.ElementAt(0);
+        }
+
+        public int GetContainerCapacity()
+        {
+            return _storageSize;
         }
     }
 }

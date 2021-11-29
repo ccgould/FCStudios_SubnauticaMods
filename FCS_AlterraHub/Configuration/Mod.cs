@@ -248,7 +248,10 @@ namespace FCS_AlterraHub.Configuration
                     GamePlaySettings = new FCSGamePlaySettings();
                 }
 
-                
+
+                GamePlaySettings.FabStationBeaconColorIndex = AlterraFabricatorStationController.Main.GetPing().colorIndex;
+                GamePlaySettings.FabStationBeaconVisible = AlterraFabricatorStationController.Main.GetPing().visible;
+
                 ModUtils.Save(GamePlaySettings, "settings.json", GetSaveFileDirectory(), OnSaveComplete);
 
                 if (File.Exists(Path.Combine(GetSaveFileDirectory(), "settings.json")))
@@ -622,6 +625,8 @@ namespace FCS_AlterraHub.Configuration
         public Dictionary<string, DataBoxData> DataBoxes { get; set; } = new();
         [JsonProperty] internal Dictionary<string, Shipment> PendingPurchases { get; set; }
         [JsonProperty] internal Shipment CurrentOrder { get; set; }
+        public int FabStationBeaconColorIndex { get; set; }
+        public bool FabStationBeaconVisible { get; set; }
 
         public bool ConditionMet(string condition)
         {

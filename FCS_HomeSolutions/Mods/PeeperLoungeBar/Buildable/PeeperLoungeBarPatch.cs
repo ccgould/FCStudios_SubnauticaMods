@@ -409,7 +409,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
                 return;
             }
 
-            QuickLogger.Info($"Attempting to load Peeper Lounge Bar audio tracks. Collection size: {audioEntries.Count}");
+            QuickLogger.Debug($"Attempting to load Peeper Lounge Bar audio tracks. Collection size: {audioEntries.Count}");
 
 
             foreach (AudioData audioData in audioEntries)
@@ -420,7 +420,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
                     Message = audioData.Caption,
                     IsRandom = audioData.IsRandom
                 });
-                QuickLogger.Info($"Loaded Peeper Lounge Bar track: {audioData.TrackName}");
+                QuickLogger.Debug($"Loaded Peeper Lounge Bar track: {audioData.TrackName}");
             }
         }
     }

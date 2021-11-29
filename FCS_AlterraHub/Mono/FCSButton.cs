@@ -43,12 +43,12 @@ namespace FCS_AlterraHub.Mono
 
             if (_button != null)
             {
-                _button.interactable = IsHovered;
+                //_button.interactable = IsHovered;
             }
 
             if (_toggle != null)
             {
-                _toggle.interactable = IsHovered;
+                //_toggle.interactable = IsHovered;
             }
         }
 
@@ -72,6 +72,40 @@ namespace FCS_AlterraHub.Mono
         public void UnSubscribe(UnityAction<bool> call)
         {
             _toggle?.onValueChanged.RemoveListener(call);
+        }
+
+        public void Check(bool notify=false)
+        {
+            if (notify)
+            {
+                _toggle.isOn = true;
+            }
+            else
+            {
+                _toggle?.SetIsOnWithoutNotify(true);
+            }
+        }
+
+        public void UnCheck(bool notify = false)
+        {
+            if (notify)
+            {
+                _toggle.isOn = false;
+            }
+            else
+            {
+                _toggle?.SetIsOnWithoutNotify(false);
+            }
+        }
+
+        public void Show()
+        {
+            gameObject.SetActive(true);
+        }
+
+        public void Hide()
+        {
+            gameObject.SetActive(false);
         }
     }
 }

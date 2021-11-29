@@ -154,7 +154,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
                 _homeNetworkToggleBtn.TextLineOne = AuxPatchers.HomeNetworkToggle();
                 _homeNetworkToggleBtn.TextLineTwo = AuxPatchers.HomeNetworkToggleDesc();
                 _homeNetworkToggleBtn.OnButtonClick = OnButtonClick;
-                _homeNetworkToggleBtn.InteractionRequirement = InteractionRequirement.IsInside;
+                _homeNetworkToggleBtn.InteractionRequirement = InteractionRequirement.None;
 
                 //Global Network Toggle
                 var globalNetworkToggle = GameObjectHelpers.FindGameObject(gameObject, "GlobalNetworkBTN");
@@ -166,7 +166,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
                 _globalNetworkToggleBtn.TextLineOne = AuxPatchers.GlobalNetworkToggle();
                 _globalNetworkToggleBtn.TextLineTwo = AuxPatchers.GlobalNetworkToggleDesc();
                 _globalNetworkToggleBtn.OnButtonClick = OnButtonClick;
-                _globalNetworkToggleBtn.InteractionRequirement = InteractionRequirement.IsInside;
+                _globalNetworkToggleBtn.InteractionRequirement = InteractionRequirement.None;
 
                 //Add To Global Network Toggle
                 var toggleGlobalNetworkBTN = GameObjectHelpers.FindGameObject(gameObject, "ToggleGlobalNetworkBTN");
@@ -178,7 +178,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
                 _toggleGlobalNetworkToggleBtn.TextLineOne = AuxPatchers.AddToGlobalNetworkToggle();
                 _toggleGlobalNetworkToggleBtn.TextLineTwo = AuxPatchers.AddToGlobalNetworkToggleDesc();
                 _toggleGlobalNetworkToggleBtn.OnButtonClick = OnButtonClick;
-                _toggleGlobalNetworkToggleBtn.InteractionRequirement = InteractionRequirement.IsInside;
+                _toggleGlobalNetworkToggleBtn.InteractionRequirement = InteractionRequirement.None;
 
                 //Rename
                 var renameObj = InterfaceHelpers.FindGameObject(canvas.gameObject, "RenameBTN");
@@ -186,7 +186,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
                     OnButtonClick, _startColor, _hoverColor, 5);
                 renameBTN.TextLineOne = AuxPatchers.Rename();
                 renameBTN.TextLineTwo = AuxPatchers.RenameDesc();
-                renameBTN.InteractionRequirement = InteractionRequirement.IsInside;
+                renameBTN.InteractionRequirement = InteractionRequirement.None;
 
                 #region Grid
                 _teleportGrid.Setup(4, ModelPrefab.NetworkItemPrefab, home, Color.gray, Color.white, OnButtonClick,
@@ -198,13 +198,13 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
                 var cancelBTN = InterfaceHelpers.CreateButton(cancelGO, "CancelBTN", InterfaceButtonMode.Background,
                     OnButtonClick, Color.black, Color.white, 5);
                 cancelBTN.ChangeText(AuxPatchers.Cancel());
-                cancelBTN.InteractionRequirement = InteractionRequirement.IsInside;
+                cancelBTN.InteractionRequirement = InteractionRequirement.None;
 
                 var confirmGO = InterfaceHelpers.FindGameObject(home, "ConfirmBTN");
                 var confirmBTN = InterfaceHelpers.CreateButton(confirmGO, "ConfirmBTN", InterfaceButtonMode.Background,
                     OnButtonClick, Color.black, Color.white, 5);
                 confirmBTN.ChangeText(AuxPatchers.Confirm());
-                confirmBTN.InteractionRequirement = InteractionRequirement.IsInside;
+                confirmBTN.InteractionRequirement = InteractionRequirement.None;
             }
             catch (Exception e)
             {
@@ -352,7 +352,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
 
         public void RefreshBaseName(string name)
         {
-            _baseName.text = name;
+            _baseName.text = $"UnitID: {_mono.UnitID} - {name}";
         }
 
         public void ShowTeleportPage(bool value)

@@ -144,7 +144,7 @@ namespace FCS_AlterraHub.Systems
 
         public void DisplayMessage(string text, object[] args = null)
         {
-            DisplayMessage(text);
+            ShowSubtitle(text);
         }
 
         public void ShowSubtitle(string message)

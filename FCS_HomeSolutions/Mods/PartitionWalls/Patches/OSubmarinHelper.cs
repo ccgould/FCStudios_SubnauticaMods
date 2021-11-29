@@ -80,12 +80,13 @@ namespace FCS_HomeSolutions.Mods.PartitionWalls.Patches
         [HarmonyPrefix]
         public static bool SetPlaceOnSurface_Prefix( RaycastHit hit, ref Vector3 position, ref Quaternion rotation)
         {
+            if (!QPatch.Configuration.IsWallPartitionsEnabled) return true;
 			GameObject ghostModel = (GameObject)_ghostModel.GetValue(null);
             if (ghostModel?.name != null && ghostModel.name.StartsWith(ModelName))
 			{
                 if (hit.collider?.gameObject?.name != null && (hit.collider.gameObject.name.StartsWith(DrillTargetObjectName)))
                 { 
-                    QuickLogger.Debug("Is Drill", true);
+                    QuickLogger.Debug("Is Partition", true);
 					return PlaceObject(hit.collider.gameObject.transform?.parent?.parent?.gameObject, GetIndexOfObject(hit.collider.gameObject.name), ref position, ref rotation);
                 }
             }
@@ -107,6 +108,8 @@ namespace FCS_HomeSolutions.Mods.PartitionWalls.Patches
         [HarmonyPrefix]
         public static bool UpdateAllowed_Postfix(ref bool __result)
         {
+            if (!QPatch.Configuration.IsWallPartitionsEnabled) return true;
+
             GameObject ghostModel = (GameObject)_ghostModel.GetValue(null);
             if (ghostModel?.name != null && ghostModel.name.StartsWith(ModelName))
             {
@@ -134,6 +137,8 @@ namespace FCS_HomeSolutions.Mods.PartitionWalls.Patches
         [HarmonyPostfix]
         public static void CheckSurfaceType_Postfix(ref bool __result, SurfaceType surfaceType)
 		{
+            if (!QPatch.Configuration.IsWallPartitionsEnabled) return;
+
             GameObject ghostModel = (GameObject)_ghostModel.GetValue(null);
 
 			if (__result)
@@ -150,7 +155,6 @@ namespace FCS_HomeSolutions.Mods.PartitionWalls.Patches
 					if (Physics.Raycast(aimTransform.position, aimTransform.forward, out RaycastHit hit, pmd, lm.value, QueryTriggerInteraction.Ignore))
                         if (hit.collider?.gameObject != null && (hit.collider.gameObject.name.StartsWith(DrillTargetObjectName)))
                         {
-                            QuickLogger.Debug("Allowed to build", true);
 							allowed = true;
                             __result = true;
                         }

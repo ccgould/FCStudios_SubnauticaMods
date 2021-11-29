@@ -27,13 +27,21 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Buildable
 
         public override string AssetsFolder => Mod.GetAssetFolder();
 
-        public FCSDeepDrillerBuildable() : base(Mod.DeepDrillerMk3ClassName, Mod.DeepDrillerMk3FriendlyName, Mod.DeepDrillerMk3Description)
+        internal const string DeepDrillerMk3TabID = "DD";
+        internal const string DeepDrillerMk3FriendlyName = "Deep Driller Heavy Duty";
+        internal const string DeepDrillerMk3ModName = "DeepDrillerMK3";
+        internal static string DeepDrillerMk3KitClassID => $"{DeepDrillerMk3ClassName}_Kit";
+        internal const string DeepDrillerMk3ClassName = "DeepDrillerMk3";
+        internal const string DeepDrillerMk3PrefabName = "DeepDrillerMK3";
+        internal const string DeepDrillerMk3Description = "Automated drill platform suitable for all biomes with integrated solar and thermal generators. Requires lubricant.";
+
+        public FCSDeepDrillerBuildable() : base(DeepDrillerMk3ClassName, DeepDrillerMk3FriendlyName, DeepDrillerMk3Description)
         {
             OnFinishedPatching += () =>
             {
-                var deepDrillerMk2Kit = new FCSKit(Mod.DeepDrillerMk3KitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
+                var deepDrillerMk2Kit = new FCSKit(DeepDrillerMk3KitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 deepDrillerMk2Kit.Patch();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, deepDrillerMk2Kit.TechType, 210000, StoreCategory.Production);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, deepDrillerMk2Kit.TechType, 700000, StoreCategory.Production);
                 AdditionalPatching();
             };
         }
@@ -105,7 +113,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Buildable
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(Mod.DeepDrillerMk3KitClassID.ToTechType(), 1)
+                    new Ingredient(AsyncExtensions.ToTechType(DeepDrillerMk3KitClassID), 1)
                 }
             };
             QuickLogger.Debug($"Created Ingredients");

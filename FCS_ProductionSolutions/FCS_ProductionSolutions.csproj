@@ -40,6 +40,17 @@
     <Compile Include="Mods\DeepDriller\Interfaces\IPowerManager.cs" />
     <Compile Include="Mods\DeepDriller\LightDuty\Buildable\DeepDrillerLightDutyPatcher.cs" />
     <Compile Include="Mods\DeepDriller\LightDuty\Mono\DeepDrillerLightDutyController.cs" />
+    <Compile Include="Mods\DeepDriller\LightDuty\Mono\DeepDrillerLightDutyPowerManager.cs" />
+    <Compile Include="Mods\DeepDriller\Managers\DrillSystem.cs" />
+    <Compile Include="Mods\DeepDriller\Patchers\DeepDrillerGUIFilterPage.cs" />
+    <Compile Include="Mods\DeepDriller\Patchers\DeepDrillerGUIInventoryPage.cs" />
+    <Compile Include="Mods\DeepDriller\Patchers\DeepDrillerGUIOilPage.cs" />
+    <Compile Include="Mods\DeepDriller\Patchers\DeepDrillerGUIPage.cs" />
+    <Compile Include="Mods\DeepDriller\Patchers\DeepDrillerGUISettingsPage.cs" />
+    <Compile Include="Mods\DeepDriller\Patchers\DeepDrillerGUISignalPage.cs" />
+    <Compile Include="Mods\DeepDriller\Patchers\DeepDrillerHUD.cs" />
+    <Compile Include="Mods\DeepDriller\Patchers\DeepDrillerHudPages.cs" />
+    <Compile Include="Mods\DeepDriller\Patchers\PowerIndicatorPatch.cs" />
     <Compile Include="Structs\DNASampleData.cs" />
     <Compile Include="Configuration\Mod.cs" />
     <Compile Include="Configuration\SaveDataEntry.cs" />

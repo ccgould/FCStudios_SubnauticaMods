@@ -263,6 +263,11 @@ namespace FCS_AlterraHub.Mono
             return transform.position.y < -1f;
         }
 
+        public virtual bool IsInside()
+        {
+            return GetConstructable()?.IsInside() ?? false;
+        }
+
         /// <summary>
         /// Remove items from the device from external sources.
         /// </summary>

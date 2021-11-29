@@ -10,12 +10,14 @@ using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Buildable;
+using FCS_HomeSolutions.Mods.QuantumTeleporter.Enumerators;
+using FCS_HomeSolutions.Mods.QuantumTeleporter.Interface;
 using FCSCommon.Utilities;
 using UnityEngine;
 
 namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
 {
-    internal class QuantumTeleporterController: FcsDevice, IFCSSave<SaveData>
+    internal class QuantumTeleporterController: FcsDevice, IFCSSave<SaveData>,IQuantumTeleporter
     {
         private bool _runStartUpOnEnable;
         private QuantumTeleporterDataEntry _data;
@@ -34,9 +36,11 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
         internal NameController NameController { get; set; }
         internal QTDisplayManager DisplayManager { get; private set; }
         internal AudioManager AudioManager { get; private set; }
-        internal QTPowerManager PowerManager { get; private set; }
+        public IQTPower PowerManager { get; set; }
         internal SubRoot SubRoot { get; set; }
         internal bool IsLinked { get; set; }
+        public override bool IsOperational => IsConstructed && IsInitialized;
+        public override bool IsVisible => GetIsGlobal();
 
         private void Start()
         {
@@ -275,7 +279,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
             return IsGlobal;
         }
 
-        internal Transform GetTarget()
+        public Transform GetTarget(TeleportItemType sender,string senderID)
         {
             return _target;
         }

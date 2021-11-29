@@ -90,14 +90,8 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
 
             if (_fromSave)
             {
-                if (_savedData.CurrentConnections != null)
-                {
-                    //_connectedTurbines = _savedData.CurrentConnections;
-                }
-                
-                //_colorManager.ChangeColor(_saveData.Body.Vector4ToColor());
-               //_colorManager.ChangeColor(_saveData.SecondaryBody.Vector4ToColor(), ColorTargetMode.Secondary);
-               _isBuilding = false;
+                _colorManager.LoadTemplate(_savedData.ColorTemplate);
+                _isBuilding = false;
                 _fromSave = false;
             }
         }
@@ -138,7 +132,8 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
         public override void Initialize()
         {
             //Get ladders
-            CreateLadders();
+            //CreateLadders();
+            base.Initialize();
             
             if (_doorSensor == null)
             {
@@ -261,12 +256,12 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
                     if(_connectedTurbines.ContainsKey(turbineSaveData.Key)) continue;
                     var parentTurbine = FCSAlterraHubService.PublicAPI.FindDeviceWithPreFabID(turbineSaveData.Value.ParentTurbineUnitID);
                     var currentTurbine = FCSAlterraHubService.PublicAPI.FindDeviceWithPreFabID(turbineSaveData.Key);
-
+                    
                     if (parentTurbine.Value != null && currentTurbine.Value != null)
                     {
                         var parentPlatformController = ((WindSurferPlatformBase)parentTurbine.Value).PlatformController;
                         var turbinePlatformController = ((WindSurferPlatformBase)currentTurbine.Value).PlatformController;
-
+                        ((WindSurferPlatformBase)currentTurbine.Value).LoadFromSave();
                         QuickLogger.Debug($"Adding From Save Turbine {turbinePlatformController.GetUnitID()} with connection to {parentPlatformController.GetUnitID()} on port {turbineSaveData.Value.Slot}");
 
                         var result = AddPlatformFromSave(turbineSaveData.Value.Slot, parentPlatformController, turbinePlatformController, turbineSaveData.Value.HoloGraphPosition);
@@ -348,7 +343,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
             _savedData.Id = GetPrefabID();
 
             QuickLogger.Debug($"Saving ID {_savedData.Id}", true);
-            //_savedData.Body = _colorManager.SaveTemplate();
+            _savedData.ColorTemplate = _colorManager.SaveTemplate();
             _savedData.BaseId = BaseId;
             _savedData.CurrentConnections = _connectedTurbines;
             newSaveData.WindSurferOperatorEntries.Add(_savedData);
@@ -690,21 +685,6 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
 
         public Action<ITelepowerPylonConnection> OnDestroyCalledAction { get; set; }
 
-        public void AddItemToPullGrid(ITelepowerPylonConnection telepowerPylonConnection, bool isChecked = false)
-        {
-            AddConnection(telepowerPylonConnection);
-        }
-
-        public void AddItemToPushGrid(ITelepowerPylonConnection telepowerPylonConnection, bool isChecked = false)
-        {
-
-        }
-
-        public void AddPylonToPushGrid(ITelepowerPylonConnection telepowerPylonConnection)
-        {
-            
-        }
-
         public IPowerInterface GetPowerRelay()
         {
             return _powerRelay;
@@ -759,6 +739,21 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
         public bool CanAddNewPylon()
         {
             return true;
+        }
+
+        public void ActivateItemOnPushGrid(ITelepowerPylonConnection parentController)
+        {
+            
+        }
+
+        public void ActivateItemOnPullGrid(ITelepowerPylonConnection controller)
+        {
+        }
+
+        public bool CheckIsPullingFrom(ITelepowerPylonConnection controller)
+        {
+            if (string.IsNullOrWhiteSpace(controller.UnitID)) return false;
+           return _currentConnections?.ContainsKey(controller.UnitID) ?? false;
         }
     }
 

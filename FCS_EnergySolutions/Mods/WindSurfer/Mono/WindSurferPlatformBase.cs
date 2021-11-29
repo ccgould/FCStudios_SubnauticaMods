@@ -1,4 +1,5 @@
-﻿using FCS_AlterraHub.Helpers;
+﻿using FCS_AlterraHub.Buildables;
+using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_EnergySolutions.Configuration;
@@ -10,10 +11,26 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
     {
         public override void Initialize()
         {
-            if (IsInitialized) return;
-            CreateLadders();
-            IsInitialized = true;
+            //if (IsInitialized) return;
 
+            if (_colorManager == null)
+            {
+                _colorManager = gameObject.AddComponent<ColorManager>();
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol);
+            }
+            
+            CreateLadders();
+            //IsInitialized = true;
+
+        }
+
+        public override bool ChangeBodyColor(ColorTemplate template)
+        {
+#if DEBUG
+            QuickLogger.Debug($"Changing Alterra Solar Cluster color to {ColorList.GetName(color)}", true);
+#endif
+
+            return _colorManager.ChangeColor(template);
         }
 
         private void CreateLadders()
@@ -38,5 +55,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
         public virtual void TryMoveToPosition(){}
         public virtual void PoleState(bool value){}
         public abstract void Save(SaveData newSaveData, ProtobufSerializer serializer = null);
+
+        public virtual void LoadFromSave(){}
     }
 }

@@ -2,6 +2,7 @@
 using FCS_AlterraHub.API;
 using FCS_AlterraHub.Buildables;
 using FCS_ProductionSolutions.Configuration;
+using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Buildable;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -42,7 +43,7 @@ namespace FCS_ProductionSolutions.Buildable
             MatterAnalyzerPrefab = GetPrefab(Mod.MatterAnalyzerPrefabName);
             DeepDrillerItemPrefab = GetPrefab("InventoryItemBTN");
             DeepDrillerOreBTNPrefab = GetPrefab("OreBTN");
-            DeepDrillerPrefab = GetPrefab(Mod.DeepDrillerMk3PrefabName);
+            DeepDrillerPrefab = GetPrefab(FCSDeepDrillerBuildable.DeepDrillerMk3PrefabName);
             DeepDrillerSandPrefab = GetPrefab("DD_SandOre");
             //DeepDrillerListItemPrefab = GetPrefab("DeepDrillerTransferToggleButton");
             //DeepDrillerProgrammingItemPrefab = GetPrefab("DeepDrillerProgrammingItem");

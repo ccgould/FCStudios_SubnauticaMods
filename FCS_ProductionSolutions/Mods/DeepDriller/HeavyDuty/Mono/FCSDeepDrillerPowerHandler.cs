@@ -23,7 +23,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         private FCSPowerStates _powerState;
         private AnimationCurve _depthCurve;
         private DeepDrillerPowerData _powerBank = new DeepDrillerPowerData();
-        private float _powerDraw;
+
         private PowerRelay _powerRelay;
         private FCSPowerStates _prevPowerState;
         private FCSDeepDrillerController _mono;
@@ -201,9 +201,9 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         private float CalculatePowerUsage()
         {
             float sum = _mono.UpgradeManager.Upgrades.Where(upgrade => upgrade.IsEnabled).Sum(upgrade => upgrade.PowerUsage);
-            return _powerDraw + sum;
+            return QPatch.Configuration.DDPowerDraw + sum;
         }
-
+        
         #endregion
 
         #region Internal Methods
@@ -215,9 +215,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 
             var thermal = gameObject.EnsureComponent<FCSDeepDrillerThermalController>();
             thermal.Initialize(_powerBank);
-
-            _powerDraw = QPatch.Configuration.DDPowerDraw + 
-                         QPatch.Configuration.DDOrePerDayUpgradePowerUsage + 12 * QPatch.Configuration.DDOreReductionValue;
+            
             _depthCurve = new AnimationCurve();
             _depthCurve.AddKey(0f, 0f);
             _depthCurve.AddKey(0.4245796f, 0.5001081f);
@@ -244,7 +242,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
             PowerState = data.PowerState;
         }
 
-        internal float GetPowerUsage()
+        public override float GetPowerUsage()
         {
             return CalculatePowerUsage();
         }
@@ -319,7 +317,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         /// Checks to see if all the conditions are met for being powered
         /// </summary>
         /// <returns>Returns true if power is available</returns>
-        public bool IsPowerAvailable()
+        public override bool IsPowerAvailable()
         {
             return !(GetTotalCharge() <= 0);
         }
@@ -329,8 +327,8 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
             if (_powerBank?.Battery == null) return 0f;
             return (_powerRelay?.GetPower() ?? 0) + _powerBank.Battery.GetCharge() + _powerBank.SolarPanel.GetCharge() + _powerBank.Thermal.GetCharge();
         }
-        
-        internal void SetPowerRelay(PowerRelay powerRelay)
+
+        public override void SetPowerRelay(PowerRelay powerRelay)
         {
             _powerRelay = powerRelay;
         }
@@ -385,7 +383,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
             PowerState = state;
         }
 
-        internal bool HasEnoughPowerToOperate()
+        public override bool HasEnoughPowerToOperate()
         {
             if (!IsPowerAvailable()) return false;
             var amount = CalculatePowerUsage();

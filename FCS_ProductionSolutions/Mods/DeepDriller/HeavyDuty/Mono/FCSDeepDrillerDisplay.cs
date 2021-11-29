@@ -619,14 +619,12 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
                 #region Visible Toggle Button
 
                 var isVisibleToggleBTN = GameObjectHelpers.FindGameObject(signalPage, "ToggleIsVisibleBTN");
-                QuickLogger.Debug("2");
+                
                 _isVisibleToggle = isVisibleToggleBTN.GetComponent<Toggle>();
-                QuickLogger.Debug("2");
                 _isVisibleToggle.onValueChanged.AddListener((state =>
                 {
                     _mono.ToggleVisibility(state);
                 }));
-                QuickLogger.Debug("2");
 
                 #endregion
 

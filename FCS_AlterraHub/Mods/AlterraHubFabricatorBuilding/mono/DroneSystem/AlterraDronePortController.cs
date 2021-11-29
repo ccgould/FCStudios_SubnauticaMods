@@ -58,7 +58,16 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         {
             var devices = Manager.GetDevices(Mod.AlterraHubDepotTabID);
 
-            return devices == null || devices.All(x => ((AlterraHubDepotController) x).IsFull());
+            if (devices == null) return true;
+
+            foreach (FcsDevice device in devices)
+            {
+                if(device == null) continue;
+
+                if (device is AlterraHubDepotController controller && !controller.IsFull()) return false;
+            }
+            
+            return true;
         }
 
         public bool IsOccupied => _assignedDrone != null;
@@ -150,7 +159,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
             foreach (FcsDevice device in devices)
             {
-                var depot = (AlterraHubDepotController) device;
+                if(device == null || device is not AlterraHubDepotController depot) continue;
+
                 //var avaliableSpace = depot.GetFreeSlotsCount();
 
                 for (int i = pendingItems.Count - 1; i >= 0; i--)
@@ -453,7 +463,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
             foreach (FcsDevice fcsDevice in devices)
             {
-                var device = (AlterraHubDepotController)fcsDevice;
+                if(fcsDevice == null || fcsDevice is not AlterraHubDepotController device) continue;
                 total += device.GetFreeSlotsCount();
             }
 

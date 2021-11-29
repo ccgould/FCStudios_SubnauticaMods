@@ -62,6 +62,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Buildable
             { $"{ModKey}_DrillDeactivated", "Drill Deactivated"},
             { $"{ModKey}_BaseIDErrorFormat", "Base {0} is either to far away or the ID is incorrect."},
             { $"{ModKey}_DrillBeaconPage", "Beacon Settings Page"},
+            { $"{ModKey}_NoLubricantFound", "No Lubricant found in player inventory."},
         };
 
 
@@ -309,6 +310,11 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Buildable
         public static string BeaconSettingsButton()
         {
             return GetLanguage($"{ModKey}_DrillBeaconPage");
+        }
+
+        public static string NoLubricantFound()
+        {
+            return GetLanguage($"{ModKey}_NoLubricantFound");
         }
     }
 }

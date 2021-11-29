@@ -8,6 +8,7 @@ using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.DataCollectors;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono;
+using FCS_AlterraHub.Mods.FCSPDA.Enums;
 using FCS_AlterraHub.Mods.FCSPDA.Mono;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
@@ -93,11 +94,20 @@ namespace FCS_AlterraHub.Patches
                 }
             }
 
+
             if (Input.GetKeyDown(QPatch.Configuration.FCSPDAKeyCode) || ForceOpenPDA && !__instance.GetPDA().isOpen)
             {
                 if (!FCSPDA.IsOpen)
                 {
-                    FCSPDA.Open();
+                    if(Input.GetKey(KeyCode.RightControl) || Input.GetKey(KeyCode.LeftControl))
+                    {
+                        FCSPDA.GoToPage(PDAPages.Teleportation);
+                        FCSPDA.Open();
+                    }
+                    else
+                    { 
+                        FCSPDA.Open();
+                    }
                 }
                 ForceOpenPDA = false;
             }

@@ -115,8 +115,9 @@ namespace FCS_EnergySolutions.Configuration
         [JsonProperty] internal float StoredPower { get; set; }
         [JsonProperty] internal Vec3 Position { get; set; }
         [JsonProperty] internal Vec4 Rotation { get; set; }
-        [JsonProperty] internal Vec3 PoleState { get; set; }
         [JsonProperty] internal float Speed { get; set; }
+        [JsonProperty] internal float ExtendProgress { get; set; }
+        [JsonProperty] internal double TimeStartGrowth { get; set; }
     }
 
     [Serializable]

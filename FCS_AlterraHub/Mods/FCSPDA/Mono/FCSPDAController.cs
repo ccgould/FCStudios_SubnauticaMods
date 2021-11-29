@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using BepInEx;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Enumerators;
@@ -32,7 +33,6 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         private PDA _pda;
         private int prevQuickSlot;
         private Sequence sequence = new(false);
-        private BaseManager _currentBase;
         private GameObject _inputDummy;
         private uGUI_InputGroup _ui;
         private Text _clock;
@@ -88,6 +88,8 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         private GameObject _404;
         private ShipmentPageController _shipmentPageController;
         private int _timesOpen;
+        private Text _currentBaseInfo;
+        private TeleportationPageController _teleportationPageController;
 
         #endregion
 
@@ -146,6 +148,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
 
             _toggleHud = GameObjectHelpers.FindGameObject(_canvas.gameObject, "ToggleHud");
             _accountName = GameObjectHelpers.FindGameObject(_canvas.gameObject, "UserName")?.GetComponent<Text>();
+            _currentBaseInfo = GameObjectHelpers.FindGameObject(_canvas.gameObject, "CurrentBaseInfo")?.GetComponent<Text>();
             _accountBalance = GameObjectHelpers.FindGameObject(_canvas.gameObject, "AccountBalance")?.GetComponent<Text>();
             _clock = GameObjectHelpers.FindGameObject(_canvas.gameObject, "Clock")?.GetComponent<Text>();
 
@@ -157,6 +160,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             AccountPage();
             LoadStore();
             LoadShipmentPage();
+            TeleportationPage();
 
             MaterialHelpers.ApplyEmissionShader(AlterraHub.BasePrimaryCol,gameObject,Color.white,0,0.01f,0.01f);
             MaterialHelpers.ApplySpecShader(AlterraHub.BasePrimaryCol,gameObject,1, 6.15f);
@@ -230,10 +234,11 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         {
             var pageTextLabel = _pages[PDAPages.Home].FindChild("PageName").GetComponent<Text>();
             var radialMenu = _pages[PDAPages.Home].FindChild("RadialMenu").AddComponent<RadialMenu>();
-            radialMenu.TabAmount = 3;
+            radialMenu.TabAmount = 4;
             radialMenu.AddEntry(this,ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(),"Icons", "Cart_Icon.png")),pageTextLabel,"Store",PDAPages.Store);
             radialMenu.AddEntry(this,ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(),"Icons", "EncyclopediaIcon.png")), pageTextLabel,"Encyclopedia",PDAPages.Encyclopedia);
             radialMenu.AddEntry(this,ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(),"Icons", "IconAccount.png")), pageTextLabel,"Account",PDAPages.AccountPage);
+            radialMenu.AddEntry(this,ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(),"Icons", "QuantumTeleporterIcon_W.png")), pageTextLabel,"Teleportation",PDAPages.Teleportation);
             radialMenu.Rearrange();
         }
 
@@ -271,6 +276,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             radialMenu.AddEntry(this, ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "Icons", "VehicleSolutionsIcon_W.png")), pageTextLabel, "Vehicle Solutions", PDAPages.VehicleSolutions);
             radialMenu.AddEntry(this, ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "Icons", "MiscIcon_W.png")), pageTextLabel, "Misc", PDAPages.MiscSolutions);
 
+            //Set gameobject to toggle for pages
             _pages[PDAPages.HomeSolutions] = _pages[PDAPages.StorePage];
             _pages[PDAPages.LifeSolutions] = _pages[PDAPages.StorePage];
             _pages[PDAPages.EnergySolutions] = _pages[PDAPages.StorePage];
@@ -318,6 +324,13 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             }));
         }
 
+        private void TeleportationPage()
+        {
+            _teleportationPageController = _pages[PDAPages.Teleportation].AddComponent<TeleportationPageController>();
+            _teleportationPageController.Initialize(this);
+
+        }
+
         private void EncyclopediaPage()
         {
             EncyclopediaTabController = _pages[PDAPages.Encyclopedia].AddComponent<EncyclopediaTabController>();
@@ -331,7 +344,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
 
         private void UpdateDisplay()
         {
-            if (_currentBiome == null || _accountName == null) return;
+            if (_currentBiome == null || _accountName == null || _currentBaseInfo == null) return;
 
             _currentBiome.text = Player.main.GetBiomeString();
 
@@ -339,8 +352,29 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
                 _accountName.text = CardSystem.main.GetUserName();
 
             _accountBalance.text = $"{CardSystem.main.GetAccountBalance():N0}";
+
+            var friendly = BaseManager.GetPlayersCurrentBase()?.GetBaseName();
+            var baseId = BaseManager.GetPlayersCurrentBase()?.GetBaseFriendlyId();
+
+            if (!string.IsNullOrWhiteSpace(friendly))
+            {
+                SetCurrentBaseInfoText(friendly);
+            }
+            else if (!string.IsNullOrWhiteSpace(baseId))
+            {
+                SetCurrentBaseInfoText(baseId);
+            }
+            else
+            {
+                SetCurrentBaseInfoText("N/A");
+            }
         }
-        
+
+        private void SetCurrentBaseInfoText(string text)
+        {
+            _currentBaseInfo.text = $"Current Base : {text}";
+        }
+
         internal void OnEnable()
         {
             QuickLogger.Debug($"FCS PDA: Active and Enabled {isActiveAndEnabled}",true);
@@ -368,7 +402,9 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             _404?.SetActive(!Mod.GamePlaySettings.IsPDAUnlocked);
             
             Player main = Player.main;
-            
+
+            _teleportationPageController.Refresh();
+
             CreateScreen();
 
             FindPDA();
@@ -414,6 +450,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             {
                 _pda.screen.SetActive(false);
             }
+            
             QuickLogger.Debug("FCS PDA Is Open", true);
             return true;
         }
@@ -520,7 +557,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
 
         internal void ShowMission()
         {
-            uGUI_PowerIndicator_Initialize_Patch.MissionHUD.ShowMessage("Hi","Eggo"); 
+           // uGUI_PowerIndicator_Initialize_Patch.MissionHUD.ShowMessage("Hi","Eggo"); 
         }
 
         internal void ShowMessage(string message)
@@ -617,6 +654,9 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
                     break;
                 case PDAPages.Shipment:
                     _shipmentPageController.gameObject.SetActive(true);
+                    break;
+                case PDAPages.Teleportation:
+                    _teleportationPageController.Refresh();
                     break;
                 default:
                     LoadStorePage(page);
@@ -859,6 +899,69 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             }   
         }
     }
+
+    internal class TeleportationPageController : MonoBehaviour
+    {
+        private GameObject _grid;
+        private List<ShipmentTracker> _trackedShipments = new();
+
+        public void Initialize(FCSPDAController controller)
+        {
+            var backButton = gameObject.FindChild("BackBTN").GetComponent<Button>();
+            backButton.onClick.AddListener((() =>
+            {
+                controller.GoToPage(PDAPages.Home);
+            }));
+
+            _grid = GameObjectHelpers.FindGameObject(gameObject, "Content");
+        }
+
+        internal void Refresh()
+        {
+            QuickLogger.Debug("Refreshing Teleportation list",true);
+            foreach (Transform child in _grid.transform)
+            {
+                Destroy(child.gameObject);
+            }
+
+            foreach (BaseManager baseManager in BaseManager.Managers)
+            {
+                if (baseManager.IsValidForTeleport())
+                {
+                    //Instantiate Item
+                    var item = GameObject.Instantiate(AlterraHub.PDATeleportItemPrefab);
+                    var baseItem = item.AddComponent<BaseTeleportItem>();
+                    baseItem.Initialize(baseManager);
+                    //Move in scrollview
+                    item.transform.SetParent(_grid.transform, false);
+                }
+            }
+        }
+    }
+
+    internal class BaseTeleportItem : MonoBehaviour
+    {
+        private Text _baseName;
+        private BaseManager _baseManager;
+
+        private void Awake()
+        {
+            _baseName = GameObjectHelpers.FindGameObject(gameObject, "BaseName")?.GetComponent<Text>();
+            var button = GameObjectHelpers.FindGameObject(gameObject, "TeleportBtn")?.GetComponent<Button>();
+            button?.onClick.AddListener((() =>
+            {
+                QuickLogger.Debug($"Trying to teleport to base: {_baseManager.GetBaseName()}",true);
+                FCSAlterraHubService.PublicAPI.TeleportationIgnitiated?.Invoke(_baseManager);
+            }));
+        }
+
+        internal void Initialize(BaseManager manager)
+        {
+            _baseName.text = manager.GetBaseName();
+            _baseManager = manager;
+        }
+    }
+
 
     internal class ShipmentTracker : MonoBehaviour
     {

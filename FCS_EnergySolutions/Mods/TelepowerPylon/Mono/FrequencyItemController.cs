@@ -24,10 +24,16 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
                 if (value)
                 {
                     QuickLogger.Debug($"Trying to Enable pull mode: {ParentController.GetCurrentMode()}");
+
                     if (ParentController.GetCurrentMode() == TelepowerPylonMode.PULL)
                     {
-                        TargetController.AddItemToPushGrid(ParentController, true);
+                        TargetController.ActivateItemOnPushGrid(ParentController);
                         ParentController.GetPowerManager().AddConnection(TargetController);
+                    }
+                    else
+                    {
+                        TargetController.ActivateItemOnPullGrid(ParentController);
+                        TargetController.GetPowerManager().AddConnection(ParentController);
                     }
                 }
                 else

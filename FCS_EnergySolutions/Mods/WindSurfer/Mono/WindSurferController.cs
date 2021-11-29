@@ -63,16 +63,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
 
             if (_fromSave)
             {
-                //_colorManager.ChangeColor(_saveData.Body.Vector4ToColor());
-                //_colorManager.ChangeColor(_saveData.SecondaryBody.Vector4ToColor(), ColorTargetMode.Secondary);
-                if (_savedData.PoleState != null)
-                {
-                    _pole1Trans.localPosition = new Vector3(_pole1Trans.localPosition.x, _savedData.PoleState.X, _pole1Trans.localPosition.z);
-                    _pole2Trans.localPosition = new Vector3(_pole2Trans.localPosition.x, _savedData.PoleState.Y, _pole1Trans.localPosition.z);
-                    _pole3Trans.localPosition = new Vector3(_pole3Trans.localPosition.x, _savedData.PoleState.Z, _pole1Trans.localPosition.z);
-                }
 
-                _motor.SpeedByPass(_savedData.Speed);
                 _fromSave = false;
             }
         }
@@ -84,34 +75,48 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
             transform.rotation = _savedData.Rotation.Vec4ToQuaternion();
         }
 
+        public override void LoadFromSave()
+        {
+            if (_savedData == null)
+            {
+                ReadySaveData();
+            }
+
+            _colorManager.LoadTemplate(_savedData.ColorTemplate);
+            _timeStartGrowth = _savedData.TimeStartGrowth;
+            SetPosition(_pole1Trans, _savedData.ExtendProgress, _pole1AnimationCurve, _pole1Max);
+            SetPosition(_pole2Trans, _savedData.ExtendProgress, _pole2AnimationCurve, _pole2Max);
+            SetPosition(_pole3Trans, _savedData.ExtendProgress, _pole3AnimationCurve, _pole3Max);
+            _motor.SpeedByPass(_savedData.Speed); 
+        }
 
         private void Update()
         {
             if (_allowedToExtend)
             {
-                float progress = this.GetProgress();
+                float progress = GetProgress();
                 if (!_allowedToExtend || Mathf.Approximately( progress, 1)) return;
                 
-                this.SetPosition(_pole1Trans, progress, _pole1AnimationCurve, _pole1Max);
-                this.SetPosition(_pole2Trans, progress, _pole2AnimationCurve, _pole2Max);
-                this.SetPosition(_pole3Trans, progress, _pole3AnimationCurve, _pole3Max);
+                SetPosition(_pole1Trans, progress, _pole1AnimationCurve, _pole1Max);
+                SetPosition(_pole2Trans, progress, _pole2AnimationCurve, _pole2Max);
+                SetPosition(_pole3Trans, progress, _pole3AnimationCurve, _pole3Max);
             }
         }
 
         private float GetProgress()
         {
-            if (this._timeStartGrowth == -1f)
+            if (_timeStartGrowth == -1f)
             {
-                this.SetProgress(0f);
+                SetProgress(0f);
                 return 0f;
             }
-            return Mathf.Clamp((float)(DayNightCycle.main.timePassed - (double)this._timeStartGrowth) / 30, 0f, this.maxProgress);
+            return Mathf.Clamp((float)(DayNightCycle.main.timePassed - (double)_timeStartGrowth) / 30, 0f, maxProgress);
         }
 
         private void SetProgress(float progress)
         {
-            progress = Mathf.Clamp(progress, 0f, this.maxProgress);
-            this._timeStartGrowth = DayNightCycle.main.timePassedAsFloat - 30 * progress;
+            progress = Mathf.Clamp(progress, 0f, maxProgress);
+            _timeStartGrowth = DayNightCycle.main.timePassedAsFloat - 30 * progress;
         }
 
         private void SetPosition(Transform tr, float progress,AnimationCurve curve,float max)
@@ -157,10 +162,10 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
 
         public override void Initialize()
         {
+            base.Initialize();
 
             if (_motor == null)
             {
-
                 _pole1Trans = GameObjectHelpers.FindGameObject(gameObject, "Pole1").transform;
                 _pole2Trans = GameObjectHelpers.FindGameObject(gameObject, "Pole2").transform;
                 _pole3Trans = GameObjectHelpers.FindGameObject(gameObject, "Pole3").transform;
@@ -176,7 +181,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
                 PowerController.Initialize(this);
             }
 
-            CreateLadders();
+            //CreateLadders();
 
             IsInitialized = true;
         }
@@ -219,12 +224,13 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
             _savedData.Id = GetPrefabID();
 
             QuickLogger.Debug($"Saving ID {_savedData.Id}", true);
-            //_savedData.Body = _colorManager.SaveTemplate();
+            _savedData.ColorTemplate = _colorManager.SaveTemplate();
             _savedData.BaseId = BaseId;
             _savedData.Position = transform.position.ToVec3();
             _savedData.Rotation = transform.rotation.QuaternionToVec4();
             _savedData.StoredPower = PowerController.GetStoredPower();
-            _savedData.PoleState = new Vec3(_pole1Trans.localPosition.y, _pole2Trans.localPosition.y,_pole3Trans.localPosition.y);
+            _savedData.ExtendProgress = GetProgress();
+            _savedData.TimeStartGrowth = _timeStartGrowth;
             _savedData.Speed = _motor.GetRPM();
             newSaveData.WindSurferEntries.Add(_savedData);
         }

@@ -66,7 +66,7 @@ namespace FCS_AlterraHub.API
             var image = bundle.LoadAsset<Texture2D>(imageName);
             if (image == null)
             {
-                QuickLogger.Error($"Failed to find image {imageName} in bundle {bundleName}");
+                QuickLogger.DebugError($"Failed to find image {imageName} in bundle {bundleName}");
                 return null;
             }
 

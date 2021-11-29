@@ -6,6 +6,7 @@ using FCS_AlterraHub.Model.Converters;
 using FCS_AlterraHub.Mono;
 using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Buildable;
 using FCS_ProductionSolutions.Mods.DeepDriller.Interfaces;
+using FCS_ProductionSolutions.Mods.DeepDriller.Managers;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -13,7 +14,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 {
     internal class FCSDeepDrillerOilHandler : MonoBehaviour, IFCSStorage
     {
-        private IDeepDrillerController _mono;
+        private DrillSystem _mono;
         public int GetContainerFreeSpace { get; }
         public Action<int, int> OnContainerUpdate { get; set; }
         public Action<FcsDevice, TechType> OnContainerAddItem { get; set; }
@@ -24,7 +25,6 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         private readonly float _lubricantRefillAmount = KDayInSeconds * QPatch.Configuration.DDOilRestoresInDays;
         private float _timeLeft;
         private float _elapsed;
-        internal Action OnOilUpdate { get; set; }
 
         private void Update()
         {
@@ -45,12 +45,12 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
                 if (_elapsed >= 1f)
                 {
                     _elapsed %= 1f;
-                    OnOilUpdate?.Invoke();
+                    _mono.OnOilLevelChange?.Invoke(GetOilPercent());
                 }
             }
         }
 
-        internal void Initialize(IDeepDrillerController mono)
+        internal void Initialize(DrillSystem mono)
         {
             _mono = mono;
             _timeLeft = 0f;
@@ -91,14 +91,19 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
-            if (pickupable.GetTechType() != TechType.Lubricant)
+            return IsAllowedToAdd(pickupable.GetTechType(),verbose);
+        }
+
+        public bool IsAllowedToAdd(TechType techType, bool verbose)
+        {
+            if (techType != TechType.Lubricant)
             {
-                QuickLogger.Message(FCSDeepDrillerBuildable.NotAllowedItem(),true);
+                QuickLogger.Message(FCSDeepDrillerBuildable.NotAllowedItem(), true);
                 return false;
             }
 
             if (!CanBeStored(_mono.OilDumpContainer.GetCount(), TechType.Lubricant))
-            {   
+            {
                 QuickLogger.Message(FCSDeepDrillerBuildable.OilTankNotFormatEmpty(TimeTilRefuel()), true);
                 return false;
             }
@@ -121,7 +126,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
             return null;
         }
 
-        private string TimeTilRefuel()
+        internal string TimeTilRefuel()
         {
             var mod = _timeLeft % KDayInSeconds;
             return TimeConverters.SecondsToHMS(mod);

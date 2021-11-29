@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Model;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Models;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States;
@@ -93,11 +94,12 @@ namespace FCS_ProductionSolutions.Configuration
     
     
     [Serializable]
-    internal class DeepDrillerLightDutySaveDataEntry
+    internal class DeepDrillerLightDutySaveDataEntry : ISaveDataEntry
     {
         [JsonProperty] internal float Health { get; set; }
-
-        [JsonProperty] internal string Id { get; set; }
+        
+        public string Id { get; set; }
+        public string BaseId { get; set; }
 
         [JsonProperty] internal FCSPowerStates PowerState { get; set; }
 
@@ -112,7 +114,10 @@ namespace FCS_ProductionSolutions.Configuration
         [JsonProperty] internal ColorTemplateSave ColorTemplate { get; set; }
         [JsonProperty] internal string BeaconName { get; set; }
         [JsonProperty] internal bool IsPingVisible { get; set; }
-        public bool IsBrakeSet { get; set; }
+        [JsonProperty] internal bool IsBrakeSet { get; set; }
+        [JsonProperty] internal HashSet<TechType> FocusOres { get; set; }
+        [JsonProperty] internal bool IsFocused { get; set; }
+        [JsonProperty] internal bool IsBlackListMode { get; set; }
     }
 
     [Serializable]

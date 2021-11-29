@@ -110,8 +110,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Patches
                 return;
             }
 
-            _craftToggleItemPrefab = ModelPrefab.GetPrefabFromGlobal("OnScreenItemToggleSelection")
-                .AddComponent<uGUI_FCSDisplayItem>().gameObject;
+            _craftToggleItemPrefab = ModelPrefab.GetPrefabFromGlobal("OnScreenItemToggleSelection").AddComponent<uGUI_FCSDisplayItem>().gameObject;
             _fcsToggleItemPrefab = ModelPrefab.GetPrefabFromGlobal("FCSToggle");
             _toggleGroup = gameObject.GetComponentInChildren<ToggleGroup>();
             _amountInput = GameObjectHelpers.FindGameObject(gameObject, "AmountInputField").GetComponent<InputField>();
@@ -134,8 +133,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Patches
                 }
             }));
 
-            _isRecursiveToggle =
-                GameObjectHelpers.FindGameObject(gameObject, "IsRecursiveToggle").GetComponent<Toggle>();
+            _isRecursiveToggle = GameObjectHelpers.FindGameObject(gameObject, "IsRecursiveToggle").GetComponent<Toggle>();
             _isRecursiveToggle.onValueChanged.AddListener((value =>
             {
                 _isRecursive = value;
