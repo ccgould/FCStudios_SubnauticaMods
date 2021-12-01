@@ -43,7 +43,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Spawnables
                 
                 PatchedTechType = TechType;
 
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, TechType, 650000, StoreCategory.Home);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, TechType, 1,650000, StoreCategory.Home,true);
 
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
             };

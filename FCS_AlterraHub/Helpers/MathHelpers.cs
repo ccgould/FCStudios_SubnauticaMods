@@ -68,5 +68,16 @@ namespace FCS_AlterraHub.Helpers
                 }
             }
         }
+
+        public static decimal PercentageOfNumber(decimal percentage, decimal amount)
+        {
+            //Equation: Y = P% * X
+            //Equation: Y = percentage * amount
+
+            var p = percentage / 100;
+            var y = p * amount;
+
+            return y;
+        }
     }
 }

@@ -305,7 +305,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
 
             AlterraHub.ApplyShadersV2(gameObject);
             gameObject.SetActive(true);
-            gameObject.SetActive(false);
         }
 
         public override bool IsVisible => GetIsVisible();

@@ -78,6 +78,7 @@ namespace FCS_AlterraHub.Buildables
             { $"{ModKey}_OreValue","Ore Value"},
             { $"{ModKey}_TimeLeft","Time Left"},
             { $"{ModKey}_PleaseClearHands","Please clear hands (E) to use."},
+            { $"{ModKey}_DebitHasBeenPaid","Your balance has been paid off."},
         };
 
         private void AdditionalPatching()
@@ -445,6 +446,11 @@ namespace FCS_AlterraHub.Buildables
         public static string PleaseClearHands()
         {
             return GetLanguage($"{ModKey}_PleaseClearHands");
+        }
+
+        public static string DebitHasBeenPaid()
+        {
+            return GetLanguage($"{ModKey}_DebitHasBeenPaid");
         }
     }
 }

@@ -20,15 +20,18 @@ namespace FCS_AlterraHub.Configuration
         private static TeleportScreenFXController _teleportEffects;
 
         [ConsoleCommand("givecredit")]
-        public static string GiveCreditCommand(double amount)
+        public static string GiveCreditCommand(string amount)
         {
-            if (CardSystem.main.HasBeenRegistered())
+            if (decimal.TryParse(amount, out var result))
             {
-                CardSystem.main.AddFinances((decimal) amount);
-            }
-            else
-            {
-                return "No account found. Please create an account to use this command";
+                if (CardSystem.main.HasBeenRegistered())
+                {
+                    CardSystem.main.AddFinances(result);
+                }
+                else
+                {
+                    return "No account found. Please create an account to use this command";
+                }
             }
             return $"Parameters: {amount}";
         }
@@ -83,12 +86,15 @@ namespace FCS_AlterraHub.Configuration
         }
 
         [ConsoleCommand("CreateDummyAccount")]
-        public static string CreateDummyAccount(int amount = 0)
+        public static string CreateDummyAccount(string amount = "0")
         {
             if(!CardSystem.main.HasBeenRegistered())
             {
-                CardSystem.main.CreateUserAccount("Ryley Robinson", "RyleyRobinson4546B", "planet4546B", "4546", amount);
-                return $"Created account RyleyRobinson4546B with amount {amount} balance.";
+                if (decimal.TryParse(amount, out var result))
+                {
+                    CardSystem.main.CreateUserAccount("Ryley Robinson", "RyleyRobinson4546B", "planet4546B", "4546", result);
+                    return $"Created account RyleyRobinson4546B with amount {amount} balance.";
+                }
             }
             QuickLogger.Message($"Account already exist {CardSystem.main.GetUserName()}", true);
             return $"Parameters: {nameof(amount)} Amount to put in account";

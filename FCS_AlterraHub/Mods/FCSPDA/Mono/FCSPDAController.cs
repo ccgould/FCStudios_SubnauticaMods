@@ -484,6 +484,8 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
                 uGUI.main.quickSlots.SetTarget(vehicle);
             }
 
+            _accountPageHandler.Close();
+
 
 #if SUBNAUTICA_STABLE
             MainGameController.Instance.PerformGarbageAndAssetCollection();
@@ -651,6 +653,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
                 case PDAPages.AccountPage:
                     _toggleHud.gameObject.SetActive(true);
                     _accountPageHandler.UpdateRequestBTN(CardSystem.main.HasBeenRegistered());
+                    _accountPageHandler.Refresh(); 
                     break;
                 case PDAPages.Shipment:
                     _shipmentPageController.gameObject.SetActive(true);

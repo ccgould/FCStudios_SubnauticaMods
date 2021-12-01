@@ -286,7 +286,6 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
         
         public override float GetPowerUsage()
         {
-            QuickLogger.Debug("Taking Power",true);
             var amount = _locked ? 0.7f : 0f;
             _powerUsagePerSecond.text = $"Power Usage Per Second : {amount}";
             return amount;

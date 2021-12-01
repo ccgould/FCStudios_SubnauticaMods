@@ -586,6 +586,8 @@ namespace FCS_AlterraHub.Configuration
             VoiceNotificationSystem.RegisterVoice(Path.Combine(Mod.GetAssetPath(), "Audio", "PDA_Account_Instructions.mp3"), "Please create a temporary AlterraHub account. This temporary account is needed because the Alterra Universal Transponder is unable to establish a connection to an Authorized Alterra Network. This temporary account will let you accumulate Alterra Credits and order goods and services from AlterraHub. Don't worry, your temporary account will be merged with your official Alterra Account when in range of an Authorized Alterra Network.");
             VoiceNotificationSystem.RegisterVoice(Path.Combine(Mod.GetAssetPath(), "Audio", "PDA_Account_Created.mp3"), @"Thank you for creating a temporary Alterra Account. You can now order goods and services from enabled AlterraHub Catalogs. Ores deposited in an Alterra Ore Consumer will add credits to your account. The Alterra Depot holds your deliveries for pickup so a convenient location is preferable. The Alterra Transport Drone Terminal recharges the Transport Drone while it delivers your order. Please route base traffic accordingly. Please contact your Project Supervisor if any of these items are not available. For more information on these devices, please see the AlterraHub Encyclopedia on the FCStudios PDA.");
             VoiceNotificationSystem.RegisterVoice(Path.Combine(Mod.GetAssetPath(), "Audio", "PDA_Drone_Instructions.mp3"), "An Alterra Transport Drone Terminal and Alterra Depot are necessary for orders to be delivered. Please notify your Project Supervisor.");
+            VoiceNotificationSystem.RegisterVoice(Path.Combine(Mod.GetAssetPath(), "Audio", "Play_NotDebtPaid.mp3"), null /*"Hey Riley! Welcome home to Alterra, permission to land denied.  You still have an outstanding balance on your Alterra account."*/);
+            VoiceNotificationSystem.RegisterVoice(Path.Combine(Mod.GetAssetPath(), "Audio", "Play_DebtPaid.mp3"), null /*"Hey Riley!  Welcome home to Alterra, permission to land granted. All debt has been paid."*/);
         }
 
         public static PatreonStatueDataEntry GetPatreonStatueEntrySaveData(string id)
@@ -626,7 +628,9 @@ namespace FCS_AlterraHub.Configuration
         [JsonProperty] internal Dictionary<string, Shipment> PendingPurchases { get; set; }
         [JsonProperty] internal Shipment CurrentOrder { get; set; }
         public int FabStationBeaconColorIndex { get; set; }
-        public bool FabStationBeaconVisible { get; set; }
+        public bool FabStationBeaconVisible { get; set; } = true;
+        public float Rate = 10;
+        public bool AutomaticDebitDeduction;
 
         public bool ConditionMet(string condition)
         {

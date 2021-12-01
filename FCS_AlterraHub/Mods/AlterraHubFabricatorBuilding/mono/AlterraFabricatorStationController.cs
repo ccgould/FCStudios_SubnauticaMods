@@ -258,7 +258,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             }
         }
 
-        internal void UpdateBeaconState(bool value)
+        internal void UpdateBeaconState(bool value, int colorIndex = 0)
         {
             if (_ping == null)
             {
@@ -270,8 +270,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             
             if (_ping != null)
             {
-                //_ping.enabled = value;
                 _ping.visible = value;
+                _ping.colorIndex = colorIndex;
             }
         }
 
@@ -322,10 +322,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                 FCSPDAController.Main.AddShipment(shipment.Value);
             }
 
-            _ping.colorIndex = settings.FabStationBeaconColorIndex;
-            _ping.visible = settings.FabStationBeaconVisible;
-
-            //UpdateBeaconState(!settings.IsPDAUnlocked);
+            UpdateBeaconState(settings.FabStationBeaconVisible,settings.FabStationBeaconColorIndex);
 
             InvokeRepeating(nameof(TryShip),1f,1f);
 

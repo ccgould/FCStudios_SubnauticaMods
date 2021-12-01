@@ -439,7 +439,26 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
 
         private void AppendMoney(decimal price)
         {
-            CardSystem.main.AddFinances(price);
+            decimal deduction = 0;
+
+            if (Mod.GamePlaySettings.AutomaticDebitDeduction && !CardSystem.main.IsDebitPaid())
+            {
+                deduction = MathHelpers.PercentageOfNumber(Convert.ToDecimal(Mod.GamePlaySettings.Rate), price);
+
+                //Get the remainder and add it to the price
+                var needed = CardSystem.main.AmountNeededForDebt();
+
+                // Get the remainder
+                var remainder = needed - deduction;
+
+                if (remainder < 0)
+                {
+                    //set the new deduction
+                    deduction = deduction + remainder;
+                }
+            }
+            
+            CardSystem.main.AddFinances(price,!CardSystem.main.IsDebitPaid() ?  deduction : 0);
         }
         
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)

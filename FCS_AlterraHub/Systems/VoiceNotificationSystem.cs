@@ -149,6 +149,7 @@ namespace FCS_AlterraHub.Systems
 
         public void ShowSubtitle(string message)
         {
+            if(Subtitles.main == null) return;
 #if SUBNAUTICA
             Subtitles.main.Add(message, null);
 #else

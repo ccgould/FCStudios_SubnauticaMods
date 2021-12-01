@@ -31,7 +31,7 @@ namespace FCS_AlterraHub.Systems
         [JsonProperty] public string PIN { get; set; }
         public decimal Balance { internal get; set; }
         [JsonProperty] public string AccountBalance { get; set; }
-        [JsonProperty] public static decimal AlterraDebitPayed { get; set; }
+        [JsonProperty] public decimal AlterraDebitPayed { get; set; }
         [JsonProperty] public decimal AccountBeforeDebit { get; set; }
         [JsonProperty] public Dictionary<string, string> KnownCardNumbers = new Dictionary<string, string>();
 
@@ -131,9 +131,7 @@ namespace FCS_AlterraHub.Systems
         /// <summary>
         /// Adds credit to the account.
         /// </summary>
-        /// <param name="cardNumber">The number of the card</param>
         /// <param name="amount">The amount of credit to add to the account.</param>
-        /// <param name="callBack">Callback method to call in-case of error</param>
         /// <returns>Boolean on success</returns>
         public bool AddFinances(decimal amount)
         {
@@ -151,6 +149,24 @@ namespace FCS_AlterraHub.Systems
                 return false;
             }
             return true;
+        }
+
+        /// <summary>
+        /// Adds credit to the account.
+        /// </summary>
+        /// <param name="amount">The amount of credit to add to the account.</param>
+        /// <returns>Boolean on success</returns>
+        /// <param name="deduction"> the amount to deduct from the pay.</param>
+        public bool AddFinances(decimal amount, decimal deduction)
+        {
+            var result = AddFinances(amount - deduction);
+
+            if (result)
+            {
+                PayDebit(deduction);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -352,16 +368,41 @@ namespace FCS_AlterraHub.Systems
 
         private bool IsAlterraRepaid()
         {
-            return AccountDetails.AlterraDebitPayed >= AlterraDebit;
+            return _accountDetails.AlterraDebitPayed >= AlterraDebit;
         }
 
-        public void PayDebit(decimal amount)
+        public bool PayDebit(decimal amount)
         {
-            QuickLogger.Debug($"Trying to add {amount} to {AccountDetails.AlterraDebitPayed}",true);
-            AccountDetails.AlterraDebitPayed += amount;
-            RemoveFinances(amount);
+            QuickLogger.Debug($"Trying to add {amount} to {_accountDetails.AlterraDebitPayed}", true);
+
+            // Check if debit needs to be paid.
+            if (IsDebitPaid())
+            {
+                return false;
+            }
+
+            var abs = AmountNeededForDebt();
+
+            var amountToTake = abs >= amount ? amount : abs;
+
+            _accountDetails.AlterraDebitPayed += amountToTake;
+            RemoveFinances(amountToTake);
+            return true;
         }
-        
+
+        public decimal AmountNeededForDebt()
+        {
+            var amountNeeded = AlterraDebit + _accountDetails.AlterraDebitPayed;
+
+            var abs = Math.Abs(amountNeeded);
+            return abs;
+        }
+
+        public bool IsDebitPaid()
+        {
+            return AlterraDebit + _accountDetails.AlterraDebitPayed >= 0;
+        }
+
         public string GetUserName()
         {
             if (_accountDetails == null) return string.Empty;
@@ -385,7 +426,7 @@ namespace FCS_AlterraHub.Systems
 
         public decimal AlterraBalance()
         {
-            return AlterraDebit + AccountDetails.AlterraDebitPayed;
+            return AlterraDebit + _accountDetails.AlterraDebitPayed;
         }
 
         public bool IsAccountNameValid(string accountName)
@@ -425,6 +466,11 @@ namespace FCS_AlterraHub.Systems
         public void Refund(TechType techType, bool checkIfKit = true)
         {
             AddFinances( StoreInventorySystem.GetPrice(techType, checkIfKit));
+        }
+
+        public bool HasPaymentBeenMadeToDebit()
+        {
+            return _accountDetails.AlterraDebitPayed > 0;
         }
     }
 }

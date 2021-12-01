@@ -1,8 +1,11 @@
-﻿using FCS_AlterraHub.Configuration;
+﻿using System;
+using FCS_AlterraHub.Buildables;
+using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Helpers;
+using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -24,14 +27,32 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
         private GameObject _createAccountDialog;
         private Text _requestButtonText;
         private FCSPDAController _mono;
+        private readonly Text _sliderText;
+        private readonly Slider _slider;
+        private readonly Toggle _deductionToggle;
 
         internal AccountPageHandler(FCSPDAController mono)
         {
             _mono = mono;
 
             var accountPage = GameObjectHelpers.FindGameObject(mono.ui.gameObject, "AccountPage");
-            
+
             _createAccountDialog = GameObjectHelpers.FindGameObject(mono.ui.gameObject, "CreateAccountDialog");
+
+            _slider = GameObjectHelpers.FindGameObject(accountPage, "Slider").GetComponent<Slider>();
+            _sliderText = _slider.GetComponentInChildren<Text>();
+            _slider.onValueChanged.AddListener((value =>
+            {
+                Mod.GamePlaySettings.Rate = value * 10f;
+                _sliderText.text = $"{Mathf.CeilToInt(Mod.GamePlaySettings.Rate)}%";
+            }));
+
+            _deductionToggle = GameObjectHelpers.FindGameObject(accountPage, "AutomaticDebitDeduction").GetComponent<Toggle>();
+            _deductionToggle.onValueChanged.AddListener((value =>
+            {
+                Mod.GamePlaySettings.AutomaticDebitDeduction = value;
+            }));
+
             var createAccountDialogCloseBtn = GameObjectHelpers.FindGameObject(_createAccountDialog, "CloseBTN").GetComponent<Button>();
             createAccountDialogCloseBtn.onClick.AddListener(() =>
             {
@@ -74,6 +95,11 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
                 }
                 if (CardSystem.main.HasEnough(_pendingPayment))
                 {
+                    if (CardSystem.main.IsDebitPaid())
+                    {
+                        QuickLogger.ModMessage(AlterraHub.DebitHasBeenPaid());
+                        return;
+                    }
                     CardSystem.main.PayDebit(_pendingPayment);
                 }
                 else
@@ -237,6 +263,20 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
         {
             var container = Inventory.main.container;
             return container.Contains(TechType.FiberMesh) && container.Contains(TechType.Magnetite);
+        }
+
+        internal void Refresh()
+        {
+            _slider.SetValueWithoutNotify(Mod.GamePlaySettings.Rate / 10f);
+            _sliderText.text = $"{Mathf.CeilToInt(Mod.GamePlaySettings.Rate)}%";
+
+            _deductionToggle.SetIsOnWithoutNotify(Mod.GamePlaySettings.AutomaticDebitDeduction);
+        }
+
+        public void Close()
+        {
+            ResetPaymentScreen();
+            HidePaymentScreen();
         }
     }
 }
