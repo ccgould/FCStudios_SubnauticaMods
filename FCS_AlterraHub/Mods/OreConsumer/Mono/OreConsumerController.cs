@@ -107,7 +107,7 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
 
         private void UpdateAnimation()
         {
-            if (!IsConstructed && !IsInitialized) return;
+            if (!IsConstructed || !IsInitialized || Manager == null) return;
 
             if (_oreQueue != null && _oreQueue.Count > 0 && (Manager.GetPowerState() == PowerSystem.Status.Normal || Manager.GetPowerState() == PowerSystem.Status.Emergency) && !_isBreakerTripped)
             {
@@ -139,7 +139,7 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
 
         private void Update()
         {
-            if(!IsConstructed && !IsInitialized) return;
+            if(!IsConstructed || !IsInitialized || Manager == null) return;
 
             if (_lowPassFilter != null)
             {
@@ -579,10 +579,16 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
 
             if (!CardSystem.main.HasBeenRegistered())
             {
-                //QuickLogger.ModMessage(AlterraHub.AccountNotFoundFormat());
                 VoiceNotificationSystem.main.ShowSubtitle(AlterraHub.AccountNotFoundFormat());
                 return;
             }
+
+            if (Manager == null)
+            {
+                VoiceNotificationSystem.main.ShowSubtitle(AlterraHub.MustBeBuiltOnBasePlatform());
+                return;
+            }
+
             OreConsumerHUD.Main.Show(this);
         }
 

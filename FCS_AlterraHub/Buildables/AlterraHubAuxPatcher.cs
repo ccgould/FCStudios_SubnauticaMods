@@ -79,6 +79,7 @@ namespace FCS_AlterraHub.Buildables
             { $"{ModKey}_TimeLeft","Time Left"},
             { $"{ModKey}_PleaseClearHands","Please clear hands (E) to use."},
             { $"{ModKey}_DebitHasBeenPaid","Your balance has been paid off."},
+            { $"{ModKey}_MustBeBuiltOnBasePlatform","Must be built on Base Platform"},
         };
 
         private void AdditionalPatching()
@@ -451,6 +452,11 @@ namespace FCS_AlterraHub.Buildables
         public static string DebitHasBeenPaid()
         {
             return GetLanguage($"{ModKey}_DebitHasBeenPaid");
+        }
+
+        public static string MustBeBuiltOnBasePlatform()
+        {
+            return GetLanguage($"{ModKey}_MustBeBuiltOnBasePlatform");
         }
     }
 }
