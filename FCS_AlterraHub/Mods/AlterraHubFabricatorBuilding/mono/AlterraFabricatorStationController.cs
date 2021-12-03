@@ -93,6 +93,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         
         private void Start()
         {
+#if SUBNAUTICA
             CreatePorts();
 
             _generator = GameObjectHelpers.FindGameObject(gameObject, "Anim_Generator").AddComponent<GeneratorController>();
@@ -186,6 +187,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             OnGamePlaySettingsLoaded(Mod.GamePlaySettings);
 
             InvokeRepeating(nameof(CheckIfSecurityDoorCanUnlock),1f,1f);
+#endif
         }
 
         private void CheckIfSecurityDoorCanUnlock()
@@ -556,10 +558,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 
             foreach (DroneController controller in drones)
             {
-                if (controller != null)
-                {
-                    DestroyImmediate(controller.gameObject);
-                }
+                DestroyImmediate(controller.gameObject);
             }
 
             ClearDronesList();

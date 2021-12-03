@@ -445,12 +445,17 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             _screen.SetActive(true);
             UwePostProcessingManager.OpenPDA();
             SafeAnimator.SetBool(Player.main.armsController.animator, "using_pda", true);
+
+#if SUBNAUTICA
             _pda.ui.soundQueue.PlayImmediately(_pda.ui.soundOpen);
             if (_pda.screen.activeSelf)
             {
                 _pda.screen.SetActive(false);
             }
-            
+#else
+#endif
+
+
             QuickLogger.Debug("FCS PDA Is Open", true);
             return true;
         }
@@ -499,7 +504,10 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             SafeAnimator.SetBool(Player.main.armsController.animator, "using_pda", false);
             ui.Deselect(null);
             UwePostProcessingManager.ClosePDA();
+#if SUBNAUTICA
             _pda.ui.soundQueue.PlayImmediately(_pda.ui.soundClose);
+#else
+#endif
             UwePostProcessingManager.ToggleDof(_depthState);
             QuickLogger.Debug("FCS PDA Is Closed", true);
         }
@@ -540,7 +548,10 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             QuickLogger.Debug("In Find PDA");
             if (PdaCanvas == null)
             {
+#if SUBNAUTICA
                 PdaCanvas = PDAObj?.GetComponent<PDA>()?.screen?.gameObject?.GetComponent<Canvas>();
+#else
+#endif
                 Player main = Player.main;
                 _pda = main.GetPDA();
             }

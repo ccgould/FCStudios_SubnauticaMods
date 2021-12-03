@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Mono;
 using UnityEngine;
+using UWE;
 
 namespace FCS_ProductionSolutions.Mods.AutoCrafter.Helpers
 {
@@ -30,7 +32,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Helpers
          private  static IEnumerator AttemptToAddToNetworkAsync(TechType techType, BaseManager manager,List<TechType> _storedItems)
         {
             TaskResult<InventoryItem> taskResult = new TaskResult<InventoryItem>();
-            yield return AsyncExtensions.ToInventoryItemLegacyAsync(techType, taskResult);
+            yield return AsyncExtensions.ToInventoryItem(techType, taskResult);
             var inventoryItem = taskResult.Get();
             var result = BaseManager.AddItemToNetwork(manager, inventoryItem, true);
             if (result)

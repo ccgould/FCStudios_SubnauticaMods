@@ -147,12 +147,20 @@ namespace FCS_AlterraHub.Patches
 
         private static IEnumerator CreateFcsPda(Player player)
         {
+#if SUBNAUTICA
             yield return new WaitUntil(() => player.pdaSpawn.spawnedObj != null);
+#else
+            yield return new WaitUntil(() => player.pda.prefabScreen != null);
+#endif
 
             QuickLogger.Debug("Creating FCS PDA");
 
+#if SUBNAUTICA
             defPDA = player.pdaSpawn.spawnedObj;
-            
+#else
+            defPDA = player.pda.prefabScreen;
+#endif
+
             var pda = GameObject.Instantiate(AlterraHub.FcsPDAPrefab, default, default, true);
             var canvas = pda.GetComponentInChildren<Canvas>();
             if (canvas != null)
@@ -162,7 +170,7 @@ namespace FCS_AlterraHub.Patches
             var controller = pda.AddComponent<FCSPDAController>();
 
             FCSPDA = controller;
-            controller.PDAObj = player.pdaSpawn.spawnedObj;
+            controller.PDAObj = defPDA;
             controller.SetInstance();
             controller.LoadCart(Mod.GetAlterraHubSaveData());
             AddUnlockedEncyclopediaEntries(FCSAlterraHubService.InternalAPI.EncyclopediaEntries);
@@ -175,7 +183,9 @@ namespace FCS_AlterraHub.Patches
         {
             foreach (var data in from entry in encyclopediaEntries from data in entry from entryData in data.Value where entryData.Unlocked select data)
             {
+#if SUBNAUTICA
                 PDAEncyclopedia.Add(data.Key, false);
+#endif
             }
         }
     }

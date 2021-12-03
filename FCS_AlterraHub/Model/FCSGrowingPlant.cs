@@ -44,8 +44,11 @@ namespace FCS_AlterraHub.Model
 
             growingTransform = growingPlant.growingTransform;
 
+#if SUBNAUTICA
             grownModelPrefab = growingPlant.grownModelPrefab;
-            
+#else
+#endif
+
             _minScale = Mod.HeightRestrictions.ContainsKey(seed.plantTechType) ? Mod.HeightRestrictions[seed.plantTechType] : 1f;
 
             QuickLogger.Debug($"Setting minScale: {_minScale} || TechType: {seed.plantTechType} || bounds {slotBounds} || Get Minscale: {GetMinScale()}",true);

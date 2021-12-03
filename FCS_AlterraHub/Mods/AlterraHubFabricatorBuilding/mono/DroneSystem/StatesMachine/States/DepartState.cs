@@ -22,9 +22,13 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Stat
         {
             //Debug.Log("Departing");
             //_drone.Depart();
-            var followPoint = _drone.GetCurrentPort().GetEntryPoint();
-            transform.position = followPoint.position;
-            transform.rotation = followPoint.rotation;
+            var followPoint = _drone.GetCurrentPort()?.GetEntryPoint();
+
+            if (followPoint != null)
+            {
+                transform.position = followPoint.position;
+                transform.rotation = followPoint.rotation;
+            }
             return null;
         }
     }

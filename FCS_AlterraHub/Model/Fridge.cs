@@ -307,22 +307,27 @@ namespace FCS_AlterraHub.Model
 
         public void RemoveItem(TechType techType, EatableType eatableType)
         {
-            
+
+#if SUBNAUTICA
             var pickupable = techType.ToPickupable();
-
-            if (Inventory.main.HasRoomFor(pickupable))
+#else
+            var pickupable = TechTypeHelpers.ConvertToPickupable(techType,(pickupable =>
             {
-                EatableEntities match = FindMatch(techType,eatableType);
-
-                if (match != null)
+                if (Inventory.main.HasRoomFor(pickupable))
                 {
-                    StartCoroutine(AttemptToRemoveAsync(techType, match, pickupable));
+                    EatableEntities match = FindMatch(techType, eatableType);
+
+                    if (match != null)
+                    {
+                        StartCoroutine(AttemptToRemoveAsync(techType, match, pickupable));
+                    }
                 }
-            }
-            else
-            {
-                Destroy(pickupable);
-            }
+                else
+                {
+                    Destroy(pickupable);
+                }
+            }));
+#endif
         }
 
         private IEnumerator AttemptToRemoveAsync(TechType techType, EatableEntities match, Pickupable pickupable)
@@ -340,7 +345,11 @@ namespace FCS_AlterraHub.Model
             eatable.timeDecayStart = match.TimeDecayStart;
 
             TaskResult<bool> pickupResult = new TaskResult<bool>();
+#if SUBNAUTICA
             yield return Inventory.main.PickupAsync(pickup, pickupResult);
+#else
+            yield return Inventory.main.Pickup(pickup);
+#endif
 
             if (pickupResult.Get())
             {

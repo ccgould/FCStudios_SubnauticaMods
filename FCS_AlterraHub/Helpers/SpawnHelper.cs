@@ -49,6 +49,7 @@ namespace FCS_AlterraHub.Helpers
             return PlantResourceDictionary.ContainsKey(plantKey);
         }
 
+#if SUBNAUTICA
         public static IEnumerator SpawnPrefabByClassID(string classId,Transform transform)
         {
             IPrefabRequest request = PrefabDatabase.GetPrefabAsync(classId);
@@ -75,6 +76,7 @@ namespace FCS_AlterraHub.Helpers
             //Destroy(base.gameObject);
             yield break;
         }
+#endif
 
         public static IEnumerator SpawnUWEPrefab(UWEPrefabID uwePrefab, Transform transform,Action<GameObject> callBack = null,bool removeComponents = true)
         {
@@ -92,6 +94,7 @@ namespace FCS_AlterraHub.Helpers
                 yield break;
             }
 
+#if SUBNAUTICA
             DeferredSpawner.Task deferredTask = DeferredSpawner.instance.InstantiateAsync(prefab, transform.localPosition, transform.localRotation, true);
             yield return deferredTask;
             GameObject result = deferredTask.result;
@@ -106,9 +109,11 @@ namespace FCS_AlterraHub.Helpers
             }
 
             callBack?.Invoke(result);
+#endif
             yield break;
         }
 
+#if SUBNAUTICA
         public static IEnumerator SpawnUWEPrefab(UWEPrefabID uwePrefab, Vector3 position, Quaternion rotation, bool removeComponents = true)
         {
             IPrefabRequest request = PrefabDatabase.GetPrefabAsync(UWEClassIDDictionary[uwePrefab]);
@@ -137,29 +142,71 @@ namespace FCS_AlterraHub.Helpers
             }
             yield break;
         }
+#endif
 
+#if SUBNAUTICA
         public static GameObject SpawnTechType(TechType techType, Vector3 position, Quaternion rotation, bool spawnGlobal = false)
         {
             QuickLogger.Debug($"Spawning: {Language.main.Get(techType)}");
             if (CraftData.IsAllowed(techType))
             {
+
                 GameObject prefabForTechType = CraftData.GetPrefabForTechType(techType);
-                if (prefabForTechType != null)
-                {
-                    GameObject gameObject = Utils.CreatePrefab(prefabForTechType);
-                    LargeWorldEntity.Register(gameObject);
-                    CrafterLogic.NotifyCraftEnd(gameObject, techType);
-                    gameObject.SendMessage("StartConstruction", SendMessageOptions.DontRequireReceiver);
-                    gameObject.transform.position = position;
-                    gameObject.transform.localRotation = rotation;
-                    if (spawnGlobal) gameObject.transform.parent = null;
-                    return gameObject;
-                }
-                ErrorMessage.AddDebug("Could not find prefab for TechType = " + techType);
+                if (SpawnTechType(techType, position, rotation, spawnGlobal, prefabForTechType, out var o)) return o;
             }
 
             return null;
         }
+
+                private static bool SpawnTechType(TechType techType, Vector3 position, Quaternion rotation, bool spawnGlobal,
+            GameObject prefabForTechType, out GameObject o)
+        {
+            if (prefabForTechType != null)
+            {
+                GameObject gameObject = Utils.CreatePrefab(prefabForTechType);
+                LargeWorldEntity.Register(gameObject);
+                CrafterLogic.NotifyCraftEnd(gameObject, techType);
+                gameObject.SendMessage("StartConstruction", SendMessageOptions.DontRequireReceiver);
+                gameObject.transform.position = position;
+                gameObject.transform.localRotation = rotation;
+                if (spawnGlobal) gameObject.transform.parent = null;
+                {
+                    o = gameObject;
+                    return true;
+                }
+            }
+
+            ErrorMessage.AddDebug("Could not find prefab for TechType = " + techType);
+            o = null;
+            return false;
+        }
+#else
+        public static IEnumerator SpawnTechTypeAsync(TechType techType, Vector3 position, Quaternion rotation, bool spawnGlobal, Action<GameObject, bool> callBack)
+        {
+            CoroutineTask<GameObject> request = CraftData.GetPrefabForTechTypeAsync(techType, true);
+            yield return request;
+
+            if (request.GetResult() != null)
+            {
+                GameObject gameObject = Utils.CreatePrefab(request.GetResult());
+                LargeWorldEntity.Register(gameObject);
+                CrafterLogic.NotifyCraftEnd(gameObject, techType);
+                gameObject.SendMessage("StartConstruction", SendMessageOptions.DontRequireReceiver);
+                gameObject.transform.position = position;
+                gameObject.transform.localRotation = rotation;
+                if (spawnGlobal) gameObject.transform.parent = null;
+                {
+                    callBack?.Invoke(gameObject, true);
+                }
+            }
+
+            ErrorMessage.AddDebug("Could not find prefab for TechType = " + techType);
+            callBack?.Invoke(null, false);
+            yield break;
+        }
+#endif
+
+
 
         public static GameObject SpawnPrefab(GameObject prefab, Vector3 position, Quaternion rotation, bool spawnGlobal = false)
         {

@@ -16,7 +16,10 @@ namespace FCS_AlterraHub.Patches
         [HarmonyPrefix]
         public static bool Prefix(EndCreditsManager __instance)
         {
-            try
+
+#if SUBNAUTICA
+
+ try
             {
 
                 if (PlatformUtils.isPS4Platform)
@@ -53,7 +56,10 @@ namespace FCS_AlterraHub.Patches
                 QuickLogger.Info("Failed to patch EndCreditManager returning to origin");
                 // Give back execution to origin function.
                 return true;
-            }
+            }      
+#else
+            return true;
+#endif
         }
 
         public static IEnumerator ReturnToMainMenu(float seconds,string key)
