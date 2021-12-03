@@ -102,24 +102,18 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         {
             _door.UnlockDoor();
             UnlockDoor();
-            switch (_id)
-            {
-                case 1:
-                    Mod.GamePlaySettings.AlterraHubDepotDoors.KeyPad1 = true;
-                    break;
-                case 2:
-                    Mod.GamePlaySettings.AlterraHubDepotDoors.KeyPad2 = true;
-                    break;
-                default:
-                    Mod.GamePlaySettings.AlterraHubDepotDoors.KeyPad3 = true;
-                    break;
-            }
         }
 
         public void UnlockDoor()
         {
             keypadUI.SetActive(false);
             unlockIcon.SetActive(true);
+        }
+
+        public void LockDoor()
+        {
+            keypadUI.SetActive(true);
+            unlockIcon.SetActive(false);
         }
 
         private void ResetNumberField()
@@ -154,6 +148,15 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         public bool IsUnlocked()
         {
             return unlocked;
+        }
+
+        public void Lock()
+        {
+            unlocked = false;
+            ResetNumberField();
+            LockDoor();
+            _door.LockDoor();
+            _door.Close();
         }
     }
 }

@@ -6,32 +6,20 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
-using FCS_AlterraHub.API;
-using FCS_AlterraHub.Buildables;
-using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Managers;
 using FCS_AlterraHub.Model.Utilities;
 using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono;
-using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem;
-using FCS_AlterraHub.Mods.FCSDataBox.Mono;
-using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Systems;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FMOD;
-using QModManager.API;
 using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
-using Story;
 using UnityEngine;
-using Debug = System.Diagnostics.Debug;
 using Object = UnityEngine.Object;
-using SearchOption = System.IO.SearchOption;
 #if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
 #else
@@ -45,7 +33,6 @@ namespace FCS_AlterraHub.Configuration
     {
         private static ModSaver _saveObject;
         private static SaveData _saveData;
-        private static bool _audioLoaded;
         public const string ModPackID = "AlterraHub";
 
         internal static string SaveDataFilename => $"{ModPackID}SaveData.json";
@@ -153,7 +140,15 @@ namespace FCS_AlterraHub.Configuration
 
         public static FCSGamePlaySettings GamePlaySettings
         {
-            get => _gamePlaySettings ??= new FCSGamePlaySettings();
+            get
+            {
+                if (_gamePlaySettings == null)
+                {
+                    _gamePlaySettings = new FCSGamePlaySettings();
+                }
+
+                return _gamePlaySettings;
+            }
             set => _gamePlaySettings = value;
         }
 
@@ -243,16 +238,9 @@ namespace FCS_AlterraHub.Configuration
             {
                 QuickLogger.Debug("Saving Gameplay Settings",true);
 
-                if (GamePlaySettings == null)
-                {
-                    GamePlaySettings = new FCSGamePlaySettings();
-                }
-
-
-                GamePlaySettings.FabStationBeaconColorIndex = AlterraFabricatorStationController.Main.GetPing().colorIndex;
-                GamePlaySettings.FabStationBeaconVisible = AlterraFabricatorStationController.Main.GetPing().visible;
-
-                ModUtils.Save(GamePlaySettings, "settings.json", GetSaveFileDirectory(), OnSaveComplete);
+                AlterraFabricatorStationController.Main.Save();
+                
+                ModUtils.Save(_gamePlaySettings, "settings.json", GetSaveFileDirectory(), OnSaveComplete);
 
                 if (File.Exists(Path.Combine(GetSaveFileDirectory(), "settings.json")))
                 {
@@ -335,7 +323,7 @@ namespace FCS_AlterraHub.Configuration
 
                 if (AlterraFabricatorStationController.Main != null)
                 {
-                    foreach (AlterraTransportDroneEntry entry in AlterraFabricatorStationController.Main.Save())
+                    foreach (AlterraTransportDroneEntry entry in AlterraFabricatorStationController.Main.SaveDrones())
                     {
                         if(entry != null)
                             newSaveData.AlterraTransportDroneEntries.Add(entry);
@@ -460,60 +448,7 @@ namespace FCS_AlterraHub.Configuration
             AudioClips.Add("AH-Mission01-Pt3",AudioUtils.CreateSound(Path.Combine(GetAssetPath(), "Audio", "AH-Mission01-Pt3.wav")));
         }
         
-        internal static IEnumerator SpawnAlterraFabStation(FCSGamePlaySettings fcsGamePlaySettings)
-        {
-            while (LargeWorldStreamer.main?.cellManager?.streamer?.globalRoot == null)
-            {
-                //QuickLogger.Error("LargeWorldStreamer not ready to make station",true);
-                yield return null;
-            }
-            
-            var spawnLocation = new Vector3(82.70f, -316.9f, -1434.7f);
-            var spawnRotation = Quaternion.Euler(348.7f, 326.24f, 43.68f);
-            var station = GameObject.Instantiate(AlterraHub.AlterraHubFabricatorPrefab);
-            station.transform.SetPositionAndRotation(spawnLocation,spawnRotation);
-            AddFabStationComponents(station);
-            yield break;
-        }
-
-        private static void AddFabStationComponents(GameObject prefab)
-        {
-            PrefabIdentifier prefabIdentifier = prefab.EnsureComponent<PrefabIdentifier>();
-            prefabIdentifier.ClassId = "AlterraHubFabricationStation";
-
-            var lw = prefab.AddComponent<LargeWorldEntity>();
-            lw.cellLevel = LargeWorldEntity.CellLevel.Far;
-
-            //Renderer
-            var renderer = prefab.GetComponentInChildren<Renderer>();
-
-            var rb = prefab.GetComponentInChildren<Rigidbody>();
-
-            if (rb == null)
-            {
-                rb = prefab.EnsureComponent<Rigidbody>();
-                rb.isKinematic = true;
-            }
-            
-            // Update sky applier
-            var applier = prefab.EnsureComponent<SkyApplier>();
-            applier.renderers = new Renderer[] { renderer };
-            applier.anchorSky = Skies.Auto;
-
-            var pickUp = prefab.AddComponent<Pickupable>();
-            pickUp.isPickupable = false;
-            pickUp.enabled = false;
-
-
-
-            WorldHelpers.CreateBeacon(prefab, AlterraHubStationPingType, "Alterra Hub Station");
-            MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
-            var controller = prefab.AddComponent<AlterraFabricatorStationController>();
-            prefab.AddComponent<PortManager>();
-        }
-
         public static PingType AlterraHubStationPingType { get; set; }
-        public static TechType StaffKeyCardTechType { get; set; }
         public static TechType DronePortPadHubNewTechType { get; set; }
         public static TechType AlterraTransportDroneTechType { get; set; }
         public static PingType AlterraTransportDronePingType { get; set; }
@@ -559,26 +494,7 @@ namespace FCS_AlterraHub.Configuration
 
             return new AlterraDronePortEntry { Id = id };
         }
-
-        public static AlterraTransportDroneEntry GetAlterraTransportDroneSaveData(string id)
-        {
-            LoadData();
-
-            var saveData = GetSaveData();
-
-            foreach (var entry in saveData.AlterraTransportDroneEntries)
-            {
-                if (string.IsNullOrEmpty(entry.Id)) continue;
-
-                if (entry.Id == id)
-                {
-                    return entry;
-                }
-            }
-
-            return new AlterraTransportDroneEntry { Id = id };
-        }
-
+        
         public static void RegisterVoices()
         {
             VoiceNotificationSystem.RegisterVoice(Path.Combine(Mod.GetAssetPath(), "Audio", "ElectricalBoxesNeedFixing.mp3"), string.Empty);
@@ -613,7 +529,6 @@ namespace FCS_AlterraHub.Configuration
 
     public class FCSGamePlaySettings
     {
-        public bool IsOreConsumerFragmentSpawned = false; 
         public List<string> AlterraHubDepotPowercellSlot = new();
         public KeyPadAccessSave AlterraHubDepotDoors = new();
         public bool BreakerOn;
@@ -624,7 +539,6 @@ namespace FCS_AlterraHub.Configuration
         public bool TransDroneSpawned { get; set; }
         public Dictionary<string,int> DronePortAssigns { get; set; } = new();
         public bool IsStationSpawned { get; set; }
-        public Dictionary<string, DataBoxData> DataBoxes { get; set; } = new();
         [JsonProperty] internal Dictionary<string, Shipment> PendingPurchases { get; set; }
         [JsonProperty] internal Shipment CurrentOrder { get; set; }
         public int FabStationBeaconColorIndex { get; set; }
@@ -643,13 +557,7 @@ namespace FCS_AlterraHub.Configuration
             Mod.SaveGamePlaySettings();
         }
     }
-
-    public class DataBoxData
-    {
-        public bool Used { get; set; }
-        public TechType TechType { get; set; }
-    }
-
+    
     public class KeyPadAccessSave
     {
         public bool KeyPad1;

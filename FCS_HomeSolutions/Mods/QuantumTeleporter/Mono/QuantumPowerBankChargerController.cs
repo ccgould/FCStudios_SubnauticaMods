@@ -109,13 +109,21 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
 
             if (_fromSave)
             {
-                if (_saveData.IsLocked)
+                var powerBanks = _storage.container.GetItems(QuantumPowerBankSpawnable.PatchedTechType);
+                if (powerBanks.Any())
                 {
-                    MountPowerBank(_storage.container.GetItems(QuantumPowerBankSpawnable.PatchedTechType)[0]);
-                    MountIonCube(_storage.container.GetItems(TechType.PrecursorIonCrystal)[0]);
-                    _locked = _saveData.IsLocked;
-                    _partialPower = _saveData.PartialPower;
+                    MountPowerBank(powerBanks[0]);
                 }
+
+                var ionCubes = _storage.container.GetItems(TechType.PrecursorIonCrystal);
+                if (ionCubes.Any())
+                {
+                    MountIonCube(ionCubes[0]);
+                }
+                
+                _locked = _saveData.IsLocked;
+                _partialPower = _saveData.PartialPower;
+
                 _colorManager.LoadTemplate(_saveData.ColorTemplate);
                 _fromSave = false;
             }
@@ -142,23 +150,8 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
             {
                 QuickLogger.Debug("Storage is not null", true);
                 _storage.enabled = false;
-                //_storage.OnContainerClosed += () =>
-                //{
-                //    if (_storage.ContainsItem(TechType.PrecursorIonCrystal) &&
-                //        _storage.ContainsItem(QuantumPowerBankSpawnable.PatchedTechType))
-                //    {
-
-                //        _locked = true;
-                //    }
-                //};
-                
                 _storage.container.onAddItem += ContainerOnAddItem;
                 _storage.container.onRemoveItem += ContainerOnRemoveItem;
-                //_storage.container.allowedTech = new HashSet<TechType>
-                //{
-                //    TechType.PrecursorIonCrystal,
-                //    QuantumPowerBankSpawnable.PatchedTechType
-                //};
                 _storage.container.isAllowedToAdd += IsAllowedToAdd;
 
             }
@@ -254,14 +247,34 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
         {
             _ionCube = item;
             var rg = _ionCube.GetComponent<Rigidbody>();
+            DisableCollision(_ionCube);
             rg.isKinematic = true;
             _ionCube.transform.position = _ionCubePosition.transform.position;
             _ionCube.gameObject.SetActive(true);
         }
 
+        private void DisableCollision(GameObject item)
+        {
+            var colliders = item.GetComponentsInChildren<BoxCollider>();
+            foreach (BoxCollider bc in colliders)
+            {
+                bc.isTrigger = true;
+            }
+        }
+
+        private void EnableCollision(GameObject item)
+        {
+            var colliders = item.GetComponentsInChildren<BoxCollider>();
+            foreach (BoxCollider bc in colliders)
+            {
+                bc.isTrigger = true;
+            }
+        }
+
         private void UnMountIonCube()
         {
             var rg = _ionCube?.GetComponent<Rigidbody>();
+            EnableCollision(_ionCube);
             if (rg is not null) rg.isKinematic = false;
             _ionCube?.gameObject.SetActive(false);
             _ionCube = null;
@@ -271,6 +284,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
         {
             _powerBank = item.item.gameObject.GetComponent<QuantumPowerBankController>();
             var rg = _powerBank.gameObject.GetComponent<Rigidbody>();
+            DisableCollision(_powerBank.gameObject);
             rg.isKinematic = true;
             _powerBank.gameObject.SetActive(true);
         }
@@ -278,6 +292,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
         private void UnMountPowerBank()
         {
             var rg = _powerBank.gameObject.GetComponent<Rigidbody>();
+            EnableCollision(_powerBank.gameObject);
             rg.isKinematic = false;
             _powerBank.gameObject.SetActive(false);
             _powerBank = null;

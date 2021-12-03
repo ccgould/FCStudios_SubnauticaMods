@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
@@ -22,10 +23,10 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         {
             if (!_controller.IsPowerOn)
             {
-                _message.text = $"Generator offline please replace powercells. Amount need {Mod.GamePlaySettings.AlterraHubDepotPowercellSlot.Count}/5";
+                _message.text = $"Generator offline please replace powercells. Amount need {OccupiedSlotsCount()}/5";
             }
 
-            if (Mod.GamePlaySettings.AlterraHubDepotPowercellSlot.Count >= 5)
+            if (IsAllSlotsOccupied())
             {
                 _activateBtn.interactable = true;
             }
@@ -39,6 +40,16 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                 _activateBtn.gameObject.SetActive(false);
                 _hasBeenActivated = true;
             }
+        }
+
+        private int OccupiedSlotsCount()
+        {
+            return _slots.Count(x => !x.AllowBatteryReplacement);
+        }
+
+        private bool IsAllSlotsOccupied()
+        {
+            return _slots.All(x => !x.AllowBatteryReplacement);
         }
 
         internal void Initialize(AlterraFabricatorStationController controller)
@@ -78,6 +89,31 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             }
 
             UpdateScreen();
+        }
+
+        public IEnumerable<string> Save()
+        {
+            foreach (var powercellSlot in _slots)
+            {
+                if(powercellSlot.AllowBatteryReplacement) continue;
+                yield return powercellSlot.GetID();
+            }
+        }
+
+        public void CompleteObjective()
+        {
+            foreach (var powercellSlot in _slots)
+            {
+                powercellSlot.AllowBatteryReplacement = false;
+            }
+        }
+
+        public void MakeDirty()
+        {
+            foreach (var powercellSlot in _slots)
+            {
+                powercellSlot.AllowBatteryReplacement = true;
+            }
         }
     }
 }

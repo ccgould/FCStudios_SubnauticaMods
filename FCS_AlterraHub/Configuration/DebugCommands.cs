@@ -71,20 +71,18 @@ namespace FCS_AlterraHub.Configuration
         {
             if (value)
             {
-                Mod.GamePlaySettings.IsPDAUnlocked = true;
                 FCSPDAController.ForceOpen();
-                AlterraFabricatorStationController.Main.UpdateBeaconState(false);
+                AlterraFabricatorStationController.Main.CompleteStation();
                 QuickLogger.Message($"FCS PDA Unlocked", true);
             }
             else
             {
-                Mod.GamePlaySettings.IsPDAUnlocked = false;
                 FCSPDAController.ForceClose();
-                AlterraFabricatorStationController.Main.UpdateBeaconState(true);
+                AlterraFabricatorStationController.Main.MakeStationDirty();
                 QuickLogger.Message($"FCS PDA locked", true);
             }
         }
-
+        
         [ConsoleCommand("CreateDummyAccount")]
         public static string CreateDummyAccount(string amount = "0")
         {

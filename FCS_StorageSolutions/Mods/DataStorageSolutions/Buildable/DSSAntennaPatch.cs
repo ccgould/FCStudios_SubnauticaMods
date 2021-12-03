@@ -52,7 +52,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
                 var model = prefab.FindChild("model");
 
                 //========== Allows the building animation and material colors ==========// 
-                Shader shader = Shader.Find("MarmosetUBER");
+                Shader shader = Shader.Find("MarmosetUBER"); 
                 Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
                 SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
                 skyApplier.renderers = renderers;
@@ -72,6 +72,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
                 constructable.allowedOnConstructables = false;
                 constructable.model = model;
                 constructable.techType = TechType;
+                constructable.forceUpright = true;
 
                 PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = ClassID;

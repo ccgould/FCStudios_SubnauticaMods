@@ -43,15 +43,11 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
             _sliderText = _slider.GetComponentInChildren<Text>();
             _slider.onValueChanged.AddListener((value =>
             {
-                Mod.GamePlaySettings.Rate = value * 10f;
-                _sliderText.text = $"{Mathf.CeilToInt(Mod.GamePlaySettings.Rate)}%";
+                _sliderText.text = $"{Mathf.CeilToInt(GetRate())}%";
             }));
 
             _deductionToggle = GameObjectHelpers.FindGameObject(accountPage, "AutomaticDebitDeduction").GetComponent<Toggle>();
-            _deductionToggle.onValueChanged.AddListener((value =>
-            {
-                Mod.GamePlaySettings.AutomaticDebitDeduction = value;
-            }));
+
 
             var createAccountDialogCloseBtn = GameObjectHelpers.FindGameObject(_createAccountDialog, "CloseBTN").GetComponent<Button>();
             createAccountDialogCloseBtn.onClick.AddListener(() =>
@@ -277,6 +273,16 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
         {
             ResetPaymentScreen();
             HidePaymentScreen();
+        }
+
+        public float GetRate()
+        {
+           return _slider.value * 10f;
+        }
+
+        public bool GetAutomaticDebitDeduction()
+        {
+            return _deductionToggle.isOn;
         }
     }
 }

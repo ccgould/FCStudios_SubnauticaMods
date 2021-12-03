@@ -81,7 +81,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Buildable
                 lwe.cellLevel = LargeWorldEntity.CellLevel.Far;
 
                 // Add constructible
-                var constructable = prefab.AddComponent<Constructable>();
+                var constructable = prefab.AddComponent<Constructable>(); 
 
                 constructable.allowedOutside = true;
                 constructable.allowedInBase = false;
@@ -96,6 +96,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Buildable
                 constructable.placeMinDistance = 5;
                 constructable.placeMaxDistance = 10;
                 constructable.techType = TechType;
+                constructable.forceUpright = true;
                 
                 PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = ClassID;

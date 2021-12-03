@@ -184,12 +184,12 @@ namespace FCS_HomeSolutions
             
             var sink = new SinkBuildable();
             sink.Patch();
-            
-            //var jukeBox = new JukeBoxBuildable();
-            //jukeBox.Patch();
 
-            //var jukeboxSpeaker = new JukeBoxSpeakerBuildable();
-            //jukeboxSpeaker.Patch();
+            var jukeBox = new JukeBoxBuildable();
+            jukeBox.Patch();
+
+            var jukeboxSpeaker = new JukeBoxSpeakerBuildable();
+            jukeboxSpeaker.Patch();
 
             if (Configuration.IsHatchStairwayEnabled)
             {

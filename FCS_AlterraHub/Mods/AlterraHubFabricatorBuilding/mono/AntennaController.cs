@@ -23,6 +23,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         private Image _powerIcon;
         private FCSMessageBox _messageBox;
         private SearchField _numberField;
+        private bool _pinValid;
         private const string _accessCode = "1993";
         private const float SpeedIncrease = 16.666666666666666666666666666667f;
         public void Initialize(AlterraFabricatorStationController controller)
@@ -53,12 +54,13 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             _reactiveBTN = antennaSecurityScreen.GetComponentInChildren<Button>();
             _reactiveBTN.onClick.AddListener(() =>
             {
-                if(!IsPinValid())
+                if (!IsPinValid())
                 {
-                    _messageBox.Show(AlterraHub.AntennaPinNeededMessage(),FCSMessageButton.OK,null);
+                    _messageBox.Show(AlterraHub.AntennaPinNeededMessage(), FCSMessageButton.OK, null);
                     return;
                 }
-                Mod.GamePlaySettings.IsPDAUnlocked = true;
+
+                _pinValid = true;
                 _numberField.gameObject.SetActive(false);
                 AlterraFabricatorStationController.Main.UpdateBeaconState(false);
                 FCSPDAController.ForceOpen();
@@ -88,8 +90,9 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                 _reactiveBTN.interactable = true;
             }
 
-            if (Mod.GamePlaySettings.IsPDAUnlocked)
+            if (AlterraFabricatorStationController.Main.DetermineIfUnlocked())
             {
+                _numberField.gameObject.SetActive(false);
                 _reactiveBTN.gameObject.SetActive(false);
                 _powerIcon.color = Color.green;
                 _information.text = "Connected";
@@ -102,7 +105,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         {
             QuickLogger.Debug("Box Fixed",true);
 
-            Mod.GamePlaySettings.FixedPowerBoxes.Add(id);
             OnBoxFixedAction?.Invoke(id);
 
             if (_electricalBoxes.Any(x => !x.IsRepaired) && LargeWorldStreamer.main.IsWorldSettled())
@@ -110,13 +112,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                 VoiceNotificationSystem.main.Play("ElectricalBoxesNeedFixing_key",
                     $"Further electrical boxes in need of repair {_electricalBoxes.Count(x => x.IsRepaired)}/{_electricalBoxes.Count}");
             }
-
-
-            if (_electricalBoxes.All(x => x.IsRepaired))
+            
+            if (IsAllElectricalBoxesFixed())
             {
                 _antenna.RPMByPass(66.666f);
             }
-
         }
 
         public Action<int> OnBoxFixedAction { get; set; }
@@ -128,6 +128,45 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                 var electricalBox = _electricalBoxes.FirstOrDefault(x => x.Id == boxID);
                 electricalBox?.Fix(true);
             }
+
+            _pinValid = Mod.GamePlaySettings.IsPDAUnlocked;
+        }
+
+        public IEnumerable<int> Save()
+        {
+            foreach (ElectricalBox electricalBox in _electricalBoxes)
+            {
+                if(!electricalBox.IsRepaired) continue;
+                yield return electricalBox.Id;
+            }
+        }
+
+        public bool IsAllElectricalBoxesFixed()
+        {
+            return _electricalBoxes.All(x => x.IsRepaired);
+        }
+
+        public bool IsUnlocked()
+        {
+            return _pinValid;
+        }
+
+        public void CompleteObjective()
+        {
+            foreach (ElectricalBox electricalBox in _electricalBoxes)
+            {
+                electricalBox.Fix(true);
+            }
+        }
+
+        public void MakeDirty()
+        {
+            foreach (ElectricalBox electricalBox in _electricalBoxes)
+            {
+                electricalBox.MakeDirty();
+            }
+
+            _antenna.RPMByPass(0f);
         }
     }
 }

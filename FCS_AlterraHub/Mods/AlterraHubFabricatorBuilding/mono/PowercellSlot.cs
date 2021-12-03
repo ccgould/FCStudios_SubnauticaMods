@@ -54,7 +54,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 
         protected void OnAddItem(InventoryItem item)
         {
-            _mono.AddPowercell(_slotID);
             AllowBatteryReplacement = false;
             _generatorController.UpdateScreen();
             Destroy(item.item.gameObject);

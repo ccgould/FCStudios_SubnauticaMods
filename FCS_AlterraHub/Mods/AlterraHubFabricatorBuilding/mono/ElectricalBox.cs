@@ -96,5 +96,15 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         public void OnHandClick(GUIHand hand)
         {
         }
+
+        public void MakeDirty()
+        {
+            _plate.SetActive(false);
+            _spark?.SetActive(true);
+#if SUBNAUTICA
+            _liveMixin.initialHealth = 0;
+#endif
+            _liveMixin.health = 0;
+        }
     }
 }

@@ -157,6 +157,26 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                 _liveMixin.AddHealth(Mod.GamePlaySettings.AlterraHubDepotDoors.SecurityDoors);
             }
         }
+
+        public void Lock()
+        {
+            foreach (SecurityDoorController door in _doors)
+            {
+                door.LockDoor();
+            }
+
+            foreach (GameObject spark in _sparks)
+            {
+                spark.SetActive(true);
+            }
+
+#if SUBNAUTICA
+            _liveMixin.initialHealth = 0;
+#endif
+            _liveMixin.health = 0;
+
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.red);
+        }
     }
 
     internal class SecurityDoorController : DoorController

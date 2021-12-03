@@ -7,6 +7,7 @@ using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Model;
+using FCS_AlterraHub.Mods.FCSPDA.Mono;
 using FCS_AlterraHub.Mods.OreConsumer.Buildable;
 using FCS_AlterraHub.Mods.OreConsumer.Model;
 using FCS_AlterraHub.Mono;
@@ -441,9 +442,9 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
         {
             decimal deduction = 0;
 
-            if (Mod.GamePlaySettings.AutomaticDebitDeduction && !CardSystem.main.IsDebitPaid())
+            if (FCSPDAController.Main.GetAutomaticDebitDeduction() && !CardSystem.main.IsDebitPaid())
             {
-                deduction = MathHelpers.PercentageOfNumber(Convert.ToDecimal(Mod.GamePlaySettings.Rate), price);
+                deduction = MathHelpers.PercentageOfNumber(Convert.ToDecimal(FCSPDAController.Main.GetRate()), price);
 
                 //Get the remainder and add it to the price
                 var needed = CardSystem.main.AmountNeededForDebt();

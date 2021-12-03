@@ -386,12 +386,12 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
 
         public bool Open()
         {
-            if (_timesOpen > 0 && !CardSystem.main.HasBeenRegistered() && !Mod.GamePlaySettings.IsPDAOpenFirstTime && Mod.GamePlaySettings.IsPDAUnlocked)
+            if (_timesOpen > 0 && !CardSystem.main.HasBeenRegistered() && !Mod.GamePlaySettings.IsPDAOpenFirstTime && AlterraFabricatorStationController.Main.DetermineIfUnlocked())
             {
                 VoiceNotificationSystem.main.Play("PDA_Account_Instructions_key",26);
             }
 
-            if (Mod.GamePlaySettings.IsPDAOpenFirstTime && Mod.GamePlaySettings.IsPDAUnlocked)
+            if (Mod.GamePlaySettings.IsPDAOpenFirstTime && AlterraFabricatorStationController.Main.DetermineIfUnlocked())
             {
                 VoiceNotificationSystem.main.Play("PDA_Instructions_key",26);
                 Mod.GamePlaySettings.IsPDAOpenFirstTime = false;
@@ -399,7 +399,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
                 Mod.SaveGamePlaySettings();
             }
             
-            _404?.SetActive(!Mod.GamePlaySettings.IsPDAUnlocked);
+            _404?.SetActive(!AlterraFabricatorStationController.Main.DetermineIfUnlocked());
             
             Player main = Player.main;
 
@@ -796,6 +796,14 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             {
                 CartItems = _cartDropDownManager?.Save() ?? new List<CartItemSaveData>()
             };
+
+            Mod.GamePlaySettings.Rate = GetRate();
+            Mod.GamePlaySettings.AutomaticDebitDeduction = GetAutomaticDebitDeduction();
+        }
+
+        public bool GetAutomaticDebitDeduction()
+        {
+            return _accountPageHandler.GetAutomaticDebitDeduction();
         }
 
         internal void LoadCart(FCSPDAEntry savedData)
@@ -857,6 +865,11 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         internal void RemoveShipment(Shipment shipment)
         {
             _shipmentPageController.RemoveItem(shipment);
+        }
+
+        public float GetRate()
+        {
+            return _accountPageHandler.GetRate();
         }
     }
 

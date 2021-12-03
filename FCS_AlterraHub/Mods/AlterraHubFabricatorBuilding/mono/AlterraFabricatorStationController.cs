@@ -74,6 +74,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         private SecurityBoxTrigger _securityBoxTrigger;
         private SecurityGateController _securityGateController;
         private bool _completePendingOrder;
+        private FCSGamePlaySettings _fcsGamePlaySettings;
+        private bool _isBaseOn;
 
 
         private void Update()
@@ -190,12 +192,23 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         {
             if (_securityBoxTrigger == null) return;
 
-            if (Mod.GamePlaySettings.IsPDAUnlocked && _keyPads[4].IsUnlocked() && _keyPads[3].IsUnlocked())
+            if (DetermineIfUnlocked())
             {
-                CancelInvoke(nameof(CheckIfSecurityDoorCanUnlock));
+                UnlockSecurityDoors();
                 return;
             }
 
+            if (_keyPads[4].IsUnlocked() && _keyPads[3].IsUnlocked())
+            {
+                UnlockSecurityDoors();
+                return;
+            }
+
+            UnlockSecurityDoors();
+        }
+
+        private void UnlockSecurityDoors()
+        {
             if (_securityBoxTrigger.IsPlayerInRange && IsPowerOn)
             {
                 _keyPads[3].Unlock();
@@ -203,7 +216,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                 _keyPads[4].Unlock();
                 _keyPads[4].ForceOpen();
             }
-
+            CancelInvoke(nameof(CheckIfSecurityDoorCanUnlock));
         }
 
         internal SecurityBoxTrigger GetSecurityBoxTrigger()
@@ -266,17 +279,18 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             }
 
 
-            QuickLogger.Debug($"Update Beacon State: {_ping != null}",true);
+            QuickLogger.Debug($"Update Beacon State. Is not null Check: {_ping != null}",true);
             
             if (_ping != null)
             {
-                _ping.visible = value;
-                _ping.colorIndex = colorIndex;
+                _ping.SetVisible(value);
+                _ping.SetColor(colorIndex);
             }
         }
 
         private void OnGamePlaySettingsLoaded(FCSGamePlaySettings settings)
         {
+            _fcsGamePlaySettings = settings;
             QuickLogger.Info($"On Game Play Settings Loaded {JsonConvert.SerializeObject(settings, Formatting.Indented)}");
 
             if (_keyPads == null || _generator == null || _antenna == null) return;
@@ -379,7 +393,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             _keyPads[2].Unlock();
             _keyPads[2].ForceOpen();
             _motor.StartMotor();
-            Mod.GamePlaySettings.BreakerOn = true;
+            _isBaseOn = true;
         }
 
         private void TurnOnKeyPads()
@@ -477,7 +491,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 
                         VoiceNotificationSystem.main.ShowSubtitle($"Your order is now being shipped to base {purchase.Value.Port.GetBaseName()}");
 
-
                         Mod.GamePlaySettings.CurrentOrder = _currentOrder;
                     }
 
@@ -526,9 +539,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                             drone.LoadData();
                         });
 #endif
-                    }
-
-                    Mod.GamePlaySettings.TransDroneSpawned = true;
+                    } 
                 }
                 else
                 {
@@ -552,9 +563,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             }
 
             ClearDronesList();
-
-
-
+            
             Mod.GamePlaySettings.TransDroneSpawned = false;
 
             SpawnMissingDrones();
@@ -566,7 +575,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             _drones.Clear();
         }
         
-        public IEnumerable<AlterraTransportDroneEntry> Save()
+        public IEnumerable<AlterraTransportDroneEntry> SaveDrones()
         {
             var drones = GameObject.FindObjectsOfType<DroneController>();
 
@@ -574,8 +583,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             {
                 yield return drone.Save();
             }
-
-            Mod.GamePlaySettings.AlterraHubDepotDoors.SecurityDoors = _securityGateController.GetHealth();
         }
 
         public bool IsStationPort(IDroneDestination dockedPort)
@@ -683,6 +690,59 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         public PingInstance GetPing()
         {
             return _ping;
+        }
+
+        public void Save()
+        {
+            QuickLogger.Debug("Saving Station");
+            Mod.GamePlaySettings.FabStationBeaconColorIndex = GetPing().colorIndex;
+            Mod.GamePlaySettings.FabStationBeaconVisible = GetPing().visible;
+            Mod.GamePlaySettings.AlterraHubDepotDoors.KeyPad1 = _keyPads[0].IsUnlocked();
+            Mod.GamePlaySettings.AlterraHubDepotDoors.KeyPad2 = _keyPads[1].IsUnlocked();
+            Mod.GamePlaySettings.AlterraHubDepotDoors.KeyPad3= _keyPads[2].IsUnlocked();
+            Mod.GamePlaySettings.AlterraHubDepotDoors.SecurityDoors = _securityGateController.GetHealth();
+            Mod.GamePlaySettings.AlterraHubDepotPowercellSlot = _generator.Save().ToList();
+            Mod.GamePlaySettings.IsPDAUnlocked = DetermineIfUnlocked();
+            Mod.GamePlaySettings.CurrentOrder = _currentOrder;
+            Mod.GamePlaySettings.BreakerOn = _isBaseOn;
+            Mod.GamePlaySettings.FixedPowerBoxes = _antenna.Save().ToHashSet();
+            Mod.GamePlaySettings.TransDroneSpawned = _drones.Any();
+            QuickLogger.Debug("Saving Station Complete");
+        }
+
+        public void CompleteStation()
+        {
+            UpdateBeaconState(false);
+            foreach (var keyPadAccessController in _keyPads)
+            {
+                keyPadAccessController.Unlock();
+            }
+            _securityGateController.Unlock();
+            _generator.CompleteObjective();
+            _isBaseOn = true;
+            _antenna.CompleteObjective();
+            QuickLogger.Debug("Station Object Complete");
+        }
+
+        public bool DetermineIfUnlocked()
+        {
+            return _isBaseOn && _keyPads[0].IsUnlocked() && _keyPads[1].IsUnlocked() && _keyPads[2].IsUnlocked() &&
+                   _securityGateController.GetHealth() >= 100 && _antenna.IsAllElectricalBoxesFixed() &&
+                   _antenna.IsUnlocked();
+        }
+
+        public void MakeStationDirty()
+        {
+            UpdateBeaconState(true);
+            foreach (var keyPadAccessController in _keyPads)
+            {
+                keyPadAccessController.Lock();
+            }
+            _securityGateController.Lock();
+            _generator.MakeDirty();
+            _isBaseOn = false;
+            _antenna.MakeDirty();
+            QuickLogger.Debug("Station Object UnComplete");
         }
     }
 
