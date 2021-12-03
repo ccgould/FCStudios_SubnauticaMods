@@ -27,7 +27,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Buildable
         public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
 
         internal const string QuantumPowerBankChargerClassID = "QuantumPowerBankCharger";
-        internal const string QuantumPowerBankChargerFriendly = "Quantum Power Bank CHarger";
+        internal const string QuantumPowerBankChargerFriendly = "Quantum Power Bank Charger";
 
         internal const string QuantumPowerBankChargerDescription = "Charge your Quantum Power Banks with raw power and those extra ion cubes you have laying around.";
 
