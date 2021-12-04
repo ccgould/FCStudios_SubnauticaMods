@@ -9,12 +9,13 @@ using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model.Utilities;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
-using FCS_ProductionSolutions.Mods.AutoCrafter.Models;
+//using FCS_ProductionSolutions.Mods.AutoCrafter.Models;
 using FCS_ProductionSolutions.Structs;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 using UnityEngine;
+using DNASampleData = FCS_ProductionSolutions.Structs.DNASampleData;
 
 namespace FCS_ProductionSolutions.Configuration
 {
@@ -24,7 +25,7 @@ namespace FCS_ProductionSolutions.Configuration
 
         private static ModSaver _saveObject;
         private static SaveData _saveData;
-        private static List<DNASampleData> _hydroponicKnownTech;
+        private static List<Structs.DNASampleData> _hydroponicKnownTech;
         private static TechType _sandBagTechType;
 
         #endregion
@@ -107,7 +108,7 @@ namespace FCS_ProductionSolutions.Configuration
                     }
                 }
 
-                newSaveData.CraftingOperations = CraftingOperations;
+               // newSaveData.CraftingOperations = CraftingOperations;
                 newSaveData.HydroponicHarvesterKnownTech = _hydroponicKnownTech;
 
                 _saveData = newSaveData;
@@ -127,14 +128,14 @@ namespace FCS_ProductionSolutions.Configuration
             ModUtils.LoadSaveData<SaveData>(SaveDataFilename, GetSaveFileDirectory(), (data) =>
             {
                 _saveData = data;
-                CraftingOperations = _saveData.CraftingOperations;
+                //CraftingOperations = _saveData.CraftingOperations;
                 _hydroponicKnownTech = _saveData.HydroponicHarvesterKnownTech;
                 QuickLogger.Info("Save Data Loaded");
                 OnDataLoaded?.Invoke(_saveData);
             });
         }
 
-        internal static List<DNASampleData> GetHydroponicKnownTech()
+        internal static List<Structs.DNASampleData> GetHydroponicKnownTech()
         {
             return _hydroponicKnownTech;
         }
@@ -289,11 +290,11 @@ namespace FCS_ProductionSolutions.Configuration
 
         #endregion
 
-        public static void AddHydroponicKnownTech(DNASampleData data)
+        public static void AddHydroponicKnownTech(Structs.DNASampleData data)
         {
             if (_hydroponicKnownTech == null)
             {
-                _hydroponicKnownTech = new List<DNASampleData>();
+                _hydroponicKnownTech = new List<Structs.DNASampleData>();
             }
             if(IsHydroponicKnownTech(data.TechType, out var sampleData)) return;
             _hydroponicKnownTech.Add(data);
@@ -302,21 +303,21 @@ namespace FCS_ProductionSolutions.Configuration
             BaseManager.GlobalNotifyByID(MatterAnalyzerTabID,"UpdateDNA");
         }
 
-        public static List<DNASampleData> GetKnownDNA()
+        public static List<Structs.DNASampleData> GetKnownDNA()
         {
             return _hydroponicKnownTech;
         }
 
-        public static bool IsHydroponicKnownTech(TechType techType, out DNASampleData data)
+        public static bool IsHydroponicKnownTech(TechType techType, out Structs.DNASampleData data)
         {
             QuickLogger.Debug($"Checking if {techType} is known tech",true);
-            data = new DNASampleData();
+            data = new Structs.DNASampleData();
             if (_hydroponicKnownTech == null)
             {
-                _hydroponicKnownTech = new List<DNASampleData>();
+                _hydroponicKnownTech = new List<Structs.DNASampleData>();
             }
 
-            foreach (DNASampleData sampleData in _hydroponicKnownTech)
+            foreach (Structs.DNASampleData sampleData in _hydroponicKnownTech)
             {
                 if (sampleData.TechType == techType || sampleData.PickType == techType)
                 {
@@ -330,20 +331,20 @@ namespace FCS_ProductionSolutions.Configuration
             return false;
         }
 
-        public static bool CreateNewDNASampleData(TechType techType,out DNASampleData data)
+        public static bool CreateNewDNASampleData(TechType techType,out Structs.DNASampleData data)
         {
-            data = new DNASampleData();
+            data = new Structs.DNASampleData();
 
             if (WorldHelpers.KnownPickTypesContains(techType))
             {
                 if (IsNonePlantableAllowedList.Contains(techType))
                 {
-                    data = new DNASampleData { PickType = techType, TechType = techType };
+                    data = new Structs.DNASampleData { PickType = techType, TechType = techType };
                     return true;
                 }
 
                 var result = WorldHelpers.GetPickTypeData(techType);
-                data = new DNASampleData { PickType = result.ReturnType, TechType = techType, IsLandPlant = result.IsLandPlant };
+                data = new Structs.DNASampleData { PickType = result.ReturnType, TechType = techType, IsLandPlant = result.IsLandPlant };
                 return true;
             }
             return false;
@@ -353,28 +354,28 @@ namespace FCS_ProductionSolutions.Configuration
         {
             QuickLogger.Debug("Purging Production Data",true);
             _saveData = null;
-            _hydroponicKnownTech = new List<DNASampleData>();
+            _hydroponicKnownTech = new List<Structs.DNASampleData>();
 
         }
 
-        public static void RemoveCraftingOperation(string unitID)
-        {
-            CraftingOperations.Remove(unitID);
-        }
+        //public static void RemoveCraftingOperation(string unitID)
+        //{
+        //    CraftingOperations.Remove(unitID);
+        //}
 
-        public static bool AddCraftingOperation(CraftingOperation operation)
-        {
-            if(CraftingOperations.ContainsKey(operation.ParentMachineUnitID)) return false;
-            CraftingOperations.Add(operation.ParentMachineUnitID, operation);
-            return true;
-        }
+        //public static bool AddCraftingOperation(CraftingOperation operation)
+        //{
+        //    if(CraftingOperations.ContainsKey(operation.ParentMachineUnitID)) return false;
+        //    CraftingOperations.Add(operation.ParentMachineUnitID, operation);
+        //    return true;
+        //}
 
-        public static CraftingOperation FindCraftingOperation(string unitID)
-        {
-            return !CraftingOperations.ContainsKey(unitID) ? null : CraftingOperations[unitID];
-        }
+        //public static CraftingOperation FindCraftingOperation(string unitID)
+        //{
+        //    return !CraftingOperations.ContainsKey(unitID) ? null : CraftingOperations[unitID];
+        //}
 
-        private static Dictionary<string, CraftingOperation> CraftingOperations = new();
+        //private static Dictionary<string, CraftingOperation> CraftingOperations = new();
 
         public static DeepDrillerLightDutySaveDataEntry GetDeepDrillerLightDutySaveData(string id)
         {

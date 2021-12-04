@@ -395,7 +395,11 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
                 _sb.Append(Environment.NewLine);
                 _sb.Append(Language.main.GetFormat<int, int, int>("SolarPanelStatus", Mathf.RoundToInt(DeepDrillerPowerManager.GetRechargeScalar() * 100f), Mathf.RoundToInt(DeepDrillerPowerManager.GetSourcePower(DeepDrillerPowerSources.Solar)), Mathf.RoundToInt(DeepDrillerPowerManager.GetSourcePowerCapacity(DeepDrillerPowerSources.Solar))));
 
+#if SUBNAUTICA_STABLE
                 HandReticle.main.SetInteractText(_sb.ToString(), AlterraHub.ViewInPDA(),false,false,HandReticle.Hand.None);
+#else
+                HandReticle.main.SetText(HandReticle.TextType.Hand, _sb + Environment.NewLine + AlterraHub.ViewInPDA(), false);
+#endif
                 HandReticle.main.SetIcon(HandReticle.IconType.Info, 1f);
             }
         }
@@ -441,9 +445,11 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 
             if (result)
             {
+#if SUBNAUTICA_STABLE
                 return techType.ToPickupable();
+#endif
             }
-
+            
             return null;
         }
         

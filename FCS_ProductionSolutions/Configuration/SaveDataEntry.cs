@@ -4,12 +4,12 @@ using System.Collections.ObjectModel;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Model;
-using FCS_ProductionSolutions.Mods.AutoCrafter.Models;
-using FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States;
+//using FCS_ProductionSolutions.Mods.AutoCrafter.Models;
+//using FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States;
 using FCS_ProductionSolutions.Mods.DeepDriller.Configuration;
 using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Structs;
-using FCS_ProductionSolutions.Mods.HydroponicHarvester.Enumerators;
-using FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono;
+//using FCS_ProductionSolutions.Mods.HydroponicHarvester.Enumerators;
+//using FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono;
 using FCS_ProductionSolutions.Structs;
 #if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
@@ -27,8 +27,8 @@ namespace FCS_ProductionSolutions.Configuration
         [JsonProperty] internal ColorTemplateSave ColorTemplate { get; set; }
         [JsonProperty] internal Dictionary<TechType, int> Storage { get; set; }
         [JsonProperty] internal bool IsInBase { get; set; }
-        [JsonProperty] internal HarvesterSpeedModes HarvesterSpeedMode { get; set; }
-        [JsonProperty] internal List<SlotsData> SlotData { get; set; }
+        //[JsonProperty] internal HarvesterSpeedModes HarvesterSpeedMode { get; set; }
+        //[JsonProperty] internal List<SlotsData> SlotData { get; set; }
         [JsonProperty] internal bool SetBreaker { get; set; }
     }
 
@@ -40,7 +40,7 @@ namespace FCS_ProductionSolutions.Configuration
         [JsonProperty] internal TechType TargetItem { get; set; }
         [JsonProperty] internal float Progress { get; set; }
         [JsonProperty] internal int ItemCount { get; set; }
-        [JsonProperty] internal HarvesterSpeedModes HarvesterSpeed { get; set; }
+       // [JsonProperty] internal HarvesterSpeedModes HarvesterSpeed { get; set; }
     }
 
     internal class MatterAnalyzerDataEntry
@@ -126,11 +126,11 @@ namespace FCS_ProductionSolutions.Configuration
         [JsonProperty] internal string ID { get; set; }
         [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
         [JsonProperty] internal ColorTemplateSave ColorTemplate { get; set; }
-        [JsonProperty] internal ObservableCollection<CraftingOperation> CurrentProcess { get; set; }
+        //[JsonProperty] internal ObservableCollection<CraftingOperation> CurrentProcess { get; set; }
         [JsonProperty] internal HashSet<TechType> KnownCrafts { get; set; }
         [JsonProperty] internal List<TechType> StoredItems { get; set; }
         [JsonProperty] internal List<string> ConnectedDevices { get; set; }
-        [JsonProperty] internal CrafterCraftingState StateData { get; set; }
+        //[JsonProperty] internal CrafterCraftingState StateData { get; set; }
         [JsonProperty] internal List<string> ParentDevices { get; set; }
         [JsonProperty] internal bool IsStandBy { get; set; }
     }
@@ -144,7 +144,7 @@ namespace FCS_ProductionSolutions.Configuration
         [JsonProperty] internal List<DeepDrillerLightDutySaveDataEntry> DeepDrillerLightDutyEntries = new();
         [JsonProperty] internal List<ReplicatorDataEntry> ReplicatorEntries = new();
         [JsonProperty] internal List<AutoCrafterDataEntry> AutoCrafterDataEntries = new();
-        [JsonProperty] internal List<DNASampleData> HydroponicHarvesterKnownTech { get; set; } = new();
-        [JsonProperty] internal Dictionary<string, CraftingOperation> CraftingOperations { get; set; } = new();
+        [JsonProperty] internal List<Structs.DNASampleData> HydroponicHarvesterKnownTech { get; set; } = new();
+        //[JsonProperty] internal Dictionary<string, CraftingOperation> CraftingOperations { get; set; } = new();
     }
 }

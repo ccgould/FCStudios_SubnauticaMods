@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Enumerators;
@@ -186,7 +187,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 #if SUBNAUTICA
             float time = Mathf.Clamp01((MaxDepth - Ocean.main.GetDepthOf(base.gameObject)) / MaxDepth);
 #elif BELOWZERO
-    float time = Mathf.Clamp01((_maxDepth - Ocean.GetDepthOf(base.gameObject)) / _maxDepth);
+    float time = Mathf.Clamp01((MaxDepth - Ocean.GetDepthOf(base.gameObject)) / MaxDepth);
 #endif
             return _depthCurve.Evaluate(time);
         }
@@ -289,7 +290,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 
             if (powercell.charge <= 0 || _powerBank.Battery.IsFull()) 
             {
-                yield return Inventory.main.PickupAsync(powercell.gameObject.GetComponent<Pickupable>(),taskResult);
+                //yield return Inventory.main.PickupAsync(powercell.gameObject.GetComponent<Pickupable>(),taskResult);
                 yield break;
             }
 
@@ -305,7 +306,6 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
             //Add the new battery amount
             _powerBank.Battery.AddCharge(amount);
 
-            yield return Inventory.main.PickupAsync(powercell.gameObject.GetComponent<Pickupable>(), taskResult);
 
             //Notify the drill of the change
             OnBatteryUpdate?.Invoke(_powerBank.Battery);

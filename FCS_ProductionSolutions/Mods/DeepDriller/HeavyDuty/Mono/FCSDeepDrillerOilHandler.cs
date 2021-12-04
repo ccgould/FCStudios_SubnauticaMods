@@ -120,10 +120,12 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         {
             if (_timeLeft - KDayInSeconds >= 0)
             {
+#if SUBNAUTICA_STABLE
                 return techType.ToPickupable();
+#endif
             }
 
-            return null;
+                return null;
         }
 
         internal string TimeTilRefuel()

@@ -67,7 +67,11 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
         
         private void UpdateDrillShaftState()
         {
+            QuickLogger.Debug("UpdateDrillShaftState",true);
+
             if (!IsConstructed || !IsInitialized) return;
+
+            QuickLogger.Debug("UpdateDrillShaftState 1",true);
 
             if (GetIsDrilling())
             {
@@ -195,6 +199,8 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
             LoadSave();
         }
 
+        
+
 
         public override void OnDestroy()
         {
@@ -266,8 +272,16 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
 
         internal void SetPingName(string beaconName)
         {
-            _ping.SetLabel(beaconName);
-            PingManager.NotifyRename(_ping);
+            try
+            {
+                _ping.SetLabel(beaconName);
+                PingManager.NotifyRename(_ping);
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error(e.Message);
+                QuickLogger.Error(e.StackTrace);
+            }
         }
 
         internal void EmptyDrill()
@@ -398,7 +412,11 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
             {
                 _sb.Clear();
                 _sb.Append(AlterraHub.PleaseClearHands());
+#if SUBNAUTICA_STABLE
                 HandReticle.main.SetInteractText(_sb.ToString(), AlterraHub.ViewInPDA(), false, false, HandReticle.Hand.None);
+#else
+                HandReticle.main.SetText(HandReticle.TextType.Hand,_sb.ToString() + Environment.NewLine + AlterraHub.ViewInPDA(), false);
+#endif
                 HandReticle.main.SetIcon(HandReticle.IconType.HandDeny);
                 return;
             }
@@ -424,7 +442,12 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
                 }
 
 
+#if SUBNAUTICA_STABLE
                 HandReticle.main.SetInteractText(_sb.ToString(), AlterraHub.ViewInPDA(), false, false, HandReticle.Hand.None);
+#else
+                HandReticle.main.SetText(HandReticle.TextType.Hand,_sb.ToString() + Environment.NewLine + AlterraHub.ViewInPDA(), false);
+
+#endif
                 HandReticle.main.SetIcon(HandReticle.IconType.Info, 1f);
 
                 if (GameInput.GetButtonDown(GameInput.Button.Exit))

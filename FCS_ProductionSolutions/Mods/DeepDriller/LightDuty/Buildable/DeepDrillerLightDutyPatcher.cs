@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
@@ -50,6 +51,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.LightDuty.Buildable
             };
         }
 
+#if SUBNAUTICA_STABLE
         public override GameObject GetGameObject()
         {
             GameObject prefab = null;
@@ -105,11 +107,70 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.LightDuty.Buildable
             return prefab;
         }
 
+#else
+        public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
+        {
+            GameObject prefab = null;
+            
+            try
+            {
+                prefab = GameObject.Instantiate<GameObject>(_prefab);
+
+                //========== Allows the building animation and material colors ==========// 
+                SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
+                skyApplier.renderers = prefab.GetComponentsInChildren<Renderer>();
+                skyApplier.anchorSky = Skies.Auto;
+
+                //========== Allows the building animation and material colors ==========// 
+
+                // Add constructible
+                var constructable = prefab.EnsureComponent<Constructable>();
+                constructable.allowedOnWall = false;
+                constructable.allowedOnGround = true;
+                constructable.allowedInSub = false;
+                constructable.allowedInBase = false;
+                constructable.allowedOnCeiling = false;
+                constructable.allowedOutside = true;
+                constructable.model = prefab.FindChild("model");
+                constructable.techType = TechType;
+                constructable.rotationEnabled = true;
+                constructable.forceUpright = true;
+                constructable.placeDefaultDistance = 10f;
+                constructable.placeMaxDistance = 10f;
+
+                // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
+                var lwe = prefab.AddComponent<LargeWorldEntity>();
+                lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
+
+                var center = new Vector3(0f, 1.880612f, 0f);
+                var size = new Vector3(1.729009f, 3.01031f, 1.815033f);
+
+                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
+
+                prefab.AddComponent<PrefabIdentifier>().ClassId = this.ClassID;
+                prefab.AddComponent<TechTag>().type = TechType;
+                prefab.AddComponent<DeepDrillerLightDutyController>();
+
+                //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
+                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID/*,1f,2,.2f*/);
+
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error(e.Message);
+            }
+
+
+            gameObject.Set(prefab);
+            yield break;
+        }
+#endif
+
         protected override RecipeData GetBlueprintRecipe()
         {
             QuickLogger.Debug($"Creating recipe...");
             // Create and associate recipe to the new TechType
-            var customFabRecipe = new TechData()
+            var customFabRecipe = new RecipeData()
             {
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()

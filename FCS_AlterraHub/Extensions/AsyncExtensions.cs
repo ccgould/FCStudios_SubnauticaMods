@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Handlers;
 using UnityEngine;
@@ -58,6 +59,8 @@ namespace FCS_AlterraHub.Extensions
             var pickupable = gameObject.GetComponent<Pickupable>();
             return new InventoryItem(pickupable.Pickup(false));
         }
+#else
+
 
 #endif
 
@@ -71,6 +74,25 @@ namespace FCS_AlterraHub.Extensions
             }
             return item;
         }
+
+        public static IEnumerator ToInventoryItem(TechType techType,Action<InventoryItem>onCallBack)
+        {
+            TaskResult<GameObject> result = new TaskResult<GameObject>();
+            yield return CraftData.InstantiateFromPrefabAsync(techType, result, false);
+            GameObject gameObject = result.Get();
+            if (gameObject != null)
+            {
+                gameObject.transform.position = MainCamera.camera.transform.position + MainCamera.camera.transform.forward * 3f;
+                CrafterLogic.NotifyCraftEnd(gameObject, techType);
+                Pickupable component = gameObject.GetComponent<Pickupable>();
+                if (component != null)
+                {
+                    onCallBack?.Invoke(new InventoryItem(component));
+                }
+            }
+            yield break;
+        }
+
 
         public static TechType ToTechType(this string value)
         {

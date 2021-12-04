@@ -175,6 +175,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Patchers
         [HarmonyPrefix]
         public static bool UpdateAllowed_Postfix(ref bool __result)
         {
+#if SUBNAUTICA_STABLE
             QuickLogger.Debug($"CheckAsSubModule Result = {__result}",true);
             GameObject ghostModel = (GameObject)_ghostModel.GetValue(null);
             if (ghostModel?.name != null && ghostModel.name.StartsWith(ModelName))
@@ -203,6 +204,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Patchers
                         return false;
                     }
             }
+#endif
             QuickLogger.Debug($"CheckAsSubModule Result = {__result}", true);
             return true;
         }

@@ -6,7 +6,11 @@ using FCS_AlterraHub.Mono;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Helpers;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Patches;
 using FCSCommon.Utilities;
+#if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
+#else
+using Newtonsoft.Json;
+#endif
 using UnityEngine;
 using UWE;
 
@@ -40,6 +44,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
 
         public override Type UpdateState()
         {
+#if SUBNAUTICA_STABLE
             if (_operation != null)
             {
                 _timeLeft -= Time.deltaTime;
@@ -54,10 +59,12 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
                     _timeLeft = MAXTIME;
                 }
             }
+#endif
 
             return typeof(CrafterCraftingState);
         }
 
+#if SUBNAUTICA_STABLE
         private bool TryCraft()
         {
             QuickLogger.Debug("Trycraft",true);
@@ -68,7 +75,11 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
 
                 _manager.Crafter.CraftMachine.OnNeededItemFound?.Invoke();
 
+#if SUBNAUTICA_STABLE
                 CraftItem(_operation.TechType, true);
+#else
+                CoroutineHost.StartCoroutine(CraftItemAsync(_operation.TechType, true));
+#endif
 
                 if (!_operation.IsComplete) return false;
                 
@@ -80,6 +91,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
             QuickLogger.Debug("try craft failed", true);
             return false;
         }
+#endif
 
         private void CompleteOperation(CraftingOperation craftingOperation)
         {
@@ -103,6 +115,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
             yield break;
         }
 
+#if SUBNAUTICA_STABLE
         private void CraftItem(TechType techType, bool isComplete)
         {
             bool result = false;
@@ -140,7 +153,14 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
             }
             else
             {
+#if SUBNAUTICA_STABLE
                 _manager.Crafter.Storage.container.UnsafeAdd(techType.ToInventoryItem());
+#else
+                CoroutineHost.StartCoroutine(AsyncExtensions.ToInventoryItem(techType, (item =>
+                {
+                    _manager.Crafter.Storage.container.UnsafeAdd(item);
+                })));
+#endif
                 result = true;
             }
 
@@ -151,6 +171,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
                 _manager.Crafter.CraftMachine.OnItemCrafted?.Invoke();
             }
         }
+#endif
 
         private void ConsumeIngredients(Dictionary<TechType, int> consumable)
         {
@@ -178,13 +199,18 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
                     {
                         for (int i = 0; i < Mathf.Abs(keyValuePair2.Value); i++)
                         {
-                            _manager.Crafter.Manager.AddItemToContainer(keyValuePair2.Key.ToInventoryItem());
+                            CoroutineHost.StartCoroutine(AsyncExtensions.ToInventoryItem(keyValuePair2.Key, (item =>
+                            {
+                                _manager.Crafter.Manager.AddItemToContainer(item);
+                            })));
+
                         }
                     }
                 }
             }
         }
 
+#if SUBNAUTICA_STABLE
         private bool AttemptToAddToNetwork(TechType techType)
         {
             var inventoryItem = techType.ToInventoryItem();
@@ -202,9 +228,13 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
 
             return result;
         }
-        
+#else
+
+#endif
+
         #region EasyCraft Code
 
+#if SUBNAUTICA_STABLE
         public bool IsCraftRecipeFulfilledAdvanced(TechType techType)
         {
             if (Inventory.main == null)
@@ -220,7 +250,9 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
             _crafted = new Dictionary<TechType, int>();
             return _IsCraftRecipeFulfilledAdvanced(techType, techType, _consumable, _crafted, 0);
         }
+#endif
 
+#if SUBNAUTICA_STABLE
         private bool _IsCraftRecipeFulfilledAdvanced(TechType parent, TechType techType, Dictionary<TechType, int> consumable, Dictionary<TechType, int> crafted, int depth = 0)
         {
             if (depth >= 5)
@@ -310,7 +342,9 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
             }
             return false;
         }
+#endif
 
+#if SUBNAUTICA_STABLE
         private static bool CheckIfInvalidEquipmentType(TechType ingredientTechType)
         {
             EquipmentType equipmentType = CraftData.GetEquipmentType(ingredientTechType);
@@ -325,6 +359,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
 
             return true;
         }
+#endif
 
         #endregion
 
@@ -333,7 +368,9 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
             if (_operation == null) return null;
             var consumable = new Dictionary<TechType, int>();
             var crafted = new Dictionary<TechType, int>();
+#if SUBNAUTICA_STABLE
             _IsCraftRecipeFulfilledAdvanced(_operation.TechType, _operation.TechType, consumable, crafted, 0);
+#endif
             return consumable;
         }
     }

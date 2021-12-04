@@ -66,7 +66,9 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
                     var canBeStored = deviceStorage.CanBeStored(1, techType);
                     if (canBeStored)
                     {
+#if SUBNAUTICA_STABLE
                         deviceStorage.AddItemToContainer(techType.ToInventoryItem());
+#endif
                     }
                 }
             }

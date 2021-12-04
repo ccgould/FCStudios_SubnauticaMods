@@ -39,8 +39,8 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Mono
 
         internal void AddItem(InventoryItem item)
         {
+#if SUBNAUTICA_STABLE
             var data = CraftData.Get(item.item.GetTechType());
-
             if(data != null && data.linkedItemCount > 0)
             {
                 Dictionary<TechType, int> pairs = new Dictionary<TechType, int>();
@@ -91,6 +91,7 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Mono
             Destroy(item.item.gameObject);
             OnStartingRecycle?.Invoke();
             OnContainerUpdated?.Invoke();
+#endif
         }
 
         public Action OnStartingRecycle { get; set; }
@@ -124,7 +125,13 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Mono
                 EnergyMixin component = gameObject.GetComponent<EnergyMixin>();
                 if (component)
                 {
+#if SUBNAUTICA_STABLE
                     GameObject battery = component.GetBattery();
+#else
+                    GameObject battery = component.GetBatteryGameObject();
+#endif
+
+
                     if (battery)
                     {
                         QuickLogger.Debug($"Removing Battery from {Language.main.Get(techType)}", true);
@@ -144,7 +151,7 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Mono
 
         private IEnumerator RecycleCoroutine(TechType techType, List<Ingredient> list)
         {
-            foreach (IIngredient ingredient in list)
+            foreach (Ingredient ingredient in list)
             {
                 for (int i = 0; i < ingredient.amount; i++)
                 {

@@ -149,7 +149,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
             _mono.DeepDrillerContainer.OnlyRemoveItemFromContainer(techType);
 
             TaskResult<InventoryItem> result = new TaskResult<InventoryItem>();
-            yield return AsyncExtensions.ToInventoryItemLegacyAsync(techType, result);
+            //yield return AsyncExtensions.ToInventoryItemLegacyAsync(techType, result);
             target.AddItemToContainer(result.Get());
             yield break;
         }

@@ -11,7 +11,7 @@
 #if SUBNAUTICA
             main.SetInteractText(_mono.DeepDrillerPowerManager.GetSolarPowerData(), false, HandReticle.Hand.None);
 #elif BELOWZERO
-            main.SetText(HandReticle.TextType.Hand, _mono.DeepDrillerLightDutyPowerManager.GetSolarPowerData(), false);
+            main.SetText(HandReticle.TextType.Hand, _mono.DeepDrillerPowerManager.GetSolarPowerData(), false);
 #endif
         }
 
