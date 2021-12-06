@@ -135,6 +135,11 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
             }
         }
 
+        internal int FocusCount()
+        {
+            return _focusOres.Count;
+        }
+
         private void ResetPassTime()
         {
             _passedTime = 0;

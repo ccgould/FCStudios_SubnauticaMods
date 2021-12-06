@@ -34,6 +34,7 @@ namespace FCS_ProductionSolutions.Buildable
             { $"{ModKey}_AutocrafterItemIsBeingCrafted","Cannot deconstruct because AutoCrafter is currently crafting an item."},
             { $"{ModKey}_AutocrafterItemsOnBelt","Cannot deconstruct because there are items on the belt."},
             { $"{ModKey}_CannotSetStandByHasConnections","Standby cannot be set due to this crafter already having connections to other crafters:{0}"},
+            { $"{ModKey}_FilterPageInformation","Filter: {0} | Black List: {1} | Enabled Filters Count : {2}"},
 
         };
 
@@ -178,7 +179,12 @@ namespace FCS_ProductionSolutions.Buildable
 
         public static string PleaseEmptyHarvesterSlot()
         {
-            throw new NotImplementedException();
+            return "";
+        }
+
+        public static string FilterPageInformation(bool focusToggleValue, bool blackListToggleValue, int focusCount)
+        {
+            return string.Format(GetLanguage($"{ModKey}_FilterPageInformation"), focusToggleValue ? "On" : "Off", blackListToggleValue ? "On" : "Off", focusCount);
         }
     }
 }

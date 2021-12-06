@@ -32,6 +32,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Patchers
         private DeepDrillerGUISignalPage _signalPage;
         private DeepDrillerGUIOilPage _lubricantPage;
         private FCSMessageBox _messageBox;
+        private Text _filterPageInformation;
 
         public override void Update()
         {
@@ -119,7 +120,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Patchers
         {
             if (_sender == null || !_isOpen || _isStandbyToggle == null) return;
         }
-        
+
         private void OnLoadDisplay()
         {
             try

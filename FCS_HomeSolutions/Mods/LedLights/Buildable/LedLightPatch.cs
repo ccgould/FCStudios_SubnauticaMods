@@ -43,8 +43,7 @@ namespace FCS_HomeSolutions.Mods.LedLights.Buildable
 
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, $"{data.classId}_Kit".ToTechType(), 33750,
-                    StoreCategory.Home);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, $"{data.classId}_Kit".ToTechType(), 33750, StoreCategory.Home);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
             };
         }

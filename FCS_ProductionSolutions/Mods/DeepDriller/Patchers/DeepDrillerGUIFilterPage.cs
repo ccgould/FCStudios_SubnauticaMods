@@ -19,6 +19,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Patchers
         private FCSButton _toggleBlackListBTN;
         private GridHelper _filterGrid;
         private readonly Dictionary<TechType, uGUI_FCSDisplayItem> _trackedFilterState = new();
+        private Text _filterPageInformation;
 
         public override void Awake()
         {
@@ -61,6 +62,17 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Patchers
             _filterGrid.Setup(6, ModelPrefab.DeepDrillerOreBTNPrefab, gameObject, Color.gray, Color.white, OnButtonClick, 5, "PrevBTN", "NextBTN", "Grid", "Paginator", string.Empty);
 
             #endregion
+
+            _filterPageInformation = GameObjectHelpers.FindGameObject(gameObject, "FilterPageInformation")?.GetComponent<Text>();
+
+            InvokeRepeating(nameof(UpdateInformation), 1,0.3f);
+
+        }
+
+        private void UpdateInformation()
+        {
+            if (_filterPageInformation == null) return;
+            _filterPageInformation.text = AuxPatchers.FilterPageInformation(_toggleFilterBTN.IsSelected(), _toggleBlackListBTN.IsSelected(), Hud.GetSender().OreGenerator.FocusCount());
         }
 
         private void OnLoadFilterGrid(DisplayData data)
@@ -132,6 +144,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Patchers
         public override void Show()
         {
             base.Show();
+            
             if (Hud.GetSender().OreGenerator.GetInBlackListMode())
             {
                 _toggleBlackListBTN.Check();
@@ -161,6 +174,8 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Patchers
                     displayItem.Value.Deselect();
                 }
             }
+
+            UpdateInformation();
         }
     }
 }

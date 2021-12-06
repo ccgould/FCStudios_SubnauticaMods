@@ -107,5 +107,15 @@ namespace FCS_AlterraHub.Mono
         {
             gameObject.SetActive(false);
         }
+
+        public bool IsSelected()
+        {
+            if (_toggle != null)
+            {
+                return _toggle.isOn;
+            }
+
+            return false;
+        }
     }
 }

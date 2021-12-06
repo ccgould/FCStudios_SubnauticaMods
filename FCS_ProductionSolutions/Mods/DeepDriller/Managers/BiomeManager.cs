@@ -220,6 +220,11 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
                 defaultLoot.Add(TechType.Lead);
             }
 
+            if (currentBiome.Equals("LavaLakes", StringComparison.OrdinalIgnoreCase))
+            {
+                defaultLoot.Add(TechType.Kyanite);
+            }
+
 
             QPatch.Configuration.Convert();
 #if DEBUG

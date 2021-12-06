@@ -1550,7 +1550,7 @@ namespace FCS_AlterraHub.Mono
 
         public string GetBaseHullStrength()
         {
-            return _baseHullStrength?.GetTotalStrength().ToString() ?? "0";
+            return _baseHullStrength?.GetTotalStrength().ToString("F2") ?? "0";
         }
 
         public static BaseManager GetPlayersCurrentBase()

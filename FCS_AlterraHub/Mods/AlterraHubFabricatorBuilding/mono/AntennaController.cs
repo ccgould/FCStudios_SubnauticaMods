@@ -157,6 +157,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             {
                 electricalBox.Fix(true);
             }
+
+            _pinValid = true;
         }
 
         public void MakeDirty()

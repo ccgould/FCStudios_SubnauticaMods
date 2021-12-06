@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
@@ -114,10 +115,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 
             if (forceFullHealth)
             {
-#if SUBNAUTICA
-                _liveMixin.initialHealth = 1;
-#endif
-                _liveMixin.health = 100;
+                _liveMixin.ResetHealth();
             }
 
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
@@ -176,6 +174,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             _liveMixin.health = 0;
 
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.red);
+        }
+
+        public bool IsUnlocked()
+        {
+            return _doors.All(x => x.IsUnlocked);
         }
     }
 

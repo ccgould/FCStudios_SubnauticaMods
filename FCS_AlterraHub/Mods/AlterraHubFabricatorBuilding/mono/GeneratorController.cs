@@ -47,7 +47,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             return _slots.Count(x => !x.AllowBatteryReplacement);
         }
 
-        private bool IsAllSlotsOccupied()
+        public bool IsAllSlotsOccupied()
         {
             return _slots.All(x => !x.AllowBatteryReplacement);
         }

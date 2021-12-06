@@ -90,6 +90,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         private int _timesOpen;
         private Text _currentBaseInfo;
         private TeleportationPageController _teleportationPageController;
+        private bool _firstTimeOpen = true;
 
         #endregion
 
@@ -374,16 +375,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         {
             _currentBaseInfo.text = $"Current Base : {text}";
         }
-
-        internal void OnEnable()
-        {
-            QuickLogger.Debug($"FCS PDA: Active and Enabled {isActiveAndEnabled}",true);
-            if(_canvasScalar == null)
-            {
-
-            }
-        }
-
+        
         public bool Open()
         {
             if (_timesOpen > 0 && !CardSystem.main.HasBeenRegistered() && !Mod.GamePlaySettings.IsPDAOpenFirstTime && AlterraFabricatorStationController.Main.DetermineIfUnlocked())
@@ -394,7 +386,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             if (Mod.GamePlaySettings.IsPDAOpenFirstTime && AlterraFabricatorStationController.Main.DetermineIfUnlocked())
             {
                 VoiceNotificationSystem.main.Play("PDA_Instructions_key",26);
-                Mod.GamePlaySettings.IsPDAOpenFirstTime = false;
+                _firstTimeOpen = false;
                 _timesOpen++;
                 Mod.SaveGamePlaySettings();
             }
@@ -810,25 +802,29 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
 
             Mod.GamePlaySettings.Rate = GetRate();
             Mod.GamePlaySettings.AutomaticDebitDeduction = GetAutomaticDebitDeduction();
+            Mod.GamePlaySettings.IsPDAOpenFirstTime = _firstTimeOpen;
         }
+
 
         public bool GetAutomaticDebitDeduction()
         {
             return _accountPageHandler.GetAutomaticDebitDeduction();
         }
 
-        internal void LoadCart(FCSPDAEntry savedData)
+        internal void LoadFromSave(FCSPDAEntry savedData)
         {
+            _firstTimeOpen = Mod.GamePlaySettings.IsPDAOpenFirstTime;
+
             if (savedData?.CartItems == null)
             {
                 QuickLogger.Debug("Cart Items returned Null");
-                _cartLoaded = true;
-                return;
             }
-
-            foreach (CartItemSaveData cartItem in savedData.CartItems)
+            else
             {
-                _cartDropDownManager.AddItem(cartItem.TechType, cartItem.ReceiveTechType, cartItem.ReturnAmount <= 0 ? 1 : cartItem.ReturnAmount);
+                foreach (CartItemSaveData cartItem in savedData.CartItems)
+                {
+                    _cartDropDownManager.AddItem(cartItem.TechType, cartItem.ReceiveTechType, cartItem.ReturnAmount <= 0 ? 1 : cartItem.ReturnAmount);
+                }
             }
 
             _cartLoaded = true;

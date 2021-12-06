@@ -33,7 +33,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
     {
         public static AlterraFabricatorStationController Main;
         private const int PowercellReq = 5;
-        internal bool IsPowerOn => Mod.GamePlaySettings.AlterraHubDepotPowercellSlot.Count >= PowercellReq && Mod.GamePlaySettings.BreakerOn;
+        internal bool IsPowerOn => _generator.IsAllSlotsOccupied() && _isBaseOn;
         public Transform BaseTransform { get; set; }
 
         private void OnBecameVisible()
@@ -86,7 +86,18 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         private void Awake()
         {
             QuickLogger.Debug("FCS Station Awake", true);
-            Main = this;
+
+            if (Main == null)
+            {
+                Main = this;
+                DontDestroyOnLoad(this);
+            }
+            else if (Main != null)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
             _warpTrans = GameObjectHelpers.FindGameObject(gameObject, "RespawnPoint").transform;
             BaseTransform = transform;
         }
@@ -306,7 +317,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             {
                 _keyPads[1].Unlock();
             }
-
+             
             if (settings.AlterraHubDepotDoors.KeyPad3)
             {
                 _keyPads[2].Unlock();
@@ -318,7 +329,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 
             _securityGateController.LoadSave();
 
-            if(IsPowerOn)
+            if(Mod.GamePlaySettings.AlterraHubDepotPowercellSlot.Count >= PowercellReq && Mod.GamePlaySettings.BreakerOn)
             {
                 TurnOnBase();
             }
@@ -716,17 +727,18 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             {
                 keyPadAccessController.Unlock();
             }
-            _securityGateController.Unlock();
+            _securityGateController.Unlock(true);
             _generator.CompleteObjective();
             _isBaseOn = true;
             _antenna.CompleteObjective();
+            TurnOnBase();
             QuickLogger.Debug("Station Object Complete");
         }
 
         public bool DetermineIfUnlocked()
         {
             return _isBaseOn && _keyPads[0].IsUnlocked() && _keyPads[1].IsUnlocked() && _keyPads[2].IsUnlocked() &&
-                   _securityGateController.GetHealth() >= 100 && _antenna.IsAllElectricalBoxesFixed() &&
+                   _securityGateController.IsUnlocked() && _antenna.IsAllElectricalBoxesFixed() &&
                    _antenna.IsUnlocked();
         }
 

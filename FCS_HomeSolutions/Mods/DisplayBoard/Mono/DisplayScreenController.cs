@@ -55,6 +55,7 @@ namespace FCS_HomeSolutions.Mods.DisplayBoard.Mono
                 _displayMode = DisplayMode.Temperature;
                 HideOptionsScreen();
                 ShowInformationScreen();
+                QueryTemperature();
             }));
 
             var customNameBTN = GameObjectHelpers.FindGameObject(gameObject, "CustomTextBTN")?.GetComponent<Button>();
@@ -92,7 +93,7 @@ namespace FCS_HomeSolutions.Mods.DisplayBoard.Mono
                 HideSettingsButton();
                 ShowOptionsScreen(); 
             }));
-
+            
             InvokeRepeating(nameof(QueryTemperature), UnityEngine.Random.value, 10f);
             InvokeRepeating(nameof(GetTime), UnityEngine.Random.value, 1f);
             InvokeRepeating(nameof(GetBaseHullStrength), UnityEngine.Random.value, 1f);
@@ -159,15 +160,17 @@ namespace FCS_HomeSolutions.Mods.DisplayBoard.Mono
         
         private void QueryTemperature()
         {
-            WaterTemperatureSimulation main = WaterTemperatureSimulation.main;
-            if (main)
+            if (_displayMode == DisplayMode.Temperature)
             {
-                _temperature = Mathf.Max(_temperature, main.GetTemperature(transform.position));
-                if (_displayMode == DisplayMode.Temperature)
+                WaterTemperatureSimulation main = WaterTemperatureSimulation.main;
+                if (main)
                 {
-                    _informationText.text = Language.main.GetFormat<float>("ThermalPlantCelsius", _temperature);
+                    _temperature = Mathf.Max(_temperature, main.GetTemperature(transform.position));
+                    var temp = Language.main.GetFormat("ThermalPlantCelsius", _temperature);
+
+                    _informationText.text =  string.IsNullOrWhiteSpace(temp) ? "LOADING" : temp;
                     float value = _temperature / 100f;
-                    _informationText.material.SetFloat(ShaderPropertyID._Amount, value);
+                    //_informationText.material.SetFloat(ShaderPropertyID._Amount, value);
                     if (_temperature < 25f)
                     {
                         _informationText.color = Color.red;
@@ -185,7 +188,11 @@ namespace FCS_HomeSolutions.Mods.DisplayBoard.Mono
                         color = UWE.Utils.LerpColor(Color.yellow, Color.green, (num - 0.4f) / 0.6f);
                     }
                     _informationText.color = color;
-                    _informationText.color = color;
+                }
+                else
+                {
+                    _informationText.color = Color.white;
+                    _informationText.text = "LOADING";
                 }
             }
         }

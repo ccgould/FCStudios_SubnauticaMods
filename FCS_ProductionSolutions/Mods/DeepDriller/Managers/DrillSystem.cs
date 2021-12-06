@@ -167,7 +167,6 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
                                                  Player.main.inExosuit ? 1566f : 22000f;
             }
 
-
             if (WorldHelpers.CheckIfInRange(gameObject, Player.main.gameObject, 5f) && IsOperational && !IsBreakSet())
             {
                 MainCameraControl.main.ShakeCamera(.3f);
@@ -179,7 +178,6 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject,
                 _isBreakSet ? Color.red : Color.cyan);
         }
-
 
         internal virtual void ConnectDisplay(){}
 
@@ -194,8 +192,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
 
             LoadSave();
         }
-
-
+        
         public override void OnDestroy()
         {
             Manager?.UnRegisterDevice(this);

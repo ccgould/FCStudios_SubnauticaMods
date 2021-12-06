@@ -198,6 +198,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             }
         }
 
+        public bool IsUnlocked => !doorLocked;
+
 
         public Action<DoorController, bool> OnDoorStateChanged;
         private void OnSealedDoorOpen(Sealed sealedComponent)

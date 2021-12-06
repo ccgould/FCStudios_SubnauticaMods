@@ -5,6 +5,7 @@ using FCS_AlterraHub.Abstract;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
+using FCS_AlterraHub.Model.GUI;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.ObjectPooler;
 using FCS_ProductionSolutions.Buildable;
@@ -27,9 +28,9 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         private bool _isInitialized;
         private readonly Color _startColor = Color.grey;
         private readonly Color _hoverColor = Color.white;
-        private readonly Color _colorEmpty = new Color(1f, 0f, 0f, 1f);
-        private readonly Color _colorHalf = new Color(1f, 1f, 0f, 1f);
-        private readonly Color _colorFull = new Color(0f, 1f, 0f, 1f);
+        private readonly Color _colorEmpty = new(1f, 0f, 0f, 1f);
+        private readonly Color _colorHalf = new(1f, 1f, 0f, 1f);
+        private readonly Color _colorFull = new(0f, 1f, 0f, 1f);
         private int _pageHash;
         private Image _batteryFill;
         private Text _batteryPercentage;
@@ -41,7 +42,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         private GridHelper _programmingGrid;
         private bool _isBeingDestroyed;
         private Text _filterBTNText;
-        private readonly Dictionary<TechType, FCSToggleButton> _trackedFilterState = new Dictionary<TechType, FCSToggleButton>();
+        private readonly Dictionary<TechType, uGUI_FCSDisplayItem> _trackedFilterState = new();
         private Text _itemCounter;
         private Text _unitID;
         private Text _batteryStatus;
@@ -52,7 +53,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         private FCSToggleButton _alterraRangeToggle;
         private FCSToggleButton _alterraStorageToggle;
         private ObjectPooler _pooler;
-        private HashSet<DrillInventoryButton> _trackedItems = new HashSet<DrillInventoryButton>();
+        private HashSet<DrillInventoryButton> _trackedItems = new();
         private InterfaceInteraction _interfaceInteraction;
         private float _updateStatusTimeLeft;
         private GridHelperPooled _libraryGrid;
@@ -61,6 +62,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         private Text _alterraStorageInformation;
         private Toggle _isVisibleToggle;
         private Text _pingInformation;
+        private Text _filterPageInformation;
         private const string InventoryPoolTag = "Inventory";
         private const string FunctionPoolTag = "Function";
 
@@ -89,7 +91,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
                 _filterGrid.DrawPage(1);
                 UpdateDisplayValues();
                 TurnOnDisplay();
-                InvokeRepeating(nameof(Updater), 0.5f, 0.5f);
+                InvokeRepeating(nameof(Updater), 0.3f, 0.3f);
                 _libraryGrid.DrawPage();
             }
         }
@@ -102,6 +104,9 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         private void Updater()
         {
             UpdateOilLevel();
+
+            if (_filterPageInformation == null) return;
+            _filterPageInformation.text = AuxPatchers.FilterPageInformation(_filterToggle.IsSelected,_filterBlackListToggle.IsSelected,_mono.OreGenerator.FocusCount());
         }
 
         internal void UpdateUnitID()
@@ -185,20 +190,6 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
                 case "ItemBTN":
                     var item = (TechType)tag;
                     _mono.DeepDrillerContainer.RemoveItemFromContainer(item);
-                    break;
-                case "FilterToggleBTN":
-                    var data = (FilterBtnData)tag;
-                    QuickLogger.Debug($"Toggle for {data.TechType} is {data.Toggle.IsSelected}", true);
-
-                    if (data.Toggle.IsSelected)
-                    {
-                        _mono.OreGenerator.AddFocus(data.TechType);
-                    }
-                    else
-                    {
-                        _mono.OreGenerator.RemoveFocus(data.TechType);
-                    }
-
                     break;
                 case "LubeRefillBTN":
                     QuickLogger.Debug("Opening Lube Drop Container", true);
@@ -515,6 +506,8 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 
                 #endregion
 
+                _filterPageInformation = GameObjectHelpers.FindGameObject(gameObject, "FilterPageInformation")?.GetComponent<Text>();
+
                 //================= Alterra Storage Page ================//
 
                 #region Alterra Storage Back Button
@@ -800,17 +793,20 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
                     {
                         GameObject buttonPrefab = Instantiate(data.ItemsPrefab);
                         buttonPrefab.transform.SetParent(data.ItemsGrid.transform, false);
-                        var itemBTN = buttonPrefab.AddComponent<FCSToggleButton>();
-                        itemBTN.ButtonMode = InterfaceButtonMode.Background;
-                        itemBTN.STARTING_COLOR = _startColor;
-                        itemBTN.HOVER_COLOR = _hoverColor;
-                        itemBTN.BtnName = "FilterToggleBTN";
-                        itemBTN.TextLineOne = Language.main.Get(techType);
-                        itemBTN.Tag = new FilterBtnData { TechType = techType, Toggle = itemBTN };
-                        itemBTN.OnButtonClick = OnButtonClick;
-                        uGUI_Icon icon = InterfaceHelpers.FindGameObject(buttonPrefab, "Icon").AddComponent<uGUI_Icon>();
-                        icon.sprite = SpriteManager.Get(techType);
-                        buttonPrefab.gameObject.SetActive(false);
+                        var itemBTN = buttonPrefab.AddComponent<uGUI_FCSDisplayItem>();
+                        itemBTN.Initialize(techType, true);
+                        itemBTN.Subscribe((value =>
+                        {
+                            if (value)
+                            {
+                                _mono.OreGenerator.AddFocus(techType);
+                            }
+                            else
+                            {
+                                _mono.OreGenerator.RemoveFocus(techType);
+                            }
+                        }));
+                        itemBTN.Hide();
                         _trackedFilterState.Add(techType, itemBTN);
                     }
                 }
@@ -822,14 +818,14 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
                     data.EndPosition = allowedOres.Count;
                 }
 
-                foreach (KeyValuePair<TechType, FCSToggleButton> toggle in _trackedFilterState)
-                {
-                    toggle.Value.SetVisible(false);
+                foreach (KeyValuePair<TechType, uGUI_FCSDisplayItem> toggle in _trackedFilterState)
+                { 
+                    toggle.Value.Hide();
                 }
 
                 for (int i = data.StartPosition; i < data.EndPosition; i++)
                 {
-                    _trackedFilterState.ElementAt(i).Value.SetVisible(true);
+                    _trackedFilterState.ElementAt(i).Value.Show();
                 }
                 _filterGrid.UpdaterPaginator(allowedOres.Count);
             }
@@ -980,7 +976,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
                 UpdateBeaconName(save.BeaconName);
             }
 
-            foreach (KeyValuePair<TechType, FCSToggleButton> toggleButton in _trackedFilterState)
+            foreach (KeyValuePair<TechType, uGUI_FCSDisplayItem> toggleButton in _trackedFilterState)
             {
                 if (_mono.OreGenerator.GetFocusedOres().Contains(toggleButton.Key))
                 {

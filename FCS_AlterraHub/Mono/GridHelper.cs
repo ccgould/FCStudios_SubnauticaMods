@@ -107,28 +107,6 @@ namespace FCS_AlterraHub.Mono
             OnLoadDisplay?.Invoke(data);
         }
 
-        //private void LoadDisplay<T>(T item)
-        //{
-        //for (int i = StartingPosition; i < EndingPosition; i++)
-        //{
-        //    var colorID = SerializedColors.ElementAt(i);
-        //    LoadDisplay(colorID);
-        //}
-
-        //GameObject itemDisplay = Instantiate(_itemPrefab);
-
-        //itemDisplay.transform.SetParent(_itemsGrid.transform, false);
-        //var text = itemDisplay.transform.Find("Location_LBL").GetComponent<Text>();
-        //text.text = storageItemName.Name;
-
-        //var itemButton = itemDisplay.AddComponent<InterfaceButton>();
-        //itemButton.ButtonMode = InterfaceButtonMode.TextColor;
-        //itemButton.Tag = storageItemName;
-        //itemButton.TextComponent = text;
-        //itemButton.OnButtonClick += _onButtonClick;
-        //itemButton.BtnName = "ShippingContainer";
-        //}
-
         public void ClearPage()
         {
             if (_itemsGrid == null) return;
