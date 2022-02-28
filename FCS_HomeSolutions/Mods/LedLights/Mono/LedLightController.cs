@@ -57,7 +57,12 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
                         if (_savedData.RotorRot != Vector3.zero && _savedData.TilerRot != Vector3.zero && _rotor != null && _tiler != null)
                         {
                             _rotor.localEulerAngles = _savedData.RotorRot.Vec3ToVector3();
+                            _mainRotor.localEulerAngles = _savedData.MainRotorRot.Vec3ToVector3();
                             _tiler.localEulerAngles = _savedData.TilerRot.Vec3ToVector3();
+
+                            InputForRotationTil = _savedData.InputForRotationTil;
+                            InputForRotationRot = _savedData.InputForRotationRot;
+                            InputForMainRotationRot = _savedData.InputForMainRotationRot;
                         }
 
                         foreach (var light in _light)
@@ -104,6 +109,7 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
                 QuickLogger.Info($"Creating Color Component", true);
                 _colorManager = gameObject.AddComponent<ColorManager>();
                 _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol, AlterraHub.BaseLightsEmissiveController);
+                _colorManager.ChangeColor(new ColorTemplate {PrimaryColor = Color.white, SecondaryColor = Color.white, EmissionColor = Color.white});
                 MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, gameObject, _buildable.isInside ? 2.5f : 1.8f );
             }
 
@@ -140,6 +146,7 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
             //    MaterialHelpers.CreateFloodLightCone(_fogCone);
 
             _rotor = GameObjectHelpers.FindGameObject(gameObject, "rotor")?.transform;
+            _mainRotor = GameObjectHelpers.FindGameObject(gameObject, "MainRotor")?.transform;
             _tiler = GameObjectHelpers.FindGameObject(gameObject, "tiller")?.transform;
 
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
@@ -176,10 +183,14 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
             _savedData.ColorTemplate = _colorManager.SaveTemplate();
             _savedData.Rotation = transform.rotation.QuaternionToVec4();
             _savedData.RotorRot = _rotor?.localEulerAngles.ToVec3() ?? new Vec3();
+            _savedData.MainRotorRot = _mainRotor?.localEulerAngles.ToVec3() ?? new Vec3();
             _savedData.TilerRot = _tiler?.localEulerAngles.ToVec3() ?? new Vec3();
             _savedData.Intensity = _light[0].intensity;
             _savedData.NightSensor = _nightSensor;
             _savedData.LightState = _light[0].enabled;
+            _savedData.InputForRotationTil = InputForRotationTil;
+            _savedData.InputForRotationRot = InputForRotationRot;
+            _savedData.InputForMainRotationRot = InputForMainRotationRot;
             QuickLogger.Debug($"Saving ID {_savedData.Id}");
             newSaveData.LedLightDataEntries.Add(_savedData);
         }
@@ -220,28 +231,44 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
         public const float ro2 = 180f;
         public const float rot1 = 0f;
         public const float rot2 = 90f;
+        public const float mainRo1 = 0f;
+        public const float mainRo2 = 360f;
 
-        public float InputForRotationTil, InputForRotationRot;//storing input in these variable
+        public float InputForRotationTil, InputForRotationRot, InputForMainRotationRot;//storing input in these variable
 
         private Vector3 _tilterPos = new Vector3(0f, 2.131469f, 0.003314057f);
         private Vector3 _rotPos = new Vector3(0.1214196f,0f, 3.439538e-17f);
+        private Vector3 _mainRotPos = new Vector3(0f,0f, 0f);
+        private Transform _mainRotor;
 
-        void RotationUpdate(Vector2 axis)
+        void RotationUpdate(Vector2 axis, bool rotateMain = false)
         {
-            if (_rotor == null || _tiler == null) return;
+            if (_rotor == null || _tiler == null || _mainRotor == null) return;
 
-            //just taking input
-            InputForRotationRot += axis.x * RotationSpeedS * Time.deltaTime;
-            InputForRotationTil += axis.y * RotationSpeedS * Time.deltaTime;
+            if (rotateMain)
+            {
+                //just taking input
+                InputForMainRotationRot += axis.x * RotationSpeedS * Time.deltaTime;
+                
+                InputForMainRotationRot = Mathf.Clamp(InputForMainRotationRot, mainRo1, mainRo2);
+                _mainRotor.localEulerAngles = new Vector3(0f, InputForMainRotationRot, 0);
+                _mainRotor.localPosition = _mainRotPos;
+            }
+            else
+            {
+                //just taking input
+                InputForRotationRot += axis.x * RotationSpeedS * Time.deltaTime;
+                InputForRotationTil += axis.y * RotationSpeedS * Time.deltaTime;
 
-            InputForRotationRot = Mathf.Clamp(InputForRotationRot, rot1, rot2);
-            _rotor.localEulerAngles = new Vector3(0f, 90.00001f, InputForRotationRot);
+                _rotor.localPosition = _rotPos;
+                _tiler.localPosition = _tilterPos;
 
-            _rotor.localPosition = _rotPos;
-            _tiler.localPosition = _tilterPos;
+                InputForRotationRot = Mathf.Clamp(InputForRotationRot, rot1, rot2);
+                _rotor.localEulerAngles = new Vector3(0f, 90.00001f, InputForRotationRot);
 
-            InputForRotationTil = Mathf.Clamp(InputForRotationTil, ro1, ro2);
-            _tiler.localEulerAngles = new Vector3(0f, -90.00001f, InputForRotationTil);
+                InputForRotationTil = Mathf.Clamp(InputForRotationTil, ro1, ro2);
+                _tiler.localEulerAngles = new Vector3(0f, -90.00001f, InputForRotationTil);
+            }
         }
 
 
@@ -287,7 +314,8 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
         {
             if (!IsInitialized || !IsConstructed) return;
 
-            base.OnHandHover(hand);
+            OnHandHover(hand, "LedLightSticks");
+
             if (hand.IsTool())
             {
                 var data = new[]
@@ -322,7 +350,8 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
                         QPatch.Configuration.LEDLightNightSensorToggleKeyCode.ToString(),
                         _light[0].intensity,
                         _nightSensor ? "Enabled" : "Disabled"),
-                    "CTRL + Arrow Keys to adjust light"
+                    "CTRL + Arrow Keys to adjust light",
+                    "CTRL + Alt Arrow Keys to rotate lamp"
                 };
                 data.HandHoverPDAHelperEx(GetTechType(), HandReticle.IconType.Hand);
 
@@ -360,7 +389,18 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
                 }
             }
 
-            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.LeftControl))
+            if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && (Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt)))
+            {
+                if (Input.GetKey(KeyCode.LeftArrow))
+                {
+                    RotationUpdate(Vector2.left,true);
+                }
+                if (Input.GetKey(KeyCode.RightArrow))
+                {
+                    RotationUpdate(Vector2.right,true);
+                }
+            }
+            else if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
             {
                 if (Input.GetKey(KeyCode.LeftArrow))
                 {

@@ -89,7 +89,7 @@ namespace FCS_HomeSolutions.Mods.CrewLocker.Buildable
                 prefabID.ClassId = ClassID;
 
                 UWEHelpers.CreateStorageContainer(prefab, prefab.FindChild("StorageRoot"), ClassID,"Storage",6,8);
-
+                
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<CabinetController>();
 

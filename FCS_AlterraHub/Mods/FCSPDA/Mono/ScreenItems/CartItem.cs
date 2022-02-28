@@ -42,7 +42,8 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
             uGUIIcon.sprite = SpriteManager.Get(TechType);
 
             var itemName = GameObjectHelpers.FindGameObject(gameObject, "ItemName").GetComponent<Text>();
-            itemName.text = Language.main.Get(TechType);
+            var name = Language.main.Get(TechType);
+            itemName.text = ReturnAmount > 1 ? $"{name} x{ReturnAmount}" : Language.main.Get(TechType);
 
             var itemPrice = GameObjectHelpers.FindGameObject(gameObject, "ItemPrice").GetComponent<Text>();
             itemPrice.text = StoreInventorySystem.GetPrice(TechType).ToString("n0");

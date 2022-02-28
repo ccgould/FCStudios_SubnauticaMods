@@ -40,7 +40,7 @@ namespace FCS_AlterraHub.Systems
         {
             if (_messageBox == null)
             {
-                QuickLogger.Error(AlterraHub.ErrorHasOccured());
+                QuickLogger.ModMessage(AlterraHub.ErrorHasOccurred("0x0003"));
                 QuickLogger.Error("MessageBox returned null");
                 return;
             }

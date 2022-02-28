@@ -62,10 +62,21 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Buildables
             {
                 var prefab = GameObject.Instantiate(_prefab);
 
-                var size = new Vector3(2.534196f, 10.11668f, 2.51761f);
-                var center = new Vector3(-4.768372e-07f, 5.354942f, -0.01068687f);
-
+                var center = new Vector3(0f, -0.7508821f, -0.01471424f);
+                var size = new Vector3(21.9853f, 4.032976f, 21.93637f);
                 GameObjectHelpers.AddConstructableBounds(prefab, size, center);
+                
+                var center1 = new Vector3(-0.04416943f, 3.445226f, -1.634275f);
+                var size1 = new Vector3(10.03543f, 4.415778f, 5.564189f);
+                GameObjectHelpers.AddConstructableBounds(prefab, size1, center1);
+                
+                var center2 = new Vector3(-0.5151188f, 1.820723f, 1.931715f);
+                var size2 = new Vector3(5.648634f, 1.023046f, 1.70119f);
+                GameObjectHelpers.AddConstructableBounds(prefab, size2, center2);
+                
+                var center3 = new Vector3(1.211275f, 0.902276f, 3.666859f);
+                var size3 = new Vector3(2.013066f, 2.804552f, 2.079138f);
+                GameObjectHelpers.AddConstructableBounds(prefab, size3, center3);
 
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<PrefabIdentifier>().ClassId = ClassID;

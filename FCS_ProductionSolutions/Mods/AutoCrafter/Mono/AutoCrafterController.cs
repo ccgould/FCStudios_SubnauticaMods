@@ -49,6 +49,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
             if (WorldHelpers.CheckIfPaused()) return;
             MoveBeltMaterial();
 
+            _transferTimer += DayNightCycle.main.deltaTime;
             if (_transferTimer >= 1f)
             {
                 for (int i = _storedItems.Count - 1; i >= 0; i--)

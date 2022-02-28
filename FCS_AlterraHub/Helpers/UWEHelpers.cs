@@ -37,6 +37,7 @@ namespace FCS_AlterraHub.Helpers
             storage.width = width;
             storage.height = height;
             storage.storageLabel = storageLabel;
+            storage.preventDeconstructionIfNotEmpty = true;
 
             //Make sure a ChildObjectIdentifier component is attached for saving and loading children.
             var childObjectIdentifier = storageRoot.EnsureComponent<ChildObjectIdentifier>();

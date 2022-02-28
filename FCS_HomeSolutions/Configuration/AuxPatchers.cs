@@ -51,6 +51,7 @@ namespace FCS_HomeSolutions.Configuration
             { $"{ModKey}_TeleportConfirmMessage","Initiate Teleportation?"},
             { $"{ModKey}_Coordinates","Coordinates"},
             { $"{ModKey}_CurtainInteractionFormat","Press {0} to change curtain pattern."},
+            { $"{ModKey}_RugInteractionFormat","Press {0} to change rug pattern."},
             { $"{ModKey}_TeleportCanceledMessage","Something went wrong with the teleport sequence canceled operation for your safety."},
             { $"{ModKey}_IngredientsFormat","Ingredients: {0}"},
             { $"{ModKey}_CookedFoods","Cooked Foods"},
@@ -285,7 +286,11 @@ namespace FCS_HomeSolutions.Configuration
         public static string CurtainInteractionFormat(string key)
         {
             return string.Format(GetLanguage($"{ModKey}_CurtainInteractionFormat"), key);
+        }
 
+        public static string RugInteractionFormat(string key)
+        {
+            return string.Format(GetLanguage($"{ModKey}_RugInteractionFormat"), key);
         }
 
         public static string IngredientsFormat(string ingredients)

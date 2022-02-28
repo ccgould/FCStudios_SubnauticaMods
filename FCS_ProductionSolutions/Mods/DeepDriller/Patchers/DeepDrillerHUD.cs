@@ -157,11 +157,15 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Patchers
                 }
                 GoToPage(DeepDrillerHudPages.Home);
 
-                sender.OnBatteryLevelChange += OnBatteryLevelChange;
-                sender.OnOilLevelChange += OnOilLevelChange;
-                sender.DeepDrillerContainer.OnContainerUpdate += RefreshInventory;
-                
                 _sender = sender;
+
+                if (_sender != null)
+                {
+                    sender.OnBatteryLevelChange += OnBatteryLevelChange;
+                    sender.OnOilLevelChange += OnOilLevelChange;
+                    sender.DeepDrillerContainer.OnContainerUpdate += RefreshInventory;
+                }
+                
                 OnLoadDisplay();
                 
                 _isOpen = true;

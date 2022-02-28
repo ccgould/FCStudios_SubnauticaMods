@@ -28,7 +28,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Buildable
         private const string AutoCrafterClassName = "AutoCrafter";
         private const string AutoCrafterPrefabName = "AutoCraftMachine";
         private static string AutoCrafterKitClassID => $"{AutoCrafterClassName}_Kit";
-        private const string AutoCrafterDescription = "Avoid long hours in front of the Fabricator. Queue up a list of multiple items or just keep yourself automatically stocked on an important one.";
+        private const string AutoCrafterDescription = "Avoid long hours in front of the Fabricator. Program a limited run of items or just keep yourself automatically stocked on an important one.";
 
         public override TechGroup GroupForPDA => TechGroup.Miscellaneous;
         public override TechCategory CategoryForPDA => TechCategory.Misc;

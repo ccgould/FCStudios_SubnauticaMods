@@ -17,6 +17,7 @@ using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
 using rail;
+using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Json.ExtensionMethods;
 using Steamworks;
 using Story;
@@ -192,7 +193,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             _securityGateController = GameObjectHelpers.FindGameObject(gameObject, "AlterraHubFabStationSecurityGate").AddComponent<SecurityGateController>();
             _securityGateController.Initialize();
 
-            WorldHelpers.CreateBeacon(gameObject, Mod.AlterraHubStationPingType, "Alterra Hub Station (320m)");
+            WorldHelpers.CreateBeacon(gameObject, Mod.AlterraHubStationPingType, "AlterraHub Fabrication Facility (320m)");
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseLightsEmissiveController, gameObject, Color.red);
             
             OnGamePlaySettingsLoaded(Mod.GamePlaySettings);
@@ -203,33 +204,24 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 
         private void CheckIfSecurityDoorCanUnlock()
         {
-            if (_securityBoxTrigger == null) return;
-
-            if (DetermineIfUnlocked())
+            if (_securityBoxTrigger != null && _securityBoxTrigger.IsPlayerInRange && IsPowerOn)
             {
                 UnlockSecurityDoors();
-                return;
             }
-
-            if (_keyPads[4].IsUnlocked() && _keyPads[3].IsUnlocked())
-            {
-                UnlockSecurityDoors();
-                return;
-            }
-
-            UnlockSecurityDoors();
         }
 
         private void UnlockSecurityDoors()
         {
-            if (_securityBoxTrigger.IsPlayerInRange && IsPowerOn)
+            if(_keyPads == null|| _keyPads.Count < 5) return;
+
+            if (!_keyPads[3].IsUnlocked() || !_keyPads[4].IsUnlocked())
             {
                 _keyPads[3].Unlock();
                 _keyPads[3].ForceOpen();
                 _keyPads[4].Unlock();
                 _keyPads[4].ForceOpen();
+                CancelInvoke(nameof(CheckIfSecurityDoorCanUnlock));
             }
-            CancelInvoke(nameof(CheckIfSecurityDoorCanUnlock));
         }
 
         internal SecurityBoxTrigger GetSecurityBoxTrigger()
@@ -323,6 +315,14 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                 _keyPads[2].Unlock();
             }
 
+            if (settings.AlterraHubDepotDoors.KeyPad4)
+            {
+                _keyPads[3].Unlock();
+                _keyPads[3].ForceOpen();
+                _keyPads[4].Unlock();
+                _keyPads[4].ForceOpen();
+            }
+
             _generator.LoadSave();
 
             _antenna.LoadSave();
@@ -354,6 +354,12 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             InvokeRepeating(nameof(TryShip),1f,1f);
 
             _gamePlaySettingsLoaded = true;
+
+
+            if (DetermineIfUnlocked())
+            {
+                //KnownTech.Add(FCSAlterraHubService.PublicAPI.FcsUnlockTechType);
+            }
 
             Mod.GamePlaySettings.IsStationSpawned = true;
         }
@@ -710,6 +716,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             Mod.GamePlaySettings.AlterraHubDepotDoors.KeyPad1 = _keyPads[0].IsUnlocked();
             Mod.GamePlaySettings.AlterraHubDepotDoors.KeyPad2 = _keyPads[1].IsUnlocked();
             Mod.GamePlaySettings.AlterraHubDepotDoors.KeyPad3= _keyPads[2].IsUnlocked();
+            Mod.GamePlaySettings.AlterraHubDepotDoors.KeyPad4= _keyPads[3].IsUnlocked();
             Mod.GamePlaySettings.AlterraHubDepotDoors.SecurityDoors = _securityGateController.GetHealth();
             Mod.GamePlaySettings.AlterraHubDepotPowercellSlot = _generator.Save().ToList();
             Mod.GamePlaySettings.IsPDAUnlocked = DetermineIfUnlocked();

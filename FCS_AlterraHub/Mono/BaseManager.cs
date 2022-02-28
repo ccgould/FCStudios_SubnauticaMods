@@ -394,16 +394,9 @@ namespace FCS_AlterraHub.Mono
         {
             if (Habitat == null || Managers == null) return "Unknown";
 
-            if (Habitat.isCyclops)
-            {
-                var count = Managers.Count(x => x.Habitat.isCyclops);
-                return $"Cyclops {count}";
-            }
-            else
-            {
-                var count = Managers.Count(x => x.Habitat.isBase);
-                return $"Base {count}";
-            }
+            var id = GetBaseFriendlyId().Remove(0, 2);
+
+            return Habitat.isCyclops ? $"Cyclops {id}" : $"Base {id}";
         }
 
         public void SendBaseMessage(string baseMessage)
@@ -765,9 +758,9 @@ namespace FCS_AlterraHub.Mono
 
         public void AddItemsToTracker(FcsDevice device,TechType item, int amountToAdd = 1)
         {
-            QuickLogger.Debug($"AddItemsToTracker: DSSServerController || {item.AsString()} || {amountToAdd} || TabID: {device?.TabID}");
+            QuickLogger.Debug($"AddItemsToTracker:  {item.AsString()} || {amountToAdd} || TabID: {device?.TabID}");
 
-            if (device?.TabID != null && (device.TabID.Equals("AS") || device.TabID.Equals("HH")))
+            if (!string.IsNullOrWhiteSpace(device?.TabID) && (device.TabID.Equals("AS") || device.TabID.Equals("HH")))
             {
                 QuickLogger.Debug($"Item is AS or HH");
                 if (TrackedResources.ContainsKey(item))
@@ -944,16 +937,18 @@ namespace FCS_AlterraHub.Mono
             return true;
         }
 
-        public void AlertNewFcsStoragePlaced(FcsDevice alterraStorage)
+        public void AlertNewFcsStoragePlaced(FcsDevice device)
         {
-            if (BaseFcsStorage.Contains(alterraStorage)) return;
-            BaseFcsStorage.Add(alterraStorage);
-            TrackFcsStorage(alterraStorage);
+            if (BaseFcsStorage.Contains(device)) return;
+            BaseFcsStorage.Add(device);
+            TrackFcsStorage(device);
         }
 
         private void TrackFcsStorage(FcsDevice sc)
         {
-            if (sc == null || sc.GetStorage()?.ItemsContainer == null)
+            if(sc == null) return;
+
+            if (sc.GetStorage()?.ItemsContainer == null)
             {
                 QuickLogger.Debug($"Failed to add {sc.UnitID} at {sc.BaseId} because ItemsContainer returned null",true);
                 return;

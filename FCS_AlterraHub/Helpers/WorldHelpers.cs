@@ -325,6 +325,15 @@ namespace FCS_AlterraHub.Helpers
             return distance <= range;
         }
 
+        public static bool CheckIfInRange(FcsDevice currentDevice, BaseManager device, float range)
+        {
+            if (currentDevice == null || device == null || device.Habitat == null ||
+                !currentDevice.IsConstructed) return false;
+            float distance = Vector3.Distance(currentDevice.gameObject.transform.position,
+                device.Habitat.transform.position);
+            return distance <= range;
+        }
+
         public static float GetDistance(FcsDevice currentDevice, FcsDevice device)
         {
             if (currentDevice == null || device == null) return 0f;
@@ -540,6 +549,8 @@ namespace FCS_AlterraHub.Helpers
 
         public static GameObject GetRoot(GameObject go)
         {
+            if (go == null) return null;
+
             GameObject gameObject = UWE.Utils.GetEntityRoot(go);
             if (!gameObject)
             {

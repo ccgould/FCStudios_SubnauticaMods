@@ -88,11 +88,11 @@ namespace FCS_AlterraHub
 
             BoosterSound = AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "booster.mp3"));
 
-            Mod.AlterraHubStationPingType = WorldHelpers.CreatePingType("AlterraHubStation", "AlterraHubStation",
+            Mod.AlterraHubStationPingType = WorldHelpers.CreatePingType("Station", "Station",
                 ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "AlterraHubPing.png")));
 
             Mod.AlterraTransportDronePingType = WorldHelpers.CreatePingType("AlterraTransportDrone",
-                "AlterraTransportDrone", ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), $"TransportDronePing.png")));
+                "AlterraTransportDrone", ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "TransportDronePing.png")));
 
             
             var pingMapIconType = Type.GetType("SubnauticaMap.PingMapIcon, SubnauticaMap", false, false);
@@ -103,12 +103,16 @@ namespace FCS_AlterraHub
                 harmony.Patch(pingOriginal, pingPrefix);
             }
 
+            FCSAlterraHubService.PublicAPI.FcsUnlockTechType = TechTypeHandler.Main.AddTechType("FCSUnlocker", "FCS Access Key", "TechType to unlock FCSItems", false);
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
+
+            AlterraHub.AdditionalPatching();
+
             Mod.RegisterVoices();
         }
-
         public static Sound BoosterSound { get; set; }
+
 
         private static void PatchAdditionalStoreItems()
         {

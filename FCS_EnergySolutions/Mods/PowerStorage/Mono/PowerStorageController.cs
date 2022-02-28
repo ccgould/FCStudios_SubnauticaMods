@@ -23,7 +23,7 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
         private bool _isFromSave;
         private PowerStorageDataEntry _savedData;
         public override bool IsOperational => IsConstructed && IsInitialized;
-        public const float POWERUSAGE = 1f;
+
         private readonly Color _colorEmpty = new Color(1f, 0f, 0f, 1f);
         private readonly Color _colorHalf = new Color(1f, 1f, 0f, 1f);
         private readonly Color _colorFull = new Color(0f, 1f, 0f, 1f);
@@ -84,7 +84,7 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.PowerStorageTabID, Mod.ModPackID);
             if (Manager != null)
             {
-                _basePowerStorage = Manager.Habitat.GetComponent<BasePowerStorage>();
+                _basePowerStorage = Manager.Habitat.gameObject.EnsureComponent<BasePowerStorage>();
                 _basePowerStorage.Register(this);
             }
 
@@ -250,7 +250,7 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
             base.OnHandHover(hand);
             var data = new string[]
             {
-                AlterraHub.PowerPerMinute((IsCharging() ? POWERUSAGE : 0f) * 60f),
+                AlterraHub.PowerPerMinute((IsCharging() ? QPatch.Configuration.PowerStoragePowerDrainPerSecond : 0f) * 60f),
                 $"Is Charging: {IsCharging()}",
                 $"Storage: {Mathf.FloorToInt(PowerSource.power)} / {Mathf.FloorToInt(PowerSource.maxPower)} | Percentage: {PowerSource.power / PowerSource.maxPower:P0}"
             };
@@ -268,25 +268,22 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
 
         public void TakePower()
         {
-            QuickLogger.Debug($"{ Manager.GetPowerRelay().inboundPowerSources.Count}",true);
-
             if (!IsCharging()) return;
 
-            float amount = POWERUSAGE;
+            float amount = QPatch.Configuration.PowerStoragePowerDrainPerSecond;
 
-            foreach (var relay in Manager.GetPowerRelay().inboundPowerSources)
+            foreach (var iPowerInterface in Manager.GetPowerRelay().inboundPowerSources)
             {
-                if (relay is PowerSource source)
+                if (iPowerInterface is PowerRelay relay)
                 {
-                    if (source.name.StartsWith("PowerStorage"))
+                    if (relay.name.StartsWith("PowerStorage"))
                     {
-                        QuickLogger.Debug("PowerStorage Found",true);
+                        QuickLogger.Debug("PowerStorage Found Skipping",true);
                         continue;
                     }
 
                     if (relay.ConsumeEnergy(amount, out float amountConsumed))
                     {
-                        QuickLogger.Debug($"Taking power from :{source.name}", true);
                         amount -= amountConsumed;
                         PowerSource.power = Mathf.Clamp(PowerSource.power + amountConsumed, 0f, PowerSource.maxPower);
                         QuickLogger.Debug($"Added {amountConsumed} to Power Storage");
@@ -297,6 +294,7 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
                         break;
                     }
                 }
+
             }
         }
 

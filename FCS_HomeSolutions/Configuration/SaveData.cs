@@ -196,6 +196,10 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty] internal bool LightState { get; set; }
         [JsonProperty] internal Vec3 RotorRot { get; set; }
         [JsonProperty] internal Vec3 TilerRot { get; set; }
+        [JsonProperty] internal Vec3 MainRotorRot { get; set; }
+        [JsonProperty] internal float InputForRotationTil { get; set; }
+        [JsonProperty] internal float InputForRotationRot { get; set; }
+        [JsonProperty] internal float InputForMainRotationRot { get; set; }
     }
 
     [Serializable]

@@ -171,7 +171,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         
         internal void Refresh()
         {
-            _itemGrid?.DrawPage();
+            _itemGrid?.DrawPage(0);
             _itemTransceiverPage?.RefreshList();
         }
 
@@ -234,6 +234,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 _itemGrid = _mono.gameObject.EnsureComponent<GridHelperV2>();
                 _itemGrid.OnLoadDisplay += OnLoadItemsGrid;
                 _itemGrid.Setup(44, gameObject, Color.gray, Color.white, OnButtonClick);
+
+
 
                 #region Search
                 var inputField = InterfaceHelpers.FindGameObject(gameObject, "InputField");

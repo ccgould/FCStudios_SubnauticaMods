@@ -30,7 +30,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Spawnables
         private readonly GameObject _prefab;
         public override string AssetsFolder => Mod.GetAssetPath();
         public static TechType PatchedTechType { get; private set; }
-        public QuantumPowerBankSpawnable() : base("QuantumPowerBank", "Quantum Power Bank", "N/A")
+        public QuantumPowerBankSpawnable() : base("QuantumPowerBank", "Quantum Power Bank", "Energy source for away-from-base Quantum Teleportation via the FCStudios PDA. Holds enough energy for 2 personal or 1 vehicle Teleport.")
         {
             _prefab = ModelPrefab.GetPrefab("FCS_QuantumPowerBank");
             OnFinishedPatching += () =>
@@ -76,12 +76,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Spawnables
                 //Renderer
                 var renderer = prefab.GetComponentInChildren<Renderer>();
 
-                // Update sky applier
-                var applier = prefab.GetComponent<SkyApplier>();
-                if (applier == null)
-                    applier = prefab.AddComponent<SkyApplier>();
-                applier.renderers = new Renderer[] { renderer };
-                applier.anchorSky = Skies.Auto;
+                GameObjectHelpers.SetDefaultSkyApplier(prefab);
 
                 var placeTool = prefab.AddComponent<PlaceTool>();
                 placeTool.allowedInBase = true;

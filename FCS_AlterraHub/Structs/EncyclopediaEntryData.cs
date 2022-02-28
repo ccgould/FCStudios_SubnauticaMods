@@ -33,6 +33,11 @@ namespace FCS_AlterraHub.Structs
             return _techType == techType;
         }
 
+        public bool IsSame(string techType)
+        {
+            return techType.Equals(TechTypeString);
+        }
+
         public override string ToString()
         {
             return $"Title: {Title} | Tab Title: {TabTitle}";

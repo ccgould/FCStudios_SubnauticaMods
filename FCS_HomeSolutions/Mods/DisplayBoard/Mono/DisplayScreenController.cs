@@ -78,7 +78,7 @@ namespace FCS_HomeSolutions.Mods.DisplayBoard.Mono
             _renameBTN = GameObjectHelpers.FindGameObject(gameObject, "RenameBTN")?.GetComponent<Button>();
             _renameBTN?.onClick.AddListener((() =>
             {
-                uGUI.main.userInput.RequestString("Enter Beacon Name", "Rename", _customtext, 100,
+                uGUI.main.userInput.RequestString("Enter Custom Name", "Rename", _customtext, 100,
                     (text =>
                     {
                         _customtext = text;

@@ -33,7 +33,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Buildable
         internal static string DeepDrillerMk3KitClassID => $"{DeepDrillerMk3ClassName}_Kit";
         internal const string DeepDrillerMk3ClassName = "DeepDrillerMk3";
         internal const string DeepDrillerMk3PrefabName = "DeepDrillerMK3";
-        internal const string DeepDrillerMk3Description = "Automated drill platform suitable for all biomes with integrated solar and thermal generators. Requires lubricant.";
+        internal const string DeepDrillerMk3Description = "Heavy Duty Automated drill platform suitable for all biomes with integrated solar and thermal generators. Requires lubricant.";
 
         public FCSDeepDrillerBuildable() : base(DeepDrillerMk3ClassName, DeepDrillerMk3FriendlyName, DeepDrillerMk3Description)
         {

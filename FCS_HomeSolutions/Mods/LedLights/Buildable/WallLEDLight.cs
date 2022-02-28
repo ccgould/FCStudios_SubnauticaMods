@@ -11,7 +11,7 @@ namespace FCS_HomeSolutions.Mods.LedLights.Buildable
         {
             classId = "LedLightStickWall",
             description = "A wall mountable LED light strip. (Change the color with the Paint Tool) (Interior use only)",
-            friendlyName = "Wall Mountable Led Light Strip",
+            friendlyName = "Wall Mountable LED Light Strip",
             allowedInBase = true,
             allowedInSub = true,
             allowedOnGround = false,

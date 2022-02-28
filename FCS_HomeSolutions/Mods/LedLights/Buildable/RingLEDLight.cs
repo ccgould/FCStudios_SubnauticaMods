@@ -13,7 +13,7 @@ namespace FCS_HomeSolutions.Mods.LedLights.Buildable
         public RingLEDLight() : base(new LedLightData
         {
             classId = "RingLight",
-            description = "Ring Light . (Change the color with the Paint Tool)",
+            description = "Elegant interior light, suitable for interior tables, shelves, or stands. (Change the color with the Paint Tool)",
             friendlyName = "Ring Light",
             allowedInBase = true,
             allowedInSub = true,

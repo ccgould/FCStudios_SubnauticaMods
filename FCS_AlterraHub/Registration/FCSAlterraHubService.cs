@@ -27,6 +27,7 @@ namespace FCS_AlterraHub.Registration
         CardSystem AccountSystem { get; }
         Action OnPurge { get; set; }
         Action<BaseManager> TeleportationIgnitiated { get; set; }
+        TechType FcsUnlockTechType { get; set; }
 
         void RegisterDevice(FcsDevice device, string tabID, string packageId);
         void RemoveDeviceFromGlobal(string unitID);
@@ -73,6 +74,7 @@ namespace FCS_AlterraHub.Registration
     public class FCSAlterraHubService : IFCSAlterraHubService, IFCSAlterraHubServiceInternal
     {
         public Action<BaseManager> TeleportationIgnitiated { get; set; }
+        public TechType FcsUnlockTechType { get; set; }
         private static readonly FCSAlterraHubService singleton = new();
         public static List<KnownDevice> knownDevices { get; set; }= new();
         private static readonly Dictionary<string, FcsDevice> GlobalDevices = new();

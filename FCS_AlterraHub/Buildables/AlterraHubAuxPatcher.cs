@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using FCSCommon.Utilities;
 using SMLHelper.V2.Handlers;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,12 +10,12 @@ namespace FCS_AlterraHub.Buildables
     {
         private const string ModKey = "AHB";
 
-        internal static Dictionary<string,string> LanguageDictionary = new Dictionary<string, string>
+        internal static Dictionary<string,string> LanguageDictionary = new()
         {
             { $"{ModKey}_RequestNewCard","Request New Card."},
             { $"{ModKey}_CreateNewAccount","Create New Account."},
             { $"{ModKey}_CardNotInSystemSettingBalanceFormat", "This card number ({0}) wasn't found in the system. Setting balance to {1}." },
-            { $"{ModKey}_ErrorHasOccured", "An error has occurred please let FCStudios in the Alterra Corp. know about this error. Thank you and sorry for the inconvenience." },
+            { $"{ModKey}_ErrorHasOccurred", "An error has occurred please let FCStudios in the Alterra Corp. know about this error. Thank you and sorry for the inconvenience. Error Code: {0}"},
             { $"{ModKey}_NotEnoughMoneyOnAccount", "There is not enough money on card to perform this transaction." },
             { $"{ModKey}_AccountNotFoundFormat", "Unable to locate your AlterraHub Account. Please consult your FCStudios PDA." },
             { $"{ModKey}_CardReader", "Card Reader" },
@@ -41,7 +42,7 @@ namespace FCS_AlterraHub.Buildables
             { $"{ModKey}_UserNamePlaceHolder", "Enter username..."},
             { $"{ModKey}_PasswordPlaceHolder", "Enter password..."},
             { $"{ModKey}_PINPlaceHolder", "Enter pin number..."},
-            { $"{ModKey}_AccountCreated", "Thank you for registering for an Alterra Bank Account your current balance is {0}"},
+            { $"{ModKey}_AccountCreated", "Thank you for registering for a temporary Alterra Account. Your current account balance is {0}"},
             { $"{ModKey}_NoCardInventory", "Error: No debit card detected. There is no card in your inventory. Your account card is needed for validation.Please get you card or request a new on from the account page."},
             { $"{ModKey}_AccountSetupError", "[Error] Please refill the following fields and press enter in the field to continue: {0}"},
             { $"{ModKey}_OreConsumerTimeLeftFormat", "Time left till {0} ore processed {1} | Pending {2} (Container Limit: {3})."},
@@ -80,9 +81,11 @@ namespace FCS_AlterraHub.Buildables
             { $"{ModKey}_PleaseClearHands","Please clear hands (E) to use."},
             { $"{ModKey}_DebitHasBeenPaid","Your balance has been paid off."},
             { $"{ModKey}_MustBeBuiltOnBasePlatform","Must be built on Base Platform"},
+            { $"{ModKey}_HolsterPaintTool","To change color and pattern/image use the Paint Tool."},
+            { $"{ModKey}_Error404", "Connection to station failed! Please visit the AlterraHub Fabrication Facility for assistance." }
         };
 
-        private void AdditionalPatching()
+        internal static void AdditionalPatching()
         {
             foreach (KeyValuePair<string, string> languageEntry in LanguageDictionary)
             {
@@ -92,202 +95,205 @@ namespace FCS_AlterraHub.Buildables
 
         private static string GetLanguage(string key)
         {
-            return LanguageDictionary.ContainsKey(key) ? Language.main.Get(LanguageDictionary[key]) : string.Empty;
+            var newKey = $"{ModKey}_{key}";
+            return LanguageDictionary.ContainsKey(newKey) ? Language.main.Get(newKey) : string.Empty;
         }
 
         internal static string RequestNewCard()
         {
-            return GetLanguage($"{ModKey}_RequestNewCard");
+            return GetLanguage("RequestNewCard");
         }
 
         internal static string CreateNewAccount()
         {
-            return GetLanguage($"{ModKey}_CreateNewAccount");
+            return GetLanguage("CreateNewAccount");
         }
 
         internal static string CardNotInSystemAddingBalanceFormat()
         {
-            return GetLanguage($"{ModKey}_CardNotInSystemSettingBalanceFormat");
+            return GetLanguage("CardNotInSystemSettingBalanceFormat");
         }
 
-        public static string ErrorHasOccured()
+        public static string ErrorHasOccurred(string errorCode)
         {
-            return GetLanguage($"{ModKey}_ErrorHasOccured");
+            var message =  string.Format(GetLanguage("ErrorHasOccurred"),errorCode);
+            QuickLogger.Error($"Error Occurred: {errorCode}");
+            return message;
         }
 
         internal static string NotEnoughMoneyOnAccount()
         {
-            return GetLanguage($"{ModKey}_NotEnoughMoneyOnAccount");
+            return GetLanguage("NotEnoughMoneyOnAccount");
         }
 
         internal static string AccountNotFoundFormat()
         {
-            return GetLanguage($"{ModKey}_AccountNotFoundFormat");
+            return GetLanguage("AccountNotFoundFormat");
         }
 
         internal static string CardReader()
         {
-            return GetLanguage($"{ModKey}_CardReader");
+            return GetLanguage("CardReader");
         }
 
         internal static string AccountBalanceFormat(decimal amount)
         {
-            return string.Format(GetLanguage($"{ModKey}_AccountBalanceFormat"), amount.ToString("n0"));
+            return string.Format(GetLanguage("AccountBalanceFormat"), amount.ToString("n0"));
         }
 
         internal static string CheckOutTotalFormat(decimal amount)
         {
-            return string.Format(GetLanguage($"{ModKey}_CheckOutTotalFormat"), amount.ToString("n0"));
+            return string.Format(GetLanguage("CheckOutTotalFormat"), amount.ToString("n0"));
         }
 
         internal static string AccountNewBalanceFormat(decimal amount)
         {
-            return string.Format(GetLanguage($"{ModKey}_AccountNewBalanceFormat"), amount.ToString("n0"));
+            return string.Format(GetLanguage("AccountNewBalanceFormat"), amount.ToString("n0"));
         }
 
         internal static string DebtBalanceFormat(decimal amount)
         {
-            return string.Format(GetLanguage($"{ModKey}_DebtBalanceFormat"), amount.ToString("n0"));
+            return string.Format(GetLanguage("DebtBalanceFormat"), amount.ToString("n0"));
         }
 
         internal static string NoValidCardForPurchase()
         {
-            return GetLanguage($"{ModKey}_NoValidCardForPurchase");
+            return GetLanguage("NoValidCardForPurchase");
         }
 
         internal static string NoItemsInCart()
         {
-            return GetLanguage($"{ModKey}_NoItemsInCart");
+            return GetLanguage("NoItemsInCart");
         }
 
         internal static string CannotAddAnyMoreItemsToCart()
         {
-            return GetLanguage($"{ModKey}_CartMaxItems");
+            return GetLanguage("CartMaxItems");
         }
 
         internal static string OreConsumerReceptacle()
         {
-            return GetLanguage($"{ModKey}_OreConsumerReceptacle");
+            return GetLanguage("OreConsumerReceptacle");
         }
 
         internal static string AccountTotal()
         {
-            return GetLanguage($"{ModKey}_AccountTotal");
+            return GetLanguage("AccountTotal");
         }
 
         internal static string TransferMoney()
         {
-            return GetLanguage($"{ModKey}_TransferMoney");
+            return GetLanguage("TransferMoney");
         }
 
         internal static string RemoveAllCreditFromDevice()
         {
-            return GetLanguage($"{ModKey}_RemoveAllCreditFromDevice");
+            return GetLanguage("RemoveAllCreditFromDevice");
         }
 
         internal static string Account()
         {
-            return GetLanguage($"{ModKey}_Account");
+            return GetLanguage("Account");
         }
 
         public static string WelcomeBack()
         {
-            return GetLanguage($"{ModKey}_WelcomeBack");
+            return GetLanguage("WelcomeBack");
         }
 
         public static string CardRequirementsMessageFormat()
         {
-            return GetLanguage($"{ModKey}_CardRequirementsMessage");
+            return GetLanguage("CardRequirementsMessage");
         }
 
         public static string RegisterWelcomeMessage()
         {
-            return GetLanguage($"{ModKey}_RegisterWelcomeMessage");
+            return GetLanguage("RegisterWelcomeMessage");
         }
 
         public static string FullName()
         {
-            return GetLanguage($"{ModKey}_FullName");
+            return GetLanguage("FullName");
         }
 
         public static string UserName()
         {
-            return GetLanguage($"{ModKey}_UserName");
+            return GetLanguage("UserName");
         }
 
         public static string Password()
         {
-            return GetLanguage($"{ModKey}_Password");
+            return GetLanguage("Password");
         }
         
         public static string PIN()
         {
-            return GetLanguage($"{ModKey}_PIN");
+            return GetLanguage("PIN");
         }
 
         public static string FullNamePlaceholder()
         {
-            return GetLanguage($"{ModKey}_FullNamePlaceHolder");
+            return GetLanguage("FullNamePlaceHolder");
         }
 
         public static string UserNamePlaceholder()
         {
-            return GetLanguage($"{ModKey}_UserNamePlaceHolder");
+            return GetLanguage("UserNamePlaceHolder");
         }
 
         public static string PasswordPlaceholder()
         {
-            return GetLanguage($"{ModKey}_PasswordPlaceHolder");
+            return GetLanguage("PasswordPlaceHolder");
         }
 
         public static string PINPlaceholder()
         {
-            return GetLanguage($"{ModKey}_PINPlaceHolder");
+            return GetLanguage("PINPlaceHolder");
         }
 
         public static string AccountCreated(string amount)
         {
-            return string.Format(GetLanguage($"{ModKey}_AccountCreated"), amount);
+            return string.Format(GetLanguage("AccountCreated"), amount);
         }
 
         public static string CardNotDetected()
         {
-            return GetLanguage($"{ModKey}_NoCardInventory");
+            return GetLanguage("NoCardInventory");
         }
 
         public static string AccountSetupError(string value)
         {
-            return string.Format(GetLanguage($"{ModKey}_AccountSetupError"),value);
+            return string.Format(GetLanguage("AccountSetupError"),value);
         }
 
         public static string OreConsumerTimeLeftFormat(string ore, string timeLeft,string pending,int max)
         {
-            return string.Format(GetLanguage($"{ModKey}_OreConsumerTimeLeftFormat"), ore,timeLeft,pending,max);
+            return string.Format(GetLanguage("OreConsumerTimeLeftFormat"), ore,timeLeft,pending,max);
         }
 
         public static string NoOresToProcess()
         {
-            return GetLanguage($"{ModKey}_NoOresToProcess");
+            return GetLanguage("NoOresToProcess");
         }
 
         public static string PleaseBuildOnPlatForm()
         {
-            return GetLanguage($"{ModKey}_PleaseBuildOnPlatForm");
+            return GetLanguage("PleaseBuildOnPlatForm");
         }
 
         public static string Offline()
         {
-            return GetLanguage($"{ModKey}_Offline");
+            return GetLanguage("Offline");
         }        
         
         public static string Online()
         {
-            return GetLanguage($"{ModKey}_Online");
+            return GetLanguage("Online");
         }        
         
         public static string BaseOnOffMessage(string baseName,string status)
         {
-            return string.Format(GetLanguage($"{ModKey}_BaseOnOff"),baseName,status);
+            return string.Format(GetLanguage("BaseOnOff"),baseName,status);
         }
 
         public static string Submit()
@@ -297,22 +303,22 @@ namespace FCS_AlterraHub.Buildables
 
         public static string ChangeBaseName()
         {
-            return GetLanguage($"{ModKey}_ChangeBaseName");
+            return GetLanguage("ChangeBaseName");
         }
 
         public static string SearchForItemsMessage()
         {
-            return GetLanguage($"{ModKey}_ClickToSearchForItems");
+            return GetLanguage("ClickToSearchForItems");
         }
 
         public static string BlackListFormat(string name)
         {
-            return string.Format(GetLanguage($"{ModKey}_BlackListItemFormat"), name);
+            return string.Format(GetLanguage("BlackListItemFormat"), name);
         }
 
         public static string NoVehiclesDocked()
         {
-            return GetLanguage($"{ModKey}_NoVehicles");
+            return GetLanguage("NoVehicles");
         }
 
         public static string InventoryFull()
@@ -322,57 +328,57 @@ namespace FCS_AlterraHub.Buildables
 
         public static string NegativeNumbersNotAllowed()
         {
-            return GetLanguage($"{ModKey}_NegativeNumbersNotAllowed");
+            return GetLanguage("NegativeNumbersNotAllowed");
         }
 
         public static string NoSpaceAccountCreation()
         {
-            return GetLanguage($"{ModKey}_NoSpaceAccountCreation");
+            return GetLanguage("NoSpaceAccountCreation");
         }
 
         public static string PressToTurnDeviceOnOff(string key)
         {
-            return string.Format(GetLanguage($"{ModKey}_PressToTurnDeviceOnOff"), key);
+            return string.Format(GetLanguage("PressToTurnDeviceOnOff"), key);
         }
 
         public static string DeviceOn()
         {
-            return GetLanguage($"{ModKey}_DeviceOn");
+            return GetLanguage("DeviceOn");
         }
 
         public static string DeviceOff()
         {
-            return GetLanguage($"{ModKey}_DeviceOff");
+            return GetLanguage("DeviceOff");
         }
 
         public static string MissionButtonPressFormat(KeyCode key)
         {
-            return string.Format(GetLanguage($"{ModKey}_PDAButtonPressFormat"), key.ToString());
+            return string.Format(GetLanguage("PDAButtonPressFormat"), key.ToString());
         }
 
         public static string OperationExistsFormat(string deviceId)
         {
-            return string.Format(GetLanguage($"{ModKey}_OperationExists"),deviceId);
+            return string.Format(GetLanguage("OperationExists"),deviceId);
         }
 
         public static string ErrorLoadingAccount()
         {
-            return GetLanguage($"{ModKey}_ErrorLoadingAccountDetails");
+            return GetLanguage("ErrorLoadingAccountDetails");
         }
 
         public static string Bulk()
         {
-            return GetLanguage($"{ModKey}_Bulk");
+            return GetLanguage("Bulk");
         }
 
         public static string FoodItemsNotAllowed()
         {
-            return GetLanguage($"{ModKey}_FoodItemsNotAllowed");
+            return GetLanguage("FoodItemsNotAllowed");
         }
 
         public static string NoDestinationFound()
         {
-            return GetLanguage($"{ModKey}_NoDestinationFound");
+            return GetLanguage("NoDestinationFound");
         }
 
         public static string NotEmpty()
@@ -382,81 +388,91 @@ namespace FCS_AlterraHub.Buildables
 
         public static string PurchaseSuccessful()
         {
-            return GetLanguage($"{ModKey}_PurchaseSuccessful");
+            return GetLanguage("PurchaseSuccessful");
         }
 
         public static string DepotFull()
         {
-            return GetLanguage($"{ModKey}_DepotFull");
+            return GetLanguage("DepotFull");
         }        
         
         public static string DepotNotFound()
         {
-            return GetLanguage($"{ModKey}_DepotNotFound");
+            return GetLanguage("DepotNotFound");
         }
 
         public static string ViewInPDA()
         {
-            return string.Format(GetLanguage($"{ModKey}_PDAButtonPressFormat"), QPatch.Configuration.PDAInfoKeyCode.ToString());
+            return string.Format(GetLanguage("PDAButtonPressFormat"), QPatch.Configuration.PDAInfoKeyCode.ToString());
         }
 
         public static string IsDeviceOn(bool value)
         {
-            return string.Format(GetLanguage($"{ModKey}_IsDeviceOn"), value);
+            return string.Format(GetLanguage("IsDeviceOn"), value);
         }
 
         public static string PowerPerMinute(float value)
         {
-            return string.Format(GetLanguage($"{ModKey}_PowerPerMinute"), value.ToString("F2"));
+            return string.Format(GetLanguage("PowerPerMinute"), value.ToString("F2"));
         }
 
         public static string Waiting()
         {
-            return GetLanguage($"{ModKey}_Waiting");
+            return GetLanguage("Waiting");
         }
         public static string DoorInstructions()
         {
-            return GetLanguage($"{ModKey}_DoorInstructions");
+            return GetLanguage("DoorInstructions");
         }
 
         public static string CannotRemovePowercell()
         {
-            return GetLanguage($"{ModKey}_CannotRemovePowercell");
+            return GetLanguage("CannotRemovePowercell");
         }
 
         public static string AntennaPinNeededMessage()
         {
-            return GetLanguage($"{ModKey}_AntennaPinNeededMessage");
+            return GetLanguage("AntennaPinNeededMessage");
         }
 
         public static string ProcessingItem()
         {
-            return GetLanguage($"{ModKey}_ProcessingItem");
+            return GetLanguage("ProcessingItem");
         }
 
         public static string OreValue()
         {
-            return GetLanguage($"{ModKey}_OreValue");
+            return GetLanguage("OreValue");
         }
 
         public static string TimeLeft()
         {
-            return GetLanguage($"{ModKey}_TimeLeft");
+            return GetLanguage("TimeLeft");
         }
 
         public static string PleaseClearHands()
         {
-            return GetLanguage($"{ModKey}_PleaseClearHands");
+            return GetLanguage("PleaseClearHands");
         }
 
         public static string DebitHasBeenPaid()
         {
-            return GetLanguage($"{ModKey}_DebitHasBeenPaid");
+            return GetLanguage("DebitHasBeenPaid");
         }
 
         public static string MustBeBuiltOnBasePlatform()
         {
-            return GetLanguage($"{ModKey}_MustBeBuiltOnBasePlatform");
+            return GetLanguage("MustBeBuiltOnBasePlatform");
+        }
+
+        public static string HolsterPaintTool()
+        {
+            return GetLanguage("HolsterPaintTool");
+        }
+
+        public static string Error404()
+        {
+            return GetLanguage("Error404");
         }
     }
 }

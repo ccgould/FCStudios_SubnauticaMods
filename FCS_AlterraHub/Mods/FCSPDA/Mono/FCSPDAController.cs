@@ -132,6 +132,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
 
             _currentBiome = GameObjectHelpers.FindGameObject(_canvas.gameObject, "BiomeLBL")?.GetComponent<Text>();
             _404 = GameObjectHelpers.FindGameObject(_canvas.gameObject, "404");
+            _404.FindChild("Message").GetComponent<Text>().text = AlterraHub.Error404();
             _checkoutDialog = _canvas.gameObject.FindChild("Dialogs").FindChild("CheckOutPopUp").AddComponent<CheckOutPopupDialogWindow>();
 
             _returnsDialogController = _canvas.gameObject.FindChild("Dialogs").FindChild("ReturnItemsDialog").AddComponent<ReturnsDialogController>();
@@ -378,43 +379,40 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         
         public bool Open()
         {
-            if (_timesOpen > 0 && !CardSystem.main.HasBeenRegistered() && !Mod.GamePlaySettings.IsPDAOpenFirstTime && AlterraFabricatorStationController.Main.DetermineIfUnlocked())
-            {
-                VoiceNotificationSystem.main.Play("PDA_Account_Instructions_key",26);
-            }
+            QuickLogger.Debug("PDA Open : 1");
 
-            if (Mod.GamePlaySettings.IsPDAOpenFirstTime && AlterraFabricatorStationController.Main.DetermineIfUnlocked())
-            {
-                VoiceNotificationSystem.main.Play("PDA_Instructions_key",26);
-                _firstTimeOpen = false;
-                _timesOpen++;
-                Mod.SaveGamePlaySettings();
-            }
-            
-            _404?.SetActive(!AlterraFabricatorStationController.Main.DetermineIfUnlocked());
-            
             Player main = Player.main;
 
-            _teleportationPageController.Refresh();
+            PlayAppropriateVoiceMessage();
+
+            TryRemove404Screen();
+            
+            RefreshTeleportationPage();
 
             CreateScreen();
 
             FindPDA();
             
             ChangePDAVisibility(false);
-            if (_returnsDialogController?.IsOpen ?? false)
-            {
-                _returnsDialogController.Open();
-            }
-            UpdateDisplay();
-            DOFOperations();
-            _pda.isInUse = true;
-            var flag = InventorySlotHandler();
 
-            if (!flag || main.cinematicModeActive)
-            {
-                return false;
-            }
+            AttemptToOpenReturnsDialog();
+
+            UpdateDisplay();
+
+            DOFOperations();
+
+            SetPDAInUse(true);
+
+            if (!DetemineIfInCinematicMode(main)) return false;
+
+            SetRequiredParametersToOpenPDA();
+            
+            QuickLogger.Debug("FCS PDA Is Open", true);
+            return true;
+        }
+
+        private void SetRequiredParametersToOpenPDA()
+        {
             MainCameraControl.main.SaveLockedVRViewModelAngle();
             IsOpen = true;
             gameObject.SetActive(true);
@@ -422,11 +420,9 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             UWE.Utils.lockCursor = false;
             HandReticle.main?.RequestCrosshairHide();
 
-            QuickLogger.Debug($"Hide Count: {HandReticle.main.hideCount}",true);
-
             if (HandReticle.main?.hideCount > 1)
             {
-               QuickLogger.Debug("Fixing Hide Count",true);
+                QuickLogger.Debug("Fixing Hide Count", true);
                 while (HandReticle.main.hideCount > 1)
                 {
                     HandReticle.main?.UnrequestCrosshairHide();
@@ -446,10 +442,64 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             }
 #else
 #endif
+        }
 
+        private bool DetemineIfInCinematicMode(Player main)
+        {
+            var flag = InventorySlotHandler();
 
-            QuickLogger.Debug("FCS PDA Is Open", true);
+            if (!flag || main.cinematicModeActive)
+            {
+                return false;
+            }
+
             return true;
+        }
+
+        private void SetPDAInUse(bool isInUse)
+        {
+            _pda.isInUse = isInUse;
+        }
+
+        private void AttemptToOpenReturnsDialog()
+        {
+            if (_returnsDialogController?.IsOpen ?? false)
+            {
+                _returnsDialogController.Open();
+            }
+        }
+
+        private void RefreshTeleportationPage()
+        {
+            _teleportationPageController.Refresh();
+        }
+
+        private void TryRemove404Screen()
+        {
+            if (AlterraFabricatorStationController.Main == null)
+            {
+                MessageBoxHandler.main.Show(AlterraHub.ErrorHasOccurred("0x0001"), FCSMessageButton.OK);
+                return;
+            }
+            
+            _404?.SetActive(!AlterraFabricatorStationController.Main.DetermineIfUnlocked());
+        }
+
+        private void PlayAppropriateVoiceMessage()
+        {
+            if (_timesOpen > 0 && !CardSystem.main.HasBeenRegistered() && !_firstTimeOpen &&
+                AlterraFabricatorStationController.Main.DetermineIfUnlocked())
+            {
+                VoiceNotificationSystem.main.Play("PDA_Account_Instructions_key", 26);
+            }
+
+            if (_firstTimeOpen && AlterraFabricatorStationController.Main.DetermineIfUnlocked())
+            {
+                VoiceNotificationSystem.main.Play("PDA_Instructions_key", 26);
+                _firstTimeOpen = false;
+                _timesOpen++;
+                Mod.SaveGamePlaySettings();
+            }
         }
 
         private bool InventorySlotHandler()
@@ -537,7 +587,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         
         private void FindPDA()
         {
-            QuickLogger.Debug("In Find PDA");
+            QuickLogger.Debug("In Find PDA",true);
             if (PdaCanvas == null)
             {
 #if SUBNAUTICA
@@ -596,7 +646,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             {
                 if (depot == null || !depot.HasRoomFor(sizes))
                 {
-                    MessageBoxHandler.main.Show(depot == null ? Buildables.AlterraHub.DepotNotFound() : Buildables.AlterraHub.DepotFull(), FCSMessageButton.OK);
+                    MessageBoxHandler.main.Show(depot == null ? AlterraHub.DepotNotFound() : AlterraHub.DepotFull(), FCSMessageButton.OK);
                     return false;
                 }
 
@@ -656,7 +706,6 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
                 case PDAPages.AccountPage:
                     _toggleHud.gameObject.SetActive(true);
                     _accountPageHandler.UpdateRequestBTN(CardSystem.main.HasBeenRegistered());
-                    _accountPageHandler.Refresh(); 
                     break;
                 case PDAPages.Shipment:
                     _shipmentPageController.gameObject.SetActive(true);
@@ -827,10 +876,26 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
                 }
             }
 
+            _accountPageHandler.Refresh();
+
             _cartLoaded = true;
         }
 
         public void OpenEncyclopedia(TechType techType)
+        {
+            if (CheckIfPDAHasEntry(techType))
+            {
+                if (!Open()) return ;
+                GoToPage(PDAPages.Encyclopedia);
+                EncyclopediaTabController.OpenEntry(techType);
+            }
+            else
+            {
+                QuickLogger.ModMessage($"AlterraHub PDA doesn't have any entry for {Language.main.Get(techType)}");
+            }
+        }
+
+        public void OpenEncyclopedia(string techType)
         {
             if (CheckIfPDAHasEntry(techType))
             {
@@ -844,7 +909,13 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             }
         }
 
+
         public bool CheckIfPDAHasEntry(TechType techType)
+        {
+            return EncyclopediaTabController.HasEntry(techType);
+        }
+
+        public bool CheckIfPDAHasEntry(string techType)
         {
             return EncyclopediaTabController.HasEntry(techType);
         }

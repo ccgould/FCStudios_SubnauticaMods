@@ -35,6 +35,7 @@ namespace FCS_HomeSolutions.Mods.PaintTool.Mono
         private int _currentTemplateIndex;
         private Image _secondaryColorRing;
         private Image _emissionColorRing;
+        private bool _ignoreDefaultControls;
         internal bool IsInitialized { get; set; }
 
         public override string animToolName => TechType.Scanner.AsString(true);
@@ -318,6 +319,7 @@ namespace FCS_HomeSolutions.Mods.PaintTool.Mono
 
         public override bool OnAltDown()
         {
+            if (_ignoreDefaultControls) return false;
 
             uGUI_PaintToolColorPicker.Main.Open(this,(template,index) =>
             {
@@ -327,23 +329,6 @@ namespace FCS_HomeSolutions.Mods.PaintTool.Mono
             });
 
             return true;
-        }
-
-        private string GetTargetModeString(ColorTargetMode mode)
-        {
-            switch (mode)
-            {
-                case ColorTargetMode.Primary:
-                    return "Primary Color PaintMode";
-                case ColorTargetMode.Secondary:
-                    return "Secondary Color Paint Mode";
-                case ColorTargetMode.Both:
-                    return "Both Colors Paint Mode";
-                case ColorTargetMode.Emission:
-                    return "Light Color Paint Mode";
-            }
-
-            return $"[GetTargetModeString]: {AlterraHub.ErrorHasOccured()}";
         }
 
         public override bool OnReloadDown()
@@ -390,7 +375,22 @@ namespace FCS_HomeSolutions.Mods.PaintTool.Mono
 
         public override string GetCustomUseText()
         {
-            return $"Press Change Colors ({QPatch.Configuration.PaintToolSelectColorBackKeyCode})/({QPatch.Configuration.PaintToolSelectColorForwardKeyCode}) | Use Paint Can: {GameInput.GetBindingName(GameInput.Button.Reload, GameInput.BindingSet.Primary)} | Change Template: {GameInput.GetBindingName(GameInput.Button.AltTool, GameInput.BindingSet.Primary)} | Color Sample {QPatch.Configuration.PaintToolColorSampleKeyCode}";
+            if (GetFCSDeviceFromTarget() != null && GetFCSDeviceFromTarget().OverrideCustomUseText(out string message))
+            {
+                _ignoreDefaultControls = true;
+                return CreateCustomUseMessage(message);
+            }
+            _ignoreDefaultControls = false;
+            return CreateCustomUseMessage();
+        }
+
+        private string CreateCustomUseMessage(string message = null)
+        {
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                message = $"Change Template: {GameInput.GetBindingName(GameInput.Button.AltTool, GameInput.BindingSet.Primary)} | Color Sample {QPatch.Configuration.PaintToolColorSampleKeyCode}";
+            }
+            return $"Press Change Colors ({QPatch.Configuration.PaintToolSelectColorBackKeyCode})/({QPatch.Configuration.PaintToolSelectColorForwardKeyCode}) | Use Paint Can: {GameInput.GetBindingName(GameInput.Button.Reload, GameInput.BindingSet.Primary)} | {message}";
         }
 
         public List<ColorTemplate> GetTemplates()

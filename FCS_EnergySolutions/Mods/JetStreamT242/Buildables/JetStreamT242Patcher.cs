@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
+using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mods.Global.Spawnables;
 using FCS_AlterraHub.Registration;
 using FCS_EnergySolutions.Buildable;
@@ -53,10 +54,14 @@ namespace FCS_EnergySolutions.Mods.JetStreamT242.Buildables
             {
                 var prefab = GameObject.Instantiate(_prefab);
 
-                var size = new Vector3(2.493512f, 1.875936f, 1.439421f);
-                var center = new Vector3(0.07963049f, 1.088284f, 0f);
+                var center = new Vector3(0.007666886f, 1.933986f, -0.003973007f);
+                var size = new Vector3(0.7161249f, 3.508634f, 2.940353f);
 
-                //GameObjectHelpers.AddConstructableBounds(prefab, size, center);
+                var center2 = new Vector3(0.007666886f, 1.933986f, -0.003973007f);
+                var size2 = new Vector3(2.914304f, 3.508634f, 0.5378983f);
+
+                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
+                GameObjectHelpers.AddConstructableBounds(prefab, size2, center2);
 
                 var model = prefab.FindChild("model");
 

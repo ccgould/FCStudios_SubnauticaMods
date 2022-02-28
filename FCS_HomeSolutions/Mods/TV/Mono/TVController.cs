@@ -1,6 +1,7 @@
 ﻿using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
+using FCS_AlterraHub.Mods.FCSPDA.Mono;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Configuration;
@@ -291,7 +292,7 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
 
         public override void OnHandHover(GUIHand hand)
         {
-            base.OnHandHover(hand);
+            OnHandHover(hand,"SmartTVs");
 
             var data = new string[]
             {
@@ -300,7 +301,8 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
                     QPatch.Configuration.SmartTelevisionsVolumeUp.ToString(),
                     QPatch.Configuration.SmartTelevisionsVolumeDown.ToString())
             };
-            data.HandHoverPDAHelperEx(GetTechType());
+
+            data.HandHoverPDAHelperEx("SmartTVs");
 
             if (Input.GetKeyDown(QPatch.Configuration.SmartTelevisionsToggleTv))
             {

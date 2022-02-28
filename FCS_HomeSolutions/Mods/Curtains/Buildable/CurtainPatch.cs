@@ -53,8 +53,8 @@ namespace FCS_HomeSolutions.Mods.Curtains.Buildable
 
                 GameObjectHelpers.AddConstructableBounds(prefab, size, center);
 
-                var model = prefab.FindChild("model");
-
+                var model = prefab.FindChild("CurtainModel");
+                 
                 //========== Allows the building animation and material colors ==========// 
                 Shader shader = Shader.Find("MarmosetUBER");
                 Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();

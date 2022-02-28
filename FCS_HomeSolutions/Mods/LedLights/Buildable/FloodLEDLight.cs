@@ -13,8 +13,8 @@ namespace FCS_HomeSolutions.Mods.LedLights.Buildable
         public FloodLEDLight() : base(new LedLightData
         {
             classId = "FloodLEDLight",
-            description = "Flood LED light . (Change the color with the Paint Tool) (Exterior use only)",
-            friendlyName = "Flood Led Light",
+            description = "A Flood Light for wide area illumination, suitable for exterior use. (Change the color with the Paint Tool)",
+            friendlyName = "LED Flood Light",
             allowedInBase = false,
             allowedInSub = false,
             allowedOnGround = true,

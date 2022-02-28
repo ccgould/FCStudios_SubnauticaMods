@@ -47,7 +47,13 @@ namespace FCS_AlterraHub.Extensions
                     item = new InventoryItem(pickupable);
                 }
             }
-            return item;
+
+            if (item == null)
+            {
+                item = techType.ToInventoryItemLegacy();
+            }
+
+        return item;
         }
 
         public static InventoryItem ToInventoryItemLegacy(this TechType techType)

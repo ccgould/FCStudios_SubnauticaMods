@@ -10,31 +10,28 @@ using UnityEngine.UI;
 
 namespace FCS_AlterraHub.Mono
 {
-    public class SearchField : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
+    public class SearchField : uGUI_InputGroup, uGUI_IButtonReceiver, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
     {
         private bool hover;
         private InputField _inputField;
         public Action<string> OnSearchValueChanged;
         public Action<string> OnEnterPressed;
-        private bool _cursorLockCached;
-        private GameObject _inputDummy;
+
         public string HoverMessage { get; set; } = Buildables.AlterraHub.SearchForItemsMessage();
-        private GameObject inputDummy
+        public bool IgnoreInputGroup { get; set; }
+
+
+        public override void Update()
         {
-            get
+            base.Update();
+
+            if (focused && GameInput.GetButtonDown(GameInput.Button.PDA))
             {
-                if (this._inputDummy == null)
-                {
-                    this._inputDummy = new GameObject("InputDummy");
-                    this._inputDummy.SetActive(false);
-                }
-                return this._inputDummy;
+                //if(IgnoreLocking) return;
+                Deselect();
             }
-        }
 
 
-        private void Update()
-        {
             if (!hover) return;
             HandReticle.main.SetIcon(HandReticle.IconType.Rename);
 #if SUBNAUTICA
@@ -44,8 +41,10 @@ namespace FCS_AlterraHub.Mono
 #endif
         }
 
-        private void Awake()
+
+        public override void Awake()
         {
+            base.Awake();
             _inputField = GetComponentInChildren<InputField>();
             _inputField.onValueChanged.AddListener(OnValueChanged);
             _inputField.onEndEdit.AddListener(OnEndEdit);
@@ -53,46 +52,33 @@ namespace FCS_AlterraHub.Mono
 
         private void OnEndEdit(string text)
         {
+            if(IgnoreInputGroup) return;
             QuickLogger.Debug("End Edit", true);
             LockMovement(false);
             InterceptInput(false);
             //OnEnterPressed?.Invoke(text);
         }
 
-        private void LockMovement(bool state)
+        public bool IsHovered()
         {
-            FPSInputModule.current.lockMovement = state;
+            return hover;
         }
 
         public void OnPointerClick(PointerEventData eventData)
         {
+            if (IgnoreInputGroup) return;
             QuickLogger.Debug("Searching", true);
             InterceptInput(true);
             LockMovement(true);
             //Player.main.playerController.SetEnabled(false);
         }
-
-        private void InterceptInput(bool state)
-        {
-            if (inputDummy.activeSelf == state)
-            {
-                return;
-            }
-            if (state)
-            {
-                InputHandlerStack.main.Push(inputDummy);
-                _cursorLockCached = UWE.Utils.lockCursor;
-                UWE.Utils.lockCursor = false;
-                return;
-            }
-            UWE.Utils.lockCursor = _cursorLockCached;
-            InputHandlerStack.main.Pop(inputDummy);
-        }
-
+        
         private void OnValueChanged(string newSearch)
         {
             OnSearchValueChanged?.Invoke(newSearch);
         }
+
+        
 
         public void OnPointerEnter(PointerEventData eventData)
         {
@@ -107,6 +93,19 @@ namespace FCS_AlterraHub.Mono
         public string GetText()
         {
             return _inputField.text;
+        }
+        
+        public bool OnButtonDown(GameInput.Button button)
+        {
+            if (IgnoreInputGroup) return false;
+            if (button == GameInput.Button.UICancel || button == GameInput.Button.PDA)
+            {
+                //if (IgnoreLocking) return true;
+                Deselect();
+                return true;
+            }
+
+            return false;
         }
     }
 }

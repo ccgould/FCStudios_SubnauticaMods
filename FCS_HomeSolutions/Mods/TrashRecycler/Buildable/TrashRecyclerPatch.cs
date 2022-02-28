@@ -87,6 +87,7 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Buildable
                 prefabID.ClassId = ClassID;
 
                 prefab.SetActive(false);
+                prefab.GetComponentInChildren<Canvas>()?.gameObject.SetActive(false);
                 var storageContainer = prefab.AddComponent<FCSStorage>();
                 storageContainer.Initialize(ClassID);
                 storageContainer.enabled = false;

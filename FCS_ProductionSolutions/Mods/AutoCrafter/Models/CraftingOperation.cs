@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Mono;
+using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Handlers;
 #if SUBNAUTICA_STABLE
@@ -19,11 +20,13 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models
         public bool IsBeingCrafted { get; set; }
         public bool IsOperational { get; set; }
         public HashSet<string> Devices { get; set; } = new HashSet<string>();
+        public List<TechType> LinkedItems { get; set; } = new List<TechType>();
         [JsonIgnore] public HashSet<FcsDevice> MountedBy { get; set; } = new HashSet<FcsDevice>();
         public int AmountCompleted { get; set; }
         public TechType TechType { get; set; }
         public bool IsComplete => GetIsComplete();
-        public int ReturnAmount { get; set; }
+        public int ReturnAmount { get;}
+        public int LinkedItemCount { get; }
         public Action<CraftingOperation> OnOperationDeleted { get; set; }
         public string ParentMachineUnitID { get; set; }
 
@@ -44,13 +47,23 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models
             TechType = techType;
             Amount = amount;
 #if SUBNAUTICA
-            var returnAmount = CraftDataHandler.Main.GetTechData(techType)?.craftAmount ?? 1;
+            var data =  CraftDataHandler.Main.GetTechData(techType);
+            var returnAmount = data?.craftAmount ?? 1;
+            var linkedItems = data?.LinkedItems;
 #else
             var returnAmount = CraftDataHandler.Main.GetRecipeData(techType)?.craftAmount ?? 1;
 #endif
+            if (linkedItems != null)
+            {
+                LinkedItems = linkedItems;
+            }
+
+            LinkedItemCount = linkedItems?.Count ?? 0;
             ReturnAmount = returnAmount == 0 ? 1 : returnAmount;
             IsRecursive = isRecursive;
+
         }
+        
 
         private void AddDevice(string unitID)
         {
@@ -85,9 +98,14 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models
             AmountCompleted++;
         }
 
-        private readonly Dictionary<TechType, TechType> _techTypeFixes = new Dictionary<TechType, TechType>()
+        private readonly Dictionary<TechType, TechType> _techTypeFixes = new()
         {
             {"FCSGlass".ToTechType(),TechType.Glass }
+        };
+
+        private readonly List<TechType> _techTypeBypasses = new()
+        {
+            { "FCSGlass".ToTechType() }
         };
 
         public TechType FixCustomTechType()
@@ -118,6 +136,11 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models
             {
                 AmountCompleted += 1;
             }
+        }
+
+        public bool OriginalBypass()
+        {
+            return _techTypeBypasses.Contains(TechType);
         }
     }
 }

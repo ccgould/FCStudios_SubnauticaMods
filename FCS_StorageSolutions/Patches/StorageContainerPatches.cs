@@ -20,6 +20,16 @@ namespace FCS_StorageSolutions.Patches
                 return;
             }
 
+            // TODO Find effective way to check this. (Trying to get the DSS C48 to display items in Wind Surfer Operator)
+            //var fcsdevice = __instance.gameObject.transform.parent.GetComponent<FcsDevice>();
+
+            //QuickLogger.Debug($"FCSDevice: {fcsdevice} || Is Bypassing: {fcsdevice?.BypassFCSDeviceCheck}", true);
+
+            //if (fcsdevice != null && !fcsdevice.BypassFCSDeviceCheck)
+            //{
+            //    return;
+            //}
+
             var manager = BaseManager.FindManager(__instance.prefabRoot);
 
             if (manager == null)
@@ -41,7 +51,7 @@ namespace FCS_StorageSolutions.Patches
         [HarmonyPostfix]
         internal static void Postfix(bool constructed, StorageContainer __instance)
         {
-            if (__instance == null || !constructed)
+            if (__instance == null || !constructed /*|| __instance.gameObject.GetComponentInParent<FcsDevice>()*/)
             {
                 return;
             }

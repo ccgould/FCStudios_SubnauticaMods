@@ -235,6 +235,7 @@
     <Compile Include="Registration\FCSAlterraHubService.cs" />
     <Compile Include="Mods\Global\Spawnables\DebitCardSpawnable.cs" />
     <Compile Include="Mods\Global\Spawnables\FCSKit.cs" />
+    <Compile Include="Systems\AccountDetails.cs" />
     <Compile Include="Systems\CardSystem.cs" />
     <Compile Include="Systems\MessageBoxHandler.cs" />
     <Compile Include="Systems\StoreInventorySystem.cs" />

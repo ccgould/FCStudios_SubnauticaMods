@@ -127,10 +127,12 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
             {
                 if (PlayerInteractionHelper.CanPlayerHold(Mod.DebitCardTechType))
                 {
-                    CardSystem.main.CreateUserAccount(_fullName, _userName, _password, _pin);
-                    _userNameLBL.text = CardSystem.main.GetUserName();
-                    _createAccountDialog.SetActive(false);
-                    UpdateRequestBTN(true);
+                    if (CardSystem.main.CreateUserAccount(_fullName, _userName, _password, _pin))
+                    {
+                        _userNameLBL.text = CardSystem.main.GetUserName();
+                        _createAccountDialog.SetActive(false);
+                        UpdateRequestBTN(true);
+                    }
                 }
                 else
                 {

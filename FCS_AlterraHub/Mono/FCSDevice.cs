@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Interfaces;
@@ -28,6 +27,7 @@ namespace FCS_AlterraHub.Mono
         public virtual Action<string> IPCMessage { get; set; }
 
         protected bool _isHovered;
+
         public virtual void Awake()
         {
 
@@ -38,6 +38,14 @@ namespace FCS_AlterraHub.Mono
             if (Input.GetKeyDown(QPatch.Configuration.PDAInfoKeyCode))
             {
                 FCSPDAController.Main.OpenEncyclopedia(GetTechType());
+            }
+        }
+
+        protected void OnHandHover(GUIHand hand, string techType)
+        {
+            if (Input.GetKeyDown(QPatch.Configuration.PDAInfoKeyCode))
+            {
+                FCSPDAController.Main.OpenEncyclopedia(techType);
             }
         }
 
@@ -74,6 +82,7 @@ namespace FCS_AlterraHub.Mono
         protected ColorManager _colorManager;
         private TechType _techType;
         private Constructable _constructable;
+        public virtual bool BypassFCSDeviceCheck => false;
 
         /// <summary>
         /// The package which this item belongs to
@@ -382,6 +391,12 @@ namespace FCS_AlterraHub.Mono
         public virtual IEnumerator RemoveItemFromContainer(TechType techType, Action<Pickupable> callBack)
         {
             return null;
+        }
+
+        public virtual bool OverrideCustomUseText(out string message)
+        {
+            message = string.Empty;
+            return false;
         }
     }
 

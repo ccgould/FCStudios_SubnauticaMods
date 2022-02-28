@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Buildable;
 using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Models.Upgrades;
@@ -113,12 +114,20 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 
             if (connectToBaseValid)
             {
-                QuickLogger.Debug($"Function  Valid: {functionString}", true);
-                var connectToBaseUpgrade = new ConnectToBaseUpgrade {IsEnabled = true, Mono = _mono, BaseName = connectToBase.BaseFriendlyID};
-                Upgrades.Add(connectToBaseUpgrade);
-                upgrade = connectToBaseUpgrade;
-                connectToBaseUpgrade.TriggerUpdate();
-                OnUpgradeUpdate?.Invoke(connectToBaseUpgrade);
+                if (WorldHelpers.CheckIfInRange(_mono, connectToBase, QPatch.Configuration.DDDrillAlterraStorageRange))
+                {
+                    QuickLogger.Debug($"Function  Valid: {functionString}", true);
+                    var connectToBaseUpgrade = new ConnectToBaseUpgrade { IsEnabled = true, Mono = _mono, BaseName = connectToBase.BaseFriendlyID };
+                    Upgrades.Add(connectToBaseUpgrade);
+                    upgrade = connectToBaseUpgrade;
+                    connectToBaseUpgrade.TriggerUpdate();
+                    OnUpgradeUpdate?.Invoke(connectToBaseUpgrade);
+                }
+                else
+                {
+                    QuickLogger.ModMessage($"Deep Driller is to far from base check range in storage settings. {paraResults[0]}");
+                }
+
             }
             else
             {

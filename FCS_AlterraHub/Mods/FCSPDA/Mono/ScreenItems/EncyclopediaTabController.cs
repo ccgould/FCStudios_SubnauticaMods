@@ -705,6 +705,20 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
             }
         }
 
+        public void OpenEntry(string techType)
+        {
+            var node = FindNodeByTechType(Tree, techType);
+            if (node != null)
+            {
+                ExpandTo(node.id);
+                Activate(node as CraftNode);
+            }
+            else
+            {
+                QuickLogger.DebugError($"Failed to find a treenode with techtype: {Language.main.Get(techType)}", true);
+            }
+        }
+
         private TreeNode FindNodeByTechType(CraftNode tree, TechType techType)
         {
             foreach (var encyclopediaEntry in FCSAlterraHubService.InternalAPI.EncyclopediaEntries)
@@ -724,7 +738,31 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
             return null;
         }
 
+        private TreeNode FindNodeByTechType(CraftNode tree, string techType)
+        {
+            foreach (var encyclopediaEntry in FCSAlterraHubService.InternalAPI.EncyclopediaEntries)
+            {
+                foreach (KeyValuePair<string, List<EncyclopediaEntryData>> dataKeyValuePair in encyclopediaEntry)
+                {
+                    foreach (EncyclopediaEntryData data in dataKeyValuePair.Value)
+                    {
+                        if (data.IsSame(techType))
+                        {
+                            return Tree.FindNodeById(dataKeyValuePair.Key);
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
         public bool HasEntry(TechType techType)
+        {
+            return FindNodeByTechType(Tree, techType) != null;
+        }
+
+        public bool HasEntry(string techType)
         {
             return FindNodeByTechType(Tree, techType) != null;
         }

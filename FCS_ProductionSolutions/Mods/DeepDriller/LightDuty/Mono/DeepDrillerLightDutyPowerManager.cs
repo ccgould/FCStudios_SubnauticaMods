@@ -105,6 +105,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.LightDuty.Mono
         internal void Initialize(DrillSystem mono)
         {
             if (_isInitialized) return;
+            BasePowerDraw = 0.025f; // since the drill is smaller I have set it to the lowest the solar can generate
             _mono = mono;
             _isInitialized = true;
         }

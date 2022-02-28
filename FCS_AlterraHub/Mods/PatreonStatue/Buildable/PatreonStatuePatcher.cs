@@ -6,6 +6,7 @@ using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mods.PatreonStatue.Mono;
+using FCS_AlterraHub.Registration;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Utility;
 using UnityEngine;
@@ -26,8 +27,10 @@ namespace FCS_AlterraHub.Mods.PatreonStatue.Buildable
         
         internal const string PatreonStatueClassID = "PatreonStatue";
         internal const string PatreonStatueFriendly = "Patreon Statue";
-        internal const string PatreonStatueDescription = "N/A";
+        internal const string PatreonStatueDescription = "A ‘Thank You’ from FCStudios listing the names of Patreon Supporters.";
         internal const string PatreonStatuePrefabName = "FCS_PatreonStatue";
+        //public override TechType RequiredForUnlock => FCSAlterraHubService.PublicAPI.FcsUnlockTechType;
+        //public override bool UnlockedAtStart => false;
 
         public PatreonStatuePatcher() : base(PatreonStatueClassID, PatreonStatueFriendly, PatreonStatueDescription)
         {

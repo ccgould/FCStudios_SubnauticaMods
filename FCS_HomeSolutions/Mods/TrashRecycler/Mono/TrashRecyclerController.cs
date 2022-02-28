@@ -11,6 +11,7 @@ using FCS_AlterraHub.Mono.ObjectPooler;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
+using FCS_HomeSolutions.Mods.TrashReceptacle.Buildable;
 using FCS_HomeSolutions.Mods.TrashRecycler.Buildable;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -18,7 +19,7 @@ using UnityEngine.UI;
 
 namespace FCS_HomeSolutions.Mods.TrashRecycler.Mono
 {
-    internal class TrashRecyclerController : FcsDevice, IFCSSave<SaveData>, IFCSDumpContainer
+    internal class TrashRecyclerController : FcsDevice, IFCSSave<SaveData>, IFCSDumpContainer, IHandTarget
     {
         private bool _runStartUpOnEnable;
         private TrashRecyclerDataEntry _savedData;
@@ -35,6 +36,8 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Mono
         private Text _percentageLabel;
         private bool _isRecycling;
         private ProtobufSerializer _serializer;
+        private Canvas _canvas;
+        private FCSStorage _storageContainer;
         private const string RecyclerPoolTag = "recycleItem";
         private const float MaxRecycleTime = 30f;
 
@@ -42,13 +45,23 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Mono
 
         private bool OperationalCheck()
         {
-            if (Manager == null && _isFromSave) return true;
+            if (Manager == null) return false;
             return IsInitialized && IsConstructed && Manager.HasEnoughPower(GetPowerUsage());
         }
 
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, TrashRecyclerPatch.RecyclerTabID, Mod.ModPackID);
+
+            if (Manager == null)
+            {
+                TurnOffDevice();
+                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.red);
+            }
+            else
+            {
+                TurnOnDevice();
+            }
         }
 
         public override Vector3 GetPosition()
@@ -84,6 +97,7 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Mono
                     TryStartRecycling(true);
                     _isFromSave = false;
                 }
+                
                 _runStartUpOnEnable = false;
             }
         }
@@ -123,6 +137,10 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Mono
         public override void Initialize()
         {
             if (IsInitialized) return;
+
+            _canvas = GetComponentInChildren<Canvas>(true);
+
+            _storageContainer = gameObject.GetComponent<FCSStorage>();
 
             _homePage = GameObjectHelpers.FindGameObject(gameObject, "Home");
             _inventoryPage = GameObjectHelpers.FindGameObject(gameObject, "Inventory");
@@ -284,21 +302,30 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Mono
 
         public override bool CanDeconstruct(out string reason)
         {
+            reason = string.Empty;
 
-            if (_recycler != null && _recycler.HasItems())
+            if (_recycler == null)
+            {
+                return true;
+            }
+
+            if (_recycler.HasItems() || !_storageContainer.IsEmpty())
             {
                 reason = AuxPatchers.ModNotEmptyFormat(TrashRecyclerPatch.RecyclerFriendly);
                 return false;
             }
-            reason = string.Empty;
+            
             return true;
         }
 
         public override void OnConstructedChanged(bool constructed)
         {
             IsConstructed = true;
+
             if (constructed)
             {
+                _storageContainer?.Deactivate();
+
                 if (isActiveAndEnabled)
                 {
                     Initialize();
@@ -307,7 +334,28 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Mono
                 {
                     _runStartUpOnEnable = true;
                 }
+
+                TurnOnDevice();
             }
+            else
+            {
+                TurnOffDevice();
+            }
+        }
+
+        public override void TurnOnDevice()
+        {
+            if (Manager == null || !IsInitialized)
+            {
+                TurnOffDevice();
+                return;
+            } 
+            _canvas?.gameObject?.SetActive(true);
+        }
+
+        public override void TurnOffDevice()
+        {
+            _canvas?.gameObject?.SetActive(false);
         }
 
         public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)
@@ -369,6 +417,28 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Mono
         public int GetFreeSpace()
         {
             return _recycler.GetStorage().GetFreeSpace();
+        }
+
+        public override void OnHandHover(GUIHand hand)
+        {
+            base.OnHandHover(hand);
+
+
+            if (Manager == null)
+            {
+                var data = new string[]
+                {
+                    "Must be built on platform"
+                };
+
+                data.HandHoverPDAHelperEx(GetTechType(),HandReticle.IconType.HandDeny);
+                return;
+            }
+        }
+
+        public void OnHandClick(GUIHand hand)
+        {
+            
         }
     }
 }

@@ -42,12 +42,12 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
         private void UpdateBeacon()
         {
-
             if (_beacon != null)
             {
                 var result = IsTransporting();
-                _beacon.SetVisible(result);
                 _beacon.enabled = result;
+                _beacon.SetVisible(result);
+                PingManager.NotifyVisible(_beacon); 
             }
         }
 
@@ -76,7 +76,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             Initialize();
             InitializeStateMachine();
             _trans = gameObject.transform;
-            InvokeRepeating(nameof(UpdateBeacon),1f,1f);
+            //InvokeRepeating(nameof(UpdateBeacon),1f,1f);
         }
 
         private StateMachine GetStateMachine()
@@ -156,6 +156,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
                 StateMachine.SwitchToNewState(typeof(IdleState));
 
                 _isDocking = false;
+
+                UpdateBeacon();
             });
 
             _isDocking = true;
@@ -181,6 +183,9 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
                 departurePort.ClearInbound();
                 StateMachine.SwitchToNewState(typeof(ClimbState));
                 _isDeparting = false;
+
+                UpdateBeacon();
+
             }));
         }
 

@@ -81,6 +81,35 @@ namespace FCS_AlterraHub.Helpers
             }
         }
 
+        public static void HandHoverPDAHelperEx(this string[] strings, string techType, HandReticle.IconType icon = HandReticle.IconType.Info, float progess = 0f)
+        {
+            var main = HandReticle.main;
+            var pda = FCSPDAController.Main;
+
+            if (strings == null || main == null) return;
+
+            main.SetIcon(icon);
+
+            Sb.Clear();
+
+            Sb.Append($"{Language.main.Get(techType)}: ");
+
+            CreateText(strings);
+
+            var text = pda?.CheckIfPDAHasEntry(techType) ?? false ? AlterraHub.ViewInPDA() : string.Empty;
+#if SUBNAUTICA
+            main.SetInteractTextRaw(Sb.ToString(), text);
+#else
+            main.SetTextRaw(HandReticle.TextType.Count, $"{Sb}/n {text}");
+#endif
+
+
+            if (icon == HandReticle.IconType.Progress)
+            {
+                main.SetProgress(progess);
+            }
+        }
+
         private static void CreateText(string[] strings)
         {
             for (var i = 0; i < strings.Length; i++)

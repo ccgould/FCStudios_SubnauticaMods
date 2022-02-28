@@ -332,9 +332,7 @@ namespace FCS_AlterraHub.Configuration
 
                 QuickLogger.Debug("Attempting to save bases",true);
                 newSaveData.BaseSaves = BaseManager.Save().ToList();
-                QuickLogger.Debug($"Save 1 {Player_Patches.FCSPDA}", true);
                 Player_Patches.FCSPDA.Save(newSaveData);
-                QuickLogger.Debug("Save 2", true);
                 QuickLogger.Debug("Bases saved", true);
 
                 if (_tempAccountDetails != null)
@@ -563,6 +561,7 @@ namespace FCS_AlterraHub.Configuration
         public bool KeyPad1;
         public bool KeyPad2;
         public bool KeyPad3;
+        public bool KeyPad4;
         public float SecurityDoors;
     }
 

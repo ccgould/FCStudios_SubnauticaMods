@@ -30,6 +30,7 @@ namespace FCS_HomeSolutions.Mods.Microwave.Mono
         public int SlotCountY;
         private float _maxCookingTime;
 
+
         private HashSet<TechType> _rawTechTypes = new HashSet<TechType>
         {
             TechType.Bladderfish,
@@ -70,7 +71,7 @@ namespace FCS_HomeSolutions.Mods.Microwave.Mono
         {
             if (WorldHelpers.CheckIfPaused() || _interfaceInteraction == null || _storageContainer == null ||
                 _storageContainer.container == null) return;
-
+            
             _storageContainer.enabled = !_interfaceInteraction.IsInRange;
 
             if (_cookingTime > 0)
@@ -116,23 +117,29 @@ namespace FCS_HomeSolutions.Mods.Microwave.Mono
                 {
                     //Check if enough salt
                     var saltCount = _storageContainer.container.GetCount(TechType.Salt);
-                    var rawItemsCount = GetRawItemsCount(); 
+                    var rawItemsCount = GetRawItemsCount();
 
-                    if (saltCount >= rawItemsCount)
+
+                    if (rawItemsCount <= 0)
                     {
-                        foreach (InventoryItem item in _storageContainer.container)
+                        QuickLogger.ModMessage("Please add a raw fish to process.");
+                        return;
+                    }
+
+                    if (CookingMode == CookingMode.Curing)
+                    {
+                        if (saltCount >= rawItemsCount)
                         {
-                            if(item.item.GetTechType() == TechType.Salt) continue;
-                            _pendingItems.Enqueue(GetCookingItemData(item.item.GetTechType()));
+                            StartCookingProcess(rawItemsCount);
                         }
-                        _cookingTime = MAX_COOKING_TIME;
-                        _maxCookingTime = MAX_COOKING_TIME * rawItemsCount;
-                        UpdateTimerUI(_maxCookingTime);
-                        _pendingItem = _pendingItems.Dequeue();
+                        else
+                        {
+                            QuickLogger.ModMessage("Please add more salt to start curing.");
+                        }
                     }
                     else
                     {
-                        QuickLogger.ModMessage("Please add more salt to start curing.");
+                        StartCookingProcess(rawItemsCount);
                     }
                 }
             }));
@@ -148,6 +155,23 @@ namespace FCS_HomeSolutions.Mods.Microwave.Mono
                 UpdateTimerUI(0);
             }));
             DummyFoodObject?.SetActive(false);
+        }
+
+        private void StartCookingProcess(int rawItemsCount)
+        {
+            for (int i = _storageContainer.container.count - 1; i >= 0; i--)
+            {
+                var item = _storageContainer.container.ElementAt(i);
+                if (item.item.GetTechType() == TechType.Salt) continue;
+                var techType = item.item.GetTechType();
+                _pendingItems.Enqueue(GetCookingItemData(techType));
+                _storageContainer.container.DestroyItem(techType);
+            }
+
+            _cookingTime = MAX_COOKING_TIME;
+            _maxCookingTime = MAX_COOKING_TIME * rawItemsCount;
+            UpdateTimerUI(_maxCookingTime);
+            _pendingItem = _pendingItems.Dequeue();
         }
 
         private int GetCuredItemsCount()

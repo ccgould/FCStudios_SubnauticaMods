@@ -457,7 +457,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         {
             var devices = Manager.GetDevices(Mod.AlterraHubDepotTabID);
 
-            var totalsizeReq = sizes.Sum(x => x.x) + sizes.Sum(x => x.y);
+            //var totalsizeReq = sizes.Sum(x => x.x) + sizes.Sum(x => x.y);
 
             int total = 0;
 
@@ -467,7 +467,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
                 total += device.GetFreeSlotsCount();
             }
 
-            return total >= totalsizeReq;
+            return total >= sizes.Count;
         }
 
         public string GetStatus()

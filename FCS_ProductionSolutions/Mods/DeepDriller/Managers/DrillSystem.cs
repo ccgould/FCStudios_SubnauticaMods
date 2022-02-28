@@ -406,7 +406,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
                 _sb.Clear();
                 _sb.Append(UnitID);
                 _sb.Append(Environment.NewLine);
-                _sb.Append(AuxPatchers.PressKeyToOperate(GameInput.GetBindingName(GameInput.Button.Exit, GameInput.BindingSet.Primary), FCSDeepDrillerBuildable.DeepDrillerMk3FriendlyName));
+                _sb.Append(AuxPatchers.PressKeyToOperate(GameInput.GetBindingName(GameInput.Button.Exit, GameInput.BindingSet.Primary), "Deep Driller"));
 
 
                 if (UseOnScreenUi)

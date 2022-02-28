@@ -8,7 +8,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
 {
     public class HoloGraphControl : MonoBehaviour
     {
-        public List<HolographSlot> Slots = new List<HolographSlot>(4);
+        public List<HolographSlot> Slots = new(4);
         private GameObject _turbine;
         private GameObject _operator;
         private Button _deleteBTN;

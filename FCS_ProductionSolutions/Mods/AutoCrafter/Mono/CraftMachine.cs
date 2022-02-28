@@ -16,8 +16,10 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
         public Func<bool> OnNeededItemFound { get; set; }
         public AutoCrafterController Crafter;
 
+        private Queue<TechType> _beltItems = new();
         private CraftingOperation _operation;
-        
+        private float _timeLeft;
+
         private void DistributeLoad(CraftingOperation operation)
         {
             if (_operation.Amount > 1 || _operation.IsRecursive)
@@ -74,6 +76,19 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
             return Crafter.StateMachine.CurrentState.GetType() == typeof(CrafterCraftingState) ? ((CrafterCraftingState)Crafter.StateMachine.CurrentState).GetConsumables() : new Dictionary<TechType, int>();
         }
 
+        private void ShowItemOnBelt()
+        {
+            if (_beltItems.TryDequeue(out var result))
+            {
+                Crafter.CrafterBelt.SpawnBeltItem(result);
+            }
+        }
+
+        internal void AppendItemToBelt(TechType techType)
+        {
+            _beltItems.Enqueue(techType);
+        }
+
         public void CancelOperation()
         {
             Crafter.StateMachine.NeededItems.Clear();
@@ -101,6 +116,17 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
         public void SetOperation(CraftingOperation operation)
         {
             _operation = operation;
+        }
+
+        private void Update()
+        {
+            _timeLeft -= Time.deltaTime;
+            if (_timeLeft < 0)
+            {
+                _timeLeft = 8f;
+
+                ShowItemOnBelt();
+            }
         }
     }
 }

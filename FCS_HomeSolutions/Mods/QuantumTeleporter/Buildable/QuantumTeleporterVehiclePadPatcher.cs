@@ -27,7 +27,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Buildable
         internal const string QuantumTeleporterVehiclePadClassID = "QuantumTeleporterVehiclePad";
         internal const string QuantumTeleporterVehiclePadFriendly = "Quantum Teleporter Vehicle Pad";
 
-        internal const string QuantumTeleporterVehiclePadDescription = "Teleport Pad for your vehicles.";
+        internal const string QuantumTeleporterVehiclePadDescription = "Creates a Quantum Teleportation destination when teleporting a vehicle via the FCStudios PDA.";
 
         internal const string QuantumTeleporterVehiclePadPrefabName = "FCS_QuantumVehiclePad";
         internal static string QuantumTeleporterVehiclePadKitClassID = $"{QuantumTeleporterVehiclePadClassID}_Kit";

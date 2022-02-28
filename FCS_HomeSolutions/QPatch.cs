@@ -27,6 +27,7 @@ using FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Buildable;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Patches;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Spawnables;
+using FCS_HomeSolutions.Mods.Rug.Buildable;
 using FCS_HomeSolutions.Mods.SeaBreeze.Buildable;
 using FCS_HomeSolutions.Mods.Shower.Buildable;
 using FCS_HomeSolutions.Mods.Sink.Buildable;
@@ -51,6 +52,8 @@ namespace FCS_HomeSolutions
     /*
      * Alterra Home Solutions mod pack adds objects to subnautica that deals with bases and decorations
     */
+
+    //TODO Change the media location to be a list of locations instead of the folder
 
     [QModCore]
     public class QPatch
@@ -185,11 +188,11 @@ namespace FCS_HomeSolutions
             var sink = new SinkBuildable();
             sink.Patch();
 
-            var jukeBox = new JukeBoxBuildable();
-            jukeBox.Patch();
+            //var jukeBox = new JukeBoxBuildable();
+            //jukeBox.Patch();
 
-            var jukeboxSpeaker = new JukeBoxSpeakerBuildable();
-            jukeboxSpeaker.Patch();
+            //var jukeboxSpeaker = new JukeBoxSpeakerBuildable();
+            //jukeboxSpeaker.Patch();
 
             if (Configuration.IsHatchStairwayEnabled)
             {
@@ -225,7 +228,7 @@ namespace FCS_HomeSolutions
                 //PatchWalls();
             }
 
-            var narrowBed = new CrewBunkBedPatcher("FCSCrewBunkBed", "Crew Bunk Bed", "N/A", "BunkBed_Kit", "FCS_CrewBunkerBed", 100000);
+            var narrowBed = new CrewBunkBedPatcher("FCSCrewBunkBed", "Crew Bunk Bed", "Bunk Bed suitable for small quarters or communal sleeping quarters. Services 2 crew members.", "BunkBed_Kit", "FCS_CrewBunkerBed", 100000);
             narrowBed.Patch();
             
             var displayBoard = new DisplayBoardBuildable();
@@ -625,23 +628,7 @@ namespace FCS_HomeSolutions
                 });
             neonTable02.Patch();
 
-            var rug = new DecorationEntryPatch("FCSRug", "Rug", "A stylish rug from the corporation that loves you. Requires floor.",
-                ModelPrefab.GetPrefabFromGlobal("FCS_Rug01"),
-                new Settings
-                {
-                    KitClassID = "rug_kit",
-                    AllowedInBase = true,
-                    AllowedOutside = false,
-                    AllowedOnGround = true,
-                    AllowedInSub = true,
-                    AllowedOnConstructables = true,
-                    RotationEnabled = true,
-                    Cost = 1500,
-                    Center = new Vector3(0, 0f, 0f),
-                    Size = new Vector3(0f, 0f, 0f),
-                    CategoryForPDA = TechCategory.InteriorModule,
-                    GroupForPDA = TechGroup.InteriorModules
-                });
+            var rug = new Rug();
             rug.Patch();
         }
 

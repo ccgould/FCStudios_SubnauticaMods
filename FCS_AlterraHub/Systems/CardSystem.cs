@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -11,7 +10,7 @@ using FCS_AlterraHub.Mono;
 using FCSCommon.Utilities;
 using Random = System.Random;
 #if SUBNAUTICA_STABLE
-using Oculus.Newtonsoft.Json;
+
 #else
 using Newtonsoft.Json;
 #endif
@@ -19,56 +18,12 @@ using Newtonsoft.Json;
 
 namespace FCS_AlterraHub.Systems
 {
-    /// <summary>
-    /// A class that represents an account for the card system
-    /// </summary>
-    public class AccountDetails
-    {
-        [JsonProperty] public string Version { get; set; } = "2.0";
-        [JsonProperty] public string FullName { get; set; }
-        [JsonProperty] public string Username { get; set; }
-        [JsonProperty] public string Password { get; set; }
-        [JsonProperty] public string PIN { get; set; }
-        public decimal Balance { internal get; set; }
-        [JsonProperty] public string AccountBalance { get; set; }
-        [JsonProperty] public decimal AlterraDebitPayed { get; set; }
-        [JsonProperty] public decimal AccountBeforeDebit { get; set; }
-        [JsonProperty] public Dictionary<string, string> KnownCardNumbers = new Dictionary<string, string>();
-
-        public AccountDetails(AccountDetails accountDetails)
-        {
-            if (accountDetails == null) return;
-            FullName = accountDetails.FullName;
-            Username = accountDetails.Username;
-            Password = accountDetails.Password;
-            PIN = accountDetails.PIN;
-            Balance = accountDetails.Balance;
-            KnownCardNumbers = accountDetails.KnownCardNumbers;
-            AccountBalance = accountDetails.AccountBalance;
-        }
-
-        public AccountDetails()
-        {
-            
-        }
-        public void ResetAccount()
-        {
-            FullName = string.Empty;
-            Username = string.Empty;
-            Password = string.Empty;
-            PIN = string.Empty;
-            Balance = 0;
-            AlterraDebitPayed = 0;
-            KnownCardNumbers.Clear();
-        }
-    }
-
     public class CardSystem
     {
         private Random _random;
 
-        private AccountDetails _accountDetails = new AccountDetails();
-        public static CardSystem main = new CardSystem();
+        private AccountDetails _accountDetails = new();
+        public static CardSystem main = new();
         private const decimal AlterraDebit = -1000000000000000000;
         public Action onBalanceUpdated;
         private bool _hasBeenSaved;
@@ -145,7 +100,7 @@ namespace FCS_AlterraHub.Systems
             {
                 QuickLogger.Error($"[AddFinances]: {e.Message}");
                 QuickLogger.Error($"[AddFinances]: {e.StackTrace}");
-                MessageBoxHandler.main.Show(AlterraHub.ErrorHasOccured(),FCSMessageButton.OK);
+                MessageBoxHandler.main.Show(AlterraHub.ErrorHasOccurred("0x0002"),FCSMessageButton.OK);
                 return false;
             }
             return true;
@@ -176,11 +131,15 @@ namespace FCS_AlterraHub.Systems
         /// <param name="amount">The amount of credit to add to the account.</param>
         /// <param name="callBack">Callback method to call in-case of error</param>
         /// <returns>Boolean on success</returns>
-        public bool RemoveFinances(decimal amount)
+        public bool RemoveFinances(decimal amount,bool isDeduction = false)
         {
             if (HasEnough(amount))
             {
                 _accountDetails.Balance -= amount;
+                if (isDeduction)
+                {
+                    QuickLogger.ModMessage($"Deducted {amount} from the account new balance is {_accountDetails.Balance}");
+                }
                 onBalanceUpdated?.Invoke();
                 return true;
             }
@@ -211,7 +170,7 @@ namespace FCS_AlterraHub.Systems
             {
                 _accountDetails.AccountBalance = EncodeDecode.Encrypt(_accountDetails.Balance.ToString(CultureInfo.InvariantCulture));
             }
-            return _accountDetails;
+            return _accountDetails /*_accountDetails != null ? _accountDetails : new AccountDetails()*/ ;
         }
 
         /// <summary>
@@ -230,6 +189,8 @@ namespace FCS_AlterraHub.Systems
                         _accountDetails.Balance = Convert.ToDecimal(EncodeDecode.Decrypt(account.AccountBalance));
                     }
                     QuickLogger.Info($"Alterra account loaded for player {account.Username}",true);
+                    QuickLogger.Info($"{account.Username} | Funds: {_accountDetails.Balance}",true);
+                    QuickLogger.Info($"{account.Username} | Debt Payed: {_accountDetails.AlterraDebitPayed}",true);
                 }
             }
             catch (Exception e)
@@ -286,61 +247,68 @@ namespace FCS_AlterraHub.Systems
         /// <param name="userName"></param>
         /// <param name="password"></param>
         /// <param name="pin"></param>
-        public void CreateUserAccount(string fullName, string userName, string password, string pin,decimal accountBalance = 0)
+        public bool CreateUserAccount(string fullName, string userName, string password, string pin,decimal accountBalance = 0)
         {
             if (_accountDetails == null)
             {
                 _accountDetails = new AccountDetails();
             }
-            
-            _accountDetails.FullName = fullName;
-            _accountDetails.Username = userName;
-            _accountDetails.Password = EncodeDecode.CreateMD5(password);
-            _accountDetails.PIN = EncodeDecode.CreateMD5(pin);
-            _accountDetails.Balance = accountBalance;
-            CalculateBalance();
 
-            if (HasBeenRegistered())
+            if (!string.IsNullOrWhiteSpace(fullName) && !string.IsNullOrWhiteSpace(userName) &&
+                !string.IsNullOrWhiteSpace(password) && !string.IsNullOrWhiteSpace(pin))
             {
-                MessageBoxHandler.main.Show(AlterraHub.AccountCreated(GetAccountBalance().ToString("N0")), FCSMessageButton.OK);
-                var newCard = PlayerInteractionHelper.GivePlayerItem(Mod.DebitCardTechType);
-                //GenerateNewCard(newCard.gameObject.GetComponent<PrefabIdentifier>().Id);
-                
-            }
-            else
-            {
-                var sb = new StringBuilder();
-                if (string.IsNullOrWhiteSpace(fullName))
+                _accountDetails.FullName = fullName;
+                _accountDetails.Username = userName;
+                _accountDetails.Password = EncodeDecode.CreateMD5(password);
+                _accountDetails.PIN = EncodeDecode.CreateMD5(pin);
+                _accountDetails.Balance = accountBalance;
+                CalculateBalance();
+
+                if (HasBeenRegistered())
                 {
-                    sb.Append(AlterraHub.FullName());
-                    sb.Append(",");
+                    MessageBoxHandler.main.Show(AlterraHub.AccountCreated(GetAccountBalance().ToString("N0")), FCSMessageButton.OK);
+                    if (!PlayerInteractionHelper.HasCard())
+                    {
+                        var newCard = PlayerInteractionHelper.GivePlayerItem(Mod.DebitCardTechType);
+                        //GenerateNewCard(newCard.gameObject.GetComponent<PrefabIdentifier>().Id);
+                    }
+
+                    VoiceNotificationSystem.main.Play("PDA_Account_Created_key");
+                    return true;
                 }
 
-                if (string.IsNullOrWhiteSpace(userName))
-                {
-                    sb.Append(AlterraHub.UserName());
-                    sb.Append(",");
-                }
-
-                if (string.IsNullOrWhiteSpace(password))
-                {
-                    sb.Append(AlterraHub.Password());
-                    sb.Append(",");
-                }
-
-                if (string.IsNullOrWhiteSpace(pin))
-                {
-                    sb.Append(AlterraHub.PIN());
-                    sb.Append(",");
-                }
-                
-                MessageBoxHandler.main.Show(AlterraHub.AccountSetupError(sb.ToString()), FCSMessageButton.OK);
-
+                _accountDetails = null;
+                return false;
             }
 
-            VoiceNotificationSystem.main.Play("PDA_Account_Created_key");
+            var sb = new StringBuilder();
+            if (string.IsNullOrWhiteSpace(fullName))
+            {
+                sb.Append(AlterraHub.FullName());
+                sb.Append(",");
+            }
 
+            if (string.IsNullOrWhiteSpace(userName))
+            {
+                sb.Append(AlterraHub.UserName());
+                sb.Append(",");
+            }
 
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                sb.Append(AlterraHub.Password());
+                sb.Append(",");
+            }
+
+            if (string.IsNullOrWhiteSpace(pin))
+            {
+                sb.Append(AlterraHub.PIN());
+                sb.Append(",");
+            }
+
+            MessageBoxHandler.main.Show(AlterraHub.AccountSetupError(sb.ToString()), FCSMessageButton.OK);
+
+            return false;
             //QPatch.MissionManagerGM.NotifyDeviceAction(Mod.AlterraHubTechType,Mod.DebitCardTechType,DeviceActionType.CREATEITEM);
         }
 

@@ -441,25 +441,15 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
         private void AppendMoney(decimal price)
         {
             decimal deduction = 0;
+            CardSystem.main.AddFinances(price);
+
 
             if (FCSPDAController.Main.GetAutomaticDebitDeduction() && !CardSystem.main.IsDebitPaid())
             {
+                QuickLogger.Debug("Getting ready to deduct",true);
                 deduction = MathHelpers.PercentageOfNumber(Convert.ToDecimal(FCSPDAController.Main.GetRate()), price);
-
-                //Get the remainder and add it to the price
-                var needed = CardSystem.main.AmountNeededForDebt();
-
-                // Get the remainder
-                var remainder = needed - deduction;
-
-                if (remainder < 0)
-                {
-                    //set the new deduction
-                    deduction = deduction + remainder;
-                }
+                CardSystem.main.RemoveFinances(deduction, true);
             }
-            
-            CardSystem.main.AddFinances(price,!CardSystem.main.IsDebitPaid() ?  deduction : 0);
         }
         
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)

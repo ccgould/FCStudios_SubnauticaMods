@@ -11,7 +11,7 @@ namespace FCS_HomeSolutions.Mods.LedLights.Buildable
         {
             classId = "LedLightStickShort",
             description = "A short LED light stick, suitable for interior and exterior use. (Change the color with the Paint Tool)",
-            friendlyName = "Short Led Light Stick",
+            friendlyName = "Short LED Light Stick",
             allowedInBase = true,
             allowedInSub = true,
             allowedOnGround = true,

@@ -11,7 +11,7 @@ namespace FCS_HomeSolutions.Mods.LedLights.Buildable
         {
             classId = "LedLightStickLong",
             description = "A long LED light stick, suitable for interior and exterior use. (Change the color with the Paint Tool)",
-            friendlyName = "Long Led Light Stick",
+            friendlyName = "Long LED Light Stick",
             allowedInBase = true,
             allowedInSub = false,
             allowedOnGround = true,

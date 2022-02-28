@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Linq;
-using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Enumerators;
-using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Managers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
+using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
+using FCS_HomeSolutions.Mods.PaintTool.Mono;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -25,8 +25,9 @@ namespace FCS_HomeSolutions.Mods.Curtains.Mono
         private AnimationManager _animationHandler;
         private int _isOpen;
         private string _selectedImagePath;
-        private CurtainDialog _dialog;
-        private InterfaceInteration _interactionChecker;
+        private Texture2D _selectedImage;
+        //private CurtainDialog _dialog;
+        //private InterfaceInteration _interactionChecker;
 
         private void Start()
         {
@@ -77,6 +78,7 @@ namespace FCS_HomeSolutions.Mods.Curtains.Mono
             var path = QPatch.Patterns.FirstOrDefault(x => x.Value == texture2D).Key;
             MaterialHelpers.SetTexture(ModelPrefab.CurtainDecalMaterial, gameObject, texture2D);
             _selectedImagePath = path;
+            _selectedImage = texture2D;
         }
 
         private void ReadySaveData()
@@ -101,13 +103,6 @@ namespace FCS_HomeSolutions.Mods.Curtains.Mono
                 _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol);
             }
 
-            if (_dialog == null)
-            {
-                var dialog = GameObjectHelpers.FindGameObject(gameObject, "HUD");
-                _interactionChecker = dialog.AddComponent<InterfaceInteration>();
-                _dialog = dialog.AddComponent<CurtainDialog>();
-                _dialog.Initialize(this);
-            }
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseLightsEmissiveController, gameObject, Color.cyan);
 
 
@@ -177,30 +172,37 @@ namespace FCS_HomeSolutions.Mods.Curtains.Mono
             }
         }
 
-        public void OnHandHover(GUIHand hand)
+        public override void OnHandHover(GUIHand hand)
         {
-            if(!IsConstructed ||_interactionChecker.IsInRange) return;
-            HandReticle main = HandReticle.main;
-            main.SetInteractText("Click to open",AuxPatchers.CurtainInteractionFormat(GameInput.GetBindingName(GameInput.Button.AltTool, GameInput.BindingSet.Primary)));
-            main.SetIcon(HandReticle.IconType.Hand);
+            if (!IsConstructed) return;
 
-            if (GameInput.GetButtonDown(GameInput.Button.AltTool))
+            base.OnHandHover(hand);
+
+            if (hand.IsTool() && hand.GetTool() is PaintToolController)
             {
+                if (GameInput.GetButtonDown(GameInput.Button.AltTool))
+                {
+                    ImageSelectorHUD.Main.Show(QPatch.PatternsIcon, _selectedImage, ((texture2D, sprite) =>
+                    {
+                        LoadImage(texture2D);
+                    }));
+                }
+            }
+            else
+            {
+                var data = new[]
+                {
+                    AlterraHub.HolsterPaintTool(),
+                    "Click to open or close"
+                };
 
-                if (_dialog.IsOpen())
-                {
-                    _dialog.Hide();
-                }
-                else
-                {
-                    _dialog.Show();
-                }
+                data.HandHoverPDAHelperEx(GetTechType());
             }
         }
 
         public void OnHandClick(GUIHand hand)
         {
-            if (!IsConstructed || _interactionChecker.IsInRange) return;
+            if (!IsConstructed) return;
             ToggleCurtainState();
         }
 
@@ -212,6 +214,13 @@ namespace FCS_HomeSolutions.Mods.Curtains.Mono
         public override bool ChangeBodyColor(ColorTemplate template)
         {
             return _colorManager.ChangeColor(template);
+        }
+
+        public override bool OverrideCustomUseText(out string message)
+        {
+
+            message = AuxPatchers.CurtainInteractionFormat(GameInput.GetBindingName(GameInput.Button.AltTool, GameInput.BindingSet.Primary));
+            return true;
         }
     }
 
@@ -246,110 +255,6 @@ namespace FCS_HomeSolutions.Mods.Curtains.Mono
         public Action<Texture2D> OnClick { get; set; }
     }
 
-    internal class CurtainDialog : MonoBehaviour
-    {
-        private GridHelper _gridHelper;
-        private CurtainController _mono;
-
-        internal void Initialize(CurtainController mono)
-        {
-            _mono = mono;
-            _gridHelper = gameObject.AddComponent<GridHelper>();
-            if(FindAllComponents())
-            {
-                _gridHelper.DrawPage();
-            }
-        }
-
-        private bool FindAllComponents()
-        {
-            try
-            {
-                var close = InterfaceHelpers.FindGameObject(gameObject, "CloseBTN");
-                InterfaceHelpers.CreateButton(close, "CloseBTN", InterfaceButtonMode.Background,
-                    OnButtonClick, Color.white, Color.cyan, 5);
-
-                _gridHelper.Setup(21,ModelPrefab.TemplateItem,gameObject,Color.gray, Color.white, OnButtonClick);
-                _gridHelper.OnLoadDisplay += OnLoadDisplay;
-            }
-            catch (Exception e)
-            {
-                QuickLogger.Error(e.Message);
-                QuickLogger.Error(e.StackTrace);
-                return false;
-            }
-
-            return true;
-        }
-
-        private void OnLoadDisplay(DisplayData data)
-        {
-            _gridHelper.ClearPage();
-
-            var grouped = QPatch.PatternsIcon;
-
-            if (data.EndPosition > grouped.Count)
-            {
-                data.EndPosition = grouped.Count;
-            }
-
-            if (data.ItemsGrid?.transform == null)
-            {
-                QuickLogger.Debug("Grid returned null canceling operation");
-                return;
-            }
-
-            for (int i = data.StartPosition; i < data.EndPosition; i++)
-            {
-                GameObject buttonPrefab = GameObject.Instantiate(data.ItemsPrefab);
-
-                if (buttonPrefab == null || data.ItemsGrid == null)
-                {
-                    if (buttonPrefab != null)
-                    {
-                        QuickLogger.Debug("Destroying Tab", true);
-                        Destroy(buttonPrefab);
-                    }
-                    return;
-                }
-                buttonPrefab.transform.SetParent(data.ItemsGrid.transform, false);
-                var item = buttonPrefab.gameObject.AddComponent<CurtainItem>();
-                item.Initialize(grouped.ElementAt(i).Key, grouped.ElementAt(i).Value);
-                item.OnClick += texture2D =>
-                {
-                    _mono.LoadImage(texture2D);
-                };
-            }
-
-            _gridHelper.UpdaterPaginator(grouped.Count);
-        }
-
-        private void OnButtonClick(string arg1, object arg2)
-        {
-            switch (arg1)
-            {
-                case "CloseBTN":
-                    Hide();
-                    break;
-            }
-        }
-
-        internal void Hide()
-        {
-            gameObject.SetActive(false);
-        }
-
-        internal void Show()
-        {
-            gameObject.SetActive(true);
-        }
-
-        public bool IsOpen()
-        {
-            return gameObject.activeSelf;
-        }
-    }
-
     internal class InterfaceInteration : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         public bool IsInRange { get; set; }
@@ -369,7 +274,4 @@ namespace FCS_HomeSolutions.Mods.Curtains.Mono
             IsInRange = false;
         }
     }
-
-
-
 }

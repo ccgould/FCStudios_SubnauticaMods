@@ -25,6 +25,7 @@
     <Compile Include="Enums\CookingMode.cs" />
     <Compile Include="Mods\BunkBed\Buildable\CrewBunkBedPatcher.cs" />
     <Compile Include="Mods\CrewLocker\Buildable\CrewLockerPatch.cs" />
+    <Compile Include="Mods\Curtains\Patches\OSubmarinHelper.cs" />
     <Compile Include="Mods\DisplayBoard\Buildable\DisplayBoardPatcher.cs" />
     <Compile Include="Mods\DisplayBoard\Mono\DisplayBoardController.cs" />
     <Compile Include="Mods\DisplayBoard\Mono\DisplayScreenController.cs" />
@@ -47,6 +48,8 @@
     <Compile Include="Mods\QuantumTeleporter\Mono\QuantumPowerBankChargerController.cs" />
     <Compile Include="Mods\QuantumTeleporter\Buildable\QuantumPowerBankChargerPatcher.cs" />
     <Compile Include="Mods\QuantumTeleporter\Patches\ToolTipFactory_Patch.cs" />
+    <Compile Include="Mods\Rug\Buildable\Rug.cs" />
+    <Compile Include="Mods\Rug\Mono\RugController.cs" />
     <Compile Include="Mods\Sink\Buildable\SinkPrefab.cs" />
     <Compile Include="Mods\Sink\Mono\SinkController.cs" />
     <Compile Include="Mods\Sofas\Buildable\NeonBarStool.cs" />

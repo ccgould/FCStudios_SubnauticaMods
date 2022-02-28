@@ -281,7 +281,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
                 Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("CoffeePackage", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 ClassId = "CoffeePackage",
                 Friendly = "Coffee Package",
-                Description = "N/A",
+                Description = "Freshly roasted and ground coffee beans, packed in argon gas, and three-fold wrapped in foil. You’ll swear you were standing next to the roaster when you breathe in the heady aroma of perfectly roasted coffee beans.",
                 Cost = 300,
                 Food = 2,
                 Water = 0
@@ -294,7 +294,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
                 Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("SpicyCheeseBalls", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 ClassId = "CarolinaPeeperBalls",
                 Friendly = "Carolina Peeper Balls",
-                Description = "N/A",
+                Description = "Peeper Balls, Caroline style. Ingredients: Sugar, Gum Base, Carolina Reaper Peppers, Balls of Peeper (make of that what you will), Carnauba Wax, Corn Starch, Artificial Flavors and Colors. Scoville Heat Units: ERRNumericOverflow.",
                 Cost = 300,
                 Food = 20,
                 Water = -5
@@ -307,7 +307,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
                 Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("AlterraMug01", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 ClassId = "AlterraCoffeeMug",
                 Friendly = "Alterra Coffee (Mug)",
-                Description = "N/A",
+                Description = "Coffee… Delicious, sumptuous coffee. Proof Alterra Corporation  loves us and wants us to be happy.",
                 Cost = 300,
                 Food = 0,
                 Water = 50
@@ -320,7 +320,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
                 Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("AlterraMug02", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 ClassId = "FCSCoffeeMug",
                 Friendly = "FCS Coffee (Mug)",
-                Description = "N/A",
+                Description = "Coffee… Delicious, sumptuous coffee. Proof FCStudios loves us and wants us to be happy.",
                 Cost = 300,
                 Food = 0,
                 Water = 50
@@ -333,7 +333,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
                 Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("AlterraMug03", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 ClassId = "MrSpicyCoffeeMug",
                 Friendly = "MrSpicy Coffee (Mug)",
-                Description = "N/A",
+                Description = "Coffee… Delicious, sumptuous coffee. Proof MrSpicy loves us and wants us to be happy.",
                 Cost = 300,
                 Food = 0,
                 Water = 50
@@ -346,7 +346,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
                 Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("AlterraMug04", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 ClassId = "Z1GamingCoffeeMug",
                 Friendly = "Z1 Gaming Coffee (Mug)",
-                Description = "N/A",
+                Description = "Coffee… Delicious, sumptuous coffee. Proof Z1 Gaming  loves us and wants us to be happy.",
                 Cost = 300,
                 Food = 0,
                 Water = 50
@@ -359,7 +359,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
                 Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("AlterraMug05", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 ClassId = "MonikaCinnyRollCoffeeMug",
                 Friendly = "Monika C.R. Coffee (Mug)",
-                Description = "N/A",
+                Description = "Coffee… Delicious, sumptuous coffee. Proof Monkia CinnyRoll loves us and wants us to be happy.",
                 Cost = 300,
                 Food = 0,
                 Water = 50
@@ -372,7 +372,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
                 Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("AlterraMug06", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 ClassId = "AlterraCoffeeMug02",
                 Friendly = "Alterra Coffee (Mug) 2",
-                Description = "N/A",
+                Description = "Delicious, sumptuous coffee. Proof Alterra Corporation loves us and wants us to be happy.",
                 Cost = 300,
                 Food = 0,
                 Water = 50
@@ -385,7 +385,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
                 Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("AlterraMug07", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 ClassId = "PeeperCoffeeMug",
                 Friendly = "Peeper Coffee (Mug)",
-                Description = "N/A",
+                Description = "Delicious, sumptuous coffee. Proof the Alterra omniLounge Artificial Intelligence loves us and wants us to be happy.",
                 Cost = 300,
                 Food = 0,
                 Water = 50

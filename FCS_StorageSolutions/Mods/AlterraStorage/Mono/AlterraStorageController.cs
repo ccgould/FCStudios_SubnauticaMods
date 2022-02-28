@@ -443,7 +443,9 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
             return _storageContainer.container.Contains(techType);
         }
 
-        public ItemsContainer ItemsContainer { get; set; }
+        public ItemsContainer ItemsContainer => _storageContainer?.container;
+
+
         public int StorageCount()
         {
             return _storageContainer.container.count;

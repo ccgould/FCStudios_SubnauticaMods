@@ -35,13 +35,13 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
         private float _timeBuildCompleted = -1f;
         private bool _isBuilding = true;
 
-        private SortedDictionary<string, ConnectedTurbineData> _connectedTurbines = new SortedDictionary<string, ConnectedTurbineData>();
-        private SortedDictionary<string, WindSurferPlatformBase> _connectedTurbinesController = new SortedDictionary<string, WindSurferPlatformBase>();
+        private readonly SortedDictionary<string, ConnectedTurbineData> _connectedTurbines = new();
+        private SortedDictionary<string, WindSurferPlatformBase> _connectedTurbinesController = new();
         private bool _saveTurbinesLoaded;
-        private List<HoloGraphControl> _holograms = new List<HoloGraphControl>();
+        private List<HoloGraphControl> _holograms = new();
         private List<Graph<HoloGraphControl>.Edge> _neighbours;
         private Graph<HoloGraphControl> _graph;
-        private readonly Dictionary<string, ITelepowerPylonConnection> _currentConnections = new Dictionary<string, ITelepowerPylonConnection>();
+        private readonly Dictionary<string, ITelepowerPylonConnection> _currentConnections = new();
 
         public Grid2<HoloGraphControl> Grid { get; private set; }
         public GameObject HologramsGrid;
@@ -49,6 +49,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
         private Text _powerInfoText;
         private Text _turbineCountText;
         private BasePowerRelay _powerRelay;
+        public override bool BypassFCSDeviceCheck => true;
         internal ScreenTrigger ScreenTrigger { get; private set; }
         public override PlatformController PlatformController => _platformController ?? (_platformController = GetComponent<PlatformController>());
         public string GetUnitID()
@@ -376,6 +377,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
             QuickLogger.Debug($"Adding Turbine to Port: {slot.Target.name}|{slot.ID}");
             
             var turbine = slot.PlatformController.AddNewPlatForm(slot.Target, slot.ID, CraftData.GetPrefabForTechType(PlatFormKitMode ==  PlatformKitModes.TurbinePlatform ? Mod.WindSurferClassName.ToTechType() : Mod.WindSurferPlatformClassName.ToTechType()));
+            
             if (turbine == null) { return false; }
 
             foreach (Collider builtCollider in turbine.GetComponentsInChildren<Collider>() ?? new Collider[0])
@@ -471,6 +473,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
         {
             foreach (HoloGraphControl holoGraphControl in _holograms)
             {
+                QuickLogger.Debug($" HoloPortUnitId {holoPortUnitId} | SlotID {slotID} |  Current {holoGraphControl.PlatFormController.GetUnitID()}");
                 if (holoGraphControl.PlatFormController.GetUnitID().Equals(holoPortUnitId))
                 {
                     QuickLogger.Debug($"Found Hologram: {holoPortUnitId}");
@@ -557,18 +560,19 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
 
         internal bool CanRemovePlatform(HoloGraphControl holoGraphControl)
         {
+            RefreshMST();
+
             _neighbours = _graph.GetVertex(holoGraphControl)?.Neighbours;
+
 
             _graph.RemoveVertex(holoGraphControl);
 
             bool canRemove = true;
             foreach (var neighbour in _neighbours.Select(n => n.To))
             {
-                if (!_graph.MST(neighbour).Contains(Grid.ElementAt(Grid.Center)))
-                {
-                    canRemove = false;
-                    break;
-                }
+                if (_graph.MST(neighbour).Contains(Grid.ElementAt(Grid.Center))) continue;
+                canRemove = false;
+                break;
             }
             return canRemove;
         }
@@ -597,6 +601,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
 
         internal void RefreshHoloGrams()
         {
+            QuickLogger.Debug("Refreshing Holograms",true);
             RefreshMST();
 
             foreach (HoloGraphControl control in _holograms)

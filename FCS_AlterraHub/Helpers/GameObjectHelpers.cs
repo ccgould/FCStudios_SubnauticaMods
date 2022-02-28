@@ -12,7 +12,7 @@ namespace FCS_AlterraHub.Helpers
             try
             {
                 if (prefab == null) return;
-                var bounds = prefab.EnsureComponent<ConstructableBounds>();
+                var bounds = prefab.AddComponent<ConstructableBounds>();
                 bounds.bounds.size = size;
                 bounds.bounds.position = center;
             }
@@ -84,6 +84,20 @@ namespace FCS_AlterraHub.Helpers
         }
 
 
+
+        public static GameObject FindParentWithName(GameObject childObject, string objectName)
+        {
+            Transform t = childObject.transform;
+            while (t.parent != null)
+            {
+                if (t.parent.name.StartsWith(objectName))
+                {
+                    return t.parent.gameObject;
+                }
+                t = t.parent;
+            }
+            return null; // Could not find a parent with given tag.
+        }
         public static IEnumerable<GameObject> FindGameObjects(GameObject go, string name,
     SearchOption searchOption = SearchOption.Full)
         {
@@ -176,6 +190,27 @@ namespace FCS_AlterraHub.Helpers
                 QuickLogger.Error($"{e.Message}");
             }
         }
+
+        //Credit to OSubmarine https://github.com/K07H/DecorationsMod/blob/c04a9345676b2a6cd463379ea84080c5eb840e5c/DecorationsMod/PrefabsHelper.cs#L176
+        public static void SetDefaultSkyApplier(GameObject gameObj, Renderer[] renderers = null, Skies anchorSky = Skies.Auto,
+            bool dynamic = false, bool emissiveFromPower = false)
+        {
+            if (gameObj == null)
+                return;
+            SkyApplier applier = gameObj.GetComponent<SkyApplier>();
+            if (applier == null)
+                applier = gameObj.AddComponent<SkyApplier>();
+            if (renderers == null)
+                renderers = gameObj.GetComponentsInChildren<Renderer>();
+            if (renderers != null)
+                applier.renderers = renderers;
+            applier.anchorSky = anchorSky;
+            applier.dynamic = dynamic;
+            applier.emissiveFromPower = emissiveFromPower;
+            applier.hideFlags = HideFlags.None;
+            applier.useGUILayout = true;
+            applier.enabled = true;
+        }
     }
 
     public enum SearchOption
@@ -185,4 +220,5 @@ namespace FCS_AlterraHub.Helpers
         EndsWith,
         Contains
     }
+
 }

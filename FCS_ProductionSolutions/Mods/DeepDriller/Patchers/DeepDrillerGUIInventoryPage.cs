@@ -139,12 +139,12 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Patchers
         public override void Show()
         {
             base.Show();
-            Refresh();
+            Refresh(); 
         }
 
         public void Refresh()
         {
-            _inventoryGrid.DrawPage();
+            _inventoryGrid?.DrawPage();
         }
     }
 }
