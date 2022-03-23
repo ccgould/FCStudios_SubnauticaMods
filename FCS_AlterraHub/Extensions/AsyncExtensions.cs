@@ -11,10 +11,9 @@ namespace FCS_AlterraHub.Extensions
 #if SUBNAUTICA
         public static Pickupable ToPickupable(this TechType techType)
         {
-            GameObject gameObject = CraftData.InstantiateFromPrefab(techType, false);
+            GameObject gameObject = CraftData.InstantiateFromPrefab(techType);
             if (gameObject != null)
             {
-                gameObject.transform.position = MainCamera.camera.transform.position + MainCamera.camera.transform.forward * 3f;
                 CrafterLogic.NotifyCraftEnd(gameObject, techType);
                 Pickupable component = gameObject.GetComponent<Pickupable>();
                 if(component !=null) return component;
@@ -59,14 +58,14 @@ namespace FCS_AlterraHub.Extensions
         public static InventoryItem ToInventoryItemLegacy(this TechType techType)
         {
             GameObject prefabForTechType = CraftData.GetPrefabForTechType(techType, false);
-            GameObject gameObject = (prefabForTechType != null) ? Utils.SpawnFromPrefab(prefabForTechType, null) : Utils.CreateGenericLoot(techType);
+            GameObject gameObject =
+ (prefabForTechType != null) ? Utils.SpawnFromPrefab(prefabForTechType, null) : Utils.CreateGenericLoot(techType);
             gameObject.transform.position = gameObject.transform.position;
             var pickupable = gameObject.GetComponent<Pickupable>();
             return new InventoryItem(pickupable.Pickup(false));
         }
 
-#endif
-
+#else
         public static InventoryItem ToInventoryItem(this Pickupable pickupable)
         {
             InventoryItem item = null;
@@ -75,8 +74,24 @@ namespace FCS_AlterraHub.Extensions
                 PickupReplacement(pickupable);
                 item = new InventoryItem(pickupable);
             }
+
             return item;
         }
+
+        public static InventoryItem ToInventoryItem(this TechType techType)
+        {
+            InventoryItem item = null;
+            if (techType != TechType.None)
+            {
+                PickupReplacement(pickupable);
+                item = new InventoryItem(pickupable);
+            }
+
+            return item;
+        }
+#endif
+
+
 
         public static TechType ToTechType(this string value)
         {
@@ -108,6 +123,7 @@ namespace FCS_AlterraHub.Extensions
             {
                 pickupable.gameObject.AddComponent<Rigidbody>();
             }
+
             pickupable.Deactivate();
             pickupable.attached = true;
             if (pickupable._isInSub)
@@ -116,5 +132,26 @@ namespace FCS_AlterraHub.Extensions
                 pickupable._isInSub = false;
             }
         }
+
+
+#if BELOWZERO
+        public static IEnumerator ToInventoryItemAsync(TechType techType, IOut<InventoryItem> result2)
+        {
+            TaskResult<GameObject> result = new TaskResult<GameObject>();
+            yield return CraftData.InstantiateFromPrefabAsync(techType, result, false);
+            GameObject gameObject = result.Get();
+            if (gameObject != null)
+            {
+                CrafterLogic.NotifyCraftEnd(gameObject, techType);
+                Pickupable component = gameObject.GetComponent<Pickupable>();
+                if (component != null)
+                {
+                    result2.Set(new InventoryItem(component));
+                }
+
+                yield break;
+            }
+        }
+#endif
     }
 }

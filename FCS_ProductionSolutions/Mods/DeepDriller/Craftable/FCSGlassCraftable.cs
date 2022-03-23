@@ -51,7 +51,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Craftable
 
         protected override RecipeData GetBlueprintRecipe()
         {
-            return new TechData
+            return new RecipeData
             {
                 LinkedItems = new List<TechType> {TechType.Glass},
                 craftAmount = 0,

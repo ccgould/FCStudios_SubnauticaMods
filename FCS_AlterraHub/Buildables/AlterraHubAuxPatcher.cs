@@ -82,7 +82,10 @@ namespace FCS_AlterraHub.Buildables
             { $"{ModKey}_DebitHasBeenPaid","Your balance has been paid off."},
             { $"{ModKey}_MustBeBuiltOnBasePlatform","Must be built on Base Platform"},
             { $"{ModKey}_HolsterPaintTool","To change color and pattern/image use the Paint Tool."},
-            { $"{ModKey}_Error404", "Connection to station failed! Please visit the AlterraHub Fabrication Facility for assistance." }
+            { $"{ModKey}_Error404", "Connection to station failed! Please visit the AlterraHub Fabrication Facility for assistance." },
+            { $"{ModKey}_OrderBeingShipped", "Your order is being shipped to base" },
+            { $"{ModKey}_NoPowerEmergencyMode", "NO POWER SYSTEM IN EMERGENCY MODE" },
+            { $"{ModKey}_BaseIDFormat", "Base ID: {0}" }
         };
 
         internal static void AdditionalPatching()
@@ -473,6 +476,21 @@ namespace FCS_AlterraHub.Buildables
         public static string Error404()
         {
             return GetLanguage("Error404");
+        }
+
+        public static string OrderBeingShipped()
+        {
+            return GetLanguage("OrderBeingShipped");
+        }
+
+        public static string NoPowerEmergencyMode()
+        {
+            return GetLanguage("NoPowerEmergencyMode");
+        }
+
+        public static string BaseIDFormat(string baseId)
+        {
+            return string.Format(GetLanguage("BaseIDFormat"), baseId);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using UnityEngine;
@@ -35,6 +36,9 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             _frcTextEditorDialog = GameObjectHelpers.FindGameObject(gameObject, "FRCTextEditorDialog");
             _grcTextEditorDialog = GameObjectHelpers.FindGameObject(gameObject, "GRCTextEditorDialog");
             _noPower = GameObjectHelpers.FindGameObject(gameObject, "NoPowerPage");
+            var noPowerText = GameObjectHelpers.FindGameObject(_noPower, "Text")?.GetComponent<Text>();
+            if (noPowerText != null) noPowerText.text = AlterraHub.NoPowerEmergencyMode();
+            
             _buttons = gameObject.GetComponentsInChildren<Button>(true);
             _terminationSqrDistance = Mathf.Pow(3f, 2f);
         }

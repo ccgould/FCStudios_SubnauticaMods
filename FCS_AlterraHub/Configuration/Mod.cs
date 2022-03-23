@@ -264,7 +264,7 @@ namespace FCS_AlterraHub.Configuration
             QuickLogger.Info("Loading Game Play Settings...");
             ModUtils.LoadSaveData<FCSGamePlaySettings>("settings.json", GetSaveFileDirectory(), data =>
             {
-                QuickLogger.Info($"Finished loading Game Play Settings : {JsonConvert.SerializeObject(data, Formatting.Indented)}");
+                QuickLogger.Debug($"Finished loading Game Play Settings : {JsonConvert.SerializeObject(data, Formatting.Indented)}");
                 GamePlaySettings = data;
             });
 

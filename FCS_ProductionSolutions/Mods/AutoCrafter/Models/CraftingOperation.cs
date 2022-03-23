@@ -4,10 +4,10 @@ using System.Linq;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Mono;
 using FCSCommon.Utilities;
-using Oculus.Newtonsoft.Json;
+
 using SMLHelper.V2.Handlers;
 #if SUBNAUTICA_STABLE
-
+using Oculus.Newtonsoft.Json;
 #else
 using Newtonsoft.Json;
 #endif
@@ -61,7 +61,6 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models
             LinkedItemCount = linkedItems?.Count ?? 0;
             ReturnAmount = returnAmount == 0 ? 1 : returnAmount;
             IsRecursive = isRecursive;
-
         }
         
 

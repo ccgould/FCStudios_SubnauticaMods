@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+#if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
+#else
+using Newtonsoft.Json;
+#endif
 
 namespace FCS_AlterraHub.Systems
 {
@@ -45,6 +49,11 @@ namespace FCS_AlterraHub.Systems
             Balance = 0;
             AlterraDebitPayed = 0;
             KnownCardNumbers.Clear();
+        }
+
+        public void GetDebit()
+        {
+            throw new NotImplementedException();
         }
     }
 }

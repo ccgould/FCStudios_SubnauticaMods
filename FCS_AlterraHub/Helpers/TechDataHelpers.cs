@@ -179,7 +179,7 @@ namespace FCS_AlterraHub.Helpers
             PowerCellCharger.compatibleTech.Add(techType);
         }
 
-        internal static Vector2int GetItemSize(TechType techType)
+        public static Vector2int GetItemSize(TechType techType)
         {
 #if SUBNAUTICA
             var size =  CraftData.GetItemSize(techType);

@@ -325,19 +325,43 @@ namespace FCS_AlterraHub.Helpers
             return distance <= range;
         }
 
+        //[Obsolete("Not very accurate for bases")]
+        //public static bool CheckIfInRange(FcsDevice currentDevice, BaseManager device, float range)
+        //{
+        //    if (currentDevice == null || device == null || device.Habitat == null || !currentDevice.IsConstructed) return false;
+        //    float distance = Vector3.Distance(currentDevice.gameObject.transform.position,
+        //        device.Habitat.transform.position);
+
+        //    QuickLogger.Debug($"Drill Distance from base {device.BaseFriendlyID}: {distance}", true);
+        //    return distance <= range;
+        //}
+
         public static bool CheckIfInRange(FcsDevice currentDevice, BaseManager device, float range)
         {
-            if (currentDevice == null || device == null || device.Habitat == null ||
-                !currentDevice.IsConstructed) return false;
-            float distance = Vector3.Distance(currentDevice.gameObject.transform.position,
-                device.Habitat.transform.position);
-            return distance <= range;
+            Collider[] hitColliders = Physics.OverlapSphere(currentDevice.GetPosition(), range);
+            foreach (var hitCollider in hitColliders)
+            {
+                var baseManager = BaseManager.FindManager(hitCollider.gameObject);
+                QuickLogger.Debug($"Base Returned: {baseManager?.BaseFriendlyID ?? "None"}, {hitCollider.gameObject.name}", true);
+                if (baseManager == device)
+                {
+                    return true;
+                }
+                //hitCollider.SendMessage("AddDamage");
+            }
+            return false;
         }
 
         public static float GetDistance(FcsDevice currentDevice, FcsDevice device)
         {
             if (currentDevice == null || device == null) return 0f;
             return Vector3.Distance(currentDevice.gameObject.transform.position, device.gameObject.transform.position);
+        }
+
+        public static float GetDistance(FcsDevice currentDevice, GameObject device)
+        {
+            if (currentDevice == null || device == null) return 0f;
+            return Vector3.Distance(currentDevice.gameObject.transform.position, device.transform.position);
         }
 
         public static bool CheckIfInRange(GameObject mainGameObject, GameObject gameObject, float range)

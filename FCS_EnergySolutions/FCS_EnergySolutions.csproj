@@ -48,7 +48,8 @@
     <Compile Include="Mods\TelepowerPylon\Buildable\TelepowerPylonPatcher.cs" />
     <Compile Include="Mods\TelepowerPylon\Model\TelepowerPylonMode.cs" />
     <Compile Include="Mods\TelepowerPylon\Mono\FrequencyItemController.cs" />
-    <Compile Include="Mods\TelepowerPylon\Mono\ITelepowerPylonConnection.cs" />
+    <Compile Include="Mods\TelepowerPylon\Interfaces\IPylonPowerManager.cs" />
+    <Compile Include="Mods\TelepowerPylon\Interfaces\ITelepowerPylonConnection.cs" />
     <Compile Include="Mods\TelepowerPylon\Mono\TelepowerPylonController.cs" />
     <Compile Include="Mods\TelepowerPylon\Mono\TelepowerPylonPowerManager.cs" />
     <Compile Include="Mods\TelepowerPylon\Mono\TelepowerPylonTrigger.cs" />
@@ -73,6 +74,7 @@
     <Compile Include="Mods\WindSurfer\Mono\WindSurferPowerController.cs" />
     <Compile Include="Mods\WindSurfer\Spawnables\WindSurferPrefab.cs" />
     <Compile Include="Patches\BasePowerRelayGetConnectPoint_Patch.cs" />
+    <Compile Include="Mods\TelepowerPylon\Model\BaseTelepowerPylonManager.cs" />
     <Compile Include="Patches\Battery_Patch.cs" />
     <Compile Include="Mods\UniversalCharger\Buildable\UniversalChargerPatcher.cs" />
     <Compile Include="Mods\UniversalCharger\Mono\PowercellCharger.cs" />

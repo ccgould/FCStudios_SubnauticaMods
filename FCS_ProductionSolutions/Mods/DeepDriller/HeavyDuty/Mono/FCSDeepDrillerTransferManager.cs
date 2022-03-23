@@ -148,9 +148,20 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         {
             _mono.DeepDrillerContainer.OnlyRemoveItemFromContainer(techType);
 
-            TaskResult<InventoryItem> result = new TaskResult<InventoryItem>();
-            yield return AsyncExtensions.ToInventoryItemLegacyAsync(techType, result);
-            target.AddItemToContainer(result.Get());
+            TaskResult<GameObject> result = new TaskResult<GameObject>();
+
+            yield return CraftData.InstantiateFromPrefabAsync(techType, result, false);
+            GameObject gameObject = result.Get();
+            
+            if (gameObject != null)
+            {
+                CrafterLogic.NotifyCraftEnd(gameObject, techType);
+                Pickupable component = gameObject.GetComponent<Pickupable>();
+                if (component != null && !target.AddItemToContainer(component.inventoryItem))
+                {
+                    ErrorMessage.AddError(Language.main.Get("InventoryFull"));
+                }
+            }
             yield break;
         }
 #endif

@@ -145,7 +145,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
                 button.InteractionRequirement = InteractionRequirement.None;
                 button.OnButtonClick += (s, o) =>
                 {
-                    _caller.SetIcon((DNASampleData)o);
+                    _caller.SetIcon((FCSDNASampleData)o);
                     GoToHome();
                 };
                 _loadedDNASamples.Add(sample.TechType);

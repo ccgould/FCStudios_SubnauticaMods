@@ -148,7 +148,7 @@ namespace FCS_AlterraHub.Mono
 
             foreach (BaseTransferOperation operation in _baseOperations)
             {
-                if (operation.Device == null || !operation.Device.IsConstructed || !operation.Device.IsInitialized || !operation.IsEnabled) continue;
+                if (operation.Device == null || !operation.Device.IsConstructed || !operation.Device.IsInitialized || !operation.IsEnabled /*|| !operation.Device.AllowsTransceiverPulling*/) continue;
 
                 if (operation.IsPullOperation)
                 {
@@ -167,7 +167,7 @@ namespace FCS_AlterraHub.Mono
                         QuickLogger.Debug($"Device {operation.DeviceId}: {operation.Device.GetStorage()?.StorageCount()}|{operation.MaxAmount}", true);
                         if (operation.Device.CanBeStored(1, item) && operation.Device.GetStorage() != null && operation.Device.GetStorage()?.StorageCount() < operation.MaxAmount)
                         {
-                            operation.Device.AddItemToContainer(TakeItem(item).ToInventoryItem());
+                            operation.Device.AddItemToContainer(TakeItem(item).GetTechType().ToInventoryItem());
                         }
                     }
                 }
@@ -184,7 +184,7 @@ namespace FCS_AlterraHub.Mono
                 var item = operation.Device.RemoveItemFromDevice(randomItem);
                 if (item != null)
                 {
-                    AddItemToContainer(item.ToInventoryItem());
+                    AddItemToContainer(item.GetTechType().ToInventoryItem());
                 }
             }
         }
@@ -1575,6 +1575,11 @@ namespace FCS_AlterraHub.Mono
             }
 
             return false;
+        }
+
+        public List<string> GetConnectedDevices(string telepowerPylonTabId)
+        {
+            return (from device in _registeredDevices where device.Key == telepowerPylonTabId select device.Value.UnitID).ToList();
         }
     }
 

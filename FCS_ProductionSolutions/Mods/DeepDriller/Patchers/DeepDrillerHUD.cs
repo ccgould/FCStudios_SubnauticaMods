@@ -279,7 +279,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Patchers
             _inventoryPage?.Hide();
             _homePage.gameObject?.SetActive(false);
             _settingsPage.Hide();
-            _filterPage.gameObject?.SetActive(false);
+            _filterPage.Hide();
             _signalPage.Hide();
             _lubricantPage.Hide();
         }

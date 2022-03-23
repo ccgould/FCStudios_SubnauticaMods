@@ -24,7 +24,7 @@ namespace FCS_ProductionSolutions.Configuration
 
         private static ModSaver _saveObject;
         private static SaveData _saveData;
-        private static List<DNASampleData> _hydroponicKnownTech;
+        private static List<FCSDNASampleData> _hydroponicKnownTech;
         private static TechType _sandBagTechType;
 
         #endregion
@@ -134,7 +134,7 @@ namespace FCS_ProductionSolutions.Configuration
             });
         }
 
-        internal static List<DNASampleData> GetHydroponicKnownTech()
+        internal static List<FCSDNASampleData> GetHydroponicKnownTech()
         {
             return _hydroponicKnownTech;
         }
@@ -289,11 +289,11 @@ namespace FCS_ProductionSolutions.Configuration
 
         #endregion
 
-        public static void AddHydroponicKnownTech(DNASampleData data)
+        public static void AddHydroponicKnownTech(FCSDNASampleData data)
         {
             if (_hydroponicKnownTech == null)
             {
-                _hydroponicKnownTech = new List<DNASampleData>();
+                _hydroponicKnownTech = new List<FCSDNASampleData>();
             }
             if(IsHydroponicKnownTech(data.TechType, out var sampleData)) return;
             _hydroponicKnownTech.Add(data);
@@ -302,21 +302,21 @@ namespace FCS_ProductionSolutions.Configuration
             BaseManager.GlobalNotifyByID(MatterAnalyzerTabID,"UpdateDNA");
         }
 
-        public static List<DNASampleData> GetKnownDNA()
+        public static List<FCSDNASampleData> GetKnownDNA()
         {
             return _hydroponicKnownTech;
         }
 
-        public static bool IsHydroponicKnownTech(TechType techType, out DNASampleData data)
+        public static bool IsHydroponicKnownTech(TechType techType, out FCSDNASampleData data)
         {
             QuickLogger.Debug($"Checking if {techType} is known tech",true);
-            data = new DNASampleData();
+            data = new FCSDNASampleData();
             if (_hydroponicKnownTech == null)
             {
-                _hydroponicKnownTech = new List<DNASampleData>();
+                _hydroponicKnownTech = new List<FCSDNASampleData>();
             }
 
-            foreach (DNASampleData sampleData in _hydroponicKnownTech)
+            foreach (FCSDNASampleData sampleData in _hydroponicKnownTech)
             {
                 if (sampleData.TechType == techType || sampleData.PickType == techType)
                 {
@@ -330,20 +330,20 @@ namespace FCS_ProductionSolutions.Configuration
             return false;
         }
 
-        public static bool CreateNewDNASampleData(TechType techType,out DNASampleData data)
+        public static bool CreateNewDNASampleData(TechType techType,out FCSDNASampleData data)
         {
-            data = new DNASampleData();
+            data = new FCSDNASampleData();
 
             if (WorldHelpers.KnownPickTypesContains(techType))
             {
                 if (IsNonePlantableAllowedList.Contains(techType))
                 {
-                    data = new DNASampleData { PickType = techType, TechType = techType };
+                    data = new FCSDNASampleData { PickType = techType, TechType = techType };
                     return true;
                 }
 
                 var result = WorldHelpers.GetPickTypeData(techType);
-                data = new DNASampleData { PickType = result.ReturnType, TechType = techType, IsLandPlant = result.IsLandPlant };
+                data = new FCSDNASampleData { PickType = result.ReturnType, TechType = techType, IsLandPlant = result.IsLandPlant };
                 return true;
             }
             return false;
@@ -353,7 +353,7 @@ namespace FCS_ProductionSolutions.Configuration
         {
             QuickLogger.Debug("Purging Production Data",true);
             _saveData = null;
-            _hydroponicKnownTech = new List<DNASampleData>();
+            _hydroponicKnownTech = new List<FCSDNASampleData>();
 
         }
 

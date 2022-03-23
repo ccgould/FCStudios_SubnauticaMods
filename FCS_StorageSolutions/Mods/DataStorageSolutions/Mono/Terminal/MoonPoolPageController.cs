@@ -168,7 +168,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         public void RefreshVehicleName()
         {
             if (_vehicleSectionName == null) return;
+#if SUBNAUTICA
             _vehicleSectionName.text = _currentVehicle?.GetName();
+#else
+            _vehicleSectionName.text = _currentVehicle?.vehicleName;
+#endif
         }
 
         public void ShowVehicleContainers(Vehicle vehicle)
@@ -195,9 +199,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             var storage = DSSVehicleDockingManager.GetVehicleContainers(vehicle);
             _vehiclesSection.SetActive(true);
             _vehiclesSettingsSection.SetActive(false);
-
-            QuickLogger.Debug($"Clicked on {vehicle.GetName()} : SC: {storage.Count}", true);
-
+            
             for (int i = 0; i < 8; i++)
             {
                 _vehicleItemButtons[i].Reset();

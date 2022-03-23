@@ -144,7 +144,7 @@ namespace FCS_ProductionSolutions.Configuration
         [JsonProperty] internal List<DeepDrillerLightDutySaveDataEntry> DeepDrillerLightDutyEntries = new();
         [JsonProperty] internal List<ReplicatorDataEntry> ReplicatorEntries = new();
         [JsonProperty] internal List<AutoCrafterDataEntry> AutoCrafterDataEntries = new();
-        [JsonProperty] internal List<DNASampleData> HydroponicHarvesterKnownTech { get; set; } = new();
+        [JsonProperty] internal List<FCSDNASampleData> HydroponicHarvesterKnownTech { get; set; } = new();
         [JsonProperty] internal Dictionary<string, CraftingOperation> CraftingOperations { get; set; } = new();
     }
 }

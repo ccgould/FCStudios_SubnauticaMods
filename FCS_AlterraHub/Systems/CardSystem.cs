@@ -27,6 +27,7 @@ namespace FCS_AlterraHub.Systems
         private const decimal AlterraDebit = -1000000000000000000;
         public Action onBalanceUpdated;
         private bool _hasBeenSaved;
+        private bool _accountLoaded;
         public TechType CardTechType { get; set; }
         
         /// <summary>
@@ -93,7 +94,10 @@ namespace FCS_AlterraHub.Systems
             try
             {
                 _accountDetails.Balance += amount;
-                QuickLogger.ModMessage($"Added {amount} to account new balance is {_accountDetails.Balance}");
+                if (QPatch.Configuration.ShowCreditMessages)
+                {
+                    QuickLogger.ModMessage($"Added {amount} to account new balance is {_accountDetails.Balance}");
+                }
                 onBalanceUpdated?.Invoke();
             }
             catch (Exception e)
@@ -106,23 +110,6 @@ namespace FCS_AlterraHub.Systems
             return true;
         }
 
-        /// <summary>
-        /// Adds credit to the account.
-        /// </summary>
-        /// <param name="amount">The amount of credit to add to the account.</param>
-        /// <returns>Boolean on success</returns>
-        /// <param name="deduction"> the amount to deduct from the pay.</param>
-        public bool AddFinances(decimal amount, decimal deduction)
-        {
-            var result = AddFinances(amount - deduction);
-
-            if (result)
-            {
-                PayDebit(deduction);
-            }
-
-            return result;
-        }
 
         /// <summary>
         /// Removes credit from the account.
@@ -131,15 +118,11 @@ namespace FCS_AlterraHub.Systems
         /// <param name="amount">The amount of credit to add to the account.</param>
         /// <param name="callBack">Callback method to call in-case of error</param>
         /// <returns>Boolean on success</returns>
-        public bool RemoveFinances(decimal amount,bool isDeduction = false)
+        public bool RemoveFinances(decimal amount)
         {
             if (HasEnough(amount))
             {
                 _accountDetails.Balance -= amount;
-                if (isDeduction)
-                {
-                    QuickLogger.ModMessage($"Deducted {amount} from the account new balance is {_accountDetails.Balance}");
-                }
                 onBalanceUpdated?.Invoke();
                 return true;
             }
@@ -181,6 +164,13 @@ namespace FCS_AlterraHub.Systems
         {
             try
             {
+
+                if (_accountLoaded)
+                {
+                    QuickLogger.Debug($"Account already loaded. Canceling load operation for {account.Username}.", true);
+                    return;
+                }
+
                 if (account != null)
                 {
                     _accountDetails = account;
@@ -188,9 +178,12 @@ namespace FCS_AlterraHub.Systems
                     {
                         _accountDetails.Balance = Convert.ToDecimal(EncodeDecode.Decrypt(account.AccountBalance));
                     }
-                    QuickLogger.Info($"Alterra account loaded for player {account.Username}",true);
-                    QuickLogger.Info($"{account.Username} | Funds: {_accountDetails.Balance}",true);
-                    QuickLogger.Info($"{account.Username} | Debt Payed: {_accountDetails.AlterraDebitPayed}",true);
+
+                    QuickLogger.Debug($"Alterra account loaded for player {account.Username}",true);
+                    QuickLogger.Debug($"{account.Username} | Funds: {_accountDetails.Balance}",true);
+                    QuickLogger.Debug($"{account.Username} | Debt Payed: {_accountDetails.AlterraDebitPayed}",true);
+
+                    _accountLoaded = true;
                 }
             }
             catch (Exception e)
@@ -341,7 +334,7 @@ namespace FCS_AlterraHub.Systems
 
         public bool PayDebit(decimal amount)
         {
-            QuickLogger.Debug($"Trying to add {amount} to {_accountDetails.AlterraDebitPayed}", true);
+            QuickLogger.Debug($"Trying to add {amount} to {AlterraHub.DebtBalanceFormat(AlterraBalance())}", true);
 
             // Check if debit needs to be paid.
             if (IsDebitPaid())
@@ -355,6 +348,8 @@ namespace FCS_AlterraHub.Systems
 
             _accountDetails.AlterraDebitPayed += amountToTake;
             RemoveFinances(amountToTake);
+
+            if(QPatch.Configuration.ShowCreditMessages) QuickLogger.ModMessage($"Deducted {amount} from the account new balance is {_accountDetails.Balance}");
             return true;
         }
 
@@ -414,6 +409,7 @@ namespace FCS_AlterraHub.Systems
         public void Purge()
         {
             _accountDetails = null;
+            _accountLoaded = false;
         }
 
         public bool HasAccountBeenSaved()

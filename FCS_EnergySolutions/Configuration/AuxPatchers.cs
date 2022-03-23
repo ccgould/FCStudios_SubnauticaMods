@@ -25,6 +25,7 @@ namespace FCS_EnergySolutions.Configuration
             { $"{ModKey}_RemoveAllTelepowerConnectionsPush","Please remove all connections to this pylon before switching to push mode."},
             { $"{ModKey}_RemoveAllTelepowerConnectionsPull","Please remove all connections to this pylon before switching to pull mode."},
             { $"{ModKey}_MaximumConnectionsReached","The maximum amount of connections have been reached. Please use an upgrade to get more slots."},
+            { $"{ModKey}_SelectAMode","Select a Mode or Connect to another Pylon."},
         };
 
         internal static void AdditionalPatching()
@@ -37,83 +38,89 @@ namespace FCS_EnergySolutions.Configuration
 
         private static string GetLanguage(string key)
         {
-            return LanguageDictionary.ContainsKey(key) ? Language.main.Get(key) : "N/A";
+            var newKey = $"{ModKey}_{key}";
+            return LanguageDictionary.ContainsKey(newKey) ? Language.main.Get(newKey) : "N/A";
         }
 
         internal static string JetStreamOnHover()
         {
-            return GetLanguage($"{ModKey}_JetStreamT242OnHover");
+            return GetLanguage("JetStreamT242OnHover");
         }
 
         public static string JetStreamOnHoverInteractionFormatted(string keyBind,string state)
         {
-            return string.Format(GetLanguage( $"{ModKey}_JetStreamOnHoverInteractionFormatted"), keyBind,state);
+            return string.Format(GetLanguage( "JetStreamOnHoverInteractionFormatted"), keyBind,state);
         }
 
 
         public static string UniversalChargerNotEmpty()
         {
-            return GetLanguage($"{ModKey}_UniversalChargerNotEmpty");
+            return GetLanguage("UniversalChargerNotEmpty");
         }
 
         public static string UniversalChargerCannotChangeMode()
         {
-            return GetLanguage($"{ModKey}_UniversalChargerCannotChangeMode");
+            return GetLanguage("UniversalChargerCannotChangeMode");
         }
 
         public static string NotUnderWater()
         {
-            return GetLanguage($"{ModKey}_NotUnderWater");
+            return GetLanguage("NotUnderWater");
         }
 
         public static string NotUnderWaterDesc()
         {
-            return GetLanguage($"{ModKey}_NotUnderWaterDesc");
+            return GetLanguage("NotUnderWaterDesc");
         }        
         
         public static string UniversalChargerSwitchMode()
         {
-            return GetLanguage($"{ModKey}_UniversalChargerSwitchMode");
+            return GetLanguage("UniversalChargerSwitchMode");
         }
 
         public static string UniversalChargerSwitchModeDesc()
         {
-            return GetLanguage($"{ModKey}_UniversalChargerSwitchModeDesc");
+            return GetLanguage("UniversalChargerSwitchModeDesc");
         }
 
         public static string NotOnPlatform()
         {
-            return GetLanguage($"{ModKey}_NotOnPlatform");
+            return GetLanguage("NotOnPlatform");
         }
 
         public static string SolarClusterHover(int sun, int charge, int capacity,int produce)
         {
-            return string.Format(GetLanguage($"{ModKey}_SolarClusterHover"),sun,charge,capacity,produce);
+            return string.Format(GetLanguage("SolarClusterHover"),sun,charge,capacity,produce);
         }
 
         public static string RemoveAllTelepowerConnections()
         {
-            return GetLanguage($"{ModKey}_RemoveAllTelepowerConnections");
+            return GetLanguage("RemoveAllTelepowerConnections");
         }
 
         public static string RemoveAllTelepowerConnectionsPush()
         {
-            return GetLanguage($"{ModKey}_RemoveAllTelepowerConnectionsPush");
+            return GetLanguage("RemoveAllTelepowerConnectionsPush");
         }
 
         public static string RemoveAllTelepowerConnectionsPull()
         {
-            return GetLanguage($"{ModKey}_RemoveAllTelepowerConnectionsPull");
+            return GetLanguage("RemoveAllTelepowerConnectionsPull");
         }
 
         public static string MaximumConnectionsReached()
         {
-            return GetLanguage($"{ModKey}_MaximumConnectionsReached");
+            return GetLanguage("MaximumConnectionsReached");
         }
 
         public static string WindSurferOnHover()
         {
-            return $"{ModKey}_WindSurferOnHover";
+            return GetLanguage("WindSurferOnHover");
+        }
+
+        public static string SelectAMode()
+        {
+            return GetLanguage("SelectAMode");
         }
     }
 }

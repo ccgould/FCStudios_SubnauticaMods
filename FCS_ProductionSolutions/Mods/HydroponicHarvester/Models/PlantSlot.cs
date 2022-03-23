@@ -116,7 +116,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Models
 
         internal bool TryClear()
         {
-            if (GrowBedManager.GetItemCount(_returnTechType) > 0)
+            if (_count > 0)
             {
                 QuickLogger.Message(AuxPatchers.PleaseEmptyHarvesterSlot(), true);
                 return false;
@@ -232,7 +232,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Models
 
         public void SetSeedType(TechType currentItemTech)
         {
-            Mod.IsHydroponicKnownTech(currentItemTech, out DNASampleData data);
+            Mod.IsHydroponicKnownTech(currentItemTech, out FCSDNASampleData data);
             _seedTech = currentItemTech;
             _returnTechType = data.PickType;
         }

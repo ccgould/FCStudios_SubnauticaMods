@@ -11,6 +11,7 @@ using UWE;
 
 namespace FCS_AlterraHub.Patches
 {
+#if SUBNAUTICA
     [HarmonyPatch]
     internal class PDAEncyclopedia_Patches
     {
@@ -83,4 +84,5 @@ namespace FCS_AlterraHub.Patches
         }
 
     }
+#endif
 }

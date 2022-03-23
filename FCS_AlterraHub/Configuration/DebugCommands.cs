@@ -162,5 +162,13 @@ namespace FCS_AlterraHub.Configuration
 
             return $"Time Set to Evening";
         }
+
+        [ConsoleCommand("FixDrillSpawns")]
+        public static string FixDrillSpawns()
+        {
+            AlterraFabricatorStationController.Main.ResetDrones();
+
+            return $"Drones reset!";
+        }
     }
 }

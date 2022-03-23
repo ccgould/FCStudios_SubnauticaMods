@@ -395,7 +395,13 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
             {
                 _sb.Clear();
                 _sb.Append(AlterraHub.PleaseClearHands());
+
+#if SUBNAUTICA
                 HandReticle.main.SetInteractText(_sb.ToString(), AlterraHub.ViewInPDA(), false, false, HandReticle.Hand.None);
+#else
+                _sb.Append(AlterraHub.ViewInPDA());
+                HandReticle.main.SetTextRaw(HandReticle.TextType.Hand ,_sb.ToString());
+#endif
                 HandReticle.main.SetIcon(HandReticle.IconType.HandDeny);
                 return;
             }
@@ -419,9 +425,14 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
                         DeepDrillerHUD.Main.Show(this);
                     }
                 }
+                _sb.Append(Environment.NewLine);
 
-
+#if SUBNAUTICA
                 HandReticle.main.SetInteractText(_sb.ToString(), AlterraHub.ViewInPDA(), false, false, HandReticle.Hand.None);
+#else
+                _sb.Append(AlterraHub.ViewInPDA());
+                HandReticle.main.SetTextRaw(HandReticle.TextType.Hand,_sb.ToString());
+#endif
                 HandReticle.main.SetIcon(HandReticle.IconType.Info, 1f);
 
                 if (GameInput.GetButtonDown(GameInput.Button.Exit))

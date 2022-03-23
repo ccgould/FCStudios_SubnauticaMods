@@ -14,20 +14,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         public override void OnProtoDeserialize(ProtobufSerializer serializer)
         {
             base.OnProtoDeserialize(serializer);
-            if (SavedData.SaveVersion.Equals("1.0"))
-            {
-
-                RestoreItems(serializer, SavedData.Slot1);
-                RestoreItems(serializer, SavedData.Slot2);
-                RestoreItems(serializer, SavedData.Slot3);
-                RestoreItems(serializer, SavedData.Slot4);
-                RestoreItems(serializer, SavedData.Slot5);
-                RestoreItems(serializer, SavedData.Slot6);
-            }
-            else
-            {
-                RestoreItems(serializer,SavedData.Slot1);
-            }
             IsFromSave = true;
         }
 

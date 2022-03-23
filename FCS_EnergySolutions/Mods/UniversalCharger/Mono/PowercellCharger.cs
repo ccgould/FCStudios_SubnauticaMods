@@ -65,6 +65,7 @@ namespace FCS_EnergySolutions.Mods.UniversalCharger.Mono
             equipment.Clear();
             batteries.Clear();
             slots.Clear();
+            slotDefinitions.Clear();
 
             this.equipment.SetLabel(this.labelStorage);
 

@@ -1,5 +1,6 @@
-﻿using FCS_AlterraHub.Mono;
+﻿using System.Collections.Generic;
 using FCS_EnergySolutions.Mods.PowerStorage.Mono;
+using FCS_EnergySolutions.Mods.TelepowerPylon.Model;
 using FCSCommon.Utilities;
 using HarmonyLib;
 using UnityEngine;
@@ -21,6 +22,13 @@ namespace FCS_EnergySolutions.Patches
                 {
                     __instance.gameObject.AddComponent<BasePowerStorage>();
                 }
+
+                if (QPatch.Configuration.IsTelepowerPylonEnabled)
+                {
+                   var baseTPowerManager = __instance.gameObject.EnsureComponent<BaseTelepowerPylonManager>();
+                   baseTPowerManager.SubRoot = __instance;
+                   BaseTelepowerPylonManager.TelePowerPylonBases.Add(baseTPowerManager);
+                }
             }
         }
     }
@@ -32,6 +40,13 @@ namespace FCS_EnergySolutions.Patches
         [HarmonyPostfix]
         public static void Postfix(ref SubRoot __instance)
         {
+
+            if (QPatch.Configuration.IsTelepowerPylonEnabled)
+            {
+                var baseTPowerManager = __instance.gameObject.GetComponent<BaseTelepowerPylonManager>();
+                BaseTelepowerPylonManager.TelePowerPylonBases.Remove(baseTPowerManager);
+            }
+
             QuickLogger.Debug("On Kill",true);
             //var manager = BaseManager.FindManager(__instance);
         }

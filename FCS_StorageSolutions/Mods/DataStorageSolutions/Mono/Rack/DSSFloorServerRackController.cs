@@ -35,37 +35,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         public override void OnProtoDeserialize(ProtobufSerializer serializer)
         {
             base.OnProtoDeserialize(serializer);
-            if (SavedData.SaveVersion.Equals("1.0"))
-            {
-                RestoreItems(serializer, new List<byte[]>
-                {
-                    SavedData.Slot1,
-                    SavedData.Slot2,
-                    SavedData.Slot3,
-                    SavedData.Slot4,
-                    SavedData.Slot5,
-                    SavedData.Slot6,
-                    SavedData.Slot7,
-                    SavedData.Slot8,
-                    SavedData.Slot9,
-                    SavedData.Slot10,
-                    SavedData.Slot11,
-                    SavedData.Slot12,
-                    SavedData.Slot13,
-                    SavedData.Slot14,
-                    SavedData.Slot15,
-                    SavedData.Slot16,
-                    SavedData.Slot17,
-                    SavedData.Slot18,
-                    SavedData.Slot19,
-                    SavedData.Slot20,
-                });
-            }
-            else
-            {
-                RestoreItems(serializer, SavedData.Slot1);
-            }
-
             IsFromSave = true;
         }
 

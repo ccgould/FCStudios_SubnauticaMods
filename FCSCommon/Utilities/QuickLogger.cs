@@ -1,4 +1,5 @@
 ﻿using BepInEx.Logging;
+using FCS_AlterraHub;
 using QModManager.API;
 
 namespace FCSCommon.Utilities
@@ -26,6 +27,7 @@ namespace FCSCommon.Utilities
 
         internal static void Info(string msg, bool showOnScreen = false)
         {
+            if (QPatch.Configuration.HideAllFCSOnScreenMessages) return;
             Initialize();
             string name = Assembly.GetCallingAssembly().GetName().Name;
 
@@ -37,6 +39,7 @@ namespace FCSCommon.Utilities
 
         internal static void Message(string msg, bool showOnScreen = false)
         {
+            if (QPatch.Configuration.HideAllFCSOnScreenMessages) return;
             Initialize();
             string name = Assembly.GetCallingAssembly().GetName().Name;
 
@@ -98,6 +101,7 @@ namespace FCSCommon.Utilities
 
         internal static void Warning(string msg, bool showOnScreen = false)
         {
+            if (QPatch.Configuration.HideAllFCSOnScreenMessages) return;
             Initialize();
             string name = Assembly.GetCallingAssembly().GetName().Name;
 
@@ -119,6 +123,7 @@ namespace FCSCommon.Utilities
 
         public static void ModMessage(string msg)
         {
+            if (QPatch.Configuration.HideAllFCSOnScreenMessages) return;
             Initialize();
             string name = Assembly.GetCallingAssembly().GetName().Name;
             _logger.LogMessage($"[{name}] {msg}");

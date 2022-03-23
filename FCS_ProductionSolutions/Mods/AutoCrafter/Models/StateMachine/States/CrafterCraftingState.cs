@@ -1,11 +1,20 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Mono;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Helpers;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Patches;
 using FCSCommon.Utilities;
+using SMLHelper.V2.Handlers;
+#if SUBNAUTICA
 using Oculus.Newtonsoft.Json;
+#else
+using Newtonsoft.Json;
+using SMLHelper.V2.Handlers;
+using UWE;
+#endif
+
 using UnityEngine;
 
 namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
@@ -199,6 +208,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
             QuickLogger.Debug("Attempting to add item", true);
 
             bool result = false;
+
             for (int i = 0; i < _operation.ReturnAmount; i++)
             {
                 result = Craft(techType);
@@ -263,13 +273,34 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
                     {
                         for (int i = 0; i < Mathf.Abs(keyValuePair2.Value); i++)
                         {
+#if SUBNAUTICA
                             _manager.Crafter.Manager.AddItemToContainer(keyValuePair2.Key.ToInventoryItem());
+#else
+                            CoroutineHost.StartCoroutine(AttemptToAddToContainerAsync(keyValuePair2.Key));
+#endif
                         }
                     }
                 }
             }
         }
 
+#if BELOWZERO
+        private IEnumerator AttemptToAddToContainerAsync(TechType techType)
+        {
+            TaskResult<InventoryItem> taskResult = new TaskResult<InventoryItem>();
+            yield return AsyncExtensions.ToInventoryItemAsync(techType, taskResult);
+            var inventoryItem = taskResult.Get();
+            if (inventoryItem != null)
+            {
+                _manager.Crafter.Manager.AddItemToContainer(inventoryItem);
+            }
+            else
+            {
+                QuickLogger.Error("Failed to add item to storage container");
+            }
+            yield break;
+        }
+#endif
         private bool AttemptToAddToNetwork(TechType techType)
         {
             QuickLogger.Debug("1");
@@ -323,7 +354,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
                 return false;
             }
 
-            ITechData techData = CraftData.Get(techType, true);
+            var techData = CraftDataHandler.GetTechData(techType);
 
             if (techData != null)
             {
@@ -334,7 +365,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
 
                 while (i < ingredientCount)
                 {
-                    IIngredient ingredient = techData.GetIngredient(i);
+                    var ingredient = techData.GetIngredient(i);
 
                     TechType ingredientTechType = ingredient.techType;
                     
@@ -366,7 +397,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
                                 return false;
                             }
                             
-                            ITechData ingredientTechTypeTechData = CraftData.Get(ingredientTechType, true);
+                            var ingredientTechTypeTechData = CraftDataHandler.GetTechData(ingredientTechType);
 
                             if (ingredientTechTypeTechData != null)
                             {
@@ -416,7 +447,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
                     return false;
                 }
 
-                ITechData techData = CraftData.Get(techType, true);
+                var techData = CraftDataHandler.GetTechData(techType);
 
                 if (techData != null)
                 {
@@ -427,7 +458,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
 
                     while (i < ingredientCount)
                     {
-                        IIngredient ingredient = techData.GetIngredient(i);
+                        var ingredient = techData.GetIngredient(i);
 
                         TechType ingredientTechType = ingredient.techType;
 
@@ -459,7 +490,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
                                     return false;
                                 }
 
-                                ITechData ingredientTechTypeTechData = CraftData.Get(ingredientTechType, true);
+                                var ingredientTechTypeTechData = CraftDataHandler.GetTechData(ingredientTechType);
 
                                 if (ingredientTechTypeTechData != null)
                                 {
@@ -504,7 +535,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
 
         private void GetRequiredItems(TechType techType)
         {
-            ITechData techData = CraftData.Get(techType, true);
+            var techData = CraftDataHandler.GetTechData(techType);
             
             if (techData != null)
             {
@@ -525,7 +556,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
                         _toCraftItems.Inc(ingredient.techType,ingredient.amount);
                     }
 
-                    if (CraftData.Get(ingredient.techType,true) != null)
+                    if (CraftDataHandler.GetTechData(ingredient.techType) != null)
                     {
                         GetRequiredItems(ingredient.techType);
                     }
@@ -535,7 +566,11 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
 
         private static bool CheckIfInvalidEquipmentType(TechType ingredientTechType)
         {
+#if SUBNAUTICA
             EquipmentType equipmentType = CraftData.GetEquipmentType(ingredientTechType);
+#else
+            EquipmentType equipmentType = TechData.GetEquipmentType(ingredientTechType);
+#endif
             if (equipmentType == EquipmentType.Body || equipmentType == EquipmentType.Chip ||
                 equipmentType == EquipmentType.CyclopsModule || equipmentType == EquipmentType.ExosuitModule ||
                 equipmentType == EquipmentType.Foots || equipmentType == EquipmentType.Gloves ||
@@ -554,7 +589,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
         {
             var ingredients = new Dictionary<TechType, int>();
 
-            var data = CraftData.Get(_operation.TechType,true);
+            var data = CraftDataHandler.GetTechData(_operation.TechType);
 
             if (data != null)
             {

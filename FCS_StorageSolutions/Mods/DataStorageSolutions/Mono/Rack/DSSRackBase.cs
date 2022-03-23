@@ -544,11 +544,19 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             if (!IsInitialized || !IsConstructed || _interfaceInteraction.IsInRange)
             {
                 main.SetIcon(HandReticle.IconType.Default);
+#if SUBNAUTICA
                 main.SetInteractTextRaw(string.Empty,string.Empty);
+#else
+                main.SetTextRaw(HandReticle.TextType.Hand, string.Empty);
+#endif
                 return;
             }
 
+#if SUBNAUTICA
             main.SetInteractTextRaw($"Power Usage Per Second: {GetPowerUsage()}","");
+#else
+            main.SetTextRaw(HandReticle.TextType.Hand,$"Power Usage Per Second: {GetPowerUsage()}");
+#endif
             main.SetIcon(HandReticle.IconType.Info);
         }
 
@@ -583,24 +591,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             return Slots;
         }
         
-        public void RestoreItems(ProtobufSerializer serializer, byte[] data)
-        {
-#if SUBNAUTICA_STABLE
-            //_storage.RestoreItems(serializer, data);
-#else
-                    StartCoroutine(_storageContainer.RestoreItemsAsync(_serializer, _savedData.Data));
-#endif
-        }
-
-        public void RestoreItems(ProtobufSerializer serializer, List<byte[]> data)
-        {
-#if SUBNAUTICA_STABLE
-            //_storage.RestoreItems(serializer, data);
-#else
-                    StartCoroutine(_storageContainer.RestoreItemsAsync(_serializer, _savedData.Data));
-#endif
-        }
-
         public bool IsAllowedToAdd(TechType techType, bool verbose)
         {
             QuickLogger.Debug($"Can Be Stored Result: {_storage.CanBeStored(_dumpContainer.GetItemCount() + 1, techType)}", true);

@@ -34,7 +34,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         private bool _isRangeVisible;
         private float _currentDistance;
         private readonly List<PistonBobbing> _pistons = new();
-        public override bool AllowsTransceiverPulling { get; } = true;
+        //public override bool AllowsTransceiverPulling { get; } = true;
         #endregion
 
         #region Internal Properties
@@ -395,7 +395,12 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
                 _sb.Append(Environment.NewLine);
                 _sb.Append(Language.main.GetFormat<int, int, int>("SolarPanelStatus", Mathf.RoundToInt(DeepDrillerPowerManager.GetRechargeScalar() * 100f), Mathf.RoundToInt(DeepDrillerPowerManager.GetSourcePower(DeepDrillerPowerSources.Solar)), Mathf.RoundToInt(DeepDrillerPowerManager.GetSourcePowerCapacity(DeepDrillerPowerSources.Solar))));
 
+#if SUBNAUTICA
                 HandReticle.main.SetInteractText(_sb.ToString(), AlterraHub.ViewInPDA(),false,false,HandReticle.Hand.None);
+#else
+                _sb.Append(AlterraHub.ViewInPDA());
+                HandReticle.main.SetTextRaw(HandReticle.TextType.Hand ,_sb.ToString());
+#endif
                 HandReticle.main.SetIcon(HandReticle.IconType.Info, 1f);
             }
         }

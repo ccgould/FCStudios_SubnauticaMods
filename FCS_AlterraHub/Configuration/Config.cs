@@ -54,10 +54,17 @@ namespace FCS_AlterraHub.Configuration
         [Toggle("[Alterra Transport Drone] Enable Drone Audio", Order = 1, Tooltip = "Enables/Disables the sound effects on the drone.")]
         public bool AlterraTransportDroneFxAllowed { get; set; } = true;
 
-        [Slider("[Alterra Transport Drone] Master Volume", 0.0f, 1.0f, DefaultValue = 1.0f, Step = 0.01f,
-            Format = "{0:P0}", Order = 1, Tooltip = "This control affects all drones.")]
+        //[Slider("[Alterra Transport Drone] Master Volume", 0.0f, 1.0f, DefaultValue = 1.0f, Step = 0.01f,
+        //    Format = "{0:P0}", Order = 1, Tooltip = "This control affects all drones.")]
+        //public float AlterraTransportDroneVolume { get; set; } = 1;
 
-        public float AlterraTransportDroneVolume { get; set; } = 1;
+
+        [Toggle("Show Credit Messages.",Tooltip = "Enables or disabled the credit added/removed account messages on screen")]
+        public bool ShowCreditMessages = true;
+
+        [Toggle("Hide All F.C.S On-Screen Messages", Tooltip = "Prevents all FCS messages that can appear on-screen from showing. (Warning: Even important functional messages from mods will not show.)")]
+        public bool HideAllFCSOnScreenMessages = false;
+
 
         private void PDAKeyCodeChangedEvent(KeybindChangedEventArgs e)
         {

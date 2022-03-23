@@ -360,11 +360,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
 
             if (!string.IsNullOrWhiteSpace(friendly))
             {
-                SetCurrentBaseInfoText(friendly);
-            }
-            else if (!string.IsNullOrWhiteSpace(baseId))
-            {
-                SetCurrentBaseInfoText(baseId);
+                SetCurrentBaseInfoText($"{friendly} | {AlterraHub.BaseIDFormat(baseId)}");
             }
             else
             {

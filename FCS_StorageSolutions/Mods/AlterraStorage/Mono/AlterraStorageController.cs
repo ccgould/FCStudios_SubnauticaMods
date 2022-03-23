@@ -245,7 +245,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
             switch (arg1)
             {
                 case "InventoryBTN":
-                    var size = CraftData.GetItemSize((TechType) arg2);
+                    var size = TechDataHelpers.GetItemSize((TechType) arg2);
                     if (Inventory.main.HasRoomFor(size.x,size.y))
                     {
                         PlayerInteractionHelper.GivePlayerItem(RemoveItemFromContainer((TechType)arg2));
@@ -385,8 +385,13 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
                 main.SetIcon(HandReticle.IconType.Default);
                 return;
             }
-            
+
+#if SUBNAUTICA
             main.SetInteractText(AuxPatchers.OpenAlterraStorage());
+#else
+            main.SetTextRaw(HandReticle.TextType.Hand, AuxPatchers.OpenAlterraStorage());
+#endif
+
             main.SetIcon(HandReticle.IconType.Hand);
         }
 
@@ -414,6 +419,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
             {
                 QuickLogger.Error(e.Message);
                 QuickLogger.Error(e.StackTrace);
+                QuickLogger.Error(AlterraHub.ErrorHasOccurred("0x0004"));
             }
             return false;
         }

@@ -60,7 +60,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
             Slot.TrackTab(this);
         }
 
-        internal void SetIcon(DNASampleData sampleData)
+        internal void SetIcon(FCSDNASampleData sampleData)
         {
             if (Mod.IsHydroponicKnownTech(sampleData.TechType, out var data))
             {

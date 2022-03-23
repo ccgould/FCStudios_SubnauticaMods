@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Buildables;
@@ -16,6 +17,7 @@ using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
+
 
 namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono
 {
@@ -181,7 +183,11 @@ namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono
             {
                 if (!IsOperational) return;
 
+#if SUBNAUTICA
                 var size = CraftData.GetItemSize(_currentTechType);
+#else
+                var size = TechData.GetItemSize(_currentTechType);
+#endif
                 if (Inventory.main.HasRoomFor(size.x, size.y))
                 {
                     CancelScanning();
@@ -214,7 +220,11 @@ namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono
             {
                 if (!IsOperational) return;
 
+#if SUBNAUTICA
                 var size = CraftData.GetItemSize(_currentTechType);
+#else
+                var size = TechData.GetItemSize(_currentTechType);
+#endif
                 if (Inventory.main.HasRoomFor(size.x, size.y))
                 {
                     CancelScanning();
@@ -272,7 +282,7 @@ namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono
         private IEnumerator SetSeed(TechType techType)
         {
             TaskResult<InventoryItem> taskResult = new TaskResult<InventoryItem>();
-            yield return AsyncExtensions.ToInventoryItemLegacyAsync(techType, taskResult);
+            yield return AsyncExtensions.ToInventoryItemAsync(techType,taskResult);
             var inventoryItem = taskResult.Get();
             Seed = inventoryItem?.item?.gameObject.GetComponentInChildren<Plantable>();
             yield break;
@@ -344,7 +354,7 @@ namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono
                 {
                     _isScanning = false;
                     _timegroup.SetActive(false);
-                    Mod.AddHydroponicKnownTech(new DNASampleData
+                    Mod.AddHydroponicKnownTech(new FCSDNASampleData
                     {
                         TechType = _currentTechType, 
                         PickType = PickTech, 

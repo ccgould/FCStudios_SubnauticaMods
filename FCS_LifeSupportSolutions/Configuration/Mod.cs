@@ -51,7 +51,7 @@ namespace FCS_LifeSupportSolutions.Configuration
 
         internal const string BaseOxygenTankClassID = "BaseOxygenTank";
         internal const string BaseOxygenTankFriendly = "Base Oxygen Tank";
-        internal const string BaseOxygenTankDescription = "Provides pressurized oxygen when connected to surface air. Designed for small habitats; larger habitats may require more units.";
+        internal const string BaseOxygenTankDescription = "Provides pressurized oxygen when connected to it's own Floating Air Pump with Pipe sections. Designed for small habitats; larger habitats may require more units. Move close to see Tank utilization.";
         internal const string BaseOxygenTankPrefabName = "oxTank";
         internal const string BaseOxygenTankTabID = "OXT";
 

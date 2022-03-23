@@ -49,7 +49,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             
             if (_title != null)
             {
+#if SUBNAUTICA
                 _title.text = _vehicle.GetName();
+#else
+                _title.text = _vehicle.vehicleName;
+#endif
             }
         }
 

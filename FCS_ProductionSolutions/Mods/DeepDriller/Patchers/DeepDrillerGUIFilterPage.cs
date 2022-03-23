@@ -177,5 +177,12 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Patchers
 
             UpdateInformation();
         }
+
+        public override void Hide()
+        {
+            _filterGrid?.DrawPage();
+            base.Hide();
+
+        }
     }
 }

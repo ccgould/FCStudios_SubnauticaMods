@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using FCS_AlterraHub.Buildables;
+using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
@@ -112,7 +113,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
             switch (arg1)
             {
                 case "ItemBTN":
-                    var size = CraftData.GetItemSize((TechType)arg2);
+                    var size = TechDataHelpers.GetItemSize((TechType)arg2);
                     if (Inventory.main.HasRoomFor(size.x, size.y))
                     {
                         FCS_AlterraHub.Helpers.PlayerInteractionHelper.GivePlayerItem(_storageContainer.ItemsContainer.RemoveItem((TechType)arg2));
@@ -221,7 +222,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
                 return;
             }
 
+#if SUBNAUTICA
             main.SetInteractText(AuxPatchers.OpenAlterraStorage());
+#else
+            main.SetTextRaw(HandReticle.TextType.Hand,AuxPatchers.OpenAlterraStorage());
+#endif
             main.SetIcon(HandReticle.IconType.Hand);
         }
 

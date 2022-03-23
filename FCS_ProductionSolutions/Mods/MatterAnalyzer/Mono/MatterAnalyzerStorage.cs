@@ -44,7 +44,7 @@ namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono
 
                 if (growingPlant != null)
                 {
-                    var pickPrefab = growingPlant.grownModelPrefab.GetComponentInChildren<PickPrefab>();
+                    var pickPrefab = GetPickPrefab(growingPlant);
                     
                     if (pickPrefab != null)
                     {
@@ -85,6 +85,11 @@ namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono
             GameObject.Destroy(item.item.gameObject);
 
             return true;
+        }
+
+        private static PickPrefab GetPickPrefab(GrowingPlant growingPlant)
+        {
+            return growingPlant.grownModelPrefab.GetComponentInChildren<PickPrefab>();
         }
 
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)

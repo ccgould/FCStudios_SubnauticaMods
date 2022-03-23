@@ -83,10 +83,6 @@
       <Name>FCS_AlterraHub</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\FCS_ProductionSolutions\FCS_ProductionSolutions.csproj">
-      <Project>{2B878BAA-1C0B-4623-A599-506A58C0DE32}</Project>
-      <Name>FCS_ProductionSolutions</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\PostBuildEvents.targets" />

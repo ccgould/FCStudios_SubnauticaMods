@@ -11,11 +11,13 @@ using FCS_AlterraHub.Registration;
 using FCS_EnergySolutions.Buildable;
 using FCS_EnergySolutions.Configuration;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Buildable;
+using FCS_EnergySolutions.Mods.TelepowerPylon.Interfaces;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Model;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Mono;
 using FCS_EnergySolutions.Mods.WindSurfer.Enums;
 using FCS_EnergySolutions.Mods.WindSurfer.Model;
 using FCS_EnergySolutions.Mods.WindSurfer.Structs;
+using FCS_EnergySolutions.Patches;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -683,6 +685,11 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
             _currentConnections.Add(unit.UnitID, unit);
         }
 
+        public bool LoopPreventionPassed(List<string> ids)
+        {
+            return true;
+        }
+
         public TelepowerPylonMode GetCurrentMode()
         {
             return TelepowerPylonMode.PUSH;
@@ -736,10 +743,11 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
             return false;
         }
 
-        public IPylonPowerManager GetPowerManager()
+        public BaseTelepowerPylonManager GetPowerManager()
         {
-            return this;
+            throw new NotImplementedException();
         }
+
 
         public bool CanAddNewPylon()
         {
@@ -759,6 +767,17 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
         {
             if (string.IsNullOrWhiteSpace(controller.UnitID)) return false;
            return _currentConnections?.ContainsKey(controller.UnitID) ?? false;
+        }
+
+        public List<string> GetBasePylons()
+        {
+            return null;
+        }
+
+
+        public void AddConnection(BaseTelepowerPylonManager controller, bool toggleSelf = false)
+        {
+            throw new NotImplementedException();
         }
     }
 

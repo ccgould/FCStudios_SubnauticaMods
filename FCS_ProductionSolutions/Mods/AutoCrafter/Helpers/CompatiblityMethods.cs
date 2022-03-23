@@ -32,7 +32,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Helpers
          private  static IEnumerator AttemptToAddToNetworkAsync(TechType techType, BaseManager manager,List<TechType> _storedItems)
         {
             TaskResult<InventoryItem> taskResult = new TaskResult<InventoryItem>();
-            yield return AsyncExtensions.ToInventoryItem(techType, taskResult);
+            yield return AsyncExtensions.ToInventoryItemAsync(techType, taskResult);
             var inventoryItem = taskResult.Get();
             var result = BaseManager.AddItemToNetwork(manager, inventoryItem, true);
             if (result)

@@ -15,6 +15,7 @@ using FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Mono;
 using FCSCommon.Utilities;
 using HarmonyLib;
+using SMLHelper.V2.Handlers;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -421,7 +422,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Patches
 
             ClearMissingItemsList();
 
-            var craftData = CraftData.Get(techType,true);
+            var craftData = CraftDataHandler.GetTechData(techType);
 
             if (craftData != null)
             {

@@ -35,6 +35,8 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
 
         public PowerSource PowerSource { get; private set; }
         
+        
+
         public override Vector3 GetPosition()
         {
             return transform.position;
@@ -274,28 +276,66 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
 
             foreach (var iPowerInterface in Manager.GetPowerRelay().inboundPowerSources)
             {
-                if (iPowerInterface is PowerRelay relay)
+                if (ChargeByRelay(iPowerInterface, ref amount))
+                    continue;
+
+                if (ChargeBySource(iPowerInterface, ref amount))
+                    continue;
+
+                break;
+            }
+        }
+
+        private bool ChargeByRelay(IPowerInterface iPowerInterface, ref float amount)
+        {
+            if (iPowerInterface is PowerRelay relay)
+            {
+                if (relay.name.StartsWith("PowerStorage"))
                 {
-                    if (relay.name.StartsWith("PowerStorage"))
-                    {
-                        QuickLogger.Debug("PowerStorage Found Skipping",true);
-                        continue;
-                    }
-
-                    if (relay.ConsumeEnergy(amount, out float amountConsumed))
-                    {
-                        amount -= amountConsumed;
-                        PowerSource.power = Mathf.Clamp(PowerSource.power + amountConsumed, 0f, PowerSource.maxPower);
-                        QuickLogger.Debug($"Added {amountConsumed} to Power Storage");
-                    }
-
-                    if (amount <= 0)
-                    {
-                        break;
-                    }
+                    QuickLogger.Debug("PowerStorage Found Skipping", true);
+                    return true;
                 }
 
+                if (relay.ConsumeEnergy(amount, out float amountConsumed))
+                {
+                    amount -= amountConsumed;
+                    PowerSource.power = Mathf.Clamp(PowerSource.power + amountConsumed, 0f, PowerSource.maxPower);
+                    QuickLogger.Debug($"Added {amountConsumed} to Power Storage");
+                }
+
+                if (amount <= 0)
+                {
+                    return false;
+                }
             }
+
+            return false;
+        }
+
+        private bool ChargeBySource(IPowerInterface iPowerInterface, ref float amount)
+        {
+            if (iPowerInterface is PowerSource relay)
+            {
+                if (relay.name.StartsWith("PowerStorage"))
+                {
+                    QuickLogger.Debug("PowerStorage Found Skipping", true);
+                    return true;
+                }
+
+                if (relay.ConsumeEnergy(amount, out float amountConsumed))
+                {
+                    amount -= amountConsumed;
+                    PowerSource.power = Mathf.Clamp(PowerSource.power + amountConsumed, 0f, PowerSource.maxPower);
+                    QuickLogger.Debug($"Added {amountConsumed} to Power Storage");
+                }
+
+                if (amount <= 0)
+                {
+                    return false;
+                }
+            }
+
+            return false;
         }
 
         public override float GetMaxPower()

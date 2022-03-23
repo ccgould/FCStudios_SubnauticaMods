@@ -114,7 +114,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
             _sc.enabled = false;
             _sc.container.onRemoveItem += item =>
             {
-                if (_sc.container.count <= 0 && GetCanPlay())
+                if (_sc.container.count <= 0)
                 {
                     PlayAudioTrack("PLB_FishRemoved");
                 }
@@ -265,7 +265,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
                 return;
             }
             
-            if (!CheckIfPlayingTrack() && GetCanPlay())
+            if (!CheckIfPlayingTrack())
             {
                 var index = _random.Next(_welcomeChatMessages.Count);
 
@@ -285,6 +285,13 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
         
         public void PlayAudioTrack(string trackName)
         {
+            
+            if (!GetCanPlay())
+            {
+                QuickLogger.Debug("[Peeper Lounge Bar] Play SFX False", true);
+                return;
+            }
+
             if (string.IsNullOrEmpty(trackName))
             {
                 QuickLogger.Debug("Track returned null", true);

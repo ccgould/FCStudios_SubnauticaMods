@@ -636,7 +636,7 @@ namespace FCS_HomeSolutions
         {
             if (!Configuration.IsRailingsEnabled) return;
 
-            var ahsrailing = new DecorationEntryPatch("ahsrailing", "Railing", "A railing to create a barrior",
+            var ahsrailing = new DecorationEntryPatch("ahsrailing", "Railing", "An external railing to create a safety barrier.",
                 ModelPrefab.GetPrefabFromGlobal("Railing_Normal"),
                 new Settings
                 {
@@ -654,7 +654,7 @@ namespace FCS_HomeSolutions
             ahsrailing.Patch();
 
             var ahsrailingglass = new DecorationEntryPatch("ahsrailingglass", "Railing With Glass",
-                "A railing to create a barrior",
+                "An external railing to create a safety barrier.",
                 ModelPrefab.GetPrefabFromGlobal("Railing_Normal_wGlass"),
                 new Settings
                 {
@@ -672,7 +672,7 @@ namespace FCS_HomeSolutions
             ahsrailingglass.Patch();
 
             var ahsLeftCornerRail = new DecorationEntryPatch("ahsLeftCornerRailing", "Railing Left Corner",
-                "A railing to create a barrior",
+                "An external railing to create a safety barrier.",
                 ModelPrefab.GetPrefabFromGlobal("Railing_LeftCorner"),
                 new Settings
                 {
@@ -690,7 +690,7 @@ namespace FCS_HomeSolutions
             ahsLeftCornerRail.Patch();
 
             var ahsLeftCornerwGlassRail = new DecorationEntryPatch("ahsLeftCornerwGlassRailing", "Railing Left Corner wGlass",
-                "A railing to create a barrior",
+                "An external railing to create a safety barrier.",
                 ModelPrefab.GetPrefabFromGlobal("Railing_LeftCorner_wGlass"),
                 new Settings
                 {
@@ -708,7 +708,7 @@ namespace FCS_HomeSolutions
             ahsLeftCornerwGlassRail.Patch();
 
             var ahsRightCornerRail = new DecorationEntryPatch("ahsRightCornerRailing", "Railing Right Corner",
-                "A railing to create a barrior",
+                "An external railing to create a safety barrier.",
                 ModelPrefab.GetPrefabFromGlobal("Railing_RightCorner"),
                 new Settings
                 {
@@ -727,7 +727,7 @@ namespace FCS_HomeSolutions
 
 
             var ahsRightCornerwGlassRail = new DecorationEntryPatch("ahsRightCornerwGlassRailing", "Railing Right Corner wGlass",
-                "A railing to create a barrior",
+                "An external railing to create a safety barrier.",
                 ModelPrefab.GetPrefabFromGlobal("Railing_RightCorner_wGlass"),
                 new Settings
                 {
@@ -744,7 +744,7 @@ namespace FCS_HomeSolutions
                 });
             ahsRightCornerwGlassRail.Patch();
         }
-
+            
         private static void PatchSmartTvs()
         {
             if (!Configuration.IsSmartTelevisionEnabled) return;

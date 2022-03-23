@@ -1,4 +1,5 @@
-﻿using FCS_AlterraHub.Mono;
+﻿using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Mono;
 using FCSCommon.Utilities;
 using HarmonyLib;
 
@@ -21,9 +22,10 @@ namespace FCS_StorageSolutions.Patches
             }
 
             // TODO Find effective way to check this. (Trying to get the DSS C48 to display items in Wind Surfer Operator)
-            //var fcsdevice = __instance.gameObject.transform.parent.GetComponent<FcsDevice>();
+            var fcsdevice = __instance.gameObject.GetComponentInChildren<FcsDevice>();
+            if (fcsdevice != null && fcsdevice.StorageType == StorageType.OtherStorage) return;
 
-            //QuickLogger.Debug($"FCSDevice: {fcsdevice} || Is Bypassing: {fcsdevice?.BypassFCSDeviceCheck}", true);
+            QuickLogger.Debug($"Awake: FCSDevice: {fcsdevice} || Is Bypassing: {fcsdevice?.BypassFCSDeviceCheck} || {fcsdevice?.StorageType}", true);
 
             //if (fcsdevice != null && !fcsdevice.BypassFCSDeviceCheck)
             //{
@@ -55,6 +57,11 @@ namespace FCS_StorageSolutions.Patches
             {
                 return;
             }
+
+            var fcsdevice = __instance.gameObject.GetComponentInChildren<FcsDevice>();
+            if(fcsdevice != null && fcsdevice.StorageType == StorageType.OtherStorage) return;
+
+            QuickLogger.Debug($"OnConstructedChanged: FCSDevice: {fcsdevice} || Is Bypassing: {fcsdevice?.BypassFCSDeviceCheck} || {fcsdevice?.StorageType}", true);
 
             var manager = BaseManager.FindManager(__instance.prefabRoot);
 

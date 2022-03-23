@@ -202,7 +202,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
                 Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("NutritionPackage", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 ClassId = "NutritionPackage",
                 Friendly = "Alterra Nutrient Pouch",
-                Description = "Packed with more nutrients than a momma marsupial could provide, you can feel confident of writing home of your good health and not getting in trouble later at the family reunion. It’s even tastier than the packaging it comes in!",
+                Description = "Packed with more nutrients than a momma marsupial could provide. (It’s even tastier than the packaging it comes in!)",
                 Cost = 100,
                 Food = 15,
                 Water = 1

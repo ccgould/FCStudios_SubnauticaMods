@@ -81,7 +81,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 QuickLogger.Debug("// ====== Setting Vehicle Grid ====== //");
                 for (int i = data.StartPosition; i < data.EndPosition; i++)
                 {
+#if SUBNAUTICA
                     _trackedVehicles[i].Set(grouped[i].GetName(), grouped[i]);
+#else
+                    _trackedVehicles[i].Set(grouped[i].vehicleName, grouped[i]);
+#endif
                     QuickLogger.Debug($"Set index {i}");
                 }
                 QuickLogger.Debug("// ====== Setting Vehicle Grid ====== //");
