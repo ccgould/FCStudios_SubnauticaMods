@@ -1,6 +1,5 @@
 ﻿using System;
 using FCSCommon.Utilities;
-using UnityEngine;
 
 namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.StatesMachine.States
 {

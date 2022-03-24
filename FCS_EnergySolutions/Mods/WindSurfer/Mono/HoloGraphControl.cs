@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using FCS_EnergySolutions.Mods.WindSurfer.Enums;
 using UnityEngine;
 using UnityEngine.UI;

@@ -4,7 +4,6 @@ using System.Linq;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Model.Converters;
 using FCS_HomeSolutions.Configuration;
-using FCS_HomeSolutions.Mods.AlienChef.Mono;
 using FCS_HomeSolutions.Mods.Stove.Struct;
 using FCSCommon.Utilities;
 using UnityEngine;

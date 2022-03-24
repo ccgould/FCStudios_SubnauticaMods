@@ -20,25 +20,20 @@
   <PropertyGroup Condition="$(Configuration.StartsWith('BZ'))">
     <GameName>BelowZero</GameName>
     <DataFolder>SubnauticaZero_Data</DataFolder>
-    <SMLFolder>SMLHelper_BZ</SMLFolder>
   </PropertyGroup>
   <PropertyGroup Condition="$(Configuration.StartsWith('SN'))">
     <GameName>Subnautica</GameName>
     <DataFolder>Subnautica_Data</DataFolder>
-    <SMLFolder>Modding Helper</SMLFolder>
   </PropertyGroup>
   <PropertyGroup>
     <OutputPath>..\..\Qmods\$(Configuration)\$(AssemblyName)\</OutputPath>
+	  <Dependencies>$(SolutionDir)Dependencies\$(Configuration)</Dependencies>
+	  <ManagedDir>$(GameDir)/$(DataFolder)/Managed</ManagedDir>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <Optimize>true</Optimize>
     <LangVersion>preview</LangVersion>
-    <ReferencePath>
-      $(GameDir)\BepInEx\core;
-      $(GameDir)\BepInEx\plugins\QModManager;
-      $(GameDir)\Qmods\$(SMLFolder);
-      $(GameDir)\$(DataFolder)\Managed\publicized_assemblies;
-      $(GameDir)\$(DataFolder)\Managed;
-      $(SolutionDir)\Libs
-    </ReferencePath>
+	  <ReferencePath>
+		  $(Dependencies);$(SolutionDir)Libs\$(Configuration)
+	  </ReferencePath>
   </PropertyGroup>
 </Project>

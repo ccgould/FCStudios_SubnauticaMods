@@ -1,7 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using FCS_AlterraHub.Helpers;
-using FCSCommon.Helpers;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Mods.OreConsumer.Model

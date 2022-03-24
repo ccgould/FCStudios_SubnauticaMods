@@ -1,6 +1,5 @@
 ﻿using System;
 using FCS_AlterraHub.Helpers;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;

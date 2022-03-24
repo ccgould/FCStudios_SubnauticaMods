@@ -1,10 +1,8 @@
 ﻿using System;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace FCS_AlterraHub.Mono
 {

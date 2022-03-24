@@ -2,7 +2,6 @@
 #if SUBNAUTICA_STABLE
 
 #else
-using Newtonsoft.Json;
 #endif
 
 namespace FCS_HomeSolutions.Mods.TrashRecycler.Model

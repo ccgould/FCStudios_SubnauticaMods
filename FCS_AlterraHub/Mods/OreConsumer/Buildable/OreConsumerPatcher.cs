@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections;
 using SMLHelper.V2.Crafting;
 using System.IO;

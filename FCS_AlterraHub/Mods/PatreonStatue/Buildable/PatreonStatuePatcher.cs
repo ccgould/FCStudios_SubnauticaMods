@@ -6,7 +6,6 @@ using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mods.PatreonStatue.Mono;
-using FCS_AlterraHub.Registration;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Utility;
 using UnityEngine;

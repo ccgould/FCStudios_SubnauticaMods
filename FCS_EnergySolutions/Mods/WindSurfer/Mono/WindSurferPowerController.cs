@@ -1,6 +1,5 @@
 ﻿using FCS_AlterraHub.Helpers;
 using FCS_EnergySolutions.Configuration;
-using FCS_EnergySolutions.Mods.TelepowerPylon.Mono;
 using UnityEngine;
 
 namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
@@ -83,8 +82,18 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
         {
             HandReticle main = HandReticle.main;
 
-            main.SetInteractTextRaw(Language.main.GetFormat(AuxPatchers.WindSurferOnHover(), _mono.UnitID, Mathf.RoundToInt(this._powerSource.GetPower()), Mathf.RoundToInt(this._powerSource.GetMaxPower()),
-                (_energyPerSec * 60).ToString("N1")), $"For more information press {FCS_AlterraHub.QPatch.Configuration.PDAInfoKeyCode}");
+            var mainString = Language.main.GetFormat(AuxPatchers.WindSurferOnHover(), _mono.UnitID,
+                Mathf.RoundToInt(this._powerSource.GetPower()), Mathf.RoundToInt(this._powerSource.GetMaxPower()),
+                (_energyPerSec * 60).ToString("N1"));
+
+            var subString = $"For more information press {FCS_AlterraHub.QPatch.Configuration.PDAInfoKeyCode}";
+
+#if SUBNAUTICA
+            main.SetInteractTextRaw(mainString, subString);
+#else
+            main.SetTextRaw(HandReticle.TextType.Use, mainString);
+            main.SetTextRaw(HandReticle.TextType.UseSubscript, subString);
+#endif
             main.SetIcon(HandReticle.IconType.Info);
         }
 

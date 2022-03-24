@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
@@ -156,7 +157,9 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Buildable
                 prefabID.ClassId = ClassID;
                 prefab.AddComponent<TechTag>().type = TechType;
 
-                PowerRelay solarPowerRelay = CraftData.GetPrefabForTechType(TechType.SolarPanel).GetComponent<PowerRelay>();
+                var result = new TaskResult<GameObject>();
+                yield return CraftData.GetPrefabForTechTypeAsync(TechType.SolarPanel, false, result);
+                PowerRelay solarPowerRelay = result.Get().GetComponent<PowerRelay>();
                 
                 var ps = prefab.AddComponent<PowerSource>();
                 ps.maxPower = 10000f;

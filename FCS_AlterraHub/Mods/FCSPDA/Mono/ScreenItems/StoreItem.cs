@@ -4,7 +4,6 @@ using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Structs;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;

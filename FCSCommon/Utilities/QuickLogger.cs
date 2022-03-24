@@ -1,9 +1,8 @@
-﻿using BepInEx.Logging;
-using FCS_AlterraHub;
-using QModManager.API;
-
-namespace FCSCommon.Utilities
+﻿namespace FCSCommon.Utilities
 {
+    using BepInEx.Logging;
+    using QModManager.API;
+    using FCS_AlterraHub;
     using System;
     using System.Diagnostics;
     using System.Reflection;

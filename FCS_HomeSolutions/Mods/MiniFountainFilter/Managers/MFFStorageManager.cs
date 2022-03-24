@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
@@ -78,10 +79,10 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Managers
             if (!_mono.IsOperational || !QPatch.Configuration.MiniFountainFilterAutoGenerateMode) return;
 
             if (IsFull() || !_mono.TankManager.HasEnoughWater(50)) return;
-            
+
             _passedTime += DayNightCycle.main.deltaTime;
 
-            if(_passedTime >= 2f)
+            if (_passedTime >= 2f)
             {
                 _mono.TankManager.RemoveWater(50);
                 NumberOfBottles++;
@@ -94,7 +95,7 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Managers
         {
             OnWaterRemoved?.Invoke();
         }
-        
+
         private bool IsAllowedToAddContainer(Pickupable pickupable, bool verbose)
         {
             return false;
@@ -105,17 +106,21 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Managers
             return _container.count <= 0;
         }
 
-        internal void LoadContainer(int waterBottleCount)
+#if !SUBNAUTICA_STABLE
+        internal IEnumerator LoadContainer(int waterBottleCount)
         {
-            if (QPatch.Configuration.MiniFountainFilterAutoGenerateMode) return;
+            if (QPatch.Configuration.MiniFountainFilterAutoGenerateMode) yield break;
 
             for (int i = 0; i < waterBottleCount; i++)
             {
-                _container.UnsafeAdd(TechType.BigFilteredWater.ToInventoryItem());
+                var result = new TaskResult<InventoryItem>();
+                yield return TechType.BigFilteredWater.ToInventoryItem(result); 
+                _container.UnsafeAdd(result.value);
             }
 
             OnWaterAdded?.Invoke();
         }
+#endif
 
         internal bool IsFull()
         {
@@ -127,7 +132,11 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Managers
             Player main = Player.main;
             PDA pda = main.GetPDA();
             Inventory.main.SetUsedStorage(_container, false);
-            pda.Open(PDATab.Inventory, null, null, 4f);
+            pda.Open(PDATab.Inventory, null, null
+#if SUBNAUTICA
+                , 4f
+#endif
+            );
         }
 
         private void RemoveSingleBottle()
@@ -179,10 +188,10 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Managers
                 QuickLogger.ModMessage(AuxPatchers.NotEnoughWaterForBottle());
             }
         }
-        
+
         public float ContainerPercentage()
         {
-            return (float)_container.count / MaxContainerSlots;
+            return (float) _container.count / MaxContainerSlots;
         }
     }
 }

@@ -7,7 +7,6 @@ using FCS_AlterraHub.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
-using Object = UnityEngine.Object;
 
 namespace FCS_AlterraHub.Buildables
 {

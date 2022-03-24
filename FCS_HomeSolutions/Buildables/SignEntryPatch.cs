@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
@@ -12,7 +11,6 @@ using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.Controllers;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Configuration;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
@@ -106,7 +104,7 @@ namespace FCS_HomeSolutions.Buildables
         {
             QuickLogger.Debug($"Creating recipe...");
             // Create and associate recipe to the new TechType
-            var customFabRecipe = new TechData()
+            var customFabRecipe = new RecipeData()
             {
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()

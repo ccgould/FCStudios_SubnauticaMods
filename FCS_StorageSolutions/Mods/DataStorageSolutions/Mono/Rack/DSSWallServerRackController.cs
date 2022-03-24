@@ -1,5 +1,4 @@
-﻿using FCS_AlterraHub.Extensions;
-using FCS_StorageSolutions.Configuration;
+﻿using FCS_StorageSolutions.Configuration;
 using FCSCommon.Utilities;
 
 namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack

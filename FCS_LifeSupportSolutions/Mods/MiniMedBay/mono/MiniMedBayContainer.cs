@@ -44,7 +44,11 @@ namespace FCS_LifeSupportSolutions.Mods.MiniMedBay.mono
 
         internal void RemoveSingleKit()
         {
+#if SUBNAUTICA
             var size = CraftData.GetItemSize(TechType.FirstAidKit);
+#elif BELOWZERO
+            var size = TechData.GetItemSize(TechType.FirstAidKit);
+#endif
             if (Inventory.main.HasRoomFor(size.x, size.y))
             {
                 if (_medKits > 0)

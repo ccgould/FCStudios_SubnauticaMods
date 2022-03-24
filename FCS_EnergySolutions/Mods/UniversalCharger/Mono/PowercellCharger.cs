@@ -2,9 +2,12 @@
 using FCS_AlterraHub.Helpers;
 using FCS_EnergySolutions.Mods.PowerStorage.Enums;
 using FCSCommon.Utilities;
-using FMOD;
 using UnityEngine;
 using UnityEngine.UI;
+
+#if BELOWZERO
+using Text = TMPro.TextMeshProUGUI;
+#endif
 
 namespace FCS_EnergySolutions.Mods.UniversalCharger.Mono
 {

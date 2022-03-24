@@ -7,11 +7,17 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
     {
         private float terminationSqrDistance = 4f;
         private Player player;
+#if BELOWZERO
+        private RectTransform rt;
+#endif
 
 
         public override void Awake()
         {
             base.Awake();
+#if BELOWZERO
+            rt = GetComponent<RectTransform>();
+#endif
             terminationSqrDistance = Mathf.Pow(3f, 2f);
         }
 
@@ -20,7 +26,8 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
         {
             base.Update();
 
-            if (base.focused && this.player != null && (this.player.transform.position - base.rt.position).sqrMagnitude >= this.terminationSqrDistance)
+            if (base.focused && this.player != null && (this.player.transform.position - rt.position).sqrMagnitude >=
+                this.terminationSqrDistance)
             {
                 base.Deselect(null);
             }
@@ -40,20 +47,25 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
 
         public void OnPointerHover(PointerEventData eventData)
         {
-
             if (base.enabled && !base.selected)
             {
+#if SUBNAUTICA
                 HandReticle.main.SetInteractText("Use Terminal");
+#else
+                HandReticle.main.SetTextRaw(HandReticle.TextType.Use, "Use Terminal");
+#endif
                 HandReticle.main.SetIcon(HandReticle.IconType.Interact);
             }
         }
-		public bool OnButtonDown(GameInput.Button button)
+
+        public bool OnButtonDown(GameInput.Button button)
         {
             if (button == GameInput.Button.UICancel)
             {
                 base.Deselect(null);
                 return true;
             }
+
             return false;
         }
     }

@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Extensions;
-using FCS_AlterraHub.Model;
 using SMLHelper.V2.Json;
 using SMLHelper.V2.Options.Attributes;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Options;
-using UnityEngine;
 #if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
 #else

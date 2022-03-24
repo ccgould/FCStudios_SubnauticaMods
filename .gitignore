@@ -260,8 +260,5 @@ paket-files/
 __pycache__/
 *.pyc
 
-Assembly-CSharp*
 
-FCSCommon/GamePaths.targets
-
-Dependancies/Subnautica/BepInEx.dll
+[Dd]ependencies

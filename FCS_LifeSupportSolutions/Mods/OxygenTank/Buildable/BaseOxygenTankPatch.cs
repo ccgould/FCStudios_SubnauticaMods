@@ -117,7 +117,7 @@ namespace FCS_LifeSupportSolutions.Mods.BaseOxygenTank.Buildable
         }
 
 
-        internal static RecipeData TrashRecyclerIngredients => new TechData
+        internal static RecipeData TrashRecyclerIngredients => new RecipeData
         {
             craftAmount = 1,
             Ingredients =

@@ -5,7 +5,6 @@ using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Models.Upgrades;
-using FCS_ProductionSolutions.Mods.DeepDriller.Interfaces;
 using FCS_ProductionSolutions.Mods.DeepDriller.Managers;
 using FCSCommon.Utilities;
 using UnityEngine;

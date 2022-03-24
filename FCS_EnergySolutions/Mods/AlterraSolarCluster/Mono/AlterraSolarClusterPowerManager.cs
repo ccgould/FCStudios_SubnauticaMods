@@ -1,15 +1,12 @@
-﻿using FCS_AlterraHub.Buildables;
-using FCS_AlterraHub.Enumerators;
-using FCS_AlterraHub.Helpers;
+﻿using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mods.FCSPDA.Mono;
 using FCS_EnergySolutions.Configuration;
 using UnityEngine;
 
 namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
 {
-    internal class AlterraSolarClusterPowerManager : HandTarget,IHandTarget
+    internal class AlterraSolarClusterPowerManager : HandTarget, IHandTarget
     {
-
         private PowerSource _powerSource;
         private const float MaxDepth = 200f;
         private AnimationCurve _depthCurve;
@@ -26,10 +23,16 @@ namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
             _depthCurve.AddKey(0.4245796f, 0.5001081f);
             _depthCurve.AddKey(1f, 1f);
         }
-        
+
         private float GetDepthScalar()
         {
-            float time = Mathf.Clamp01((MaxDepth - Ocean.main.GetDepthOf(gameObject)) / MaxDepth);
+            float time = Mathf.Clamp01((MaxDepth -
+#if SUBNAUTICA
+                                        Ocean.main.GetDepthOf(gameObject)
+#else
+                                        Ocean.GetDepthOf(gameObject)
+#endif
+                ) / MaxDepth);
             return _depthCurve.Evaluate(time);
         }
 
@@ -58,7 +61,10 @@ namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
             {
                 var data = new[]
                 {
-                    AuxPatchers.SolarClusterHover(Mathf.RoundToInt(GetRechargeScalar() * 100f), Mathf.RoundToInt(_powerSource.GetPower()), Mathf.RoundToInt(_powerSource.GetMaxPower()), Mathf.RoundToInt((GetRechargeScalar() * 0.25f * 5f) * 13f)), string.Empty
+                    AuxPatchers.SolarClusterHover(Mathf.RoundToInt(GetRechargeScalar() * 100f),
+                        Mathf.RoundToInt(_powerSource.GetPower()), Mathf.RoundToInt(_powerSource.GetMaxPower()),
+                        Mathf.RoundToInt((GetRechargeScalar() * 0.25f * 5f) * 13f)),
+                    string.Empty
                 };
                 data.HandHoverPDAHelperEx(_mono.GetTechType());
 
@@ -68,7 +74,7 @@ namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
                 }
             }
         }
-        
+
         public void OnHandClick(GUIHand hand)
         {
         }

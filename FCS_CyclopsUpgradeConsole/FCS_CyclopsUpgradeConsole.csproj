@@ -15,6 +15,18 @@
     <Deterministic>true</Deterministic>
     <TargetFrameworkProfile />
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'BZ_Exp|AnyCPU' ">
+    <OutputPath>bin\BZ_Exp\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'BZ_Stable|AnyCPU' ">
+    <OutputPath>bin\BZ_Stable\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SN_Exp|AnyCPU' ">
+    <OutputPath>bin\SN_Exp\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SN_Stable|AnyCPU' ">
+    <OutputPath>bin\SN_Stable\</OutputPath>
+  </PropertyGroup>
   <Import Project="$(SolutionDir)\Configurations.targets" />
   <Import Project="$(SolutionDir)\References.targets" />
   <ItemGroup>
@@ -34,9 +46,16 @@
   <ItemGroup>
     <Reference Include="MoreCyclopsUpgrades">
       <HintPath>$(GameDir)\QMods\MoreCyclopsUpgrades\MoreCyclopsUpgrades.dll</HintPath>
+      <Private>False</Private>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FCS_AlterraHub\FCS_AlterraHub.csproj">
+      <Project>{1a17b4ba-aae5-41c2-924a-ce05dc74efe8}</Project>
+      <Name>FCS_AlterraHub</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(SolutionDir)\PostBuildEvents.targets" />
+  <Import Project="$(SolutionDir)\BuildEvents.targets" />
 </Project>

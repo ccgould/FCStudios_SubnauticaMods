@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using FCSCommon.Utilities;
 using SMLHelper.V2.Handlers;
 using UnityEngine;
 using UWE;
@@ -8,6 +7,17 @@ namespace FCS_AlterraHub.Extensions
 {
     public static class AsyncExtensions
     {
+        public static InventoryItem ToInventoryItem(this Pickupable pickupable)
+        {
+            InventoryItem item = null;
+            if (pickupable != null)
+            {
+                PickupReplacement(pickupable);
+                item = new InventoryItem(pickupable);
+            }
+
+            return item;
+        }
 #if SUBNAUTICA
         public static Pickupable ToPickupable(this TechType techType)
         {
@@ -66,28 +76,25 @@ namespace FCS_AlterraHub.Extensions
         }
 
 #else
-        public static InventoryItem ToInventoryItem(this Pickupable pickupable)
-        {
-            InventoryItem item = null;
-            if (pickupable != null)
-            {
-                PickupReplacement(pickupable);
-                item = new InventoryItem(pickupable);
-            }
 
-            return item;
-        }
-
-        public static InventoryItem ToInventoryItem(this TechType techType)
+        public static IEnumerator ToInventoryItem(this TechType techType, TaskResult<InventoryItem> item)
         {
-            InventoryItem item = null;
             if (techType != TechType.None)
             {
+                var result = CraftData.GetPrefabForTechTypeAsync(techType, false);
+
+                yield return result;
+
+                var go = result.GetResult();
+
+                if (!go.TryGetComponent(out Pickupable pickupable))
+                    pickupable = go.AddComponent<Pickupable>();
+                
                 PickupReplacement(pickupable);
-                item = new InventoryItem(pickupable);
+                item.Set(new InventoryItem(pickupable));
             }
 
-            return item;
+            yield break;
         }
 #endif
 

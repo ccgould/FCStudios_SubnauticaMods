@@ -1,5 +1,4 @@
-﻿using FCS_HomeSolutions.Configuration;
-using FCSCommon.Utilities;
+﻿using FCSCommon.Utilities;
 using SMLHelper.V2.Handlers;
 
 namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Buildables

@@ -1,8 +1,5 @@
-﻿using FCS_AlterraHub.Configuration;
-using FCS_AlterraHub.Enumerators;
-using FCS_AlterraHub.Interfaces;
+﻿using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Model;
-using FCSCommon.Interfaces;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Managers

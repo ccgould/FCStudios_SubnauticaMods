@@ -34,7 +34,7 @@ namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono
             if (item == null) return false;
             var pickTypeSet = false;
             var plantable = item.item.gameObject.GetComponentInChildren<Plantable>();
-            
+
             if (plantable != null)
             {
                 var size = plantable.size;
@@ -44,11 +44,12 @@ namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono
 
                 if (growingPlant != null)
                 {
+#if SUBNAUTICA
                     var pickPrefab = GetPickPrefab(growingPlant);
                     
                     if (pickPrefab != null)
                     {
-                        QuickLogger.Debug($"PickPrefab: {pickPrefab?.pickTech}", true);
+                        QuickLogger.Debug($"PickPrefab: {Language.main.Get(pickPrefab.pickTech)}", true);
                         _device.PickTech = pickPrefab.pickTech;
                         pickTypeSet = true;
                     }
@@ -58,17 +59,24 @@ namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono
                         var pickup = growingPlant.grownModelPrefab.GetComponentInChildren<Pickupable>();
                         if (pickup != null)
                         {
-                            QuickLogger.Debug($"Pickup: {pickup.GetTechType()}", true);
+                            QuickLogger.Debug($"Pickup: {Language.main.Get(pickup.GetTechType())}", true);
                             _device.PickTech = pickup.GetTechType();
                             pickTypeSet = true;
                         }
                     }
+#else
+                    if (growingPlant.plantTechType != TechType.None)
+                    {
+                        QuickLogger.Debug($"Pickup: {Language.main.Get(growingPlant.plantTechType)}", true);
+                        _device.PickTech = growingPlant.plantTechType;
+                        pickTypeSet = true;
+                    }
+#endif
 
                     if (!pickTypeSet)
                     {
                         _device.PickTech = TechType.None;
                     }
-                    
                 }
 
                 GameObject.Destroy(grown);
@@ -87,10 +95,12 @@ namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono
             return true;
         }
 
+#if SUBNAUTICA
         private static PickPrefab GetPickPrefab(GrowingPlant growingPlant)
         {
             return growingPlant.grownModelPrefab.GetComponentInChildren<PickPrefab>();
         }
+#endif
 
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
@@ -98,7 +108,8 @@ namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono
 
             var techType = pickupable.GetTechType();
 
-            if (!Mod.IsHydroponicKnownTech(techType, out var data1) && Mod.IsNonePlantableAllowedList.Contains(techType))
+            if (!Mod.IsHydroponicKnownTech(techType, out var data1) &&
+                Mod.IsNonePlantableAllowedList.Contains(techType))
             {
                 return true;
             }
@@ -109,7 +120,7 @@ namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono
 
             if (plantable == null || !plantable.isSeedling || !IsValidSeedling(pickupable.GetTechType())) return false;
 
-            return !Mod.IsHydroponicKnownTech(techType, out var data) &&_device.DumpContainer.GetCount() != 1;
+            return !Mod.IsHydroponicKnownTech(techType, out var data) && _device.DumpContainer.GetCount() != 1;
         }
 
         private bool IsValidSeedling(TechType techType)
@@ -138,6 +149,7 @@ namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono
         }
 
         public ItemsContainer ItemsContainer { get; set; }
+
         public int StorageCount()
         {
             return ItemsContainer?.count ?? 0;

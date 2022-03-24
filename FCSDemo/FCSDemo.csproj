@@ -16,6 +16,18 @@
     <Deterministic>true</Deterministic>
     <TargetFrameworkProfile />
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'BZ_Exp|AnyCPU' ">
+    <OutputPath>bin\BZ_Exp\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'BZ_Stable|AnyCPU' ">
+    <OutputPath>bin\BZ_Stable\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SN_Exp|AnyCPU' ">
+    <OutputPath>bin\SN_Exp\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SN_Stable|AnyCPU' ">
+    <OutputPath>bin\SN_Stable\</OutputPath>
+  </PropertyGroup>
   <Import Project="$(SolutionDir)\Configurations.targets" />
   <Import Project="$(SolutionDir)\References.targets" />
   <ItemGroup>
@@ -37,5 +49,5 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-<Import Project="$(SolutionDir)\PostBuildEvents.targets" />
+<Import Project="$(SolutionDir)\BuildEvents.targets" />
 </Project>

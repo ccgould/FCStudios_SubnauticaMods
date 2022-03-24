@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Text;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Spawnables;
-using FCS_HomeSolutions.Spawnables;
 
 namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Patches
 {

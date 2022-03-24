@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using FCS_EnergySolutions.Mods.PowerStorage.Mono;
+﻿using FCS_EnergySolutions.Mods.PowerStorage.Mono;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Model;
 using FCSCommon.Utilities;
 using HarmonyLib;

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using FCSCommon.Utilities;
+#if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
-using SMLHelper.V2.Utility;
+#else
+#endif
 using UnityEngine;
 
 namespace FCSDemo.Mono

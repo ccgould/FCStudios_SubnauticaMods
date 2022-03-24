@@ -8,7 +8,6 @@ using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
 using FCSCommon.Utilities;
-using rail;
 using UnityEngine;
 
 namespace FCS_HomeSolutions.Mods.Stairs.Mono

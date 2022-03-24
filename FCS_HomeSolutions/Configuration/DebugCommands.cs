@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mono;
@@ -14,9 +13,12 @@ using FCS_HomeSolutions.Mods.QuantumTeleporter.Mono;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Spawnables;
 using FCS_HomeSolutions.Mods.SeaBreeze.Buildable;
 using FCS_HomeSolutions.Mods.SeaBreeze.Mono;
-using FCS_HomeSolutions.Spawnables;
 using FCSCommon.Utilities;
+#if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
+#else
+using Newtonsoft.Json;
+#endif
 using SMLHelper.V2.Commands;
 using UnityEngine;
 

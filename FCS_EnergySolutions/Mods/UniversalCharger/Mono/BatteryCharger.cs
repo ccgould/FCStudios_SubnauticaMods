@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using FCS_AlterraHub.Helpers;
-using FCS_AlterraHub.Mono;
-using FCSCommon.Utilities;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
+#if BELOWZERO
+using Text = TMPro.TextMeshProUGUI;
+#endif
 
 namespace FCS_EnergySolutions.Mods.UniversalCharger.Mono
 {

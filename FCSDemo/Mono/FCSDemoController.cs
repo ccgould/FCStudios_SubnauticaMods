@@ -1,11 +1,8 @@
 ﻿using System;
-using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
-using FCS_AlterraHub.Objects;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FCSDemo.Model;
 using UnityEngine;
@@ -94,7 +91,11 @@ namespace FCSDemo.Mono
         public void OnHandHover(GUIHand hand)
         {
             HandReticle main = HandReticle.main;
+#if SUBNAUTICA
             main.SetInteractTextRaw($"Item PrefabID: {GetPrefabID()}","");
+#else
+            main.SetTextRaw(HandReticle.TextType.Hand,$"Item PrefabID: {GetPrefabID()}");
+#endif
         }
 
         public void OnHandClick(GUIHand hand)

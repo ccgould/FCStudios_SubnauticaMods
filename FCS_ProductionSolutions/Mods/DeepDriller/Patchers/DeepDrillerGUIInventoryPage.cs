@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Model.GUI;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.ObjectPooler;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Buildable;
-using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;

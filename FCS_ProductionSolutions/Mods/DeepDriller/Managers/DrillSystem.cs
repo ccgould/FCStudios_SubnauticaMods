@@ -16,7 +16,6 @@ using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono;
 using FCS_ProductionSolutions.Mods.DeepDriller.Patchers;
 using FCSCommon.Utilities;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
 {

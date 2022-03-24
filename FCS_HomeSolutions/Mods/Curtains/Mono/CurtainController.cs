@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using FCS_AlterraHub.Buildables;
-using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Managers;
 using FCS_AlterraHub.Model;
@@ -14,6 +13,9 @@ using FCS_HomeSolutions.Mods.PaintTool.Mono;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.EventSystems;
+#if SUBNAUTICA
+ using Sprite = Atlas.Sprite;
+#endif
 
 namespace FCS_HomeSolutions.Mods.Curtains.Mono
 {
@@ -229,7 +231,7 @@ namespace FCS_HomeSolutions.Mods.Curtains.Mono
         private Texture2D _texture;
         private GameObject _ring;
 
-        internal void Initialize(Texture2D texture,Atlas.Sprite sprite)
+        internal void Initialize(Texture2D texture,Sprite sprite)
         {
             var icon = gameObject.AddComponent<uGUI_Icon>();
             icon.sprite = sprite;

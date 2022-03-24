@@ -78,11 +78,6 @@
             The modification station that upgrades your equipment.
             </summary>
         </member>
-        <member name="F:SMLHelper.V2.Assets.CustomFabricator.Models.MoonPool">
-            <summary>
-            The style of fabricator found in the Moon Pool and the Cyclops sub.
-            </summary>
-        </member>
         <member name="F:SMLHelper.V2.Assets.CustomFabricator.Models.Custom">
             <summary>
             Use this option only if you want to provide your own custom model for your fabricator.<para/>
@@ -209,7 +204,7 @@
             </summary>
             <param name="craftTreeType"></param>
         </member>
-        <member name="M:SMLHelper.V2.Assets.CustomFabricator.AddTabNode(System.String,System.String,Atlas.Sprite,System.String)">
+        <member name="M:SMLHelper.V2.Assets.CustomFabricator.AddTabNode(System.String,System.String,UnityEngine.Sprite,System.String)">
             <summary>
             Adds a new tab node to the custom crafting tree of this fabricator.
             </summary>
@@ -413,6 +408,13 @@
             Used for the <see cref="T:TechTag" /> and <see cref="T:Constructable" /> components whenever applicable.
             Can also be set later in the constructor if it is not yet provided.</param>
         </member>
+        <member name="M:SMLHelper.V2.Assets.ModPrefab.ProcessPrefab(UnityEngine.GameObject)">
+            <summary>
+            Caches the prefab, then sets its TechType and ClassID to a default set of values applicable to most mods.<br/>
+            FOR ADVANCED MODDING ONLY. Do not override unless you know exactly what you are doing.
+            </summary>
+            <param name="go"></param>
+        </member>
         <member name="M:SMLHelper.V2.Assets.ModPrefab.GetGameObject">
             <summary>
             Gets the prefab game object. Set up your prefab components here.
@@ -478,46 +480,29 @@
             The internal identifier of this sprite when it isn't associated to an item.
             </summary>
         </member>
-        <member name="M:SMLHelper.V2.Assets.ModSprite.#ctor(TechType,Atlas.Sprite)">
+        <member name="M:SMLHelper.V2.Assets.ModSprite.#ctor(TechType,UnityEngine.Sprite)">
             <summary>
             Creates a new ModSprite to be used with a specific TechType.
             Created with an Atlas Sprite.
             </summary>
-            <param name="type">The techtype paired to this sprite.</param>
-            <param name="sprite">The sprite to be added.</param>
-        </member>
-        <member name="M:SMLHelper.V2.Assets.ModSprite.#ctor(SpriteManager.Group,System.String,Atlas.Sprite)">
-            <summary>
-            Creates a new ModSprite to be used with a specific group and internal ID.
-            Created with an Atlas Sprite.
-            </summary>
-            <param name="group">The sprite group.</param>
-            <param name="id">The sprite internal identifier.</param>
-            <param name="sprite">The sprite to be added.</param>
-        </member>
-        <member name="M:SMLHelper.V2.Assets.ModSprite.#ctor(SpriteManager.Group,TechType,Atlas.Sprite)">
-            <summary>
-            Creates a new ModSprite to be used with a specific group and internal ID.
-            Created with an Atlas Sprite.
-            </summary>
-            <param name="group">The sprite group.</param>
             <param name="type">The techtype paired to this sprite.</param>
             <param name="sprite">The sprite to be added.</param>
         </member>
         <member name="M:SMLHelper.V2.Assets.ModSprite.#ctor(SpriteManager.Group,System.String,UnityEngine.Sprite)">
             <summary>
             Creates a new ModSprite to be used with a specific group and internal ID.
-            Created with a UnityEngine Sprite.
+            Created with an Atlas Sprite.
             </summary>
-            <param name="group">The sprite group this sprite will be added to.</param>
+            <param name="group">The sprite group.</param>
             <param name="id">The sprite internal identifier.</param>
             <param name="sprite">The sprite to be added.</param>
         </member>
-        <member name="M:SMLHelper.V2.Assets.ModSprite.#ctor(TechType,UnityEngine.Sprite)">
+        <member name="M:SMLHelper.V2.Assets.ModSprite.#ctor(SpriteManager.Group,TechType,UnityEngine.Sprite)">
             <summary>
-            Creates a new ModSprite to be used with a specific TechType.
-            Created with a UnityEngine Sprite.
+            Creates a new ModSprite to be used with a specific group and internal ID.
+            Created with an Atlas Sprite.
             </summary>
+            <param name="group">The sprite group.</param>
             <param name="type">The techtype paired to this sprite.</param>
             <param name="sprite">The sprite to be added.</param>
         </member>
@@ -575,7 +560,11 @@
             Override with the category within the group in the PDA blueprints where this item appears.
             </summary>
         </member>
-        <!-- Badly formed XML comment ignored for member "P:SMLHelper.V2.Assets.PdaItem.UnlockedAtStart" -->
+        <member name="P:SMLHelper.V2.Assets.PdaItem.UnlockedAtStart">
+            <summary>
+            Override this property to assign whether or not the <see cref="T:TechType"/> should be unlocked at the start, defaulted to <c><see cref="P:SMLHelper.V2.Assets.PdaItem.RequiredForUnlock"/> == <see cref="F:TechType.None"/></c>
+            </summary>
+        </member>
         <member name="P:SMLHelper.V2.Assets.PdaItem.DiscoverMessage">
             <summary>
             Message which should be shown when the item is unlocked. <para/>
@@ -592,7 +581,7 @@
         </member>
         <member name="M:SMLHelper.V2.Assets.PdaItem.GetBlueprintRecipe">
             <summary>
-            This provides the <see cref="T:SMLHelper.V2.Crafting.TechData"/> instance used to designate how this item is crafted or constructed.
+            This provides the <see cref="T:SMLHelper.V2.Crafting.RecipeData"/> instance used to designate how this item is crafted or constructed.
             </summary>
         </member>
         <member name="T:SMLHelper.V2.Assets.Spawnable">
@@ -642,6 +631,26 @@
             By default this will be 1x1. Override to change the size.
             </summary>
         </member>
+        <member name="T:SMLHelper.V2.Assets.Spawnable.SpawnLocation">
+            <summary>
+            A lightweight class used to specify the position of a Coordinated Spawn and optionally set its rotation.
+            </summary>
+            <param name="position"></param>
+            <param name="eulerAngles"></param>
+        </member>
+        <member name="M:SMLHelper.V2.Assets.Spawnable.SpawnLocation.#ctor(UnityEngine.Vector3,UnityEngine.Vector3)">
+            <summary>
+            A lightweight class used to specify the position of a Coordinated Spawn and optionally set its rotation.
+            </summary>
+            <param name="position"></param>
+            <param name="eulerAngles"></param>
+        </member>
+        <member name="P:SMLHelper.V2.Assets.Spawnable.CoordinatedSpawns">
+            <summary>
+            Returns the list of <see cref="T:SMLHelper.V2.Assets.Spawnable.SpawnLocation"/>s that specify the prefab's Coordinated Spawns.<br/>
+            By default this will be null.
+            </summary>
+        </member>
         <member name="P:SMLHelper.V2.Assets.Spawnable.BiomesToSpawnIn">
             <summary>
             Returns the List of BiomeData that handles what Biomes this prefab will spawn, how probable it is to spawn there and how many per spawn.
@@ -652,6 +661,11 @@
             <summary>
             Returns the <see cref="T:UWE.WorldEntityInfo"/> of this object if it has one.
             By default this will be null. Override to change this.
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Assets.Spawnable.HasSprite">
+            <summary>
+            Gets a value indicating whether if we should be looking for a Sprite when NOT overriding <see cref="M:SMLHelper.V2.Assets.Spawnable.GetItemSprite"/>.
             </summary>
         </member>
         <member name="M:SMLHelper.V2.Assets.Spawnable.#ctor(System.String,System.String,System.String)">
@@ -690,10 +704,10 @@
         </member>
         <member name="M:SMLHelper.V2.Assets.Spawnable.GetItemSprite">
             <summary>
-            Determines thee <see cref="T:Atlas.Sprite"/> to be used for this spawnable's icon.<para/>
+            Determines thee <see cref="T:UnityEngine.Sprite"/> to be used for this spawnable's icon.<para/>
             Default behavior will look for a PNG file named <see cref="P:SMLHelper.V2.Assets.Spawnable.IconFileName"/> inside <see cref="P:SMLHelper.V2.Assets.Spawnable.AssetsFolder"/>.
             </summary>
-            <returns>Returns the <see cref="T:Atlas.Sprite"/> that will be used in the <see cref="M:SMLHelper.V2.Handlers.SpriteHandler.RegisterSprite(TechType,Atlas.Sprite)"/> call.</returns>
+            <returns>Returns the <see cref="T:UnityEngine.Sprite"/> that will be used in the <see cref="M:SMLHelper.V2.Handlers.SpriteHandler.RegisterSprite(TechType,UnityEngine.Sprite)"/> call.</returns>
         </member>
         <member name="T:SMLHelper.V2.Commands.ConsoleCommand">
             <summary>
@@ -822,15 +836,6 @@
             <summary>
             The child nodes linked bellow this node.
             </summary>
-        </member>
-        <member name="M:SMLHelper.V2.Crafting.ModCraftTreeLinkingNode.AddTabNode(System.String,System.String,Atlas.Sprite)">
-            <summary>
-            Creates a new tab node for the crafting tree and links it to the calling node.
-            </summary>
-            <param name="nameID">The name/ID of this node.</param>
-            <param name="displayText">The hover text to display in-game.</param>
-            <param name="sprite">The custom sprite to display on this tab node.</param>
-            <returns>A new tab node linked to the root node and ready to use.</returns>
         </member>
         <member name="M:SMLHelper.V2.Crafting.ModCraftTreeLinkingNode.AddTabNode(System.String,System.String,UnityEngine.Sprite)">
             <summary>
@@ -986,13 +991,13 @@
             </summary>
             <seealso cref="T:SMLHelper.V2.Crafting.ModCraftTreeLinkingNode" />
         </member>
-        <member name="T:SMLHelper.V2.Crafting.TechData">
+        <member name="T:SMLHelper.V2.Crafting.RecipeData">
             <summary>
             A class that fully describes a recipe for a <see cref="T:TechType"/> identified item.
             </summary>
-            <seealso cref="T:ITechData" />
+            <seealso cref="T:TechData" />
         </member>
-        <member name="P:SMLHelper.V2.Crafting.TechData.craftAmount">
+        <member name="P:SMLHelper.V2.Crafting.RecipeData.craftAmount">
             <summary>
             Gets or sets the how many copies of the item are created when crafting this recipe.
             </summary>
@@ -1000,7 +1005,7 @@
             The quantity of the item this recipe yields.
             </value>
         </member>
-        <member name="P:SMLHelper.V2.Crafting.TechData.ingredientCount">
+        <member name="P:SMLHelper.V2.Crafting.RecipeData.ingredientCount">
             <summary>
             Gets the number of different ingredients for this recipe.
             </summary>
@@ -1008,7 +1013,7 @@
             The number of ingredients for this recipe.
             </value>
         </member>
-        <member name="P:SMLHelper.V2.Crafting.TechData.linkedItemCount">
+        <member name="P:SMLHelper.V2.Crafting.RecipeData.linkedItemCount">
             <summary>
             Gets the number of items linked to this recipe.
             </summary>
@@ -1016,76 +1021,609 @@
             The number of linked items.
             </value>
         </member>
-        <member name="F:SMLHelper.V2.Crafting.TechData.Ingredients">
+        <member name="F:SMLHelper.V2.Crafting.RecipeData.Ingredients">
             <summary>
             The list of ingredients required for this recipe.
             </summary>
         </member>
-        <member name="F:SMLHelper.V2.Crafting.TechData.LinkedItems">
+        <member name="F:SMLHelper.V2.Crafting.RecipeData.LinkedItems">
             <summary>
             The items that will also be created when this recipe is crafted.
             </summary>
         </member>
-        <member name="M:SMLHelper.V2.Crafting.TechData.#ctor">
+        <member name="M:SMLHelper.V2.Crafting.RecipeData.#ctor">
             <summary>
-            Initializes a new instance of the <see cref="T:SMLHelper.V2.Crafting.TechData"/> class a custom recipe.
+            Initializes a new instance of the <see cref="T:TechData"/> class a custom recipe.
             </summary>
         </member>
-        <member name="M:SMLHelper.V2.Crafting.TechData.#ctor(System.Collections.Generic.List{SMLHelper.V2.Crafting.Ingredient})">
+        <member name="M:SMLHelper.V2.Crafting.RecipeData.#ctor(System.Collections.Generic.List{Ingredient})">
             <summary>
-            Initializes a new instance of the <see cref="T:SMLHelper.V2.Crafting.TechData"/> class for a custom recipe with a list of ingridients.
-            </summary>
-            <param name="ingredients">The ingredients.</param>
-        </member>
-        <member name="M:SMLHelper.V2.Crafting.TechData.#ctor(SMLHelper.V2.Crafting.Ingredient[])">
-            <summary>
-            Initializes a new instance of the <see cref="T:SMLHelper.V2.Crafting.TechData"/> class for a custom recipe with a collection of ingridients.
+            Initializes a new instance of the <see cref="T:TechData"/> class for a custom recipe with a list of ingridients.
             </summary>
             <param name="ingredients">The ingredients.</param>
         </member>
-        <member name="M:SMLHelper.V2.Crafting.TechData.GetIngredient(System.Int32)">
+        <member name="M:SMLHelper.V2.Crafting.RecipeData.#ctor(Ingredient[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:TechData"/> class for a custom recipe with a collection of ingridients.
+            </summary>
+            <param name="ingredients">The ingredients.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Crafting.RecipeData.GetIngredient(System.Int32)">
             <summary>
             Gets the ingredient at the specified index.
             </summary>
             <param name="index">The index.</param>
-            <returns>The <see cref="T:IIngredient"/> at the requested the index if the index is value; Otherwise returns null.</returns>
+            <returns>The <see cref="T:Ingredient"/> at the requested the index if the index is value; Otherwise returns null.</returns>
         </member>
-        <member name="M:SMLHelper.V2.Crafting.TechData.GetLinkedItem(System.Int32)">
+        <member name="M:SMLHelper.V2.Crafting.RecipeData.GetLinkedItem(System.Int32)">
             <summary>
             Gets the linked item at the specified index.
             </summary>
             <param name="index">The index.</param>
             <returns>The <see cref="T:TechType"/> at the requested the index if the index is value; Otherwise returns null.</returns>
         </member>
-        <member name="T:SMLHelper.V2.Crafting.Ingredient">
+        <member name="T:SMLHelper.V2.FMod.Interfaces.IFModSound">
             <summary>
-            A class for representing a required ingredient in a recipe.
+            This interface is used to integrate with <see cref="T:SMLHelper.V2.Handlers.CustomSoundHandler"/>.
             </summary>
-            <seealso cref="T:IIngredient" />
-            <seealso cref="T:SMLHelper.V2.Crafting.TechData"/>
         </member>
-        <member name="P:SMLHelper.V2.Crafting.Ingredient.techType">
+        <member name="M:SMLHelper.V2.FMod.Interfaces.IFModSound.PlaySound">
             <summary>
-            Gets or sets the item ID.
+            Defines how to play sound in this object.
             </summary>
-            <value>
-            The item ID.
-            </value>
+            <returns>The channel the sound was played on</returns>
         </member>
-        <member name="P:SMLHelper.V2.Crafting.Ingredient.amount">
+        <member name="T:SMLHelper.V2.FMod.FModMultiSounds">
             <summary>
-            Gets or sets the number of this item required for the recipe.
+            This class is used to register FMOD events with multiple sounds in one event.
             </summary>
-            <value>
-            The amount of this item needed for the recipe.
-            </value>
         </member>
-        <member name="M:SMLHelper.V2.Crafting.Ingredient.#ctor(TechType,System.Int32)">
+        <member name="F:SMLHelper.V2.FMod.FModMultiSounds.randomizeSounds">
             <summary>
-            Initializes a new instance of the <see cref="T:SMLHelper.V2.Crafting.Ingredient"/> class.
+            Makes the sounds play in a randomized order. when <c>false</c>, sounds will play subsequently.
             </summary>
-            <param name="techType">The item ID.</param>
-            <param name="amount">The number of instances of this item required for the recipe.</param>
+        </member>
+        <member name="M:SMLHelper.V2.FMod.FModMultiSounds.#ctor(FMOD.Sound[],System.String,System.Boolean)">
+            <summary>
+            Constructs a new instance of <see cref="T:SMLHelper.V2.FMod.FModMultiSounds"/>. Used to register FMOD events with multiple sounds in one event.
+            </summary>
+            <param name="sounds">The sounds to register for this object. Please ensure that none of the sounds are on <see cref="F:FMOD.MODE.LOOP_NORMAL"/> or <see cref="F:FMOD.MODE.LOOP_BIDI"/> modes.</param>
+            <param name="busPath"><see cref="T:FMOD.Studio.Bus"/> path to play these sounds under.</param>
+            <param name="randomizeSounds">Makes the sounds play in a randomized order. when <c>false</c>, sounds will play subsequently.</param>
+        </member>
+        <member name="M:SMLHelper.V2.FMod.FModMultiSounds.#ctor(UnityEngine.AudioClip[],FMOD.MODE,System.String,System.Boolean)">
+            <summary>
+            Constructs a new instance of <see cref="T:SMLHelper.V2.FMod.FModMultiSounds"/>. Used to register FMOD events with multiple sounds in one event.
+            </summary>
+            <param name="clips">The clips to register for this object.</param>
+            <param name="mode">The mode to set the clips to. Cannot be <c>MODE.LOOP_NORMAL</c> or <c>MODE.LOOP_BIDI</c>.</param>
+            <param name="busPath"><see cref="T:FMOD.Studio.Bus"/> path to play these sounds under.</param>
+            <param name="randomizeSounds">Makes the sounds play in a randomized order. when <c>false</c>, sounds will play subsequently.</param>
+        </member>
+        <member name="M:SMLHelper.V2.FMod.FModMultiSounds.#ctor(System.String[],FMOD.MODE,System.String,System.Boolean)">
+            <summary>
+            Constructs a new instance of <see cref="T:SMLHelper.V2.FMod.FModMultiSounds"/>. Used to register FMOD events with multiple sounds in one event.
+            </summary>
+            <param name="soundPaths">The sound paths to register for this object. Paths must be relative to the base game folder.</param>
+            <param name="mode">The mode to set the clips to. Cannot be <c>MODE.LOOP_NORMAL</c> or <c>MODE.LOOP_BIDI</c>.</param>
+            <param name="busPath"><see cref="T:FMOD.Studio.Bus"/> path to play these sounds under.</param>
+            <param name="randomizeSounds">Makes the sounds play in a randomized order. when <c>false</c>, sounds will play subsequently.</param>
+        </member>
+        <member name="T:SMLHelper.V2.Handlers.BackgroundTypeHandler">
+            <summary>
+            A handler for everything related to creating new BackgroundTypes.
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Handlers.BackgroundTypeHandler.Main">
+            <summary>
+            Main entry point for all calls to this handler.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.BackgroundTypeHandler.SMLHelper#V2#Interfaces#IBackgroundTypeHandler#AddBackgroundType(System.String,UnityEngine.Sprite)">
+            <summary>
+            adds a new <see cref="T:CraftData.BackgroundType"/> into the game.
+            </summary>
+            <param name="backgroundTypeName">the name of the BackgroundType, should not contain special characters.</param>
+            <param name="backgroundSprite">The sprite for this BackgroundType.</param>
+            <returns>The new <see cref="T:CraftData.BackgroundType"/> that's created.</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.BackgroundTypeHandler.SMLHelper#V2#Interfaces#IBackgroundTypeHandler#TryGetModdedBackgroundType(System.String,CraftData.BackgroundType@)">
+            <summary>
+            Safely looks for a modded Background Type from another mod in the SMLHelper BackgroundTypeCache and outputs its <see cref="T:CraftData.BackgroundType" /> value when found.
+            </summary>
+            <param name="backgroundTypeString">The string used to define the BackgroundType</param>
+            <param name="modBackgroundType">The BackgroundType enum value of the modded. Defaults to <see cref="F:CraftData.BackgroundType.Normal" /> when the item was not found.</param>
+            <returns><see langword="true"/> if the item was found; otherwise <see langword="false"/>.</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.BackgroundTypeHandler.SMLHelper#V2#Interfaces#IBackgroundTypeHandler#ModdedBackgroundTypeExists(System.String)">
+            <summary>
+            Safely looks for a modded Background Type from another mod in the SMLHelper BackgroundTypeCache.
+            </summary>
+            <param name="backgroundTypeString">The string used to define the BackgroundType.</param>
+            <returns><see langword="true"/> if the item was found; otherwise <see langword="false"/>.</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.BackgroundTypeHandler.AddBackgroundType(System.String,UnityEngine.Sprite)">
+            <summary>
+            adds a new <see cref="T:CraftData.BackgroundType"/> into the game.
+            </summary>
+            <param name="backgroundTypeName">the name of the BackgroundType, should not contain special characters.</param>
+            <param name="backgroundSprite">The sprite for this BackgroundType.</param>
+            <returns>The new <see cref="T:CraftData.BackgroundType"/> that's created.</returns>
+            <returns></returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.BackgroundTypeHandler.TryGetModdedBackgroundType(System.String,CraftData.BackgroundType@)">
+            <summary>
+            Safely looks for a modded Background Type from another mod in the SMLHelper BackgroundTypeCache and outputs its <see cref="T:CraftData.BackgroundType" /> value when found.
+            </summary>
+            <param name="backgroundTypeString">The string used to define the BackgroundType</param>
+            <param name="modBackgroundType">The BackgroundType enum value of the modded. Defaults to <see cref="F:CraftData.BackgroundType.Normal" /> when the item was not found.</param>
+            <returns><see langword="true"/> if the item was found; otherwise <see langword="false"/>.</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.BackgroundTypeHandler.ModdedBackgroundTypeExists(System.String)">
+            <summary>
+            Safely looks for a modded Background Type from another mod in the SMLHelper BackgroundTypeCache.
+            </summary>
+            <param name="backgroundTypeString">The string used to define the BackgroundType.</param>
+            <returns><see langword="true"/> if the item was found; otherwise <see langword="false"/>.</returns>
+        </member>
+        <member name="T:SMLHelper.V2.Handlers.CoordinatedSpawnsHandler">
+            <summary>
+            a Handler that handles and registers Coordinated (<see cref="T:UnityEngine.Vector3"/> spawns).
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Handlers.CoordinatedSpawnsHandler.Main">
+            <summary>
+            Main entry point for all calls to this handler.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CoordinatedSpawnsHandler.SMLHelper#V2#Interfaces#ICoordinatedSpawnHandler#RegisterCoordinatedSpawnsForOneTechType(TechType,System.Collections.Generic.List{UnityEngine.Vector3})">
+            <summary>
+            Registers Multiple Coordinated spawns for one single passed TechType
+            </summary>
+            <param name="techTypeToSpawn">The TechType to spawn</param>
+            <param name="coordinatesToSpawnTo">the coordinates the <see cref="T:TechType"/> should spawn to</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CoordinatedSpawnsHandler.SMLHelper#V2#Interfaces#ICoordinatedSpawnHandler#RegisterCoordinatedSpawn(SMLHelper.V2.Handlers.SpawnInfo)">
+            <summary>
+            Registers a Coordinated Spawn
+            </summary>
+            <param name="spawnInfo">the SpawnInfo to spawn</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CoordinatedSpawnsHandler.SMLHelper#V2#Interfaces#ICoordinatedSpawnHandler#RegisterCoordinatedSpawns(System.Collections.Generic.List{SMLHelper.V2.Handlers.SpawnInfo})">
+            <summary>
+            registers Many Coordinated Spawns.
+            </summary>
+            <param name="spawnInfos">The SpawnInfos to spawn.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CoordinatedSpawnsHandler.SMLHelper#V2#Interfaces#ICoordinatedSpawnHandler#RegisterCoordinatedSpawnsForOneTechType(TechType,System.Collections.Generic.Dictionary{UnityEngine.Vector3,UnityEngine.Vector3})">
+            <summary>
+            Registers Multiple Coordinated spawns with rotations for one single passed TechType
+            </summary>
+            <param name="techTypeToSpawn">The TechType to spawn</param>
+            <param name="coordinatesAndRotationsToSpawnTo">the coordinates(Key) and the rotations(Value) the <see cref="T:TechType"/> should spawn to</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CoordinatedSpawnsHandler.RegisterCoordinatedSpawn(SMLHelper.V2.Handlers.SpawnInfo)">
+            <summary>
+            Registers a Coordinated Spawn
+            </summary>
+            <param name="spawnInfo">the SpawnInfo to spawn</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CoordinatedSpawnsHandler.RegisterCoordinatedSpawns(System.Collections.Generic.List{SMLHelper.V2.Handlers.SpawnInfo})">
+            <summary>
+            registers Many Coordinated Spawns.
+            </summary>
+            <param name="spawnInfos">The SpawnInfo to spawn.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CoordinatedSpawnsHandler.RegisterCoordinatedSpawnsForOneTechType(TechType,System.Collections.Generic.List{UnityEngine.Vector3})">
+            <summary>
+            Registers Multiple Coordinated spawns for one single passed TechType
+            </summary>
+            <param name="techTypeToSpawn">The TechType to spawn</param>
+            <param name="coordinatesToSpawnTo">the coordinates the <see cref="T:TechType"/> should spawn to</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CoordinatedSpawnsHandler.RegisterCoordinatedSpawnsForOneTechType(TechType,System.Collections.Generic.Dictionary{UnityEngine.Vector3,UnityEngine.Vector3})">
+            <summary>
+            Registers Multiple Coordinated spawns with rotations for one single passed TechType
+            </summary>
+            <param name="techTypeToSpawn">The TechType to spawn</param>
+            <param name="coordinatesAndRotationsToSpawnTo">the coordinates(Key) and the rotations(Value) the <see cref="T:TechType"/> should spawn to</param>
+        </member>
+        <member name="T:SMLHelper.V2.Handlers.SpawnInfo">
+            <summary>
+            A basic struct that provides enough info for the <see cref="T:SMLHelper.V2.Handlers.CoordinatedSpawnsHandler"/> System to function.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.SpawnInfo.#ctor(TechType,UnityEngine.Vector3)">
+            <summary>
+            Initializes a new <see cref="T:SMLHelper.V2.Handlers.SpawnInfo"/>.
+            </summary>
+            <param name="techType">TechType to spawn.</param>
+            <param name="spawnPosition">Position to spawn into.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.SpawnInfo.#ctor(System.String,UnityEngine.Vector3)">
+            <summary>
+            Initializes a new <see cref="T:SMLHelper.V2.Handlers.SpawnInfo"/>.
+            </summary>
+            <param name="classId">ClassID to spawn.</param>
+            <param name="spawnPosition">Position to spawn into.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.SpawnInfo.#ctor(TechType,UnityEngine.Vector3,UnityEngine.Quaternion)">
+            <summary>
+            Initializes a new <see cref="T:SMLHelper.V2.Handlers.SpawnInfo"/>.
+            </summary>
+            <param name="techType">TechType to spawn.</param>
+            <param name="spawnPosition">Position to spawn into.</param>
+            <param name="rotation">Rotation to spawn at.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.SpawnInfo.#ctor(System.String,UnityEngine.Vector3,UnityEngine.Quaternion)">
+            <summary>
+            Initializes a new <see cref="T:SMLHelper.V2.Handlers.SpawnInfo"/>.
+            </summary>
+            <param name="classId">ClassID to spawn.</param>
+            <param name="spawnPosition">Position to spawn into.</param>
+            <param name="rotation">Rotation to spawn at.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.SpawnInfo.#ctor(TechType,UnityEngine.Vector3,UnityEngine.Vector3)">
+            <summary>
+            Initializes a new <see cref="T:SMLHelper.V2.Handlers.SpawnInfo"/>.
+            </summary>
+            <param name="techType">TechType to spawn.</param>
+            <param name="spawnPosition">Position to spawn into.</param>
+            <param name="rotation">Rotation to spawn at.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.SpawnInfo.#ctor(System.String,UnityEngine.Vector3,UnityEngine.Vector3)">
+            <summary>
+            Initializes a new <see cref="T:SMLHelper.V2.Handlers.SpawnInfo"/>.
+            </summary>
+            <param name="classId">ClassID to spawn.</param>
+            <param name="spawnPosition">Position to spawn into.</param>
+            <param name="rotation">Rotation to spawn at.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.SpawnInfo.Equals(System.Object)">
+            <summary>
+            Indicates whether this instance and a specified object are equal.
+            </summary>
+            <remarks>
+            It is worth noting that we use Unity's <see cref="M:UnityEngine.Vector3.op_Equality(UnityEngine.Vector3,UnityEngine.Vector3)"/> and <see cref="M:UnityEngine.Quaternion.op_Equality(UnityEngine.Quaternion,UnityEngine.Quaternion)"/>
+            operator comparisons for comparing the <see cref="P:SMLHelper.V2.Handlers.SpawnInfo.SpawnPosition"/> and <see cref="P:SMLHelper.V2.Handlers.SpawnInfo.Rotation"/> properties of each instance, 
+            to allow for an approximate comparison of these values.
+            </remarks>
+            <param name="obj">The object to compare with the current instance.</param>
+            <returns><see langword="true"/> if <paramref name="obj"/> is a <see cref="T:SMLHelper.V2.Handlers.SpawnInfo"/> and represents the same
+            value as this instance; otherwise, <see langword="false"/>.</returns>
+            <seealso cref="M:SMLHelper.V2.Handlers.SpawnInfo.Equals(SMLHelper.V2.Handlers.SpawnInfo)"/>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.SpawnInfo.GetHashCode">
+            <summary>
+            A custom hash code algorithm that takes into account the values of each property of the <see cref="T:SMLHelper.V2.Handlers.SpawnInfo"/> instance,
+            and attempts to reduce diagonal collisions.
+            </summary>
+            <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.SpawnInfo.Equals(SMLHelper.V2.Handlers.SpawnInfo)">
+            <summary>
+            Indicates whether the current <see cref="T:SMLHelper.V2.Handlers.SpawnInfo"/> is equal to another.
+            </summary>
+            <remarks>
+            It is worth noting that we use Unity's <see cref="M:UnityEngine.Vector3.op_Equality(UnityEngine.Vector3,UnityEngine.Vector3)"/> and <see cref="M:UnityEngine.Quaternion.op_Equality(UnityEngine.Quaternion,UnityEngine.Quaternion)"/>
+            operator comparisons for comparing the <see cref="P:SMLHelper.V2.Handlers.SpawnInfo.SpawnPosition"/> and <see cref="P:SMLHelper.V2.Handlers.SpawnInfo.Rotation"/> properties of each instance, 
+            to allow for an approximate comparison of these values.
+            </remarks>
+            <param name="other">The other <see cref="T:SMLHelper.V2.Handlers.SpawnInfo"/>.</param>
+            <returns><see langword="true"/> if the current <see cref="T:SMLHelper.V2.Handlers.SpawnInfo"/> is equal to the <paramref name="other"/> parameter;
+            otherwise <see langword="false"/>.</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.SpawnInfo.op_Equality(SMLHelper.V2.Handlers.SpawnInfo,SMLHelper.V2.Handlers.SpawnInfo)">
+            <summary>
+            Indicates whether two <see cref="T:SMLHelper.V2.Handlers.SpawnInfo"/> instances are equal.
+            </summary>
+            <param name="a">The first instance to compare.</param>
+            <param name="b">The second instance to compare.</param>
+            <returns><see langword="true"/> if the <see cref="T:SMLHelper.V2.Handlers.SpawnInfo"/> instances are equal; otherwise, <see langword="false"/>.</returns>
+            <seealso cref="M:SMLHelper.V2.Handlers.SpawnInfo.op_Inequality(SMLHelper.V2.Handlers.SpawnInfo,SMLHelper.V2.Handlers.SpawnInfo)"/>
+            <seealso cref="M:SMLHelper.V2.Handlers.SpawnInfo.Equals(SMLHelper.V2.Handlers.SpawnInfo)"/>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.SpawnInfo.op_Inequality(SMLHelper.V2.Handlers.SpawnInfo,SMLHelper.V2.Handlers.SpawnInfo)">
+            <summary>
+            Indicates whether two <see cref="T:SMLHelper.V2.Handlers.SpawnInfo"/> instances are not equal.
+            </summary>
+            <param name="a">The first instance to compare.</param>
+            <param name="b">The second instance to compare.</param>
+            <returns><see langword="true"/> if the <see cref="T:SMLHelper.V2.Handlers.SpawnInfo"/> instances are not equal; otherwise, <see langword="false"/>.</returns>
+            <seealso cref="M:SMLHelper.V2.Handlers.SpawnInfo.op_Equality(SMLHelper.V2.Handlers.SpawnInfo,SMLHelper.V2.Handlers.SpawnInfo)"/>
+            <seealso cref="M:SMLHelper.V2.Handlers.SpawnInfo.Equals(SMLHelper.V2.Handlers.SpawnInfo)"/>
+        </member>
+        <member name="T:SMLHelper.V2.Handlers.CustomSoundHandler">
+            <summary>
+            A handler class for adding and overriding Sounds.
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Handlers.CustomSoundHandler.Main">
+            <summary>
+            Main entry point for all calls to this handler.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CustomSoundHandler.SMLHelper#V2#Interfaces#ICustomSoundHandler#RegisterCustomSound(System.String,System.String,SMLHelper.V2.Utility.SoundChannel)">
+            <summary>
+            Register a Custom sound by file path. Some vanilla game sounds can be overridden by matching the id to the <see cref="F:FMODAsset.path"/>.
+            </summary>
+            <param name="id">The Id of your custom sound which is used when checking which sounds to play.</param>
+            <param name="filePath">The file path on disk of the sound file to load</param>
+            <param name="soundChannel">The sound channel to get the volume to play the sound at. defaults to <see cref="F:SMLHelper.V2.Utility.SoundChannel.Master"/></param>
+            <returns>the <see cref="T:FMOD.Sound"/> loaded</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CustomSoundHandler.SMLHelper#V2#Interfaces#ICustomSoundHandler#RegisterCustomSound(System.String,System.String,System.String)">
+            <summary>
+            Register a Custom sound by file path. Some vanilla game sounds can be overridden by matching the id to the <see cref="F:FMODAsset.path"/>.
+            </summary>
+            <param name="id">The Id of your custom sound which is used when checking which sounds to play.</param>
+            <param name="filePath">The file path on disk of the sound file to load.</param>
+            <param name="busPath">The bus path to play the sound on.</param>
+            <returns>the <see cref="T:FMOD.Sound"/> loaded</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CustomSoundHandler.SMLHelper#V2#Interfaces#ICustomSoundHandler#RegisterCustomSound(System.String,System.String,FMOD.Studio.Bus)">
+            <summary>
+            Register a Custom sound by file path. Some vanilla game sounds can be overridden by matching the id to the <see cref="F:FMODAsset.path"/>.
+            </summary>
+            <param name="id">The Id of your custom sound which is used when checking which sounds to play.</param>
+            <param name="filePath">The file path on disk of the sound file to load.</param>
+            <param name="bus">The bus to play the sound on.</param>
+            <returns>the <see cref="T:FMOD.Sound"/> loaded</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CustomSoundHandler.SMLHelper#V2#Interfaces#ICustomSoundHandler#RegisterCustomSound(System.String,UnityEngine.AudioClip,SMLHelper.V2.Utility.SoundChannel)">
+            <summary>
+            Register a custom sound by an <see cref="T:UnityEngine.AudioClip"/> instance. Some vanilla game sounds can be overridden by matching the id to the <see cref="F:FMODAsset.path"/>.
+            </summary>
+            <param name="id">The Id of your custom sound which is used when checking which sounds to play.</param>
+            <param name="audio">The AudioClip to register.</param>
+            <param name="soundChannel">The sound channel to get the volume to play the sound at. defaults to <see cref="F:SMLHelper.V2.Utility.SoundChannel.Master"/></param>
+            <returns>the <see cref="T:FMOD.Sound"/> registered.</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CustomSoundHandler.SMLHelper#V2#Interfaces#ICustomSoundHandler#RegisterCustomSound(System.String,UnityEngine.AudioClip,System.String)">
+            <summary>
+            Register a custom sound by an <see cref="T:UnityEngine.AudioClip"/> instance. Some vanilla game sounds can be overridden by matching the id to the <see cref="F:FMODAsset.path"/>.
+            </summary>
+            <param name="id">The Id of your custom sound which is used when checking which sounds to play.</param>
+            <param name="audio">The AudioClip to register.</param>
+            <param name="busPath">The bus path to play the sound on.</param>
+            <returns>the <see cref="T:FMOD.Sound"/> loaded</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CustomSoundHandler.SMLHelper#V2#Interfaces#ICustomSoundHandler#RegisterCustomSound(System.String,UnityEngine.AudioClip,FMOD.Studio.Bus)">
+            <summary>
+            Register a custom sound by an <see cref="T:UnityEngine.AudioClip"/> instance. Some vanilla game sounds can be overridden by matching the id to the <see cref="F:FMODAsset.path"/>.
+            </summary>
+            <param name="id">The Id of your custom sound which is used when checking which sounds to play.</param>
+            <param name="audio">The AudioClip to register.</param>
+            <param name="bus">The bus to play the sound on.</param>
+            <returns>the <see cref="T:FMOD.Sound"/> loaded</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CustomSoundHandler.SMLHelper#V2#Interfaces#ICustomSoundHandler#RegisterCustomSound(System.String,SMLHelper.V2.FMod.Interfaces.IFModSound)">
+            <summary>
+            Registers a Custom sound by an <see cref="T:SMLHelper.V2.FMod.Interfaces.IFModSound"/> instance. IFModSound instances have custom logic for playing sounds.
+            </summary>
+            <param name="id">The Id of your custom sound which is used when checking which sounds to play.</param>
+            <param name="fModSound">The sound IFModSound object to register.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CustomSoundHandler.SMLHelper#V2#Interfaces#ICustomSoundHandler#RegisterCustomSound(System.String,FMOD.Sound,SMLHelper.V2.Utility.SoundChannel)">
+            <summary>
+            Register a Custom sound that has been loaded using AudioUtils. Some vanilla game sounds can be overridden by matching the id to the <see cref="F:FMODAsset.path"/>.
+            </summary>
+            <param name="id">The Id of your custom sound which is used when checking which sounds to play.</param>
+            <param name="sound">The pre loaded sound</param>
+            <param name="soundChannel">The sound channel to get the volume to play the sound at. <see cref="T:SMLHelper.V2.Utility.SoundChannel"/></param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CustomSoundHandler.SMLHelper#V2#Interfaces#ICustomSoundHandler#RegisterCustomSound(System.String,FMOD.Sound,System.String)">
+            <summary>
+            Register a Custom sound that has been loaded using AudioUtils. Some vanilla game sounds can be overridden by matching the id to the <see cref="F:FMODAsset.path"/>.
+            </summary>
+            <param name="id">The Id of your custom sound which is used when checking which sounds to play.</param>
+            <param name="sound">The pre loaded sound</param>
+            <param name="busPath">The bus path to play the sound on.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CustomSoundHandler.SMLHelper#V2#Interfaces#ICustomSoundHandler#RegisterCustomSound(System.String,FMOD.Sound,FMOD.Studio.Bus)">
+            <summary>
+            Register a Custom sound that has been loaded using AudioUtils. Some vanilla game sounds can be overridden by matching the id to the <see cref="F:FMODAsset.path"/>.
+            </summary>
+            <param name="id">The Id of your custom sound which is used when checking which sounds to play.</param>
+            <param name="sound">The pre loaded sound</param>
+            <param name="bus">The bus to play the sound on.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CustomSoundHandler.SMLHelper#V2#Interfaces#ICustomSoundHandler#TryPlayCustomSound(System.String)">
+            <summary>
+            Try to find and play a custom <see cref="T:FMOD.Sound"/> that has been registered.
+            </summary>
+            <param name="id">The Id of the custom sound</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CustomSoundHandler.SMLHelper#V2#Interfaces#ICustomSoundHandler#TryGetCustomSound(System.String,FMOD.Sound@)">
+            <summary>
+            Try to get a registered custom <see cref="T:FMOD.Sound"/>.
+            </summary>
+            <param name="id">The Id of the custom sound</param>
+            <param name="sound">Outputs the <see cref="T:FMOD.Sound"/> if found and null if not found.</param>
+            <returns>true or false depending on if the id was found</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CustomSoundHandler.SMLHelper#V2#Interfaces#ICustomSoundHandler#TryGetCustomSoundChannel(System.Int32,FMOD.Channel@)">
+            <summary>
+            Try to get a playing custom sound channel for an emitter
+            </summary>
+            <param name="id">The emitter's ID, can be retrieved by calling <c>object.GetInstanceID()</c>.</param>
+            <param name="channel">Outputs the <see cref="T:FMOD.Channel"/>.</param>
+            <returns>True if found, otherwise false.</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CustomSoundHandler.RegisterCustomSound(System.String,System.String,SMLHelper.V2.Utility.SoundChannel)">
+            <summary>
+            Register a Custom sound by file path. Some vanilla game sounds can be overridden by matching the id to the <see cref="F:FMODAsset.path"/>.
+            </summary>
+            <param name="id">The Id of your custom sound which is used when checking which sounds to play.</param>
+            <param name="filePath">The file path on disk of the sound file to load</param>
+            <param name="soundChannel">The sound channel to get the volume to play the sound at. defaults to <see cref="F:SMLHelper.V2.Utility.SoundChannel.Master"/></param>
+            <returns>the <see cref="T:FMOD.Sound"/> loaded</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CustomSoundHandler.RegisterCustomSound(System.String,System.String,System.String)">
+            <summary>
+            Register a Custom sound by file path. Some vanilla game sounds can be overridden by matching the id to the <see cref="F:FMODAsset.path"/>.
+            </summary>
+            <param name="id">The Id of your custom sound which is used when checking which sounds to play.</param>
+            <param name="filePath">The file path on disk of the sound file to load.</param>
+            <param name="busPath">The bus path to play the sound on.</param>
+            <returns>the <see cref="T:FMOD.Sound"/> loaded</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CustomSoundHandler.RegisterCustomSound(System.String,System.String,FMOD.Studio.Bus)">
+            <summary>
+            Register a Custom sound by file path. Some vanilla game sounds can be overridden by matching the id to the <see cref="F:FMODAsset.path"/>.
+            </summary>
+            <param name="id">The Id of your custom sound which is used when checking which sounds to play.</param>
+            <param name="filePath">The file path on disk of the sound file to load.</param>
+            <param name="bus">The bus to play the sound on.</param>
+            <returns>the <see cref="T:FMOD.Sound"/> loaded</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CustomSoundHandler.RegisterCustomSound(System.String,UnityEngine.AudioClip,SMLHelper.V2.Utility.SoundChannel)">
+            <summary>
+            Register a custom sound by an <see cref="T:UnityEngine.AudioClip"/> instance. Some vanilla game sounds can be overridden by matching the id to the <see cref="F:FMODAsset.path"/>.
+            </summary>
+            <param name="id">The Id of your custom sound which is used when checking which sounds to play.</param>
+            <param name="audio">The AudioClip to register.</param>
+            <param name="soundChannel">The sound channel to get the volume to play the sound at. defaults to <see cref="F:SMLHelper.V2.Utility.SoundChannel.Master"/></param>
+            <returns>the <see cref="T:FMOD.Sound"/> registered.</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CustomSoundHandler.RegisterCustomSound(System.String,UnityEngine.AudioClip,System.String)">
+            <summary>
+            Register a custom sound by an <see cref="T:UnityEngine.AudioClip"/> instance. Some vanilla game sounds can be overridden by matching the id to the <see cref="F:FMODAsset.path"/>.
+            </summary>
+            <param name="id">The Id of your custom sound which is used when checking which sounds to play.</param>
+            <param name="audio">The AudioClip to register.</param>
+            <param name="busPath">The bus path to play the sound on.</param>
+            <returns>the <see cref="T:FMOD.Sound"/> loaded</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CustomSoundHandler.RegisterCustomSound(System.String,SMLHelper.V2.FMod.Interfaces.IFModSound)">
+            <summary>
+            Registers a Custom sound by an <see cref="T:SMLHelper.V2.FMod.Interfaces.IFModSound"/> instance. IFModSound instances have custom logic for playing sounds.
+            </summary>
+            <param name="id">The Id of your custom sound which is used when checking which sounds to play.</param>
+            <param name="fModSound">The sound IFModSound object to register.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CustomSoundHandler.RegisterCustomSound(System.String,UnityEngine.AudioClip,FMOD.Studio.Bus)">
+            <summary>
+            Register a custom sound by an <see cref="T:UnityEngine.AudioClip"/> instance. Some vanilla game sounds can be overridden by matching the id to the <see cref="F:FMODAsset.path"/>.
+            </summary>
+            <param name="id">The Id of your custom sound which is used when checking which sounds to play.</param>
+            <param name="audio">The AudioClip to register.</param>
+            <param name="bus">The bus to play the sound on.</param>
+            <returns>the <see cref="T:FMOD.Sound"/> loaded</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CustomSoundHandler.RegisterCustomSound(System.String,FMOD.Sound,SMLHelper.V2.Utility.SoundChannel)">
+            <summary>
+            Register a Custom sound that has been loaded using AudioUtils. Some vanilla game sounds can be overridden by matching the id to the <see cref="F:FMODAsset.path"/>.
+            </summary>
+            <param name="id">The Id of your custom sound which is used when checking which sounds to play.</param>
+            <param name="sound">The pre loaded sound</param>
+            <param name="soundChannel">The sound channel to get the volume to play the sound at. <see cref="T:SMLHelper.V2.Utility.SoundChannel"/></param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CustomSoundHandler.RegisterCustomSound(System.String,FMOD.Sound,System.String)">
+            <summary>
+            Register a Custom sound that has been loaded using AudioUtils. Some vanilla game sounds can be overridden by matching the id to the <see cref="F:FMODAsset.path"/>.
+            </summary>
+            <param name="id">The Id of your custom sound which is used when checking which sounds to play.</param>
+            <param name="sound">The pre loaded sound</param>
+            <param name="busPath">The bus path to play the sound on.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CustomSoundHandler.RegisterCustomSound(System.String,FMOD.Sound,FMOD.Studio.Bus)">
+            <summary>
+            Register a Custom sound that has been loaded using AudioUtils. Some vanilla game sounds can be overridden by matching the id to the <see cref="F:FMODAsset.path"/>.
+            </summary>
+            <param name="id">The Id of your custom sound which is used when checking which sounds to play.</param>
+            <param name="sound">The pre loaded sound</param>
+            <param name="bus">The bus to play the sound on.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CustomSoundHandler.TryPlayCustomSound(System.String)">
+            <summary>
+            Try to find and play a custom <see cref="T:FMOD.Sound"/> that has been registered.
+            </summary>
+            <param name="id">The Id of the custom sound</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CustomSoundHandler.TryGetCustomSound(System.String,FMOD.Sound@)">
+            <summary>
+            Try to get a registered custom <see cref="T:FMOD.Sound"/>.
+            </summary>
+            <param name="id">The Id of the custom sound</param>
+            <param name="sound">Outputs the <see cref="T:FMOD.Sound"/> if found and null if not found.</param>
+            <returns>true or false depending on if the id was found</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CustomSoundHandler.TryGetCustomSoundChannel(System.Int32,FMOD.Channel@)">
+            <summary>
+            Try to get a playing custom sound channel for an emitter
+            </summary>
+            <param name="id">The emitter's ID, can be retrieved by calling <c>object.GetInstanceID()</c>.</param>
+            <param name="channel">Outputs the <see cref="T:FMOD.Channel"/>.</param>
+            <returns>True if found, otherwise false.</returns>
+        </member>
+        <member name="T:SMLHelper.V2.Handlers.EquipmentHandler">
+            <summary>
+            A handler class for everything related to creating new Equipments.
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Handlers.EquipmentHandler.Main">
+            <summary>
+            Main entry point for all calls to this handler.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.EquipmentHandler.AddEquipmentType(System.String)">
+            <summary>
+            Adds a new <see cref="T:Equipment" /> into the game.
+            </summary>
+            <param name="equipmentName">The name of the Equipment. Should not contain special characters.</param>
+            <returns>
+            The new <see cref="T:Equipment" /> that is created.
+            </returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.EquipmentHandler.ModdedEquipmentTypeExists(System.String)">
+            <summary>
+            Safely looks for a modded group from another mod in the SMLHelper EquipmentCache.
+            </summary>
+            <param name="equipmentString">The string used to define the techgroup.</param>
+            <returns>
+              <c>True</c> if the item was found; Otherwise <c>false</c>.
+            </returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.EquipmentHandler.TryGetModdedEquipmentType(System.String,EquipmentType@)">
+            <summary>
+            Safely looks for a modded item from another mod in the SMLHelper EquipmentCache and outputs its <see cref="T:Equipment" /> value when found.
+            </summary>
+            <param name="equipmentString">The string used to define the techgroup.</param>
+            <param name="modEquipment">The Equipment enum value of the modded. Defaults to <see cref="F:EquipmentType.None" /> when the item was not found.</param>
+            <returns>
+              <c>True</c> if the item was found; Otherwise <c>false</c>.
+            </returns>
+        </member>
+        <member name="T:SMLHelper.V2.Handlers.PDALogHandler">
+            <summary>
+            A handler for stuff related to the PDALog class.
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Handlers.PDALogHandler.Main">
+            <summary>
+            Main entry point for all calls to this handler.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.PDALogHandler.SMLHelper#V2#Interfaces#IPDALogHandler#AddCustomEntry(System.String,System.String,UnityEngine.Sprite,FMODAsset)">
+            <summary>
+            Adds a custom log entry.
+            </summary>
+            <param name="key">The key to refer to this entry.</param>
+            <param name="languageKey">The subtitles language key for this entry.</param>
+            <param name="icon">The icon that will be used in the Log tab for this entry. if <c>null</c> It will use the default log entry icon.</param>
+            <param name="sound">The sound that will be played once this entry is triggered or played in the Log tab.<br/>
+            If <c>null</c> the Play button in the Log tab will disappear and a sound wont play when this entry is triggered.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.PDALogHandler.AddCustomEntry(System.String,System.String,UnityEngine.Sprite,FMODAsset)">
+            <summary>
+            Adds a custom log entry.
+            </summary>
+            <param name="key">The key to refer to this entry.</param>
+            <param name="languageKey">The subtitles language key for this entry.</param>
+            <param name="icon">The icon that will be used in the Log tab for this entry. if <c>null</c> It will use the default log entry icon.</param>
+            <param name="sound">The sound that will be played once this entry is triggered or played in the Log tab.<br/>
+            If <c>null</c> the Play button in the Log tab will disappear and a sound wont play when this entry is triggered.</param>
         </member>
         <member name="T:SMLHelper.V2.Handlers.PingHandler">
             <summary>
@@ -1097,7 +1635,7 @@
             Main entry point for all calls to this handler.
             </summary>
         </member>
-        <member name="M:SMLHelper.V2.Handlers.PingHandler.RegisterNewPingType(System.String,Atlas.Sprite)">
+        <member name="M:SMLHelper.V2.Handlers.PingHandler.RegisterNewPingType(System.String,UnityEngine.Sprite)">
             <summary>
             Registers a ping type for use when creating a beacon
             </summary>
@@ -1113,7 +1651,7 @@
             <param name="moddedPingType">The PingType enum value. Defaults to <see cref="F:PingType.None"/> when the PingType was not found.</param>
             <returns><c>True</c> if the PingType was found; Otherwise <c>false</c></returns>
         </member>
-        <member name="M:SMLHelper.V2.Handlers.PingHandler.SMLHelper#V2#Interfaces#IPingHandler#RegisterNewPingType(System.String,Atlas.Sprite)">
+        <member name="M:SMLHelper.V2.Handlers.PingHandler.SMLHelper#V2#Interfaces#IPingHandler#RegisterNewPingType(System.String,UnityEngine.Sprite)">
             <summary>
             Registers a ping type for use when creating a beacon
             </summary>
@@ -1128,6 +1666,16 @@
             <param name="pingTypeString">The string used to define the modded PingType</param>
             <param name="moddedPingType">The PingType enum value. Defaults to <see cref="F:PingType.None"/> when the PingType was not found.</param>
             <returns><c>True</c> if the PingType was found; Otherwise <c>false</c></returns>
+        </member>
+        <member name="T:SMLHelper.V2.Handlers.SaveDataHandler">
+            <summary>
+            A handler class for registering your <see cref="T:SMLHelper.V2.Json.SaveDataCache"/>.
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Handlers.SaveDataHandler.Main">
+            <summary>
+            Main entry point for all calls to this handler.
+            </summary>
         </member>
         <member name="T:SMLHelper.V2.Handlers.SurvivalHandler">
             <summary>
@@ -1179,6 +1727,93 @@
             <para>defaults to <see langword="false" /></para>
             </param>
         </member>
+        <member name="T:SMLHelper.V2.Handlers.TechCategoryHandler">
+            <summary>
+            A handler class for everything related to creating new TechCategories.
+            </summary>
+            <seealso cref="T:SMLHelper.V2.Interfaces.ITechCategoryHandler" />
+        </member>
+        <member name="P:SMLHelper.V2.Handlers.TechCategoryHandler.Main">
+            <summary>
+            Main entry point for all calls to this handler.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.TechCategoryHandler.AddTechCategory(System.String,System.String)">
+            <summary>
+            Adds a new <see cref="T:TechCategory" /> into the game.
+            </summary>
+            <param name="techCatagoryName">The name of the TechCategory. Should not contain special characters.</param>
+            <param name="displayName">The display name of the TechCategory. Can be anything.</param>
+            <returns>
+            The new <see cref="T:TechCategory" /> that is created.
+            </returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.TechCategoryHandler.ModdedTechCategoryExists(System.String)">
+            <summary>
+            Safely looks for a modded category from another mod in the SMLHelper TechCategoryCache.
+            </summary>
+            <param name="techCategoryString">The string used to define the techcategory.</param>
+            <returns>
+              <c>True</c> if the item was found; Otherwise <c>false</c>.
+            </returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.TechCategoryHandler.TryGetModdedTechCategory(System.String,TechCategory@)">
+            <summary>
+            Safely looks for a modded category from another mod in the SMLHelper TechCategoryCache and outputs its <see cref="T:TechCategory" /> value when found.
+            </summary>
+            <param name="techCategoryString">The string used to define the techcategory.</param>
+            <param name="modTechCategory">The TechCategory enum value of the modded. Defaults to <see cref="F:TechCategory.Misc" /> when the item was not found.</param>
+            <returns>
+              <c>True</c> if the item was found; Otherwise <c>false</c>.
+            </returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.TechCategoryHandler.TryRegisterTechCategoryToTechGroup(TechGroup,TechCategory)">
+            <summary>
+            Registers the TechCategory to a TechGroup in CraftData.groups.
+            </summary>
+            <param name="techGroup">The tech group.</param>
+            <param name="techCategory">The tech category.</param>
+            <returns></returns>
+        </member>
+        <member name="T:SMLHelper.V2.Handlers.TechGroupHandler">
+            <summary>
+            A handler class for everything related to creating new TechGroups.
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Handlers.TechGroupHandler.Main">
+            <summary>
+            Main entry point for all calls to this handler.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.TechGroupHandler.AddTechGroup(System.String,System.String)">
+            <summary>
+            Adds a new <see cref="T:TechGroup" /> into the game.
+            </summary>
+            <param name="techGroupName">The name of the TechGroup. Should not contain special characters.</param>
+            <param name="displayName">The display name of the TechGroup. Can be anything.</param>
+            <returns>
+            The new <see cref="T:TechGroup" /> that is created.
+            </returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.TechGroupHandler.ModdedTechGroupExists(System.String)">
+            <summary>
+            Safely looks for a modded group from another mod in the SMLHelper TechGroupCache.
+            </summary>
+            <param name="techGroupString">The string used to define the techgroup.</param>
+            <returns>
+              <c>True</c> if the item was found; Otherwise <c>false</c>.
+            </returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.TechGroupHandler.TryGetModdedTechGroup(System.String,TechGroup@)">
+            <summary>
+            Safely looks for a modded item from another mod in the SMLHelper TechGroupCache and outputs its <see cref="T:TechGroup" /> value when found.
+            </summary>
+            <param name="techGroupString">The string used to define the techgroup.</param>
+            <param name="modTechGroup">The TechGroup enum value of the modded. Defaults to <see cref="F:TechGroup.Uncategorized" /> when the item was not found.</param>
+            <returns>
+              <c>True</c> if the item was found; Otherwise <c>false</c>.
+            </returns>
+        </member>
         <member name="T:SMLHelper.V2.Handlers.BioReactorHandler">
             <summary>
             A handler with common methods for updating BioReactor values.
@@ -1229,7 +1864,7 @@
         <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SetQuickSlotType(TechType,QuickSlotType)">
             <summary>
             <para>Allows you to edit QuickSlotType for TechTypes. Can be used for existing TechTypes too.</para>
-            <para>Careful: This has to be called after <see cref="M:SMLHelper.V2.Handlers.CraftDataHandler.SetTechData(TechType,SMLHelper.V2.Crafting.TechData)"/> and <see cref="M:SMLHelper.V2.Handlers.CraftDataHandler.SetTechData(TechType,SMLHelper.V2.Crafting.TechData)"/>.</para>
+            <para>Careful: This has to be called after <see cref="M:SMLHelper.V2.Handlers.CraftDataHandler.SetTechData(TechType,SMLHelper.V2.Crafting.RecipeData)"/>.</para>
             </summary>
             <param name="techType">The TechType whose QuickSlotType you want to edit.</param>
             <param name="slotType">The QuickSlotType for that TechType.</param>
@@ -1335,7 +1970,7 @@
         <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#AddToGroup(TechGroup,TechCategory,TechType)">
             <summary>
             Allows you to add items to the game's internal grouping system.
-            Required if you want to make buildable items show up in the Habitat Builder.
+            Required if you want to make buildable items show up in the Habitat Builder or show in the Blueprints Tab of the PDA.
             </summary>
             <param name="group">The TechGroup you want to add your TechType to.</param>
             <param name="category">The TechCategory (in the TechGroup) you want to add your TechType to.</param>
@@ -1344,7 +1979,7 @@
         <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#AddToGroup(TechGroup,TechCategory,TechType,TechType)">
             <summary>
             Allows you to add items to the game's internal grouping system.
-            Required if you want to make buildable items show up in the Habitat Builder.
+            Required if you want to make buildable items show up in the Habitat Builder or show in the Blueprints Tab of the PDA.
             </summary>
             <param name="group">The TechGroup you want to add your TechType to.</param>
             <param name="category">The TechCategory (in the TechGroup) you want to add your TechType to.</param>
@@ -1359,23 +1994,66 @@
             <param name="category">The TechCategory in which the TechType is located.</param>
             <param name="techType">The TechType which you want to remove.</param>
         </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SetTechData(TechType,ITechData)">
+        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SetTechData(TechType,SMLHelper.V2.Crafting.RecipeData)">
             <summary>
-            <para>Allows you to edit recipes, i.e. TechData for TechTypes.</para>
+            <para>Allows you to edit recipes, i.e. RecipeData for TechTypes.</para>
             <para>Can be used for existing TechTypes too.</para>
             </summary>
             <param name="techType">The TechType whose TechData you want to edit.</param>
-            <param name="techData">The TechData for that TechType.</param>
-            <seealso cref="T:SMLHelper.V2.Crafting.TechData"/>
+            <param name="recipeData">The TechData for that TechType.</param>
+            <seealso cref="T:SMLHelper.V2.Crafting.RecipeData"/>
         </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SetTechData(TechType,SMLHelper.V2.Crafting.TechData)">
+        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SetIngredients(TechType,System.Collections.Generic.ICollection{Ingredient})">
             <summary>
-            <para>Allows you to edit recipes, i.e. TechData for TechTypes.</para>
+            <para>Allows you to add ingredients for a TechType crafting recipe.</para>
             <para>Can be used for existing TechTypes too.</para>
             </summary>
-            <param name="techType">The TechType whose TechData you want to edit.</param>
-            <param name="techData">The TechData for that TechType.</param>
-            <seealso cref="T:SMLHelper.V2.Crafting.TechData"/>
+            <param name="techType">The TechType whose ingredient list you want to edit.</param>
+            <param name="ingredients">The collection of Ingredients for that TechType.</param>
+            <seealso cref="T:Ingredient"/>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SetColdResistance(TechType,System.Int32)">
+            <summary>
+            <para>Allows you to edit the Cold Resistance for TechTypes.</para>
+            <para>Can be used for existing TechTypes too.</para>
+            </summary>
+            <param name="techType">The TechType whose Cold Resistance you want to edit.</param>
+            <param name="resistance">The int value for the Cold Resistance.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SetLinkedItems(TechType,System.Collections.Generic.ICollection{TechType})">
+            <summary>
+            <para>Allows you to add linked items for a TechType crafting recipe.</para>
+            <para>Can be used for existing TechTypes too.</para>
+            </summary>
+            <param name="techType">The TechType whose ingredient list you want to edit.</param>
+            <param name="linkedItems">The collection of linked items for that TechType</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.GetRecipeData(TechType)">
+            <summary>
+            Safely accesses the crafting data from a modded or vanilla item.<para/>
+            WARNING: This method is highly dependent on mod load order. 
+            Make sure your mod is loading after the mod whose TechData you are trying to access.
+            </summary>
+            <param name="techType">The TechType whose TechData you want to access.</param>
+            <returns>The JsonValue from the modded item if it exists; Otherwise, returns <c>null</c>.</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.GetTechData(TechType)">
+            <summary>
+            Safely accesses the crafting data from a modded or vanilla item.<para/>
+            WARNING: This method is highly dependent on mod load order. 
+            Make sure your mod is loading after the mod whose TechData you are trying to access.
+            </summary>
+            <param name="techType">The TechType whose TechData you want to access.</param>
+            <returns>The JsonValue from the modded item if it exists; Otherwise, returns <c>null</c>.</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.GetModdedRecipeData(TechType)">
+            <summary>
+            Safely accesses the crafting data from a modded item.<para/>
+            WARNING: This method is highly dependent on mod load order. 
+            Make sure your mod is loading after the mod whose TechData you are trying to access.
+            </summary>
+            <param name="techType">The TechType whose TechData you want to access.</param>
+            <returns>The JsonValue from the modded item if it exists; Otherwise, returns <c>null</c>.</returns>
         </member>
         <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.GetModdedTechData(TechType)">
             <summary>
@@ -1384,50 +2062,73 @@
             Make sure your mod is loading after the mod whose TechData you are trying to access.
             </summary>
             <param name="techType">The TechType whose TechData you want to access.</param>
-            <returns>The ITechData from the modded item if it exists; Otherwise, returns <c>null</c>.</returns>
+            <returns>The JsonValue from the modded item if it exists; Otherwise, returns <c>null</c>.</returns>
         </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.GetTechData(TechType)">
+        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SetMaxCharge(TechType,System.Single)">
             <summary>
-            Safely accesses the crafting data from any item.<para/>
+            Sets the maximum charge.
+            </summary>
+            <param name="techType">The TechType whose MaxCharge you want to edit.</param>
+            <param name="maxCharge">The maximum charge.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SetEnergyCost(TechType,System.Single)">
+            <summary>
+            Sets the energy cost.
+            </summary>
+            <param name="techType">The TechType whose EnergyCost you want to edit.</param>
+            <param name="energyCost">The energy cost.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SetSoundType(TechType,TechData.SoundType)">
+            <summary>
+            Sets the type of the sound.
+            </summary>
+            <param name="techType">Type of the tech.</param>
+            <param name="soundType">Type of the sound.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#SetTechData(TechType,SMLHelper.V2.Crafting.RecipeData)">
+            <summary>
+            <para>Allows you to add or edit RecipeData for TechTypes.</para>
+            <para>Can be used for existing TechTypes too.</para>
+            </summary>
+            <param name="techType">The TechType whose TechData you want to edit.</param>
+            <param name="recipeData">The TechData for that TechType.</param>
+            <seealso cref="T:SMLHelper.V2.Crafting.RecipeData"/>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#SetIngredients(TechType,System.Collections.Generic.ICollection{Ingredient})">
+            <summary>
+            <para>Allows you to edit recipes for TechTypes.</para>
+            <para>Can be used for existing TechTypes too.</para>
+            </summary>
+            <param name="techType">The TechType whose TechData you want to edit.</param>
+            <param name="ingredients">The collection of Ingredients for that TechType.</param>
+            <seealso cref="T:Ingredient"/>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#SetLinkedItems(TechType,System.Collections.Generic.ICollection{TechType})">
+            <summary>
+            <para>Allows you to edit Linked Items for TechTypes.</para>
+            <para>Can be used for existing TechTypes too.</para>
+            </summary>
+            <param name="techType">The TechType whose TechData you want to edit.</param>
+            <param name="linkedItems">The collection of Ingredients for that TechType.</param>
+            <seealso cref="T:Ingredient"/>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#GetRecipeData(TechType)">
+            <summary>
+            Safely accesses the crafting data from a Modded or Vanilla item.<para/>
             WARNING: This method is highly dependent on mod load order. 
             Make sure your mod is loading after the mod whose TechData you are trying to access.
             </summary>
             <param name="techType">The TechType whose TechData you want to access.</param>
-            <returns>Returns TechData if it exists; Otherwise, returns <c>null</c>.</returns>
+            <returns>The RecipeData from the item if it exists; Otherwise, returns <c>null</c>.</returns>
         </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SetEatingSound(TechType,System.String)">
+        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#GetModdedRecipeData(TechType)">
             <summary>
-            Sets the eating sound for the provided TechType.
+            Safely accesses the crafting data from a Modded item.<para/>
+            WARNING: This method is highly dependent on mod load order. 
+            Make sure your mod is loading after the mod whose TechData you are trying to access.
             </summary>
-            <param name="consumable">The item being consumed during <see cref="M:Survival.Eat(UnityEngine.GameObject)"/>.</param>
-            <param name="soundPath">
-            The sound path.
-            <para>
-            Value values are
-            - "event:/player/drink"
-            - "event:/player/drink_stillsuit"
-            - "event:/player/use_first_aid"
-            - "event:/player/eat" (default)
-            </para>
-            </param>
-        </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#SetTechData(TechType,ITechData)">
-            <summary>
-            <para>Allows you to edit recipes, i.e. TechData for TechTypes.</para>
-            <para>Can be used for existing TechTypes too.</para>
-            </summary>
-            <param name="techType">The TechType whose TechData you want to edit.</param>
-            <param name="techData">The TechData for that TechType.</param>
-            <seealso cref="T:SMLHelper.V2.Crafting.TechData"/>
-        </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#SetTechData(TechType,SMLHelper.V2.Crafting.TechData)">
-            <summary>
-            <para>Allows you to edit recipes, i.e. TechData for TechTypes.</para>
-            <para>Can be used for existing TechTypes too.</para>
-            </summary>
-            <param name="techType">The TechType whose TechData you want to edit.</param>
-            <param name="techData">The TechData for that TechType.</param>
-            <seealso cref="T:SMLHelper.V2.Crafting.TechData"/>
+            <param name="techType">The TechType whose TechData you want to access.</param>
+            <returns>The RecipeData from the modded item if it exists; Otherwise, returns <c>null</c>.</returns>
         </member>
         <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#SetEquipmentType(TechType,EquipmentType)">
             <summary>
@@ -1440,7 +2141,7 @@
         <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#SetQuickSlotType(TechType,QuickSlotType)">
             <summary>
             <para>Allows you to edit QuickSlotType for TechTypes. Can be used for existing TechTypes too.</para>
-            <para>Careful: This has to be called after <see cref="M:SMLHelper.V2.Handlers.CraftDataHandler.SetTechData(TechType,ITechData)"/> and <see cref="M:SMLHelper.V2.Handlers.CraftDataHandler.SetTechData(TechType,SMLHelper.V2.Crafting.TechData)"/>.</para>
+            <para>Careful: This has to be called after <see cref="M:SMLHelper.V2.Handlers.CraftDataHandler.SetTechData(TechType,SMLHelper.V2.Crafting.RecipeData)"/>.</para>
             </summary>
             <param name="techType">The TechType whose QuickSlotType you want to edit.</param>
             <param name="slotType">The QuickSlotType for that TechType.</param>
@@ -1502,6 +2203,14 @@
             <param name="uncooked">The TechType whose cooked creature counterpart to edit.</param>
             <param name="cooked">The cooked creature counterpart for that TechType.</param>
         </member>
+        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#SetColdResistance(TechType,System.Int32)">
+            <summary>
+            <para>Allows you to edit the Cold Resistance of a TechType.</para>
+            <para>Can be used for existing TechTypes too.</para>
+            </summary>
+            <param name="uncooked">The TechType whose Cold Resistance to edit.</param>
+            <param name="resistance">The Cold Resistance for that TechType.</param>
+        </member>
         <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#SetBackgroundType(TechType,CraftData.BackgroundType)">
             <summary>
             <para>Allows you to edit inventory background colors for TechTypes.</para>
@@ -1516,39 +2225,26 @@
             </summary>
             <param name="techType">The TechType which you want to add to the buildable list.</param>
         </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#GetModdedTechData(TechType)">
+        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#SetMaxCharge(TechType,System.Single)">
             <summary>
-            Safely accesses the crafting data from a modded item.<para/>
-            WARNING: This method is highly dependent on mod load order. 
-            Make sure your mod is loading after the mod whose TechData you are trying to access.
+            Sets the maximum charge.
             </summary>
-            <param name="techType">The TechType whose TechData you want to access.</param>
-            <returns>The ITechData from the modded item if it exists; Otherwise, returns <c>null</c>.</returns>
+            <param name="techType">The TechType whose MaxCharge you want to edit.</param>
+            <param name="maxCharge">The maximum charge.</param>
         </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#GetTechData(TechType)">
+        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#SetEnergyCost(TechType,System.Single)">
             <summary>
-            Safely accesses the crafting data from any item.<para/>
-            WARNING: This method is highly dependent on mod load order. 
-            Make sure your mod is loading after the mod whose TechData you are trying to access.
+            Sets the energy cost.
             </summary>
-            <param name="techType">The TechType whose TechData you want to access.</param>
-            <returns>Returns TechData if it exists; Otherwise, returns <c>null</c>.</returns>
+            <param name="techType">The TechType whose EnergyCost you want to edit.</param>
+            <param name="energyCost">The energy cost.</param>
         </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#SetEatingSound(TechType,System.String)">
+        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#SetSoundType(TechType,TechData.SoundType)">
             <summary>
-            Sets the eating sound for the provided TechType.
+            Sets the type of the sound.
             </summary>
-            <param name="consumable">The item being consumed during <see cref="M:Survival.Eat(UnityEngine.GameObject)"/>.</param>
-            <param name="soundPath">
-            The sound path.
-            <para>
-            Value values are
-            - "event:/player/drink"
-            - "event:/player/drink_stillsuit"
-            - "event:/player/use_first_aid"
-            - "event:/player/eat" (default)
-            </para>
-            </param>
+            <param name="techType">Type of the tech.</param>
+            <param name="soundType">Type of the sound.</param>
         </member>
         <member name="T:SMLHelper.V2.Handlers.CraftTreeHandler">
             <summary>
@@ -1618,29 +2314,6 @@
             <param name="name">The ID of the tab node. Must be unique!</param>
             <param name="displayName">The display name of the tab, which will show up when you hover your mouse on the tab.</param>
             <param name="sprite">The sprite of the tab.</param>        
-        </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftTreeHandler.AddTabNode(CraftTree.Type,System.String,System.String,Atlas.Sprite)">
-            <summary>
-            Adds a new tab node to the root of the specified crafting tree.
-            </summary>
-            <param name="craftTree">The target craft tree to edit.</param>
-            <param name="name">The ID of the tab node. Must be unique!</param>
-            <param name="displayName">The display name of the tab, which will show up when you hover your mouse on the tab.</param>
-            <param name="sprite">The sprite of the tab.</param>        
-        </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftTreeHandler.AddTabNode(CraftTree.Type,System.String,System.String,Atlas.Sprite,System.String[])">
-            <summary>
-            Adds a new tab node to the root of the specified crafting tree, at the specified tab location.
-            </summary>
-            <param name="craftTree">The target craft tree to edit.</param>
-            <param name="name">The ID of the tab node. Must be unique!</param>
-            <param name="displayName">The display name of the tab, which will show up when you hover your mouse on the tab.</param>
-            <param name="sprite">The sprite of the tab.</param>
-            <param name="stepsToTab">
-            <para>The steps to the target tab.</para>
-            <para>These must match the id value of the CraftNode in the crafting tree you're targeting.</para>
-            <para>Do not include "root" in this path.</para>
-            </param>        
         </member>
         <member name="M:SMLHelper.V2.Handlers.CraftTreeHandler.AddTabNode(CraftTree.Type,System.String,System.String,UnityEngine.Sprite,System.String[])">
             <summary>
@@ -1719,15 +2392,6 @@
             <param name="craftTree">The target craft tree to edit.</param>
             <param name="craftingItem">The item to craft.</param>
         </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftTreeHandler.SMLHelper#V2#Interfaces#ICraftTreeHandler#AddTabNode(CraftTree.Type,System.String,System.String,Atlas.Sprite)">
-            <summary>
-            Adds a new tab node to the root of the specified crafting tree.
-            </summary>
-            <param name="craftTree">The target craft tree to edit.</param>
-            <param name="name">The ID of the tab node. Must be unique!</param>
-            <param name="displayName">The display name of the tab, which will show up when you hover your mouse on the tab.</param>
-            <param name="sprite">The sprite of the tab.</param>        
-        </member>
         <member name="M:SMLHelper.V2.Handlers.CraftTreeHandler.SMLHelper#V2#Interfaces#ICraftTreeHandler#AddTabNode(CraftTree.Type,System.String,System.String,UnityEngine.Sprite)">
             <summary>
             Adds a new tab node to the root of the specified crafting tree.
@@ -1735,21 +2399,7 @@
             <param name="craftTree">The target craft tree to edit.</param>
             <param name="name">The ID of the tab node. Must be unique!</param>
             <param name="displayName">The display name of the tab, which will show up when you hover your mouse on the tab.</param>
-            <param name="sprite">The sprite of the tab.</param>
-        </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftTreeHandler.SMLHelper#V2#Interfaces#ICraftTreeHandler#AddTabNode(CraftTree.Type,System.String,System.String,Atlas.Sprite,System.String[])">
-            <summary>
-            Adds a new tab node to the root of the specified crafting tree, at the specified tab location.
-            </summary>
-            <param name="craftTree">The target craft tree to edit.</param>
-            <param name="name">The ID of the tab node. Must be unique!</param>
-            <param name="displayName">The display name of the tab, which will show up when you hover your mouse on the tab.</param>
-            <param name="sprite">The sprite of the tab.</param>
-            <param name="stepsToTab">
-            <para>The steps to the target tab.</para>
-            <para>These must match the id value of the CraftNode in the crafting tree you're targeting.</para>
-            <para>Do not include "root" in this path.</para>
-            </param>        
+            <param name="sprite">The sprite of the tab.</param>        
         </member>
         <member name="M:SMLHelper.V2.Handlers.CraftTreeHandler.SMLHelper#V2#Interfaces#ICraftTreeHandler#AddTabNode(CraftTree.Type,System.String,System.String,UnityEngine.Sprite,System.String[])">
             <summary>
@@ -1824,6 +2474,12 @@
             </summary>
             <param name="onSaveAction">The method to invoke.</param>
         </member>
+        <member name="M:SMLHelper.V2.Handlers.IngameMenuHandler.RegisterOnLoadEvent(System.Action)">
+            <summary>
+            Registers a simple <see cref="T:System.Action"/> method to invoke whenever the player loads a saved game via the in game menu.
+            </summary>
+            <param name="onLoadAction">The method to invoke.</param>
+        </member>
         <member name="M:SMLHelper.V2.Handlers.IngameMenuHandler.RegisterOnQuitEvent(System.Action)">
             <summary>
             Registers a simple <see cref="T:System.Action"/> method to invoke whenever the player quits the game via the in game menu.
@@ -1837,6 +2493,13 @@
             </summary>
             <param name="onSaveAction">The method invoked.</param>
         </member>
+        <member name="M:SMLHelper.V2.Handlers.IngameMenuHandler.UnregisterOnLoadEvent(System.Action)">
+            <summary>
+            Removes a method previously added through <see cref="M:SMLHelper.V2.Handlers.IngameMenuHandler.RegisterOnLoadEvent(System.Action)"/> so it is no longer invoked when loading the game.<para/>
+            If you plan on using this, do not register an anonymous method.
+            </summary>
+            <param name="onLoadAction">The method invoked.</param>
+        </member>
         <member name="M:SMLHelper.V2.Handlers.IngameMenuHandler.UnregisterOnQuitEvent(System.Action)">
             <summary>
             Removes a method previously added through <see cref="M:SMLHelper.V2.Handlers.IngameMenuHandler.RegisterOnSaveEvent(System.Action)"/> so it is no longer invoked when quitting the game.<para/>
@@ -1849,6 +2512,12 @@
             Registers a simple <see cref="T:System.Action"/> method to invoke the <c>first time</c> the player saves the game via the in game menu.
             </summary>
             <param name="onSaveAction">The method to invoke. This action will not be invoked a second time.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.IngameMenuHandler.RegisterOneTimeUseOnLoadEvent(System.Action)">
+            <summary>
+            Registers a simple <see cref="T:System.Action"/> method to invoke the <c>first time</c> the player loads a saved game via the in game menu.
+            </summary>
+            <param name="onLoadAction">The method to invoke. This action will not be invoked a second time.</param>
         </member>
         <member name="M:SMLHelper.V2.Handlers.IngameMenuHandler.RegisterOneTimeUseOnQuitEvent(System.Action)">
             <summary>
@@ -2362,21 +3031,6 @@
             Main entry point for all calls to this handler.
             </summary>
         </member>
-        <member name="M:SMLHelper.V2.Handlers.SpriteHandler.RegisterSprite(TechType,Atlas.Sprite)">
-            <summary>
-            Registers a new sprite to the game.
-            </summary>
-            <param name="type">The techtype paired to this sprite.</param>
-            <param name="sprite">The sprite to be added.</param>
-        </member>
-        <member name="M:SMLHelper.V2.Handlers.SpriteHandler.RegisterSprite(SpriteManager.Group,System.String,Atlas.Sprite)">
-            <summary>
-            Registers a new sprite to the game.
-            </summary>
-            <param name="group">The sprite group.</param>
-            <param name="id">The sprite internal identifier.</param>
-            <param name="sprite">The sprite to be added.</param>
-        </member>
         <member name="M:SMLHelper.V2.Handlers.SpriteHandler.RegisterSprite(SpriteManager.Group,System.String,UnityEngine.Sprite)">
             <summary>
             Registers a new sprite to the game.
@@ -2431,21 +3085,6 @@
             <para>https://docs.unity3d.com/ScriptReference/TextureFormat.BC7.html</para>
             <para>Don't change this unless you really know what you're doing.</para></param>
             <seealso cref="M:SMLHelper.V2.Utility.ImageUtils.LoadSpriteFromFile(System.String,UnityEngine.TextureFormat)" />
-        </member>
-        <member name="M:SMLHelper.V2.Handlers.SpriteHandler.SMLHelper#V2#Interfaces#ISpriteHandler#RegisterSprite(TechType,Atlas.Sprite)">
-            <summary>
-            Registers a new sprite to the game.
-            </summary>
-            <param name="type">The techtype paired to this sprite.</param>
-            <param name="sprite">The sprite to be added.</param>
-        </member>
-        <member name="M:SMLHelper.V2.Handlers.SpriteHandler.SMLHelper#V2#Interfaces#ISpriteHandler#RegisterSprite(SpriteManager.Group,System.String,Atlas.Sprite)">
-            <summary>
-            Registers a new sprite to the game.
-            </summary>
-            <param name="group">The sprite group.</param>
-            <param name="id">The sprite internal identifier.</param>
-            <param name="sprite">The sprite to be added.</param>
         </member>
         <member name="M:SMLHelper.V2.Handlers.SpriteHandler.SMLHelper#V2#Interfaces#ISpriteHandler#RegisterSprite(SpriteManager.Group,System.String,UnityEngine.Sprite)">
             <summary>
@@ -2512,9 +3151,30 @@
             Main entry point for all calls to this handler.
             </summary>
         </member>
+        <member name="M:SMLHelper.V2.Handlers.TechTypeHandler.AddTechType(System.Reflection.Assembly,System.String,System.String,System.String)">
+            <summary>
+            Adds a new <see cref="T:TechType"/> into the game. This new <see cref="T:TechType"/> will be unlocked at the start of a game.
+            </summary>
+            <param name="addedByAssembly">The assembly this TechType is getting added by.</param>
+            <param name="internalName">The internal name of the TechType. Should not contain special characters</param>
+            <param name="displayName">The display name of the TechType. Can be anything.</param>
+            <param name="tooltip">The tooltip, displayed when hovered in an inventory. Can be anything.</param>
+            <returns>The new <see cref="T:TechType"/> that is created.</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.TechTypeHandler.AddTechType(System.Reflection.Assembly,System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            Adds a new <see cref="T:TechType"/> into the game.
+            </summary>
+            <param name="addedByAssembly">The assembly this TechType is getting added by.</param>
+            <param name="internalName">The internal name of the TechType. Should not contain special characters</param>
+            <param name="displayName">The display name of the TechType. Can be anything.</param>
+            <param name="tooltip">The tooltip, displayed when hovered in an inventory. Can be anything.</param>
+            <param name="unlockAtStart">Whether this TechType should be unlocked on game start, or not. By default, <see langword="true"/>.</param>
+            <returns>The new <see cref="T:TechType"/> that is created.</returns>
+        </member>
         <member name="M:SMLHelper.V2.Handlers.TechTypeHandler.AddTechType(System.String,System.String,System.String)">
             <summary>
-            Adds a new <see cref="T:TechType"/> into the game. This new techtype will be unlocked at the start of a the game.
+            Adds a new <see cref="T:TechType"/> into the game. This new <see cref="T:TechType"/> will be unlocked at the start of a game.
             </summary>
             <param name="internalName">The internal name of the TechType. Should not contain special characters.</param>
             <param name="displayName">The display name of the TechType. Can be anything.</param>
@@ -2528,28 +3188,7 @@
             <param name="internalName">The internal name of the TechType. Should not contain special characters.</param>
             <param name="displayName">The display name of the TechType. Can be anything.</param>
             <param name="tooltip">The tooltip, displayed when hovered in an inventory. Can be anything.</param>
-            <param name="unlockAtStart">Whether this TechType should be unlocked on game start, or not. By default, <c>true</c>.</param>
-            <returns>The new <see cref="T:TechType"/> that is created.</returns>
-        </member>
-        <member name="M:SMLHelper.V2.Handlers.TechTypeHandler.AddTechType(System.String,System.String,System.String,Atlas.Sprite)">
-            <summary>
-            Adds a new <see cref="T:TechType"/> into the game, with a sprite. This new techtype will be unlocked at the start of a the game.
-            </summary>
-            <param name="internalName">The internal name of the TechType. Should not contain special characters.</param>
-            <param name="displayName">The display name of the TechType. Can be anything.</param>
-            <param name="tooltip">The tooltip, displayed when hovered in an inventory. Can be anything.</param>
-            <param name="sprite">The sprite that will related to this TechType.</param>
-            <returns>The new <see cref="T:TechType"/> that is created.</returns>
-        </member>
-        <member name="M:SMLHelper.V2.Handlers.TechTypeHandler.AddTechType(System.String,System.String,System.String,Atlas.Sprite,System.Boolean)">
-            <summary>
-            Adds a new <see cref="T:TechType"/> into the game, with a sprite.
-            </summary>
-            <param name="internalName">The internal name of the TechType. Should not contain special characters.</param>
-            <param name="displayName">The display name of the TechType. Can be anything.</param>
-            <param name="tooltip">The tooltip, displayed when hovered in an inventory. Can be anything.</param>
-            <param name="sprite">The sprite that will related to this TechType.</param>
-            <param name="unlockAtStart">Whether this TechType should be unlocked on game start, or not. By default, <c>true</c>.</param>
+            <param name="unlockAtStart">Whether this TechType should be unlocked on game start, or not. By default, <see langword="true"/>.</param>
             <returns>The new <see cref="T:TechType"/> that is created.</returns>
         </member>
         <member name="M:SMLHelper.V2.Handlers.TechTypeHandler.AddTechType(System.String,System.String,System.String,UnityEngine.Sprite)">
@@ -2570,7 +3209,7 @@
             <param name="displayName">The display name of the TechType. Can be anything.</param>
             <param name="tooltip">The tooltip, displayed when hovered in an inventory. Can be anything.</param>
             <param name="sprite">The sprite that will related to this TechType.</param>
-            <param name="unlockAtStart">Whether this TechType should be unlocked on game start, or not. By default, <c>true</c>.</param>
+            <param name="unlockAtStart">Whether this TechType should be unlocked on game start, or not. By default, <see langword="true"/>.</param>
             <returns>The new <see cref="T:TechType"/> that is created.</returns>
         </member>
         <member name="M:SMLHelper.V2.Handlers.TechTypeHandler.TryGetModdedTechType(System.String,TechType@)">
@@ -2580,7 +3219,7 @@
             <param name="techtypeString">The string used to define the modded item's new techtype.</param>
             <param name="modTechType">The TechType enum value of the modded. Defaults to <see cref="F:TechType.None" /> when the item was not found.</param>
             <returns>
-              <c>True</c> if the item was found; Otherwise <c>false</c>.
+              <see langword="true"/> if the item was found; Otherwise <see langword="false"/>.
             </returns>
             <remarks>
             There's no guarantee in which order SMLHelper dependent mods are loaded,
@@ -2591,9 +3230,9 @@
             <summary>
             Safely looks for a modded item from another mod in the SMLHelper TechTypeCache.
             </summary>
-            <param name="techtypeString">The string used to define the modded item's new techtype.</param>
+            <param name="techtypeString">The string used to define the modded item's new <see cref="T:TechType"/>.</param>
             <returns>
-              <c>True</c> if the item was found; Otherwise <c>false</c>.
+              <c>True</c> if the item was found; Otherwise <see langword="false"/>.
             </returns>
             <remarks>
             There's no guarantee in which order SMLHelper dependent mods are loaded,
@@ -2607,7 +3246,7 @@
             <param name="internalName">The internal name of the TechType. Should not contain special characters.</param>
             <param name="displayName">The display name of the TechType. Can be anything.</param>
             <param name="tooltip">The tooltip, displayed when hovered in an inventory. Can be anything.</param>
-            <param name="unlockAtStart">Whether this TechType should be unlocked on game start, or not. By default, <c>true</c>.</param>
+            <param name="unlockAtStart">Whether this TechType should be unlocked on game start, or not. By default, <see langword="true"/>.</param>
             <returns>The new <see cref="T:TechType"/> that is created.</returns>
         </member>
         <member name="M:SMLHelper.V2.Handlers.TechTypeHandler.SMLHelper#V2#Interfaces#ITechTypeHandler#AddTechType(System.String,System.String,System.String)">
@@ -2617,27 +3256,6 @@
             <param name="internalName">The internal name of the TechType. Should not contain special characters.</param>
             <param name="displayName">The display name of the TechType. Can be anything.</param>
             <param name="tooltip">The tooltip, displayed when hovered in an inventory. Can be anything.</param>
-            <returns>The new <see cref="T:TechType"/> that is created.</returns>
-        </member>
-        <member name="M:SMLHelper.V2.Handlers.TechTypeHandler.SMLHelper#V2#Interfaces#ITechTypeHandler#AddTechType(System.String,System.String,System.String,Atlas.Sprite,System.Boolean)">
-            <summary>
-            Adds a new <see cref="T:TechType"/> into the game, with a sprite.
-            </summary>
-            <param name="internalName">The internal name of the TechType. Should not contain special characters.</param>
-            <param name="displayName">The display name of the TechType. Can be anything.</param>
-            <param name="tooltip">The tooltip, displayed when hovered in an inventory. Can be anything.</param>
-            <param name="sprite">The sprite that will related to this TechType.</param>
-            <param name="unlockAtStart">Whether this TechType should be unlocked on game start, or not. By default, <c>true</c>.</param>
-            <returns>The new <see cref="T:TechType"/> that is created.</returns>
-        </member>
-        <member name="M:SMLHelper.V2.Handlers.TechTypeHandler.SMLHelper#V2#Interfaces#ITechTypeHandler#AddTechType(System.String,System.String,System.String,Atlas.Sprite)">
-            <summary>
-            Adds a new <see cref="T:TechType"/> into the game, with a sprite. This new techtype will be unlocked at the start of a the game.
-            </summary>
-            <param name="internalName">The internal name of the TechType. Should not contain special characters.</param>
-            <param name="displayName">The display name of the TechType. Can be anything.</param>
-            <param name="tooltip">The tooltip, displayed when hovered in an inventory. Can be anything.</param>
-            <param name="sprite">The sprite that will related to this TechType.</param>
             <returns>The new <see cref="T:TechType"/> that is created.</returns>
         </member>
         <member name="M:SMLHelper.V2.Handlers.TechTypeHandler.SMLHelper#V2#Interfaces#ITechTypeHandler#AddTechType(System.String,System.String,System.String,UnityEngine.Sprite,System.Boolean)">
@@ -2727,6 +3345,177 @@
             <summary>
             Main entry point for all calls to this handler.
             </summary>
+        </member>
+        <member name="T:SMLHelper.V2.Interfaces.IBackgroundTypeHandler">
+            <summary>
+            A handler interface for everything related to creating new BackgroundTypes.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.IBackgroundTypeHandler.AddBackgroundType(System.String,UnityEngine.Sprite)">
+            <summary>
+            adds a new <see cref="T:CraftData.BackgroundType"/> into the game.
+            </summary>
+            <param name="backgroundTypeName">the name of the BackgroundType, should not contain special characters.</param>
+            <param name="backgroundSprite">The sprite for this BackgroundType.</param>
+            <returns>The new <see cref="T:CraftData.BackgroundType"/> that's created.</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.IBackgroundTypeHandler.TryGetModdedBackgroundType(System.String,CraftData.BackgroundType@)">
+            <summary>
+            Safely looks for a modded Background Type from another mod in the SMLHelper BackgroundTypeCache and outputs its <see cref="T:CraftData.BackgroundType" /> value when found.
+            </summary>
+            <param name="backgroundTypeString">The string used to define the BackgroundType</param>
+            <param name="modBackgroundType">The BackgroundType enum value of the modded. Defaults to <see cref="F:CraftData.BackgroundType.Normal" /> when the item was not found.</param>
+            <returns><see langword="true"/> if the item was found; otherwise <see langword="false"/>.</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.IBackgroundTypeHandler.ModdedBackgroundTypeExists(System.String)">
+            <summary>
+            Safely looks for a modded Background Type from another mod in the SMLHelper BackgroundTypeCache.
+            </summary>
+            <param name="backgroundTypeString">The string used to define the BackgroundType.</param>
+            <returns><see langword="true"/> if the item was found; otherwise <see langword="false"/>.</returns>
+        </member>
+        <member name="T:SMLHelper.V2.Interfaces.ICoordinatedSpawnHandler">
+            <summary>
+            a Handler interface that handles and registers Coordinated (<see cref="T:UnityEngine.Vector3"/> spawns).
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ICoordinatedSpawnHandler.RegisterCoordinatedSpawn(SMLHelper.V2.Handlers.SpawnInfo)">
+            <summary>
+            Registers a Coordinated Spawn
+            </summary>
+            <param name="spawnInfo">the SpawnInfo to spawn</param>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ICoordinatedSpawnHandler.RegisterCoordinatedSpawns(System.Collections.Generic.List{SMLHelper.V2.Handlers.SpawnInfo})">
+            <summary>
+            registers Many Coordinated Spawns.
+            </summary>
+            <param name="spawnInfos">The SpawnInfos to spawn.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ICoordinatedSpawnHandler.RegisterCoordinatedSpawnsForOneTechType(TechType,System.Collections.Generic.List{UnityEngine.Vector3})">
+            <summary>
+            Registers Multiple Coordinated spawns for one single passed TechType
+            </summary>
+            <param name="techTypeToSpawn">The TechType to spawn</param>
+            <param name="coordinatesToSpawnTo">the coordinates the <see cref="T:TechType"/> should spawn to</param>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ICoordinatedSpawnHandler.RegisterCoordinatedSpawnsForOneTechType(TechType,System.Collections.Generic.Dictionary{UnityEngine.Vector3,UnityEngine.Vector3})">
+            <summary>
+            Registers Multiple Coordinated spawns with rotations for one single passed TechType
+            </summary>
+            <param name="techTypeToSpawn">The TechType to spawn</param>
+            <param name="coordinatesAndRotationsToSpawnTo">the coordinates(Key) and the rotations(Value) the <see cref="T:TechType"/> should spawn to</param>
+        </member>
+        <member name="T:SMLHelper.V2.Interfaces.ICustomSoundHandler">
+            <summary>
+            A handler class for adding and overriding Sounds.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ICustomSoundHandler.RegisterCustomSound(System.String,System.String,SMLHelper.V2.Utility.SoundChannel)">
+            <summary>
+            Register a Custom sound by file path. Some vanilla game sounds can be overridden by matching the id to the <see cref="F:FMODAsset.path"/>.
+            </summary>
+            <param name="id">The Id of your custom sound which is used when checking which sounds to play.</param>
+            <param name="filePath">The file path on disk of the sound file to load</param>
+            <param name="soundChannel">The sound channel to get the volume to play the sound at. defaults to <see cref="F:SMLHelper.V2.Utility.SoundChannel.Master"/></param>
+            <returns>the <see cref="T:FMOD.Sound"/> loaded</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ICustomSoundHandler.RegisterCustomSound(System.String,System.String,System.String)">
+            <summary>
+            Register a Custom sound by file path. Some vanilla game sounds can be overridden by matching the id to the <see cref="F:FMODAsset.path"/>.
+            </summary>
+            <param name="id">The Id of your custom sound which is used when checking which sounds to play.</param>
+            <param name="filePath">The file path on disk of the sound file to load.</param>
+            <param name="busPath">The bus path to play the sound on.</param>
+            <returns>the <see cref="T:FMOD.Sound"/> loaded</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ICustomSoundHandler.RegisterCustomSound(System.String,System.String,FMOD.Studio.Bus)">
+            <summary>
+            Register a Custom sound by file path. Some vanilla game sounds can be overridden by matching the id to the <see cref="F:FMODAsset.path"/>.
+            </summary>
+            <param name="id">The Id of your custom sound which is used when checking which sounds to play.</param>
+            <param name="filePath">The file path on disk of the sound file to load.</param>
+            <param name="bus">The bus to play the sound on.</param>
+            <returns>the <see cref="T:FMOD.Sound"/> loaded</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ICustomSoundHandler.RegisterCustomSound(System.String,UnityEngine.AudioClip,SMLHelper.V2.Utility.SoundChannel)">
+            <summary>
+            Register a custom sound by an <see cref="T:UnityEngine.AudioClip"/> instance. Some vanilla game sounds can be overridden by matching the id to the <see cref="F:FMODAsset.path"/>.
+            </summary>
+            <param name="id">The Id of your custom sound which is used when checking which sounds to play.</param>
+            <param name="audio">The AudioClip to register.</param>
+            <param name="soundChannel">The sound channel to get the volume to play the sound at. defaults to <see cref="F:SMLHelper.V2.Utility.SoundChannel.Master"/></param>
+            <returns>the <see cref="T:FMOD.Sound"/> registered.</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ICustomSoundHandler.RegisterCustomSound(System.String,UnityEngine.AudioClip,System.String)">
+            <summary>
+            Register a custom sound by an <see cref="T:UnityEngine.AudioClip"/> instance. Some vanilla game sounds can be overridden by matching the id to the <see cref="F:FMODAsset.path"/>.
+            </summary>
+            <param name="id">The Id of your custom sound which is used when checking which sounds to play.</param>
+            <param name="audio">The AudioClip to register.</param>
+            <param name="busPath">The bus path to play the sound on.</param>
+            <returns>the <see cref="T:FMOD.Sound"/> loaded</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ICustomSoundHandler.RegisterCustomSound(System.String,UnityEngine.AudioClip,FMOD.Studio.Bus)">
+            <summary>
+            Register a custom sound by an <see cref="T:UnityEngine.AudioClip"/> instance. Some vanilla game sounds can be overridden by matching the id to the <see cref="F:FMODAsset.path"/>.
+            </summary>
+            <param name="id">The Id of your custom sound which is used when checking which sounds to play.</param>
+            <param name="audio">The AudioClip to register.</param>
+            <param name="bus">The bus to play the sound on.</param>
+            <returns>the <see cref="T:FMOD.Sound"/> loaded</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ICustomSoundHandler.RegisterCustomSound(System.String,SMLHelper.V2.FMod.Interfaces.IFModSound)">
+            <summary>
+            Registers a Custom sound by an <see cref="T:SMLHelper.V2.FMod.Interfaces.IFModSound"/> instance. IFModSound instances have custom logic for playing sounds.
+            </summary>
+            <param name="id">The Id of your custom sound which is used when checking which sounds to play.</param>
+            <param name="fModSound">The sound IFModSound object to register.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ICustomSoundHandler.RegisterCustomSound(System.String,FMOD.Sound,SMLHelper.V2.Utility.SoundChannel)">
+            <summary>
+            Register a Custom sound that has been loaded using AudioUtils. Some vanilla game sounds can be overridden by matching the id to the <see cref="F:FMODAsset.path"/>.
+            </summary>
+            <param name="id">The Id of your custom sound which is used when checking which sounds to play.</param>
+            <param name="sound">The pre loaded sound</param>
+            <param name="soundChannel">The sound channel to get the volume to play the sound at. <see cref="T:SMLHelper.V2.Utility.SoundChannel"/></param>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ICustomSoundHandler.RegisterCustomSound(System.String,FMOD.Sound,System.String)">
+            <summary>
+            Register a Custom sound that has been loaded using AudioUtils. Some vanilla game sounds can be overridden by matching the id to the <see cref="F:FMODAsset.path"/>.
+            </summary>
+            <param name="id">The Id of your custom sound which is used when checking which sounds to play.</param>
+            <param name="sound">The pre loaded sound</param>
+            <param name="busPath">The bus path to play the sound on.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ICustomSoundHandler.RegisterCustomSound(System.String,FMOD.Sound,FMOD.Studio.Bus)">
+            <summary>
+            Register a Custom sound that has been loaded using AudioUtils. Some vanilla game sounds can be overridden by matching the id to the <see cref="F:FMODAsset.path"/>.
+            </summary>
+            <param name="id">The Id of your custom sound which is used when checking which sounds to play.</param>
+            <param name="sound">The pre loaded sound</param>
+            <param name="bus">The bus to play the sound on.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ICustomSoundHandler.TryPlayCustomSound(System.String)">
+            <summary>
+            Try to find and play a custom <see cref="T:FMOD.Sound"/> that has been registered.
+            </summary>
+            <param name="id">The Id of the custom sound</param>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ICustomSoundHandler.TryGetCustomSound(System.String,FMOD.Sound@)">
+            <summary>
+            Try to get a registered custom <see cref="T:FMOD.Sound"/>.
+            </summary>
+            <param name="id">The Id of the custom sound</param>
+            <param name="sound">Outputs the <see cref="T:FMOD.Sound"/> if found and null if not found.</param>
+            <returns>true or false depending on if the id was found</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ICustomSoundHandler.TryGetCustomSoundChannel(System.Int32,FMOD.Channel@)">
+            <summary>
+            Try to get a playing custom sound channel for an emitter
+            </summary>
+            <param name="id">The emitter's ID, can be retrieved by calling <c>object.GetInstanceID()</c>.</param>
+            <param name="channel">Outputs the <see cref="T:FMOD.Channel"/>.</param>
+            <returns>True if found, otherwise false.</returns>
         </member>
         <member name="T:SMLHelper.V2.Interfaces.IModOptionAttribute">
             <summary>
@@ -2839,12 +3628,54 @@
             <seealso cref="M:SMLHelper.V2.Interfaces.IConsoleCommandHandler.RegisterConsoleCommand``1(System.String,``0)"/>
             <seealso cref="T:SMLHelper.V2.Commands.ConsoleCommandAttribute"/>
         </member>
+        <member name="T:SMLHelper.V2.Interfaces.IEquipmentHandler">
+            <summary>
+            A handler related to EquipmentTypes
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.IEquipmentHandler.AddEquipmentType(System.String)">
+            <summary>
+            Registers an equipment type for use when creating a equipment
+            </summary>
+            <param name="equipmentName">The name of the new equipment type</param>
+            <returns>The newly registered EquipmentType</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.IEquipmentHandler.TryGetModdedEquipmentType(System.String,EquipmentType@)">
+            <summary>
+            Safely looks for a modded equipment type in the SMLHelper EquipmentTypeCache and outputs its <see cref="T:EquipmentType"/> value when found.
+            </summary>
+            <param name="equipmentTypeString">The string used to define the modded EquipmentType</param>
+            <param name="moddedEquipmentType">The EquipmentType enum value. Defaults to <see cref="F:EquipmentType.None"/> when the EquipmentType was not found.</param>
+            <returns><c>True</c> if the EquipmentType was found; Otherwise <c>false</c></returns>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.IEquipmentHandler.ModdedEquipmentTypeExists(System.String)">
+            <summary>
+             Checks for the existence of an added EquipmentType in the SMLHelper EquipmentTypeCache and outputs the result of the check
+            </summary>
+            <param name="equipmentString">The string used to define the modded EquipmentType</param>
+            <returns><c>True</c> if the EquipmentType was found; Otherwise <c>false</c></returns>
+        </member>
+        <member name="T:SMLHelper.V2.Interfaces.IPDALogHandler">
+            <summary>
+            A handler for stuff related to the PDALog class.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.IPDALogHandler.AddCustomEntry(System.String,System.String,UnityEngine.Sprite,FMODAsset)">
+            <summary>
+            Adds a custom log entry.
+            </summary>
+            <param name="key">The key to refer to this entry.</param>
+            <param name="languageKey">The subtitles language key for this entry.</param>
+            <param name="icon">The icon that will be used in the Log tab for this entry. if <c>null</c> It will use the default log entry icon.</param>
+            <param name="sound">The sound that will be played once this entry is triggered or played in the Log tab.<br/>
+            If <c>null</c> the Play button in the Log tab will disappear and a sound wont play when this entry is triggered.</param>
+        </member>
         <member name="T:SMLHelper.V2.Interfaces.IPingHandler">
             <summary>
             A handler related to PingTypes
             </summary>
         </member>
-        <member name="M:SMLHelper.V2.Interfaces.IPingHandler.RegisterNewPingType(System.String,Atlas.Sprite)">
+        <member name="M:SMLHelper.V2.Interfaces.IPingHandler.RegisterNewPingType(System.String,UnityEngine.Sprite)">
             <summary>
             Registers a ping type for use when creating a beacon
             </summary>
@@ -2859,6 +3690,19 @@
             <param name="pingTypeString">The string used to define the modded PingType</param>
             <param name="moddedPingType">The PingType enum value. Defaults to <see cref="F:PingType.None"/> when the PingType was not found.</param>
             <returns><c>True</c> if the PingType was found; Otherwise <c>false</c></returns>
+        </member>
+        <member name="T:SMLHelper.V2.Interfaces.ISaveDataHandler">
+            <summary>
+            A handler class for registering your <see cref="T:SMLHelper.V2.Json.SaveDataCache"/>.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ISaveDataHandler.RegisterSaveDataCache``1">
+            <summary>
+            Registers your <see cref="T:SMLHelper.V2.Json.SaveDataCache"/> to be automatically loaded and saved whenever the game is.
+            </summary>
+            <typeparam name="T">A class derived from <see cref="T:SMLHelper.V2.Json.SaveDataCache"/> to hold your save data.</typeparam>
+            <returns>An instance of the <typeparamref name="T"/> : <see cref="T:SMLHelper.V2.Json.SaveDataCache"/> with values loaded
+            from the json file on disk whenever a save slot is loaded.</returns>
         </member>
         <member name="T:SMLHelper.V2.Interfaces.ISurvivalHandler">
             <summary>
@@ -2884,6 +3728,78 @@
             <param name="isEdible">set it to <see langword="true" /> if the item is edible and has the <see cref="T:Eatable"/> component attached to it. 
             <para>defaults to <see langword="false" /></para>
             </param>
+        </member>
+        <member name="T:SMLHelper.V2.Interfaces.ITechCategoryHandler">
+            <summary>
+            A handler class for everything related to creating new TechCategorys.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ITechCategoryHandler.AddTechCategory(System.String,System.String)">
+            <summary>
+            Adds a new <see cref="T:TechCategory"/> into the game. 
+            </summary>
+            <param name="techCatagoryName">The name of the TechCategory. Should not contain special characters.</param>
+            <param name="displayName">The display name of the TechCategory. Can be anything.</param>
+            <returns>The new <see cref="T:TechCategory"/> that is created.</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ITechCategoryHandler.TryGetModdedTechCategory(System.String,TechCategory@)">
+            <summary>
+            Safely looks for a modded item from another mod in the SMLHelper TechCategoryCache and outputs its <see cref="T:TechCategory" /> value when found.
+            </summary>
+            <param name="techCategoryString">The string used to define the techcategory.</param>
+            <param name="modTechCategory">The TechCategory enum value of the modded. Defaults to <see cref="F:TechCategory.Misc" /> when the item was not found.</param>
+            <returns>
+              <c>True</c> if the item was found; Otherwise <c>false</c>.
+            </returns>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ITechCategoryHandler.ModdedTechCategoryExists(System.String)">
+            <summary>
+            Safely looks for a modded item from another mod in the SMLHelper TechCategoryCache.
+            </summary>
+            <param name="techCategoryString">The string used to define the techcategory.</param>
+            <returns>
+              <c>True</c> if the item was found; Otherwise <c>false</c>.
+            </returns>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ITechCategoryHandler.TryRegisterTechCategoryToTechGroup(TechGroup,TechCategory)">
+            <summary>
+            Registers the TechCategory to a TechGroup.
+            </summary>
+            <param name="techGroup">The tech group.</param>
+            <param name="techCategory">The tech category.</param>
+            <returns></returns>
+        </member>
+        <member name="T:SMLHelper.V2.Interfaces.ITechGroupHandler">
+            <summary>
+            A handler class for everything related to creating new TechGroups.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ITechGroupHandler.AddTechGroup(System.String,System.String)">
+            <summary>
+            Adds a new <see cref="T:TechGroup"/> into the game. 
+            </summary>
+            <param name="techGroupName">The name of the TechGroup. Should not contain special characters.</param>
+            <param name="displayName">The display name of the TechGroup. Can be anything.</param>
+            <returns>The new <see cref="T:TechGroup"/> that is created.</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ITechGroupHandler.TryGetModdedTechGroup(System.String,TechGroup@)">
+            <summary>
+            Safely looks for a modded item from another mod in the SMLHelper TechGroupCache and outputs its <see cref="T:TechGroup" /> value when found.
+            </summary>
+            <param name="techGroupString">The string used to define the techgroup.</param>
+            <param name="modTechGroup">The TechGroup enum value of the modded. Defaults to <see cref="F:TechGroup.Uncategorized" /> when the item was not found.</param>
+            <returns>
+              <c>True</c> if the item was found; Otherwise <c>false</c>.
+            </returns>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ITechGroupHandler.ModdedTechGroupExists(System.String)">
+            <summary>
+            Safely looks for a modded item from another mod in the SMLHelper TechGroupCache.
+            </summary>
+            <param name="techGroupString">The string used to define the techgroup.</param>
+            <returns>
+              <c>True</c> if the item was found; Otherwise <c>false</c>.
+            </returns>
         </member>
         <member name="T:SMLHelper.V2.Interfaces.IBioReactorHandler">
             <summary>
@@ -2914,7 +3830,7 @@
         <member name="M:SMLHelper.V2.Interfaces.ICraftDataHandler.SetQuickSlotType(TechType,QuickSlotType)">
             <summary>
             <para>Allows you to edit QuickSlotType for TechTypes. Can be used for existing TechTypes too.</para>
-            <para>Careful: This has to be called after <see cref="M:SMLHelper.V2.Interfaces.ICraftDataHandler.SetTechData(TechType,SMLHelper.V2.Crafting.TechData)"/> and <see cref="M:SMLHelper.V2.Interfaces.ICraftDataHandler.SetTechData(TechType,ITechData)"/>.</para>
+            <para>Careful: This has to be called after <see cref="M:SMLHelper.V2.Interfaces.ICraftDataHandler.SetTechData(TechType,SMLHelper.V2.Crafting.RecipeData)"/>.</para>
             </summary>
             <param name="techType">The TechType whose QuickSlotType you want to edit.</param>
             <param name="slotType">The QuickSlotType for that TechType.</param>
@@ -3017,57 +3933,78 @@
             <param name="category">The TechCategory in which the TechType is located.</param>
             <param name="techType">The TechType which you want to remove.</param>
         </member>
-        <member name="M:SMLHelper.V2.Interfaces.ICraftDataHandler.SetTechData(TechType,ITechData)">
+        <member name="M:SMLHelper.V2.Interfaces.ICraftDataHandler.SetTechData(TechType,SMLHelper.V2.Crafting.RecipeData)">
             <summary>
-            <para>Allows you to edit recipes, i.e. TechData for TechTypes.</para>
+            <para>Allows you to edit RecipeData for TechTypes.</para>
             <para>Can be used for existing TechTypes too.</para>
             </summary>
             <param name="techType">The TechType whose TechData you want to edit.</param>
             <param name="techData">The TechData for that TechType.</param>
-            <seealso cref="T:SMLHelper.V2.Crafting.TechData"/>
+            <seealso cref="T:SMLHelper.V2.Crafting.RecipeData"/>
         </member>
-        <member name="M:SMLHelper.V2.Interfaces.ICraftDataHandler.SetTechData(TechType,SMLHelper.V2.Crafting.TechData)">
-            <summary>
-            <para>Allows you to edit recipes, i.e. TechData for TechTypes.</para>
-            <para>Can be used for existing TechTypes too.</para>
-            </summary>
-            <param name="techType">The TechType whose TechData you want to edit.</param>
-            <param name="techData">The TechData for that TechType.</param>
-            <seealso cref="T:SMLHelper.V2.Crafting.TechData"/>
-        </member>
-        <member name="M:SMLHelper.V2.Interfaces.ICraftDataHandler.GetModdedTechData(TechType)">
+        <member name="M:SMLHelper.V2.Interfaces.ICraftDataHandler.GetRecipeData(TechType)">
             <summary>
             Safely accesses the crafting data from a modded item.<para/>
             WARNING: This method is highly dependent on mod load order. 
             Make sure your mod is loading after the mod whose TechData you are trying to access.
             </summary>
             <param name="techType">The TechType whose TechData you want to access.</param>
-            <returns>The ITechData from the modded item if it exists; Otherwise, returns <c>null</c>.</returns>
+            <returns>The RecipeData from the modded item if it exists; Otherwise, returns <c>null</c>.</returns>
         </member>
-        <member name="M:SMLHelper.V2.Interfaces.ICraftDataHandler.GetTechData(TechType)">
+        <member name="M:SMLHelper.V2.Interfaces.ICraftDataHandler.GetModdedRecipeData(TechType)">
             <summary>
-            Safely accesses the crafting data from any item.<para/>
+            Safely accesses the crafting data from a modded item.<para/>
             WARNING: This method is highly dependent on mod load order. 
             Make sure your mod is loading after the mod whose TechData you are trying to access.
             </summary>
             <param name="techType">The TechType whose TechData you want to access.</param>
-            <returns>Returns TechData if it exists; Otherwise, returns <c>null</c>.</returns>
+            <returns>The RecipeData from the modded item if it exists; Otherwise, returns <c>null</c>.</returns>
         </member>
-        <member name="M:SMLHelper.V2.Interfaces.ICraftDataHandler.SetEatingSound(TechType,System.String)">
+        <member name="M:SMLHelper.V2.Interfaces.ICraftDataHandler.SetIngredients(TechType,System.Collections.Generic.ICollection{Ingredient})">
             <summary>
-            Sets the eating sound for the provided TechType.
+            <para>Allows you to set ingredients for a TechType crafting recipe.</para>
+            <para>Can be used for existing TechTypes too.</para>
             </summary>
-            <param name="consumable">The item being consumed during <see cref="M:Survival.Eat(UnityEngine.GameObject)"/>.</param>
-            <param name="soundPath">
-            The sound path.
-            <para>
-            Value values are
-            - "event:/player/drink"
-            - "event:/player/drink_stillsuit"
-            - "event:/player/use_first_aid"
-            - "event:/player/eat" (default)
-            </para>
-            </param>
+            <param name="techType">The TechType whose ingredient list you want to edit.</param>
+            <param name="ingredients">The collection of Ingredients for that TechType.</param>
+            <seealso cref="T:Ingredient"/>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ICraftDataHandler.SetLinkedItems(TechType,System.Collections.Generic.ICollection{TechType})">
+            <summary>
+            <para>Allows you to set linked items for a TechType crafting recipe.</para>
+            <para>Can be used for existing TechTypes too.</para>
+            </summary>
+            <param name="techType">The TechType whose ingredient list you want to edit.</param>
+            <param name="linkedItems">The collection of linked items for that TechType</param>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ICraftDataHandler.SetColdResistance(TechType,System.Int32)">
+            <summary>
+            <para>Allows you to edit the Cold Resistance for TechTypes.</para>
+            <para>Can be used for existing TechTypes too.</para>
+            </summary>
+            <param name="techType">The TechType whose Cold Resistance you want to edit.</param>
+            <param name="resistance">The int value for the Cold Resistance.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ICraftDataHandler.SetMaxCharge(TechType,System.Single)">
+            <summary>
+            Sets the maximum charge.
+            </summary>
+            <param name="techType">The TechType whose MaxCharge you want to edit.</param>
+            <param name="maxCharge">The maximum charge.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ICraftDataHandler.SetEnergyCost(TechType,System.Single)">
+            <summary>
+            Sets the energy cost.
+            </summary>
+            <param name="techType">The TechType whose EnergyCost you want to edit.</param>
+            <param name="energyCost">The energy cost.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ICraftDataHandler.SetSoundType(TechType,TechData.SoundType)">
+            <summary>
+            Sets the type of the sound.
+            </summary>
+            <param name="techType">Type of the tech.</param>
+            <param name="soundType">Type of the sound.</param>
         </member>
         <member name="T:SMLHelper.V2.Interfaces.ICraftTreeHandler">
             <summary>
@@ -3133,29 +4070,6 @@
             <param name="displayName">The display name of the tab, which will show up when you hover your mouse on the tab.</param>
             <param name="sprite">The sprite of the tab.</param>        
         </member>
-        <member name="M:SMLHelper.V2.Interfaces.ICraftTreeHandler.AddTabNode(CraftTree.Type,System.String,System.String,Atlas.Sprite)">
-            <summary>
-            Adds a new tab node to the root of the specified crafting tree.
-            </summary>
-            <param name="craftTree">The target craft tree to edit.</param>
-            <param name="name">The ID of the tab node. Must be unique!</param>
-            <param name="displayName">The display name of the tab, which will show up when you hover your mouse on the tab.</param>
-            <param name="sprite">The sprite of the tab.</param>        
-        </member>
-        <member name="M:SMLHelper.V2.Interfaces.ICraftTreeHandler.AddTabNode(CraftTree.Type,System.String,System.String,Atlas.Sprite,System.String[])">
-            <summary>
-            Adds a new tab node to the root of the specified crafting tree, at the specified tab location.
-            </summary>
-            <param name="craftTree">The target craft tree to edit.</param>
-            <param name="name">The ID of the tab node. Must be unique!</param>
-            <param name="displayName">The display name of the tab, which will show up when you hover your mouse on the tab.</param>
-            <param name="sprite">The sprite of the tab.</param>
-            <param name="stepsToTab">
-            <para>The steps to the target tab.</para>
-            <para>These must match the id value of the CraftNode in the crafting tree you're targeting.</para>
-            <para>Do not include "root" in this path.</para>
-            </param>        
-        </member>
         <member name="M:SMLHelper.V2.Interfaces.ICraftTreeHandler.AddTabNode(CraftTree.Type,System.String,System.String,UnityEngine.Sprite,System.String[])">
             <summary>
             Adds a new tab node to the root of the specified crafting tree, at the specified tab location.
@@ -3207,6 +4121,12 @@
             </summary>
             <param name="onSaveAction">The method to invoke.</param>
         </member>
+        <member name="M:SMLHelper.V2.Interfaces.IIngameMenuHandler.RegisterOnLoadEvent(System.Action)">
+            <summary>
+            Registers a simple <see cref="T:System.Action"/> method to invoke whenever the player loads a saved game via the in game menu.
+            </summary>
+            <param name="onLoadAction">The method to invoke.</param>
+        </member>
         <member name="M:SMLHelper.V2.Interfaces.IIngameMenuHandler.RegisterOnQuitEvent(System.Action)">
             <summary>
             Registers a simple <see cref="T:System.Action"/> method to invoke whenever the player quits the game via the in game menu.
@@ -3220,6 +4140,13 @@
             </summary>
             <param name="onSaveAction">The method invoked.</param>
         </member>
+        <member name="M:SMLHelper.V2.Interfaces.IIngameMenuHandler.UnregisterOnLoadEvent(System.Action)">
+            <summary>
+            Removes a method previously added through <see cref="M:SMLHelper.V2.Interfaces.IIngameMenuHandler.RegisterOnLoadEvent(System.Action)"/> so it is no longer invoked when loading the game.<para/>
+            If you plan on using this, do not register an anonymous method.
+            </summary>
+            <param name="onLoadAction">The method invoked.</param>
+        </member>
         <member name="M:SMLHelper.V2.Interfaces.IIngameMenuHandler.UnregisterOnQuitEvent(System.Action)">
             <summary>
             Removes a method previously added through <see cref="M:SMLHelper.V2.Interfaces.IIngameMenuHandler.RegisterOnQuitEvent(System.Action)"/> so it is no longer invoked when quiting the game.<para/>
@@ -3232,6 +4159,12 @@
             Registers a simple <see cref="T:System.Action"/> method to invoke the <c>first time</c> the player saves the game via the in game menu.
             </summary>
             <param name="onSaveAction">The method to invoke. This action will not be invoked a second time.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.IIngameMenuHandler.RegisterOneTimeUseOnLoadEvent(System.Action)">
+            <summary>
+            Registers a simple <see cref="T:System.Action"/> method to invoke the <c>first time</c> the player loads a saved game via the in game menu.
+            </summary>
+            <param name="onLoadAction">The method to invoke. This action will not be invoked a second time.</param>
         </member>
         <member name="M:SMLHelper.V2.Interfaces.IIngameMenuHandler.RegisterOneTimeUseOnQuitEvent(System.Action)">
             <summary>
@@ -3507,21 +4440,6 @@
             A handler class for adding custom sprites into the game.
             </summary>
         </member>
-        <member name="M:SMLHelper.V2.Interfaces.ISpriteHandler.RegisterSprite(TechType,Atlas.Sprite)">
-            <summary>
-            Registers a new sprite to the game.
-            </summary>
-            <param name="type">The techtype paired to this sprite.</param>
-            <param name="sprite">The sprite to be added.</param>
-        </member>
-        <member name="M:SMLHelper.V2.Interfaces.ISpriteHandler.RegisterSprite(SpriteManager.Group,System.String,Atlas.Sprite)">
-            <summary>
-            Registers a new sprite to the game.
-            </summary>
-            <param name="group">The sprite group.</param>
-            <param name="id">The sprite internal identifier.</param>
-            <param name="sprite">The sprite to be added.</param>
-        </member>
         <member name="M:SMLHelper.V2.Interfaces.ISpriteHandler.RegisterSprite(SpriteManager.Group,System.String,UnityEngine.Sprite)">
             <summary>
             Registers a new sprite to the game.
@@ -3598,27 +4516,6 @@
             <param name="internalName">The internal name of the TechType. Should not contain special characters.</param>
             <param name="displayName">The display name of the TechType. Can be anything.</param>
             <param name="tooltip">The tooltip, displayed when hovered in an inventory. Can be anything.</param>
-            <param name="unlockAtStart">Whether this TechType should be unlocked on game start, or not. By default, <c>true</c>.</param>
-            <returns>The new <see cref="T:TechType"/> that is created.</returns>
-        </member>
-        <member name="M:SMLHelper.V2.Interfaces.ITechTypeHandler.AddTechType(System.String,System.String,System.String,Atlas.Sprite)">
-            <summary>
-            Adds a new <see cref="T:TechType"/> into the game, with a sprite. This new techtype will be unlocked at the start of a the game.
-            </summary>
-            <param name="internalName">The internal name of the TechType. Should not contain special characters.</param>
-            <param name="displayName">The display name of the TechType. Can be anything.</param>
-            <param name="tooltip">The tooltip, displayed when hovered in an inventory. Can be anything.</param>
-            <param name="sprite">The sprite that will related to this TechType.</param>
-            <returns>The new <see cref="T:TechType"/> that is created.</returns>
-        </member>
-        <member name="M:SMLHelper.V2.Interfaces.ITechTypeHandler.AddTechType(System.String,System.String,System.String,Atlas.Sprite,System.Boolean)">
-            <summary>
-            Adds a new <see cref="T:TechType"/> into the game, with a sprite.
-            </summary>
-            <param name="internalName">The internal name of the TechType. Should not contain special characters.</param>
-            <param name="displayName">The display name of the TechType. Can be anything.</param>
-            <param name="tooltip">The tooltip, displayed when hovered in an inventory. Can be anything.</param>
-            <param name="sprite">The sprite that will related to this TechType.</param>
             <param name="unlockAtStart">Whether this TechType should be unlocked on game start, or not. By default, <c>true</c>.</param>
             <returns>The new <see cref="T:TechType"/> that is created.</returns>
         </member>
@@ -3769,13 +4666,13 @@
             </summary>
             <param name="useColor">The text color to use</param>
         </member>
-        <member name="M:SMLHelper.V2.Interfaces.IBasicText.SetFont(UnityEngine.Font)">
+        <member name="M:SMLHelper.V2.Interfaces.IBasicText.SetFont(TMPro.TMP_FontAsset)">
             <summary>
             Sets the font 
             </summary>
             <param name="useFont">The font to render the text as.</param>
         </member>
-        <member name="M:SMLHelper.V2.Interfaces.IBasicText.SetFontStyle(UnityEngine.FontStyle)">
+        <member name="M:SMLHelper.V2.Interfaces.IBasicText.SetFontStyle(TMPro.FontStyles)">
             <summary>
             Sets the font style.
             </summary>
@@ -3806,6 +4703,22 @@
             </summary>
             <param name="s">The text to display</param>
             <param name="seconds">The duration to hold before fading</param>
+        </member>
+        <member name="T:SMLHelper.V2.Json.Attributes.FileNameAttribute">
+            <summary>
+            Attribute used to specify a file name for use with a <see cref="T:SMLHelper.V2.Json.JsonFile"/>.
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Json.Attributes.FileNameAttribute.FileName">
+            <summary>
+            The filename.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Json.Attributes.FileNameAttribute.#ctor(System.String)">
+            <summary>
+            Used to specify the file name for a <see cref="T:SMLHelper.V2.Json.JsonFile"/>.
+            </summary>
+            <param name="fileName"></param>
         </member>
         <member name="T:SMLHelper.V2.Json.ConfigFileAttribute">
             <summary>
@@ -3844,6 +4757,22 @@
             When used alongside the <see cref="M:SMLHelper.V2.Json.ConfigFile.#ctor(System.String,System.String)"/> constructor, this attribute is ignored.
             </remarks>
             <param name="filename">The filename to use for the <see cref="T:SMLHelper.V2.Json.ConfigFile"/>.</param>
+        </member>
+        <member name="T:SMLHelper.V2.Json.ConfigFileEventArgs">
+            <summary>
+            Contains basic information for a <see cref="T:SMLHelper.V2.Json.ConfigFile"/> event.
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Json.ConfigFileEventArgs.Instance">
+            <summary>
+            The instance of the <see cref="T:SMLHelper.V2.Json.ConfigFile"/> this event pertains to.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Json.ConfigFileEventArgs.#ctor(SMLHelper.V2.Json.ConfigFile)">
+            <summary>
+            Instantiates a new <see cref="T:SMLHelper.V2.Json.ConfigFileEventArgs"/>.
+            </summary>
+            <param name="instance">The <see cref="T:SMLHelper.V2.Json.ConfigFile"/> instance the event pertains to.</param>
         </member>
         <member name="T:SMLHelper.V2.Json.Converters.FloatConverter">
             <summary>
@@ -3900,6 +4829,186 @@
             <see cref="T:Newtonsoft.Json.JsonConverter"/>
             </summary>
             <param name="objectType"></param>
+            <returns></returns>
+        </member>
+        <member name="T:SMLHelper.V2.Json.Converters.QuaternionConverter">
+            <summary>
+            A Quaternion json converter that simplifies the Vector3 to only x,y,z serialization.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Json.Converters.QuaternionConverter.CanConvert(System.Type)">
+            <summary>
+            A method that determines when this converter should process.
+            </summary>
+            <param name="objectType">the current object type</param>
+            <returns></returns>
+        </member>
+        <member name="M:SMLHelper.V2.Json.Converters.QuaternionConverter.WriteJson(Newtonsoft.Json.JsonWriter,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <summary>
+            A method that tells Newtonsoft how to Serialize the current object.
+            </summary>
+            <param name="writer"></param>
+            <param name="value"></param>
+            <param name="serializer"></param>
+        </member>
+        <member name="M:SMLHelper.V2.Json.Converters.QuaternionConverter.ReadJson(Newtonsoft.Json.JsonReader,System.Type,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <summary>
+            A method that tells Newtonsoft how to Deserialize and read the current object.
+            </summary>
+            <param name="reader"></param>
+            <param name="objectType"></param>
+            <param name="existingValue"></param>
+            <param name="serializer"></param>
+            <returns></returns>
+        </member>
+        <member name="T:SMLHelper.V2.Json.Converters.Vector2Converter">
+            <summary>
+            A Vector2 json converter that simplifies the Vector2 to only x,y serialization.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Json.Converters.Vector2Converter.CanConvert(System.Type)">
+            <summary>
+            A method that determines when this converter should process.
+            </summary>
+            <param name="objectType">the current object type</param>
+            <returns></returns>
+        </member>
+        <member name="M:SMLHelper.V2.Json.Converters.Vector2Converter.WriteJson(Newtonsoft.Json.JsonWriter,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <summary>
+            A method that tells Newtonsoft how to Serialize the current object.
+            </summary>
+            <param name="writer"></param>
+            <param name="value"></param>
+            <param name="serializer"></param>
+        </member>
+        <member name="M:SMLHelper.V2.Json.Converters.Vector2Converter.ReadJson(Newtonsoft.Json.JsonReader,System.Type,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <summary>
+            A method that tells Newtonsoft how to Deserialize and read the current object.
+            </summary>
+            <param name="reader"></param>
+            <param name="objectType"></param>
+            <param name="existingValue"></param>
+            <param name="serializer"></param>
+            <returns></returns>
+        </member>
+        <member name="T:SMLHelper.V2.Json.Converters.Vector2IntConverter">
+            <summary>
+            A Vector2Int json converter that simplifies the Vector2Int to only x,y serialization.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Json.Converters.Vector2IntConverter.CanConvert(System.Type)">
+            <summary>
+            A method that determines when this converter should process.
+            </summary>
+            <param name="objectType">the current object type</param>
+            <returns></returns>
+        </member>
+        <member name="M:SMLHelper.V2.Json.Converters.Vector2IntConverter.WriteJson(Newtonsoft.Json.JsonWriter,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <summary>
+            A method that tells Newtonsoft how to Serialize the current object.
+            </summary>
+            <param name="writer"></param>
+            <param name="value"></param>
+            <param name="serializer"></param>
+        </member>
+        <member name="M:SMLHelper.V2.Json.Converters.Vector2IntConverter.ReadJson(Newtonsoft.Json.JsonReader,System.Type,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <summary>
+            A method that tells Newtonsoft how to Deserialize and read the current object.
+            </summary>
+            <param name="reader"></param>
+            <param name="objectType"></param>
+            <param name="existingValue"></param>
+            <param name="serializer"></param>
+            <returns></returns>
+        </member>
+        <member name="T:SMLHelper.V2.Json.Converters.Vector3Converter">
+            <summary>
+            A Vector3 json converter that simplifies the Vector3 to only x,y,z serialization.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Json.Converters.Vector3Converter.CanConvert(System.Type)">
+            <summary>
+            A method that determines when this converter should process.
+            </summary>
+            <param name="objectType">the current object type</param>
+            <returns></returns>
+        </member>
+        <member name="M:SMLHelper.V2.Json.Converters.Vector3Converter.WriteJson(Newtonsoft.Json.JsonWriter,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <summary>
+            A method that tells Newtonsoft how to Serialize the current object.
+            </summary>
+            <param name="writer"></param>
+            <param name="value"></param>
+            <param name="serializer"></param>
+        </member>
+        <member name="M:SMLHelper.V2.Json.Converters.Vector3Converter.ReadJson(Newtonsoft.Json.JsonReader,System.Type,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <summary>
+            A method that tells Newtonsoft how to Deserialize and read the current object.
+            </summary>
+            <param name="reader"></param>
+            <param name="objectType"></param>
+            <param name="existingValue"></param>
+            <param name="serializer"></param>
+            <returns></returns>
+        </member>
+        <member name="T:SMLHelper.V2.Json.Converters.Vector3IntConverter">
+            <summary>
+            A Vector3Int json converter that simplifies the Vector3Int to only x,y,z serialization.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Json.Converters.Vector3IntConverter.CanConvert(System.Type)">
+            <summary>
+            A method that determines when this converter should process.
+            </summary>
+            <param name="objectType">the current object type</param>
+            <returns></returns>
+        </member>
+        <member name="M:SMLHelper.V2.Json.Converters.Vector3IntConverter.WriteJson(Newtonsoft.Json.JsonWriter,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <summary>
+            A method that tells Newtonsoft how to Serialize the current object.
+            </summary>
+            <param name="writer"></param>
+            <param name="value"></param>
+            <param name="serializer"></param>
+        </member>
+        <member name="M:SMLHelper.V2.Json.Converters.Vector3IntConverter.ReadJson(Newtonsoft.Json.JsonReader,System.Type,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <summary>
+            A method that tells Newtonsoft how to Deserialize and read the current object.
+            </summary>
+            <param name="reader"></param>
+            <param name="objectType"></param>
+            <param name="existingValue"></param>
+            <param name="serializer"></param>
+            <returns></returns>
+        </member>
+        <member name="T:SMLHelper.V2.Json.Converters.Vector4Converter">
+            <summary>
+            A Vector4 json converter that simplifies the Vector4 to only x,y,z,w serialization.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Json.Converters.Vector4Converter.CanConvert(System.Type)">
+            <summary>
+            A method that determines when this converter should process.
+            </summary>
+            <param name="objectType">the current object type</param>
+            <returns></returns>
+        </member>
+        <member name="M:SMLHelper.V2.Json.Converters.Vector4Converter.WriteJson(Newtonsoft.Json.JsonWriter,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <summary>
+            A method that tells Newtonsoft how to Serialize the current object.
+            </summary>
+            <param name="writer"></param>
+            <param name="value"></param>
+            <param name="serializer"></param>
+        </member>
+        <member name="M:SMLHelper.V2.Json.Converters.Vector4Converter.ReadJson(Newtonsoft.Json.JsonReader,System.Type,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <summary>
+            A method that tells Newtonsoft how to Deserialize and read the current object.
+            </summary>
+            <param name="reader"></param>
+            <param name="objectType"></param>
+            <param name="existingValue"></param>
+            <param name="serializer"></param>
             <returns></returns>
         </member>
         <member name="T:SMLHelper.V2.Json.Converters.KeyCodeConverter">
@@ -4009,6 +5118,150 @@
             <seealso cref="M:SMLHelper.V2.Json.Interfaces.IJsonFile.LoadWithConverters(System.Boolean,Newtonsoft.Json.JsonConverter[])"/>
             <seealso cref="M:SMLHelper.V2.Json.Interfaces.IJsonFile.Save"/>
         </member>
+        <member name="T:SMLHelper.V2.Json.JsonFile">
+            <summary>
+            A simple abstract implementation of <see cref="T:SMLHelper.V2.Json.Interfaces.IJsonFile"/>.
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Json.JsonFile.JsonFilePath">
+            <summary>
+            The file path at which the JSON file is accessible for reading and writing.
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Json.JsonFile.AlwaysIncludedJsonConverters">
+            <summary>
+            The <see cref="T:Newtonsoft.Json.JsonConverter"/>s that should always be used when reading/writing JSON data.
+            </summary>
+            <seealso cref="F:SMLHelper.V2.Json.JsonFile.alwaysIncludedJsonConverters"/>
+        </member>
+        <member name="F:SMLHelper.V2.Json.JsonFile.OnStartedLoading">
+            <summary>
+            An event that is invoked whenever the <see cref="T:SMLHelper.V2.Json.JsonFile"/> is about to load data from disk.
+            </summary>
+        </member>
+        <member name="F:SMLHelper.V2.Json.JsonFile.OnFinishedLoading">
+            <summary>
+            An event that is invoked whenever the <see cref="T:SMLHelper.V2.Json.JsonFile"/> has finished loading data from disk.
+            </summary>
+        </member>
+        <member name="F:SMLHelper.V2.Json.JsonFile.OnStartedSaving">
+            <summary>
+            An event that is invoked whenever the <see cref="T:SMLHelper.V2.Json.JsonFile"/> is about to save data to disk.
+            </summary>
+        </member>
+        <member name="F:SMLHelper.V2.Json.JsonFile.OnFinishedSaving">
+            <summary>
+            An event that is invoked whenever the <see cref="T:SMLHelper.V2.Json.JsonFile"/> has finished saving data to disk.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Json.JsonFile.Load(System.Boolean)">
+            <summary>
+            Loads the JSON properties from the file on disk into the <see cref="T:SMLHelper.V2.Json.JsonFile"/>.
+            </summary>
+            <param name="createFileIfNotExist">Whether a new JSON file should be created with default values if it does not
+            already exist.</param>
+            <seealso cref="M:SMLHelper.V2.Json.JsonFile.Save"/>
+            <seealso cref="M:SMLHelper.V2.Json.JsonFile.LoadWithConverters(System.Boolean,Newtonsoft.Json.JsonConverter[])"/>
+        </member>
+        <member name="M:SMLHelper.V2.Json.JsonFile.Save">
+            <summary>
+            Saves the current fields and properties of the <see cref="T:SMLHelper.V2.Json.JsonFile"/> as JSON properties to the file on disk.
+            </summary>
+            <seealso cref="M:SMLHelper.V2.Json.JsonFile.Load(System.Boolean)"/>
+            <seealso cref="M:SMLHelper.V2.Json.JsonFile.SaveWithConverters(Newtonsoft.Json.JsonConverter[])"/>
+        </member>
+        <member name="M:SMLHelper.V2.Json.JsonFile.LoadWithConverters(System.Boolean,Newtonsoft.Json.JsonConverter[])">
+            <summary>
+            Loads the JSON properties from the file on disk into the <see cref="T:SMLHelper.V2.Json.JsonFile"/>.
+            </summary>
+            <param name="createFileIfNotExist">Whether a new JSON file should be created with default values if it does not
+            already exist.</param>
+            <param name="jsonConverters">Optional <see cref="T:Newtonsoft.Json.JsonConverter"/>s to be used for serialization.
+            The <see cref="P:SMLHelper.V2.Json.JsonFile.AlwaysIncludedJsonConverters"/> will always be used, regardless of whether you pass them.</param>
+            <seealso cref="M:SMLHelper.V2.Json.JsonFile.SaveWithConverters(Newtonsoft.Json.JsonConverter[])"/>
+            <seealso cref="M:SMLHelper.V2.Json.JsonFile.Load(System.Boolean)"/>
+        </member>
+        <member name="M:SMLHelper.V2.Json.JsonFile.SaveWithConverters(Newtonsoft.Json.JsonConverter[])">
+            <summary>
+            Saves the current fields and properties of the <see cref="T:SMLHelper.V2.Json.JsonFile"/> as JSON properties to the file on disk.
+            </summary>
+            <param name="jsonConverters">Optional <see cref="T:Newtonsoft.Json.JsonConverter"/>s to be used for deserialization.
+            The <see cref="P:SMLHelper.V2.Json.JsonFile.AlwaysIncludedJsonConverters"/> will always be used, regardless of whether you pass them.</param>
+            <seealso cref="M:SMLHelper.V2.Json.JsonFile.LoadWithConverters(System.Boolean,Newtonsoft.Json.JsonConverter[])"/>
+            <seealso cref="M:SMLHelper.V2.Json.JsonFile.Save"/>
+        </member>
+        <member name="T:SMLHelper.V2.Json.JsonFileEventArgs">
+            <summary>
+            Contains basic information for a <see cref="T:SMLHelper.V2.Json.JsonFile"/> event.
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Json.JsonFileEventArgs.Instance">
+            <summary>
+            The instance of the <see cref="T:SMLHelper.V2.Json.JsonFile"/> this event pertains to.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Json.JsonFileEventArgs.#ctor(SMLHelper.V2.Json.JsonFile)">
+            <summary>
+            Instantiates a new <see cref="T:SMLHelper.V2.Json.JsonFileEventArgs"/>.
+            </summary>
+            <param name="instance">The <see cref="T:SMLHelper.V2.Json.JsonFile"/> instance the event pertains to.</param>
+        </member>
+        <member name="T:SMLHelper.V2.Json.SaveDataCache">
+            <summary>
+            An abstract implementation of <see cref="T:SMLHelper.V2.Json.Interfaces.IJsonFile"/> intended for use with caching per-save data.
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Json.SaveDataCache.JsonFilePath">
+            <summary>
+            The file path at which the JSON file is accessible for reading and writing.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Json.SaveDataCache.#ctor">
+            <summary>
+            Creates a new instance of <see cref="T:SMLHelper.V2.Json.SaveDataCache"/>, parsing the file name from <see cref="T:SMLHelper.V2.Json.Attributes.FileNameAttribute"/>
+            if declared, or with default values otherwise.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Json.SaveDataCache.Load(System.Boolean)">
+            <summary>
+            Loads the JSON properties from the file on disk into the <see cref="T:SMLHelper.V2.Json.SaveDataCache"/>.
+            </summary>
+            <param name="createFileIfNotExist">Whether a new JSON file should be created with default values if it does not
+            already exist.</param>
+            <seealso cref="M:SMLHelper.V2.Json.SaveDataCache.Save"/>
+            <seealso cref="M:SMLHelper.V2.Json.SaveDataCache.LoadWithConverters(System.Boolean,Newtonsoft.Json.JsonConverter[])"/>
+            <exception cref="T:System.InvalidOperationException">Thrown when the player is not in-game.</exception>
+        </member>
+        <member name="M:SMLHelper.V2.Json.SaveDataCache.Save">
+            <summary>
+            Saves the current fields and properties of the <see cref="T:SMLHelper.V2.Json.SaveDataCache"/> as JSON properties to the file on disk.
+            </summary>
+            <seealso cref="M:SMLHelper.V2.Json.SaveDataCache.Load(System.Boolean)"/>
+            <seealso cref="M:SMLHelper.V2.Json.SaveDataCache.SaveWithConverters(Newtonsoft.Json.JsonConverter[])"/>
+            <exception cref="T:System.InvalidOperationException">Thrown when the player is not in-game.</exception>
+        </member>
+        <member name="M:SMLHelper.V2.Json.SaveDataCache.LoadWithConverters(System.Boolean,Newtonsoft.Json.JsonConverter[])">
+            <summary>
+            Loads the JSON properties from the file on disk into the <see cref="T:SMLHelper.V2.Json.SaveDataCache"/>.
+            </summary>
+            <param name="createFileIfNotExist">Whether a new JSON file should be created with default values if it does not
+            already exist.</param>
+            <param name="jsonConverters">Optional <see cref="T:Newtonsoft.Json.JsonConverter"/>s to be used for serialization.
+            The <see cref="P:SMLHelper.V2.Json.JsonFile.AlwaysIncludedJsonConverters"/> will always be used, regardless of whether you pass them.</param>
+            <seealso cref="M:SMLHelper.V2.Json.SaveDataCache.SaveWithConverters(Newtonsoft.Json.JsonConverter[])"/>
+            <seealso cref="M:SMLHelper.V2.Json.SaveDataCache.Load(System.Boolean)"/>
+            <exception cref="T:System.InvalidOperationException">Thrown when the player is not in-game.</exception>
+        </member>
+        <member name="M:SMLHelper.V2.Json.SaveDataCache.SaveWithConverters(Newtonsoft.Json.JsonConverter[])">
+            <summary>
+            Saves the current fields and properties of the <see cref="T:SMLHelper.V2.Json.SaveDataCache"/> as JSON properties to the file on disk.
+            </summary>
+            <param name="jsonConverters">Optional <see cref="T:Newtonsoft.Json.JsonConverter"/>s to be used for deserialization.
+            The <see cref="P:SMLHelper.V2.Json.JsonFile.AlwaysIncludedJsonConverters"/> will always be used, regardless of whether you pass them.</param>
+            <seealso cref="M:SMLHelper.V2.Json.SaveDataCache.LoadWithConverters(System.Boolean,Newtonsoft.Json.JsonConverter[])"/>
+            <seealso cref="M:SMLHelper.V2.Json.SaveDataCache.Save"/>
+            <exception cref="T:System.InvalidOperationException">Thrown when the player is not in-game.</exception>
+        </member>
         <member name="T:SMLHelper.V2.Json.ConfigFile">
             <summary>
             A simple implementation of <see cref="T:SMLHelper.V2.Json.Interfaces.IJsonFile"/> for use with config files.
@@ -4107,22 +5360,6 @@
             <seealso cref="M:SMLHelper.V2.Json.ConfigFile.LoadWithConverters(System.Boolean,Newtonsoft.Json.JsonConverter[])"/>
             <seealso cref="M:SMLHelper.V2.Json.ConfigFile.Save"/>
         </member>
-        <member name="T:SMLHelper.V2.Json.ConfigFileEventArgs">
-            <summary>
-            Contains basic information for a <see cref="T:SMLHelper.V2.Json.ConfigFile"/> event.
-            </summary>
-        </member>
-        <member name="P:SMLHelper.V2.Json.ConfigFileEventArgs.Instance">
-            <summary>
-            The instance of the <see cref="T:SMLHelper.V2.Json.ConfigFile"/> this event pertains to.
-            </summary>
-        </member>
-        <member name="M:SMLHelper.V2.Json.ConfigFileEventArgs.#ctor(SMLHelper.V2.Json.ConfigFile)">
-            <summary>
-            Instantiates a new <see cref="T:SMLHelper.V2.Json.ConfigFileEventArgs"/>.
-            </summary>
-            <param name="instance">The <see cref="T:SMLHelper.V2.Json.ConfigFile"/> instance the event pertains to.</param>
-        </member>
         <member name="T:SMLHelper.V2.Handler">
             <summary>
             A simple location where every SMLHelper handler class can be accessed.
@@ -4211,6 +5448,51 @@
         <member name="P:SMLHelper.V2.Handler.SurvivalHandler">
             <summary>
             a handler for common uses to the Survival component
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Handler.CoordinatedSpawnHandler">
+            <summary>
+            A handler to making coordinated Vector3 spawns ingame.
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Handler.TechGroupHandler">
+            <summary>
+            A handler class for adding custom TechGroups into the game.
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Handler.TechCategoryHandler">
+            <summary>
+            A handler class for adding custom TechCategories into the game.
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Handler.ConsoleCommandsHandler">
+            <summary>
+            A handler class for registering your custom console commands.
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Handler.PingHandler">
+            <summary>
+            A handler related to PingTypes
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Handler.BackgroundTypeHandler">
+            <summary>
+            A handler for everything related to creating new BackgroundTypes.
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Handler.SoundHandler">
+            <summary>
+            A handler related to Custom Sounds
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Handler.EquipmentHandler">
+            <summary>
+            A handler for adding custom EquipmentTypes into the game.
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Handler.PDALogHandler">
+            <summary>
+            A handler for stuff related to the PDALog class.
             </summary>
         </member>
         <member name="T:SMLHelper.V2.Initializer">
@@ -4308,6 +5590,47 @@
             <param name="mode"></param>
             <returns>The <see cref="T:FMOD.Sound"/> instance</returns>
         </member>
+        <member name="M:SMLHelper.V2.Utility.AudioUtils.CreateSound(UnityEngine.AudioClip,FMOD.MODE)">
+            <summary>
+            Creates a <see cref="T:FMOD.Sound"/> instance from an <see cref="T:UnityEngine.AudioClip"/>. Can be stored and later used with <see cref="M:SMLHelper.V2.Utility.AudioUtils.PlaySound(FMOD.Sound)"/>
+            </summary>
+            <param name="audio">the AudioClip to make a Sound instance of.</param>
+            <param name="mode"></param>
+            <returns>The <see cref="T:FMOD.Sound"/> instance.</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.AudioUtils.CreateSounds(System.Collections.Generic.IEnumerable{UnityEngine.AudioClip},FMOD.MODE)">
+            <summary>
+            Creates an FMOD <see cref="T:FMOD.Sound"/> collection from an <see cref="T:UnityEngine.AudioClip"/> collection.
+            </summary>
+            <param name="clips">AudioClips to create from.</param>
+            <param name="mode">The mode to set the sound to</param>
+            <returns>A collection of FMOD Sounds.</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.AudioUtils.CreateSounds(System.Collections.Generic.IEnumerable{System.String},FMOD.MODE)">
+            <summary>
+            Converts a sound paths collection to an FMOD <see cref="T:FMOD.Sound"/> collection.
+            </summary>
+            <param name="soundPaths">Sound paths to create from. Relative to the base game folder</param>
+            <param name="mode">The mode to set the sound to</param>
+            <returns>A collection of FMOD Sounds.</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.AudioUtils.PlaySound(UnityEngine.AudioClip,FMOD.MODE)">
+            <summary>
+            Plays a <see cref="T:FMOD.Sound"/> from an <see cref="T:UnityEngine.AudioClip"/>.
+            </summary>
+            <param name="audio">The AudioClip of the sound.</param>
+            <param name="mode"></param>
+            <returns>The channel on which the sound was created.</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.AudioUtils.PlaySound(UnityEngine.AudioClip,SMLHelper.V2.Utility.SoundChannel,FMOD.MODE)">
+            <summary>
+            Plays a <see cref="T:FMOD.Sound"/> from an <see cref="T:UnityEngine.AudioClip"/>. Has overload for controlling volume.
+            </summary>
+            <param name="audio">The AudioClip of the sound.</param>
+            <param name="mode"></param>
+            <param name="volumeControl">Which volume control to adjust sound levels by. How loud sound is.</param>
+            <returns>The channel on which the sound was created</returns>
+        </member>
         <member name="M:SMLHelper.V2.Utility.AudioUtils.PlaySound(System.String,FMOD.MODE)">
             <summary>
             Plays a <see cref="T:FMOD.Sound"/> globally from a path. Must be a .wav file
@@ -4339,6 +5662,64 @@
             <param name="sound">The sound which should be played</param>
             <param name="volumeControl">Which volume control to adjust sound levels by. How loud sound is.</param>
             <returns>The channel on which the sound was created</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.AudioUtils.PlaySound(FMOD.Sound,FMOD.Studio.Bus)">
+            <summary>
+            Plays a <see cref="T:FMOD.Sound"/> on the specified <see cref="T:FMOD.Studio.Bus"/>.
+            </summary>
+            <param name="sound">The sound which should be played.</param>
+            <param name="bus">The bus to play the sound on.</param>
+            <returns>The channel on which the sound was created.</returns>
+        </member>
+        <member name="T:SMLHelper.V2.Utility.AudioUtils.BusPaths">
+            <summary>
+            A list of the relevant FMOD bus paths the game uses.
+            </summary>
+        </member>
+        <member name="F:SMLHelper.V2.Utility.AudioUtils.BusPaths.UnderwaterCreatures">
+            <summary>
+            Used for underwater creature SFXs. Tied to the master volume.
+            </summary>
+        </member>
+        <member name="F:SMLHelper.V2.Utility.AudioUtils.BusPaths.SurfaceCreatures">
+            <summary>
+            Used for surface creature SFXs that dont get muted when at the surface of the ocean. Tied to the master volume.
+            </summary>
+        </member>
+        <member name="F:SMLHelper.V2.Utility.AudioUtils.BusPaths.PDAVoice">
+            <summary>
+            Used for PDA voices. Tied to the voice volume.
+            </summary>
+        </member>
+        <member name="F:SMLHelper.V2.Utility.AudioUtils.BusPaths.VoiceOvers">
+            <summary>
+            Used for encyclopedia VOs. Tied to the voice volume.
+            </summary>
+        </member>
+        <member name="F:SMLHelper.V2.Utility.AudioUtils.BusPaths.Music">
+            <summary>
+            Used for main music. Tied to the music volume.
+            </summary>
+        </member>
+        <member name="F:SMLHelper.V2.Utility.AudioUtils.BusPaths.EnvironmentalMusic">
+            <summary>
+            Used for environmental music. Tied to the music volume.
+            </summary>
+        </member>
+        <member name="F:SMLHelper.V2.Utility.AudioUtils.BusPaths.UnderwaterAmbient">
+            <summary>
+            Used for underwater ambience SFXs. Tied to the ambient volume.
+            </summary>
+        </member>
+        <member name="F:SMLHelper.V2.Utility.AudioUtils.BusPaths.SurfaceAmbient">
+            <summary>
+            Used for ambience SFXs that dont get muted when at the surface of the ocean. Tied to the ambient volume.
+            </summary>
+        </member>
+        <member name="F:SMLHelper.V2.Utility.AudioUtils.BusPaths.PlayerSFXs">
+            <summary>
+            Used for player and hand-held tools SFXs. Tied to the master volume.
+            </summary>
         </member>
         <member name="T:SMLHelper.V2.Utility.BasicText">
             <summary>
@@ -4501,7 +5882,7 @@
             Resets to using "cloned" size of Subnautica default.
             </summary>
         </member>
-        <member name="M:SMLHelper.V2.Utility.BasicText.SetFont(UnityEngine.Font)">
+        <member name="M:SMLHelper.V2.Utility.BasicText.SetFont(TMPro.TMP_FontAsset)">
             <summary>
             Sets the font 
             </summary>
@@ -4512,7 +5893,7 @@
             Resets to using "cloned" font of Subnautica default.
             </summary>
         </member>
-        <member name="M:SMLHelper.V2.Utility.BasicText.SetFontStyle(UnityEngine.FontStyle)">
+        <member name="M:SMLHelper.V2.Utility.BasicText.SetFontStyle(TMPro.FontStyles)">
             <summary>
             Sets the font style.
             </summary>
@@ -4586,23 +5967,23 @@
         </member>
         <member name="M:SMLHelper.V2.Utility.ImageUtils.LoadSpriteFromFile(System.String,UnityEngine.TextureFormat)">
             <summary>
-            Creates a new <see cref="T:Atlas.Sprite" /> from an image file.
+            Creates a new <see cref="T:UnityEngine.Sprite" /> from an image file.
             </summary>
             <param name="filePathToImage">The path to the image file.</param>
             <param name="format">
-            <para>The texture format. By default, this uses <see cref="F:UnityEngine.TextureFormat.BC7" />.</para>
-            <para>https://docs.unity3d.com/ScriptReference/TextureFormat.BC7.html</para>
-            <para>Don't change this unless you really know what you're doing.</para>
+            The texture format. By default, this uses <see cref="F:UnityEngine.TextureFormat.BC7" />.<br/>
+            https://docs.unity3d.com/ScriptReference/TextureFormat.BC7.html <br/>
+            Don't change this unless you really know what you're doing.
             </param>
-            <returns>Will return a new <see cref="T:Atlas.Sprite"/> instance if the file exists; Otherwise returns null.</returns>
+            <returns>Will return a new <see cref="T:UnityEngine.Sprite"/> instance if the file exists; Otherwise returns null.</returns>
         </member>
         <member name="M:SMLHelper.V2.Utility.ImageUtils.LoadSpriteFromTexture(UnityEngine.Texture2D)">
             <summary>
-            Creates a new <see cref="T:Atlas.Sprite" /> from an image file.
+            Creates a new <see cref="T:UnityEngine.Sprite" /> from an image file.
             </summary>
             <param name="texture2D">The 2D texture to convert into a sprite.</param>
             <returns>
-            Will return a new <see cref="T:Atlas.Sprite" /> instance using the provided texture.
+            Will return a new <see cref="T:UnityEngine.Sprite" /> instance using the provided texture.
             </returns>
         </member>
         <member name="T:SMLHelper.V2.Utility.IOUtilities">
@@ -5417,7 +6798,7 @@
             <summary>
             Sets the value in the <see cref="P:SMLHelper.V2.Options.Attributes.ConfigFileMetadata`1.Config"/>, optionally saving the <see cref="P:SMLHelper.V2.Options.Attributes.ConfigFileMetadata`1.Config"/> to disk if the
             <see cref="F:SMLHelper.V2.Options.Attributes.MenuAttribute.SaveEvents.ChangeValue"/> flag is set, before passing off to
-            <see cref="M:SMLHelper.V2.Options.Attributes.ConfigFileMetadata`1.invokeOnChangeEvents``1(SMLHelper.V2.Options.Attributes.ModOptionAttributeMetadata{`0},System.Object,``0)"/>
+            <see cref="M:SMLHelper.V2.Options.Attributes.ConfigFileMetadata`1.InvokeOnChangeEvents``1(SMLHelper.V2.Options.Attributes.ModOptionAttributeMetadata{`0},System.Object,``0)"/>
             to invoke any methods specified with an <see cref="T:SMLHelper.V2.Options.Attributes.OnChangeAttribute"/>.
             </summary>
             <param name="sender">The sender of the original choice changed event.</param>
@@ -5427,7 +6808,7 @@
             <summary>
             Sets the value in the <see cref="P:SMLHelper.V2.Options.Attributes.ConfigFileMetadata`1.Config"/>, optionally saving the <see cref="P:SMLHelper.V2.Options.Attributes.ConfigFileMetadata`1.Config"/> to disk if the
             <see cref="F:SMLHelper.V2.Options.Attributes.MenuAttribute.SaveEvents.ChangeValue"/> flag is set, before passing off to
-            <see cref="M:SMLHelper.V2.Options.Attributes.ConfigFileMetadata`1.invokeOnChangeEvents``1(SMLHelper.V2.Options.Attributes.ModOptionAttributeMetadata{`0},System.Object,``0)"/>
+            <see cref="M:SMLHelper.V2.Options.Attributes.ConfigFileMetadata`1.InvokeOnChangeEvents``1(SMLHelper.V2.Options.Attributes.ModOptionAttributeMetadata{`0},System.Object,``0)"/>
             to invoke any methods specified with an <see cref="T:SMLHelper.V2.Options.Attributes.OnChangeAttribute"/>.
             </summary>
             <param name="sender">The sender of the original keybind changed event.</param>
@@ -5437,7 +6818,7 @@
             <summary>
             Sets the value in the <see cref="P:SMLHelper.V2.Options.Attributes.ConfigFileMetadata`1.Config"/>, optionally saving the <see cref="P:SMLHelper.V2.Options.Attributes.ConfigFileMetadata`1.Config"/> to disk if the
             <see cref="F:SMLHelper.V2.Options.Attributes.MenuAttribute.SaveEvents.ChangeValue"/> flag is set, before passing off to
-            <see cref="M:SMLHelper.V2.Options.Attributes.ConfigFileMetadata`1.invokeOnChangeEvents``1(SMLHelper.V2.Options.Attributes.ModOptionAttributeMetadata{`0},System.Object,``0)"/>
+            <see cref="M:SMLHelper.V2.Options.Attributes.ConfigFileMetadata`1.InvokeOnChangeEvents``1(SMLHelper.V2.Options.Attributes.ModOptionAttributeMetadata{`0},System.Object,``0)"/>
             to invoke any methods specified with an <see cref="T:SMLHelper.V2.Options.Attributes.OnChangeAttribute"/>.
             </summary>
             <param name="sender">The sender of the original slider changed event.</param>
@@ -5447,7 +6828,7 @@
             <summary>
             Sets the value in the <see cref="P:SMLHelper.V2.Options.Attributes.ConfigFileMetadata`1.Config"/>, optionally saving the <see cref="P:SMLHelper.V2.Options.Attributes.ConfigFileMetadata`1.Config"/> to disk if the
             <see cref="F:SMLHelper.V2.Options.Attributes.MenuAttribute.SaveEvents.ChangeValue"/> flag is set, before passing off to
-            <see cref="M:SMLHelper.V2.Options.Attributes.ConfigFileMetadata`1.invokeOnChangeEvents``1(SMLHelper.V2.Options.Attributes.ModOptionAttributeMetadata{`0},System.Object,``0)"/>
+            <see cref="M:SMLHelper.V2.Options.Attributes.ConfigFileMetadata`1.InvokeOnChangeEvents``1(SMLHelper.V2.Options.Attributes.ModOptionAttributeMetadata{`0},System.Object,``0)"/>
             to invoke any methods specified with an <see cref="T:SMLHelper.V2.Options.Attributes.OnChangeAttribute"/>.
             </summary>
             <param name="sender">The sender of the original toggle changed event.</param>
@@ -5462,7 +6843,7 @@
             <param name="sender"></param>
             <param name="e"></param>
         </member>
-        <member name="M:SMLHelper.V2.Options.Attributes.ConfigFileMetadata`1.invokeOnChangeEvents(SMLHelper.V2.Options.Attributes.ModOptionAttributeMetadata{`0},System.Object)">
+        <member name="M:SMLHelper.V2.Options.Attributes.ConfigFileMetadata`1.InvokeOnChangeEvents(SMLHelper.V2.Options.Attributes.ModOptionAttributeMetadata{`0},System.Object)">
             <summary>
             Invokes the relevant method(s) specified with the <see cref="T:SMLHelper.V2.Options.Attributes.OnChangeAttribute"/>(s)
             and passes parameters when a value is changed when loaded from disk.
@@ -5470,7 +6851,7 @@
             <param name="modOptionMetadata">The metadata for the mod option.</param>
             <param name="sender">The sender of the event.</param>
         </member>
-        <member name="M:SMLHelper.V2.Options.Attributes.ConfigFileMetadata`1.invokeOnChangeEvents``1(SMLHelper.V2.Options.Attributes.ModOptionAttributeMetadata{`0},System.Object,``0)">
+        <member name="M:SMLHelper.V2.Options.Attributes.ConfigFileMetadata`1.InvokeOnChangeEvents``1(SMLHelper.V2.Options.Attributes.ModOptionAttributeMetadata{`0},System.Object,``0)">
             <summary>
             Invokes the relevant method(s) specified with <see cref="T:SMLHelper.V2.Options.Attributes.OnChangeAttribute"/>(s)
             and passes parameters when a value is changed.
@@ -5480,7 +6861,7 @@
             <param name="sender">The sender of the event.</param>
             <param name="e">The event args from the OnChange event.</param>
         </member>
-        <member name="M:SMLHelper.V2.Options.Attributes.ConfigFileMetadata`1.invokeEvent``1(SMLHelper.V2.Options.Attributes.MemberInfoMetadata{`0},System.Object,``0)">
+        <member name="M:SMLHelper.V2.Options.Attributes.ConfigFileMetadata`1.InvokeEvent``1(SMLHelper.V2.Options.Attributes.MemberInfoMetadata{`0},System.Object,``0)">
             <summary>
             Invoke the relevant method specified by a <see cref="T:SMLHelper.V2.Options.Attributes.ModOptionEventAttribute"/>
             and passes relevant parameters.

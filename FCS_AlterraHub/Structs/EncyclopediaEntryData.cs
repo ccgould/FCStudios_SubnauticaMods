@@ -1,5 +1,4 @@
 ﻿using FCS_AlterraHub.Extensions;
-using UnityEngine;
 
 namespace FCS_AlterraHub.Structs
 {

@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Reflection;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Registration;
@@ -18,7 +17,6 @@ using HarmonyLib;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
-using UnityEngine;
 
 namespace FCS_ProductionSolutions
 {

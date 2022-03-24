@@ -2,7 +2,6 @@
 using FCS_AlterraHub.Helpers;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Patches;
-using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;

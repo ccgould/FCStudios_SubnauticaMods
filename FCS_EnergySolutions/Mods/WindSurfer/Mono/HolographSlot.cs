@@ -1,5 +1,5 @@
 ﻿using System;
-using FCS_EnergySolutions.Configuration;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -83,18 +83,23 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
 
             _button.onClick.AddListener((() =>
             {
-                var result = WindSurferOperatorController.AddPlatform(this, GetPosition() + Direction);
-                
-                if (result)
-                {
-                    WindSurferOperatorController.RefreshHoloGrams();
-                }
-
+                StartCoroutine(TryAddPlatform());
             }));
 
             InvokeRepeating(nameof(UpdateSlot),.1f,.1f);
 
             _initialized = true;
+        }
+
+        private IEnumerator TryAddPlatform()
+        {
+            var result = new TaskResult<bool>();
+            yield return WindSurferOperatorController.AddPlatform(this, GetPosition() + Direction, result);
+                
+            if (result.Get())
+            {
+                WindSurferOperatorController.RefreshHoloGrams();
+            }
         }
 
         private void UpdateSlot()

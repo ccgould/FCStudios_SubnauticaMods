@@ -7,7 +7,6 @@ using FCS_AlterraHub.Mods.Global.Spawnables;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Mods.LedLights.Mono;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
@@ -129,7 +128,7 @@ namespace FCS_HomeSolutions.Mods.LedLights.Buildable
         public bool allowedOnGround;
         public bool allowedInSub;
         public GameObject prefab;
-        public TechData TechData;
+        public RecipeData TechData;
         public bool allowedOnContructables;
     }
 }

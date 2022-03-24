@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Helpers;
-using FCS_AlterraHub.Mono;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Mono;

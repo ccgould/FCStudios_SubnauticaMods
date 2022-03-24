@@ -1,5 +1,4 @@
 ﻿using System;
-using FCS_AlterraHub.Mods.AlterraHubDepot.Mono;
 using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem;
 using FCSCommon.Utilities;
 using UnityEngine;

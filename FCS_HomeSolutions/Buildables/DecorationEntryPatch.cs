@@ -7,7 +7,6 @@ using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mods.Global.Spawnables;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Configuration;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
@@ -106,7 +105,7 @@ namespace FCS_HomeSolutions.Buildables
         {
             QuickLogger.Debug($"Creating recipe...");
             // Create and associate recipe to the new TechType
-            var customFabRecipe = new TechData()
+            var customFabRecipe = new RecipeData()
             {
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()

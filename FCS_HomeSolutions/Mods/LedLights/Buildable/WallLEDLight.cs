@@ -1,5 +1,4 @@
-﻿using FCS_AlterraHub.API;
-using FCS_HomeSolutions.Buildables;
+﻿using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
 using UnityEngine;
 
@@ -10,7 +9,8 @@ namespace FCS_HomeSolutions.Mods.LedLights.Buildable
         public WallLEDLight() : base(new LedLightData
         {
             classId = "LedLightStickWall",
-            description = "A wall mountable LED light strip. (Change the color with the Paint Tool) (Interior use only)",
+            description =
+                "A wall mountable LED light strip. (Change the color with the Paint Tool) (Interior use only)",
             friendlyName = "Wall Mountable LED Light Strip",
             allowedInBase = true,
             allowedInSub = true,
@@ -22,7 +22,11 @@ namespace FCS_HomeSolutions.Mods.LedLights.Buildable
             size = Vector3.zero,
             center = Vector3.zero,
             prefab = ModelPrefab.GetPrefabFromGlobal("FCS_LedLightStick_02"),
+#if SUBNAUTICA
             TechData = Mod.LedLightStickWallIngredients
+#else
+            TechData = Mod.DeskLEDIngredients
+#endif
         })
         {
         }

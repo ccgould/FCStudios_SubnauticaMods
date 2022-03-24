@@ -9,6 +9,7 @@ using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Mods.Curtains.Mono;
 using FCSCommon.Utilities;
+using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 #if SUBNAUTICA

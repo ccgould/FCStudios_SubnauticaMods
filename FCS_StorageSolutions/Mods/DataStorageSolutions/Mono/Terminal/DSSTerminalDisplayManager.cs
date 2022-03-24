@@ -6,7 +6,6 @@ using FCS_AlterraHub.Abstract;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
-using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.Controllers;
@@ -16,7 +15,6 @@ using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Windows.WebCam;
 
 namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 {

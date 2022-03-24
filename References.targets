@@ -7,10 +7,10 @@
     <Reference Include="BepInEx">
       <Private>False</Private>
     </Reference>
-    <Reference Include="Assembly-CSharp-firstpass_publicized">
+    <Reference Include="Assembly-CSharp-firstpass">
       <Private>False</Private>
     </Reference>
-    <Reference Include="Assembly-CSharp_publicized">
+    <Reference Include="Assembly-CSharp">
       <Private>False</Private>
     </Reference>
     <Reference Include="QModInstaller">
@@ -20,6 +20,9 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="FMODUnity">
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />

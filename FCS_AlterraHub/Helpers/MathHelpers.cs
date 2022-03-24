@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using QModManager.API;
-using UnityEngine;
 
 namespace FCS_AlterraHub.Helpers
 {

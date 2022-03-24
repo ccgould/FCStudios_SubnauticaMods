@@ -7,7 +7,6 @@ using FCS_ProductionSolutions.Mods.HydroponicHarvester.Models;
 using FCS_ProductionSolutions.Structs;
 using UnityEngine;
 using UnityEngine.UI;
-using Valve.VR;
 
 namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
 {

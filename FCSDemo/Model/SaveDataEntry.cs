@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using FCS_AlterraHub.Model;
+#if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
+#else
+using Newtonsoft.Json;
+#endif
 
 namespace FCSDemo.Model
 {

@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using FCSCommon.Utilities;
-using HarmonyLib;
-using UnityEngine;
-
-namespace FCS_AlterraHub.Patches
+﻿namespace FCS_AlterraHub.Patches
 {
     //[HarmonyPatch(typeof(StorageContainer))]
     //[HarmonyPatch("OnProtoDeserializeObjectTree")]

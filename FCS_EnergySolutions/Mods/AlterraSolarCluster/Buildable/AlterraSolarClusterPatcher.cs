@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
@@ -9,7 +10,6 @@ using FCS_AlterraHub.Registration;
 using FCS_EnergySolutions.Buildable;
 using FCS_EnergySolutions.Configuration;
 using FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
@@ -197,7 +197,7 @@ namespace FCS_EnergySolutions.AlterraSolarCluster.Buildables
                 Resources.UnloadAsset(solarPowerRelay);
 
                 //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
-                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
+                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
                 gameObject.Set(prefab);
                 yield break;
         }
@@ -208,7 +208,7 @@ namespace FCS_EnergySolutions.AlterraSolarCluster.Buildables
         {
             QuickLogger.Debug($"Creating recipe...");
             // Create and associate recipe to the new TechType
-            var customFabRecipe = new TechData()
+            var customFabRecipe = new RecipeData()
             {
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()

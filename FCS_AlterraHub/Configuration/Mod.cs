@@ -6,8 +6,6 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
-using FCS_AlterraHub.Helpers;
-using FCS_AlterraHub.Managers;
 using FCS_AlterraHub.Model.Utilities;
 using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono;
 using FCS_AlterraHub.Mono;

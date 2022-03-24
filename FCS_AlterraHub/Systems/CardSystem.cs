@@ -6,13 +6,11 @@ using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
-using FCS_AlterraHub.Mono;
 using FCSCommon.Utilities;
 using Random = System.Random;
 #if SUBNAUTICA_STABLE
 
 #else
-using Newtonsoft.Json;
 #endif
 
 

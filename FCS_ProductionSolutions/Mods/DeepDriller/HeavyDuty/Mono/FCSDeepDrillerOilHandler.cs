@@ -5,7 +5,6 @@ using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Model.Converters;
 using FCS_AlterraHub.Mono;
 using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Buildable;
-using FCS_ProductionSolutions.Mods.DeepDriller.Interfaces;
 using FCS_ProductionSolutions.Mods.DeepDriller.Managers;
 using FCSCommon.Utilities;
 using UnityEngine;

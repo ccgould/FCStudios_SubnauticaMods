@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
-using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Models.Upgrades;
 using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono;
 
 namespace FCS_ProductionSolutions.Mods.DeepDriller.Interfaces

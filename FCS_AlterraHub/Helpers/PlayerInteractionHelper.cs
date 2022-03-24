@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using FCS_AlterraHub.Configuration;
-using FCS_AlterraHub.Extensions;
 using FCSCommon.Utilities;
 using UnityEngine;
-using UWE;
 
 namespace FCS_AlterraHub.Helpers
 {

@@ -11,7 +11,6 @@ using SMLHelper.V2.Handlers;
 using Oculus.Newtonsoft.Json;
 #else
 using Newtonsoft.Json;
-using SMLHelper.V2.Handlers;
 using UWE;
 #endif
 

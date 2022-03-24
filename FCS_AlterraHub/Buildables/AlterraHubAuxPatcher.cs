@@ -2,7 +2,6 @@
 using FCSCommon.Utilities;
 using SMLHelper.V2.Handlers;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace FCS_AlterraHub.Buildables
 {

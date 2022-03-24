@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.IO;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Enumerators;
@@ -9,7 +10,6 @@ using FCS_AlterraHub.Registration;
 using FCS_EnergySolutions.Buildable;
 using FCS_EnergySolutions.Configuration;
 using FCS_EnergySolutions.Mods.WindSurfer.Mono;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Handlers;
@@ -100,6 +100,7 @@ namespace FCS_EnergySolutions.Spawnables
         public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
         {
 
+            yield break;
         }
 #endif
         protected override Sprite GetItemSprite()

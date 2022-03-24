@@ -8,23 +8,29 @@ using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono;
 using FCS_HomeSolutions.Spawnables;
 using FCS_HomeSolutions.Structs;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+#if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
-using Oculus.Newtonsoft.Json.Linq;
+#else
+using Newtonsoft.Json;
+#endif
 using SMLHelper.V2.Utility;
 using UnityEngine;
 #if SUBNAUTICA
 using Sprite = Atlas.Sprite;
 
 #endif
+
 namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
 {
     internal class PeeperLoungeBarPatch : DecorationEntryPatch
     {
         internal const string PeeperLoungeBarClassId = "PeeperLoungeBar";
         internal const string PeeperLoungeBarFriendly = "Peeper Lounge Bar";
-        internal const string PeeperLoungeBarDescription = "AI-driven specialty food and drinks kiosk with small aquarium.";
+
+        internal const string PeeperLoungeBarDescription =
+            "AI-driven specialty food and drinks kiosk with small aquarium.";
+
         internal const string PeeperLoungeBarPrefabName = "PeeperLoungeBar";
         internal static string PeeperLoungeBarKitClassID = $"{PeeperLoungeBarClassId}_Kit";
 
@@ -43,16 +49,15 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
             IconName = "PeeperLoungeBar"
         };
 
-        public PeeperLoungeBarPatch() : base(PeeperLoungeBarClassId, PeeperLoungeBarFriendly, PeeperLoungeBarDescription, ModelPrefab.GetPrefabFromGlobal(PeeperLoungeBarPrefabName),Settings) 
+        public PeeperLoungeBarPatch() : base(PeeperLoungeBarClassId, PeeperLoungeBarFriendly,
+            PeeperLoungeBarDescription, ModelPrefab.GetPrefabFromGlobal(PeeperLoungeBarPrefabName), Settings)
         {
-
         }
 
         public override GameObject GetGameObject()
         {
             try
             {
-
                 var prefab = GameObject.Instantiate(_prefab);
 
                 //Disable the object so we can fill in the properties before awake
@@ -83,7 +88,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
                 constructable.allowedOnConstructables = Settings.AllowedOnConstructables;
                 constructable.model = model;
                 constructable.techType = TechType;
-                
+
                 prefab.AddComponent<PrefabIdentifier>().ClassId = ClassID;
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<DecorationController>();
@@ -173,10 +178,12 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
         {
             var mrSpicyChip = new FoodSpawnable(new PeeperBarFoodItemData
             {
-                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("SpicyChips", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("SpicyChips",
+                    FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 ClassId = "SpicyChips",
                 Friendly = "MrSpicy Chips",
-                Description = "Your taste buds will be screaming in delight from the very first bite of MrSpicy Chips. Get energized for the big project or running for your life on an alien planet, or celebrate your victories over even the most mundane tasks with MrSpicy Chips: an adventure in every bag.",
+                Description =
+                    "Your taste buds will be screaming in delight from the very first bite of MrSpicy Chips. Get energized for the big project or running for your life on an alien planet, or celebrate your victories over even the most mundane tasks with MrSpicy Chips: an adventure in every bag.",
                 Cost = 205,
                 Food = 5,
                 Water = -1
@@ -186,10 +193,12 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
 
             var z1Chips = new FoodSpawnable(new PeeperBarFoodItemData
             {
-                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("Z1Chips", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("Z1Chips",
+                    FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 ClassId = "Z1Snacks",
                 Friendly = "Z1 Snacks",
-                Description = "A Countdown to flavor and adventuring, Z1 Snacks bring out your inner intrepid adventurer. Whether you’re running toward adventure or running away because you found it, Z1 Snacks are the ideal compliment. Perfect taste on Z3...Z2...Z1 Snacks!",
+                Description =
+                    "A Countdown to flavor and adventuring, Z1 Snacks bring out your inner intrepid adventurer. Whether you’re running toward adventure or running away because you found it, Z1 Snacks are the ideal compliment. Perfect taste on Z3...Z2...Z1 Snacks!",
                 Cost = 205,
                 Food = 15,
                 Water = -1
@@ -199,10 +208,12 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
 
             var nutritionPackage = new FoodSpawnable(new PeeperBarFoodItemData
             {
-                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("NutritionPackage", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("NutritionPackage",
+                    FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 ClassId = "NutritionPackage",
                 Friendly = "Alterra Nutrient Pouch",
-                Description = "Packed with more nutrients than a momma marsupial could provide. (It’s even tastier than the packaging it comes in!)",
+                Description =
+                    "Packed with more nutrients than a momma marsupial could provide. (It’s even tastier than the packaging it comes in!)",
                 Cost = 100,
                 Food = 15,
                 Water = 1
@@ -212,10 +223,12 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
 
             var spicyPop = new FoodSpawnable(new PeeperBarFoodItemData
             {
-                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("SpicyPop", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("SpicyPop",
+                    FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 ClassId = "SpicyPop",
                 Friendly = "MrSpicy Pop",
-                Description = "Wake up those taste buds and the rest of you too. A delicious compliment MrSpicy chips -- IF you’re brave enough -- Spicy Pop packs a crate full of flavor in every bottle. Made with zero caffeine because who could take a nap with all that flavor on your tongue!",
+                Description =
+                    "Wake up those taste buds and the rest of you too. A delicious compliment MrSpicy chips -- IF you’re brave enough -- Spicy Pop packs a crate full of flavor in every bottle. Made with zero caffeine because who could take a nap with all that flavor on your tongue!",
                 Cost = 300,
                 Food = 0,
                 Water = 60
@@ -225,10 +238,12 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
 
             var extraHotCoffee = new FoodSpawnable(new PeeperBarFoodItemData
             {
-                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("ExtraHotCoffee", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("ExtraHotCoffee",
+                    FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 ClassId = "ExtraHotCoffee",
                 Friendly = "Extra Hot Coffee",
-                Description = "Whether you’re chilled to the bone and about to die from arctic winds or just keep getting distracted by co-workers, Alterra Extra Hot Coffee will keep you going with rich taste, deep flavor, and always the right amount of cream, sugar, salt, hot chili sauce, bacon, or...whatever makes coffee great:  Alterra knows and Alterra delivers.",
+                Description =
+                    "Whether you’re chilled to the bone and about to die from arctic winds or just keep getting distracted by co-workers, Alterra Extra Hot Coffee will keep you going with rich taste, deep flavor, and always the right amount of cream, sugar, salt, hot chili sauce, bacon, or...whatever makes coffee great:  Alterra knows and Alterra delivers.",
                 Cost = 250,
                 Food = 0,
                 Water = 50
@@ -238,10 +253,12 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
 
             var fcsOrangeSoda = new FoodSpawnable(new PeeperBarFoodItemData
             {
-                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("fcsOrangeSoda", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("fcsOrangeSoda",
+                    FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 ClassId = "FCSOrangeSoda",
                 Friendly = "FCS Orange Soda",
-                Description = "Ah, the simple, joyful flavor of True-Natural synthetic oranges and a little carbon-dioxide. A simple and delicious soda to sparkle the tongue and enjoy youthful memories.",
+                Description =
+                    "Ah, the simple, joyful flavor of True-Natural synthetic oranges and a little carbon-dioxide. A simple and delicious soda to sparkle the tongue and enjoy youthful memories.",
                 Cost = 300,
                 Food = 0,
                 Water = 60
@@ -251,10 +268,12 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
 
             var peeperWhiskey = new FoodSpawnable(new PeeperBarFoodItemData
             {
-                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("PeeperWhiskey", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("PeeperWhiskey",
+                    FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 ClassId = "PeeperWhiskey",
                 Friendly = "Peeper Whiskey",
-                Description = "Always a unique flavor, this special whiskey is created from uniquely local ingredients for the perfect taste of your far-away place. Specially tailored for alcoholic effects on peepers; please do not give Peeper Whiskey to underage peepers.",
+                Description =
+                    "Always a unique flavor, this special whiskey is created from uniquely local ingredients for the perfect taste of your far-away place. Specially tailored for alcoholic effects on peepers; please do not give Peeper Whiskey to underage peepers.",
                 Cost = 425,
                 Food = 0,
                 Water = 85
@@ -264,10 +283,12 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
 
             var alterraScotch = new FoodSpawnable(new PeeperBarFoodItemData
             {
-                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("AlterraScotch", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("AlterraScotch",
+                    FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 ClassId = "AlterraScotch",
                 Friendly = "Alterra Scotch",
-                Description = "An aged whisky made by a single distillery using only malted barley and water, with a complex and mellow flavor. Perfect for taking the edge off a rough day.  (Dealcoholized for your comfort and convenience and reduced chance of hangover)",
+                Description =
+                    "An aged whisky made by a single distillery using only malted barley and water, with a complex and mellow flavor. Perfect for taking the edge off a rough day.  (Dealcoholized for your comfort and convenience and reduced chance of hangover)",
                 Cost = 475,
                 Food = 0,
                 Water = 95
@@ -278,10 +299,12 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
 
             var coffeePackage = new FoodSpawnable(new PeeperBarFoodItemData
             {
-                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("CoffeePackage", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("CoffeePackage",
+                    FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 ClassId = "CoffeePackage",
                 Friendly = "Coffee Package",
-                Description = "Freshly roasted and ground coffee beans, packed in argon gas, and three-fold wrapped in foil. You’ll swear you were standing next to the roaster when you breathe in the heady aroma of perfectly roasted coffee beans.",
+                Description =
+                    "Freshly roasted and ground coffee beans, packed in argon gas, and three-fold wrapped in foil. You’ll swear you were standing next to the roaster when you breathe in the heady aroma of perfectly roasted coffee beans.",
                 Cost = 300,
                 Food = 2,
                 Water = 0
@@ -291,10 +314,12 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
 
             var carolinaPeeperBalls = new FoodSpawnable(new PeeperBarFoodItemData
             {
-                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("SpicyCheeseBalls", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("SpicyCheeseBalls",
+                    FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 ClassId = "CarolinaPeeperBalls",
                 Friendly = "Carolina Peeper Balls",
-                Description = "Peeper Balls, Caroline style. Ingredients: Sugar, Gum Base, Carolina Reaper Peppers, Balls of Peeper (make of that what you will), Carnauba Wax, Corn Starch, Artificial Flavors and Colors. Scoville Heat Units: ERRNumericOverflow.",
+                Description =
+                    "Peeper Balls, Caroline style. Ingredients: Sugar, Gum Base, Carolina Reaper Peppers, Balls of Peeper (make of that what you will), Carnauba Wax, Corn Starch, Artificial Flavors and Colors. Scoville Heat Units: ERRNumericOverflow.",
                 Cost = 300,
                 Food = 20,
                 Water = -5
@@ -304,10 +329,12 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
 
             var alterraMug01 = new FoodSpawnable(new PeeperBarFoodItemData
             {
-                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("AlterraMug01", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("AlterraMug01",
+                    FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 ClassId = "AlterraCoffeeMug",
                 Friendly = "Alterra Coffee (Mug)",
-                Description = "Coffee… Delicious, sumptuous coffee. Proof Alterra Corporation  loves us and wants us to be happy.",
+                Description =
+                    "Coffee… Delicious, sumptuous coffee. Proof Alterra Corporation  loves us and wants us to be happy.",
                 Cost = 300,
                 Food = 0,
                 Water = 50
@@ -317,7 +344,8 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
 
             var alterraMug02 = new FoodSpawnable(new PeeperBarFoodItemData
             {
-                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("AlterraMug02", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("AlterraMug02",
+                    FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 ClassId = "FCSCoffeeMug",
                 Friendly = "FCS Coffee (Mug)",
                 Description = "Coffee… Delicious, sumptuous coffee. Proof FCStudios loves us and wants us to be happy.",
@@ -330,7 +358,8 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
 
             var alterraMug03 = new FoodSpawnable(new PeeperBarFoodItemData
             {
-                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("AlterraMug03", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("AlterraMug03",
+                    FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 ClassId = "MrSpicyCoffeeMug",
                 Friendly = "MrSpicy Coffee (Mug)",
                 Description = "Coffee… Delicious, sumptuous coffee. Proof MrSpicy loves us and wants us to be happy.",
@@ -343,10 +372,12 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
 
             var alterraMug04 = new FoodSpawnable(new PeeperBarFoodItemData
             {
-                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("AlterraMug04", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("AlterraMug04",
+                    FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 ClassId = "Z1GamingCoffeeMug",
                 Friendly = "Z1 Gaming Coffee (Mug)",
-                Description = "Coffee… Delicious, sumptuous coffee. Proof Z1 Gaming  loves us and wants us to be happy.",
+                Description =
+                    "Coffee… Delicious, sumptuous coffee. Proof Z1 Gaming  loves us and wants us to be happy.",
                 Cost = 300,
                 Food = 0,
                 Water = 50
@@ -356,10 +387,12 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
 
             var alterraMug05 = new FoodSpawnable(new PeeperBarFoodItemData
             {
-                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("AlterraMug05", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("AlterraMug05",
+                    FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 ClassId = "MonikaCinnyRollCoffeeMug",
                 Friendly = "Monika C.R. Coffee (Mug)",
-                Description = "Coffee… Delicious, sumptuous coffee. Proof Monkia CinnyRoll loves us and wants us to be happy.",
+                Description =
+                    "Coffee… Delicious, sumptuous coffee. Proof Monkia CinnyRoll loves us and wants us to be happy.",
                 Cost = 300,
                 Food = 0,
                 Water = 50
@@ -369,10 +402,12 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
 
             var alterraMug06 = new FoodSpawnable(new PeeperBarFoodItemData
             {
-                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("AlterraMug06", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("AlterraMug06",
+                    FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 ClassId = "AlterraCoffeeMug02",
                 Friendly = "Alterra Coffee (Mug) 2",
-                Description = "Delicious, sumptuous coffee. Proof Alterra Corporation loves us and wants us to be happy.",
+                Description =
+                    "Delicious, sumptuous coffee. Proof Alterra Corporation loves us and wants us to be happy.",
                 Cost = 300,
                 Food = 0,
                 Water = 50
@@ -382,10 +417,12 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
 
             var alterraMug07 = new FoodSpawnable(new PeeperBarFoodItemData
             {
-                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("AlterraMug07", FCSAssetBundlesService.PublicAPI.GlobalBundleName),
+                Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName("AlterraMug07",
+                    FCSAssetBundlesService.PublicAPI.GlobalBundleName),
                 ClassId = "PeeperCoffeeMug",
                 Friendly = "Peeper Coffee (Mug)",
-                Description = "Delicious, sumptuous coffee. Proof the Alterra omniLounge Artificial Intelligence loves us and wants us to be happy.",
+                Description =
+                    "Delicious, sumptuous coffee. Proof the Alterra omniLounge Artificial Intelligence loves us and wants us to be happy.",
                 Cost = 300,
                 Food = 0,
                 Water = 50
@@ -398,10 +435,12 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
 
         internal static void LoadPeeperLoungeTracks()
         {
-            QuickLogger.Debug($"Peeper Lounge Path: {Path.Combine(Mod.GetAudioFolderPath(), "PeeperLoungeBarTrackConfig.json")}");
+            QuickLogger.Debug(
+                $"Peeper Lounge Path: {Path.Combine(Mod.GetAudioFolderPath(), "PeeperLoungeBarTrackConfig.json")}");
 
             // read file into a string and deserialize JSON to a type
-            var audioEntries = JsonConvert.DeserializeObject<List<AudioData>>(File.ReadAllText(Path.Combine(Mod.GetAudioFolderPath(), "PeeperLoungeBarTrackConfig.json")));
+            var audioEntries = JsonConvert.DeserializeObject<List<AudioData>>(
+                File.ReadAllText(Path.Combine(Mod.GetAudioFolderPath(), "PeeperLoungeBarTrackConfig.json")));
 
             if (audioEntries == null)
             {
@@ -409,14 +448,16 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
                 return;
             }
 
-            QuickLogger.Debug($"Attempting to load Peeper Lounge Bar audio tracks. Collection size: {audioEntries.Count}");
+            QuickLogger.Debug(
+                $"Attempting to load Peeper Lounge Bar audio tracks. Collection size: {audioEntries.Count}");
 
 
             foreach (AudioData audioData in audioEntries)
             {
                 Mod.AudioClips.Add(audioData.Key, new SoundEntry
                 {
-                    Sound = AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", $"{audioData.TrackName}.mp3")),
+                    Sound = AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio",
+                        $"{audioData.TrackName}.mp3")),
                     Message = audioData.Caption,
                     IsRandom = audioData.IsRandom
                 });

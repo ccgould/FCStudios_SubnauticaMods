@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
-using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Managers;
 using FCS_AlterraHub.Model;
@@ -12,14 +11,9 @@ using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Interfac
 using FCS_AlterraHub.Mods.FCSPDA.Mono;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
-using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
-using rail;
-using SMLHelper.V2.Handlers;
-using SMLHelper.V2.Json.ExtensionMethods;
-using Steamworks;
 using Story;
 using UnityEngine;
 #if SUBNAUTICA_STABLE

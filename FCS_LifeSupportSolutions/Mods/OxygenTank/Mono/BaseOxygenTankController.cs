@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
 {
-    internal class BaseOxygenTankController : FcsDevice,IFCSSave<SaveData>, IHandTarget
+    internal class BaseOxygenTankController : FcsDevice, IFCSSave<SaveData>, IHandTarget
     {
         private bool _runStartUpOnEnable;
         private bool _isFromSave;
@@ -75,7 +75,7 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
 
             IsInitialized = true;
         }
-        
+
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
             QuickLogger.Debug("In OnProtoSerialize");
@@ -173,21 +173,26 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
 
             var requiredTankCount = Manager.GetRequiredTankCount(QPatch.Configuration.SmallBaseOxygenHardcore);
             _sb.Clear();
-            if(_oxygenAttachPoint.allowConnection && _oxygenAttachPoint.parentPipeUID != null)
+            if (_oxygenAttachPoint.allowConnection && _oxygenAttachPoint.parentPipeUID != null)
                 _sb.Append($"Pipe Connected");
-            else if(_oxygenAttachPoint.allowConnection)
+            else if (_oxygenAttachPoint.allowConnection)
                 _sb.Append($"Searching for Oxygen Pipe");
             else
                 _sb.Append($"Pipe Connection Disabled.");
             _sb.Append(Environment.NewLine);
             _sb.Append($"Active Tanks: {Manager.ActiveBaseOxygenTankCount}, Required Tank Count: {requiredTankCount}");
+#if SUBNAUTICA
             main.SetInteractTextRaw($"{Mod.BaseOxygenTankFriendly} - {UnitID}", _sb.ToString());
+#else
+            main.SetTextRaw(HandReticle.TextType.Use, $"{Mod.BaseOxygenTankFriendly} - {UnitID}");
+            main.SetTextRaw(HandReticle.TextType.UseSubscript, _sb.ToString());
+#endif
         }
 
         public void OnHandClick(GUIHand hand)
         {
             _oxygenAttachPoint.allowConnection = !_oxygenAttachPoint.allowConnection;
-            if(_oxygenAttachPoint.parentPipeUID != null)
+            if (_oxygenAttachPoint.parentPipeUID != null)
                 _oxygenAttachPoint.SetParent(null);
         }
     }

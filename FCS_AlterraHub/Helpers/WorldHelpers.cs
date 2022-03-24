@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
@@ -9,9 +7,7 @@ using FCSCommon.Utilities;
 using QModManager.API;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
-using SMLHelper.V2.Utility;
 using UnityEngine;
-using UnityEngine.UI;
 #if SUBNAUTICA
 using Sprite = Atlas.Sprite;
 using RecipeData = SMLHelper.V2.Crafting.TechData;

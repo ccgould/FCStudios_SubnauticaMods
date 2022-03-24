@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Globalization;
-using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 

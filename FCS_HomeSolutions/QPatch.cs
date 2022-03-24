@@ -17,7 +17,6 @@ using FCS_HomeSolutions.Mods.DisplayBoard.Buildable;
 using FCS_HomeSolutions.Mods.Elevator.Buildable;
 using FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Buildable;
 using FCS_HomeSolutions.Mods.HologramPoster.Buildable;
-using FCS_HomeSolutions.Mods.JukeBox.Buildable;
 using FCS_HomeSolutions.Mods.LedLights.Buildable;
 using FCS_HomeSolutions.Mods.Microwave.Buildable;
 using FCS_HomeSolutions.Mods.MiniFountainFilter.Buildables;
@@ -38,7 +37,6 @@ using FCS_HomeSolutions.Mods.Toilet.Buildable;
 using FCS_HomeSolutions.Mods.TrashReceptacle.Buildable;
 using FCS_HomeSolutions.Mods.TrashRecycler.Buildable;
 using FCS_HomeSolutions.Mods.TV.Buildable;
-using FCS_HomeSolutions.Spawnables;
 using FCSCommon.Utilities;
 using HarmonyLib;
 using QModManager.API.ModLoading;
@@ -46,6 +44,10 @@ using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 using Settings = FCS_HomeSolutions.Buildables.Settings;
+
+#if SUBNAUTICA
+    using Sprite = Atlas.Sprite;
+#endif
 
 namespace FCS_HomeSolutions
 {
@@ -62,7 +64,7 @@ namespace FCS_HomeSolutions
 
         internal static Dictionary<string, Texture2D> Patterns = new();
 
-        internal static Dictionary<Texture2D, Atlas.Sprite> PatternsIcon = new();
+        internal static Dictionary<Texture2D, Sprite> PatternsIcon = new();
         
         [QModPatch]
         public void Patch()

@@ -13,12 +13,9 @@ using FCS_EnergySolutions.Configuration;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Buildable;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Interfaces;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Model;
-using FCS_EnergySolutions.Mods.TelepowerPylon.Mono;
 using FCS_EnergySolutions.Mods.WindSurfer.Enums;
 using FCS_EnergySolutions.Mods.WindSurfer.Model;
 using FCS_EnergySolutions.Mods.WindSurfer.Structs;
-using FCS_EnergySolutions.Patches;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
@@ -357,7 +354,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
             Grid = new Grid2<HoloGraphControl>((BuildingCapacity + 1) * 2);
         }
 
-        public bool AddPlatform(HolographSlot slot, Vector2Int position)
+        public IEnumerator AddPlatform(HolographSlot slot, Vector2Int position, IOut<bool> result)
         {
             if (!CheckForKit())
             {
@@ -365,7 +362,8 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
                     ? Language.main.Get(_windSurferKitTechType)
                     : Language.main.Get(_windSurferPlatformKitTechType);
                 _messageBox.Show($"No {kit} found in your inventory.", FCSMessageButton.OK, null);
-                return false;
+                result.Set(false);
+                yield break;
             }
 
            var kitPickupable =  Inventory.main.container.RemoveItem(PlatFormKitMode == PlatformKitModes.TurbinePlatform
@@ -374,13 +372,28 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
 
            Destroy(kitPickupable.gameObject);
 
-            if (Grid.Count() > BuildingCapacity || Grid.ElementAt(position) != null) { return false; } // Grid.ElementAt(position) != null tells us if the "slot" is filled
+            if (Grid.Count() > BuildingCapacity || Grid.ElementAt(position) != null) { 
+                result.Set(false);
+                yield break;
+                
+            } // Grid.ElementAt(position) != null tells us if the "slot" is filled
             
             QuickLogger.Debug($"Adding Turbine to Port: {slot.Target.name}|{slot.ID}");
+
+            TechType platformType = PlatFormKitMode == PlatformKitModes.TurbinePlatform
+                ? Mod.WindSurferClassName.ToTechType()
+                : Mod.WindSurferPlatformClassName.ToTechType();
+
+            var prefabTask = new TaskResult<GameObject>();
+            yield return CraftData.GetPrefabForTechTypeAsync(platformType, false, prefabTask);
             
-            var turbine = slot.PlatformController.AddNewPlatForm(slot.Target, slot.ID, CraftData.GetPrefabForTechType(PlatFormKitMode ==  PlatformKitModes.TurbinePlatform ? Mod.WindSurferClassName.ToTechType() : Mod.WindSurferPlatformClassName.ToTechType()));
+            var turbine = slot.PlatformController.AddNewPlatForm(slot.Target, slot.ID, prefabTask.Get());
             
-            if (turbine == null) { return false; }
+            if (turbine == null) { 
+                result.Set(false);
+                yield break;
+                
+            }
 
             foreach (Collider builtCollider in turbine.GetComponentsInChildren<Collider>() ?? new Collider[0])
             {
@@ -413,7 +426,8 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
             _connectedTurbinesController.Add(turbineController.GetPrefabID(),turbineController);
 
             _powerRelay.AddInboundPower(turbineController.PlatformController.GetPowerSource());
-            return true;
+            result.Set(true);
+            yield break;
         }
 
         private bool CheckForKit()

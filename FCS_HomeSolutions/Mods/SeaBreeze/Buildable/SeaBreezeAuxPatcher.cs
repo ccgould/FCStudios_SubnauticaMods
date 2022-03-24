@@ -1,5 +1,4 @@
-﻿using FCS_HomeSolutions.Configuration;
-using SMLHelper.V2.Handlers;
+﻿using SMLHelper.V2.Handlers;
 
 namespace FCS_HomeSolutions.Mods.SeaBreeze.Buildable
 {

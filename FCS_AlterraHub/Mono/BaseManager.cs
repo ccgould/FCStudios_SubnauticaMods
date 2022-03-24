@@ -167,12 +167,26 @@ namespace FCS_AlterraHub.Mono
                         QuickLogger.Debug($"Device {operation.DeviceId}: {operation.Device.GetStorage()?.StorageCount()}|{operation.MaxAmount}", true);
                         if (operation.Device.CanBeStored(1, item) && operation.Device.GetStorage() != null && operation.Device.GetStorage()?.StorageCount() < operation.MaxAmount)
                         {
-                            operation.Device.AddItemToContainer(TakeItem(item).GetTechType().ToInventoryItem());
+#if SUBNAUTICA_STABLE
+                            var result = TakeItem(item).GetTechType().ToInventoryItem();
+                            operation.Device.AddItemToContainer(result);
+                            #else
+                            CoroutineHost.StartCoroutine(AddItemToDevice(operation.Device, item));
+                            #endif
                         }
                     }
                 }
             }
         }
+
+#if  !SUBNAUTICA_STABLE
+        private IEnumerator AddItemToDevice(FcsDevice Device, TechType item)
+        {
+            var result = new TaskResult<InventoryItem>();
+            yield return TakeItem(item).GetTechType().ToInventoryItem(result);
+            Device.AddItemToContainer(result.value);
+        }
+#endif
 
         private void PerformPullOperation(BaseTransferOperation operation)
         {
@@ -184,7 +198,7 @@ namespace FCS_AlterraHub.Mono
                 var item = operation.Device.RemoveItemFromDevice(randomItem);
                 if (item != null)
                 {
-                    AddItemToContainer(item.GetTechType().ToInventoryItem());
+                    AddItemToContainer(item.ToInventoryItem());
                 }
             }
         }

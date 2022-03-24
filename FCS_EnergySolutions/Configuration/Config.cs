@@ -5,7 +5,6 @@ using FCSCommon.Utilities;
 using SMLHelper.V2.Json;
 using SMLHelper.V2.Options;
 using SMLHelper.V2.Options.Attributes;
-using UnityEngine;
 
 
 namespace FCS_EnergySolutions.Configuration

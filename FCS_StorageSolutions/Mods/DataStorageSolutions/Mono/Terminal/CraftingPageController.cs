@@ -5,7 +5,6 @@ using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.Controllers;
-using FCS_AlterraHub.Structs;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal.Enumerators;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;

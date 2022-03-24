@@ -1,10 +1,7 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
-using System.Text;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
-using FCS_ProductionSolutions.HydroponicHarvester.Mono;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Buildable;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Mono;
 using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono;

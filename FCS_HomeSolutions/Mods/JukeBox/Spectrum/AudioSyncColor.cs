@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using FCS_AlterraHub.Buildables;
+﻿using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Helpers;
 using UnityEngine;
-using UnityEngine.UI;
 
 
 namespace FCS_HomeSolutions.Mods.JukeBox.Spectrum

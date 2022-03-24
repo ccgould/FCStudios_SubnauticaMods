@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
@@ -196,7 +197,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Buildable
             Resources.UnloadAsset(solarPowerRelay);
 
             //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
-            MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
+            MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
             gameObject.Set(prefab);
             yield break;
         }
@@ -206,7 +207,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Buildable
         {
             QuickLogger.Debug($"Creating recipe...");
             // Create and associate recipe to the new TechType
-            var customFabRecipe = new TechData()
+            var customFabRecipe = new RecipeData()
             {
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()

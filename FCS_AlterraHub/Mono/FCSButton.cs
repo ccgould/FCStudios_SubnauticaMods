@@ -1,5 +1,4 @@
 ﻿using FCSCommon.Utilities;
-using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;

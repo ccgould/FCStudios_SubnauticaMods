@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using FCS_AlterraHub.Mono;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace FCS_AlterraHub.Model
 {

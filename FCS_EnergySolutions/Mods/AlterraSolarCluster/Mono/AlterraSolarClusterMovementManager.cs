@@ -1,6 +1,4 @@
 ﻿using FCS_AlterraHub.Helpers;
-using FCSCommon.Helpers;
-using FCSCommon.Utilities;
 using UnityEngine;
 
 namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono

@@ -12,7 +12,6 @@ using FCS_AlterraHub.Structs;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Handlers;
-using UnityEngine;
 #if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
 #else

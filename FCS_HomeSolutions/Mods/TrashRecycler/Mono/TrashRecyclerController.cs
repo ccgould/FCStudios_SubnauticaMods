@@ -1,8 +1,6 @@
 ﻿using System.Linq;
-using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Enumerators;
-using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Model;
@@ -11,7 +9,6 @@ using FCS_AlterraHub.Mono.ObjectPooler;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
-using FCS_HomeSolutions.Mods.TrashReceptacle.Buildable;
 using FCS_HomeSolutions.Mods.TrashRecycler.Buildable;
 using FCSCommon.Utilities;
 using UnityEngine;

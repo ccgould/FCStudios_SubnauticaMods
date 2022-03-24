@@ -1,7 +1,5 @@
-﻿using FCS_HomeSolutions.Configuration;
-using FCS_HomeSolutions.Mods.JukeBox.Mono;
+﻿using FCS_HomeSolutions.Mods.JukeBox.Mono;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Mono;
-using FCSCommon.Utilities;
 using HarmonyLib;
 
 namespace FCS_HomeSolutions.Patches

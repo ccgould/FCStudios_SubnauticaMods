@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using SMLHelper.V2.Handlers;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace FCS_HomeSolutions.Configuration
 {

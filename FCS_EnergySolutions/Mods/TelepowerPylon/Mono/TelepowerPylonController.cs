@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
@@ -15,7 +14,6 @@ using FCS_EnergySolutions.Configuration;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Buildable;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Interfaces;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Model;
-using FCS_EnergySolutions.Patches;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;

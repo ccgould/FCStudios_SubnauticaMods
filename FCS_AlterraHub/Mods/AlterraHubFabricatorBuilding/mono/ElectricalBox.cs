@@ -1,8 +1,6 @@
 ﻿using System.Collections;
-using System.Security.Cryptography;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
-using FCSCommon.Helpers;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono

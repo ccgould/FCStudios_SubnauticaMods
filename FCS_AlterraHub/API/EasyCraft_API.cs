@@ -1,18 +1,4 @@
-﻿using FCS_AlterraHub.Mono;
-using FCS_AlterraHub.Registration;
-using HarmonyLib;
-using QModManager.API;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using FCS_AlterraHub.Interfaces;
-using UnityEngine;
-
-namespace FCS_AlterraHub.API
+﻿namespace FCS_AlterraHub.API
 {
 	//public static class EasyCraft_API
 	//{
