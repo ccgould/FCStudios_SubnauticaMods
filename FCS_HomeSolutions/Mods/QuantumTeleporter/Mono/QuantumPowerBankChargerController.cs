@@ -340,12 +340,16 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
 
         public override bool CanDeconstruct(out string reason)
         {
+            reason = string.Empty;
             if (_storage == null)
             {
-                reason = string.Empty;
                 return true;
             }
-            return _storage.CanDeconstruct(out reason);
+
+            if (!_storage.preventDeconstructionIfNotEmpty || _storage.IsEmpty()) return true;
+            
+            reason = Language.main.Get("DeconstructNonEmptyStorageContainerError");
+            return false;
         }
 
         public override void OnConstructedChanged(bool constructed)

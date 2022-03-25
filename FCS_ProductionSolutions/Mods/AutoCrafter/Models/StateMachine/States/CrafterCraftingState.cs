@@ -20,31 +20,30 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
 {
     internal class CrafterCraftingState : CrafterBaseState
     {
-        [JsonProperty] internal  CraftingOperation _operation;
+        [JsonProperty] internal CraftingOperation _operation;
         [JsonProperty] internal float _timeLeft;
         [JsonProperty] internal Dictionary<TechType, int> _consumable;
         [JsonProperty] internal Dictionary<TechType, int> _crafted;
 
-        [JsonProperty] internal Dictionary<TechType, int> _availableItems = new ();
-        [JsonProperty] internal Dictionary<TechType, int> _recipeItems = new ();
-        [JsonProperty] internal Dictionary<TechType, int> _toCraftItems = new ();
+        [JsonProperty] internal Dictionary<TechType, int> _availableItems = new();
+        [JsonProperty] internal Dictionary<TechType, int> _recipeItems = new();
+        [JsonProperty] internal Dictionary<TechType, int> _toCraftItems = new();
 
         private const float MAXTIME = 7f;
         public override string Name => "CrafterCraftingState";
+
         public CrafterCraftingState()
         {
-            
         }
 
         public CrafterCraftingState(CrafterStateManager manager) : base(manager)
         {
-            
         }
 
         public override void EnterState()
         {
-            QuickLogger.Debug("======================================",true);
-            QuickLogger.Debug("Entering Crafter Crafting State",true);
+            QuickLogger.Debug("======================================", true);
+            QuickLogger.Debug("Entering Crafter Crafting State", true);
             _operation = _manager.GetOperation();
             _timeLeft = MAXTIME; //-1 was causing craft to start to fast
         }
@@ -62,6 +61,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
                         _manager.Reset();
                         return typeof(CrafterIdleState);
                     }
+
                     _timeLeft = MAXTIME;
                 }
             }
@@ -71,9 +71,10 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
 
         private bool TryCraft()
         {
-            QuickLogger.Debug("Trycraft",true);
+            QuickLogger.Debug("Trycraft", true);
 
-            if (_operation != null && IsCraftRecipeFulfilledAdvanced(_operation.TechType) && CheckIfLinkedItemsAllowed())
+            if (_operation != null && IsCraftRecipeFulfilledAdvanced(_operation.TechType) &&
+                CheckIfLinkedItemsAllowed())
             {
                 QuickLogger.Debug("Crafting", true);
 
@@ -100,9 +101,9 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
                 CraftLinkedItems(_operation.TechType);
 
                 if (!_operation.IsComplete) return false;
-                
+
                 CompleteOperation(_operation);
-                
+
                 return true;
             }
 
@@ -112,15 +113,15 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
 
         private bool CheckIfLinkedItemsAllowed()
         {
-           var totalAmount = _operation.ReturnAmount + _operation.LinkedItemCount * _operation.ReturnAmount;
+            var totalAmount = _operation.ReturnAmount + _operation.LinkedItemCount * _operation.ReturnAmount;
 
-          //TODO I need a way to check is the base can hold all the linked items and orginal item in storage and dss
-          return _manager.Crafter.Manager.IsAllowedToAdd(_operation.FixCustomTechType(), _operation.ReturnAmount, true);
+            //TODO I need a way to check is the base can hold all the linked items and orginal item in storage and dss
+            return _manager.Crafter.Manager.IsAllowedToAdd(_operation.FixCustomTechType(), _operation.ReturnAmount,
+                true);
         }
 
         private void CraftLinkedItems(TechType techType)
         {
-
             if (_operation.LinkedItemCount > 0)
             {
                 foreach (var dataLinkedItem in _operation.LinkedItems)
@@ -133,7 +134,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
 
         private void CompleteOperation(CraftingOperation craftingOperation)
         {
-            QuickLogger.Debug("Operation Complete.",true);
+            QuickLogger.Debug("Operation Complete.", true);
             _operation = null;
             _consumable?.Clear();
             _crafted?.Clear();
@@ -244,28 +245,32 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
             _operation.AppendCompletion();
             _manager.Crafter.CraftMachine.OnItemCrafted?.Invoke();
         }
-        
+
 
         private void ConsumeIngredients(Dictionary<TechType, int> consumable)
         {
-            QuickLogger.Debug("Consume Ingredients",true);
+            QuickLogger.Debug("Consume Ingredients", true);
             if (GameModeUtils.RequiresIngredients())
             {
-                QuickLogger.Debug("------------------------------------------------------------",true);
+                QuickLogger.Debug("------------------------------------------------------------", true);
                 foreach (KeyValuePair<TechType, int> valuePair in consumable)
                 {
-                    QuickLogger.Debug($"consumable includes: {Language.main.Get(valuePair.Key)} with the amount {valuePair.Value}",true);
+                    QuickLogger.Debug(
+                        $"consumable includes: {Language.main.Get(valuePair.Key)} with the amount {valuePair.Value}",
+                        true);
                 }
-                QuickLogger.Debug("------------------------------------------------------------", true); 
-                
+
+                QuickLogger.Debug("------------------------------------------------------------", true);
+
                 foreach (KeyValuePair<TechType, int> keyValuePair in consumable)
                 {
                     if (keyValuePair.Value > 0)
                     {
-                        QuickLogger.Debug($"Consuming {Language.main.Get(keyValuePair.Key)}",true);
+                        QuickLogger.Debug($"Consuming {Language.main.Get(keyValuePair.Key)}", true);
                         _manager.Crafter.Manager.DestroyItemsFromBase(keyValuePair.Key, keyValuePair.Value);
                     }
                 }
+
                 foreach (KeyValuePair<TechType, int> keyValuePair2 in consumable)
                 {
                     if (keyValuePair2.Value < 0)
@@ -297,13 +302,20 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
             {
                 QuickLogger.Error("Failed to add item to storage container");
             }
+
             yield break;
         }
 #endif
         private bool AttemptToAddToNetwork(TechType techType)
         {
             QuickLogger.Debug("1");
+#if SUBNAUTICA
             var inventoryItem = techType.ToInventoryItem();
+#else
+            var itemTask = new TaskResult<InventoryItem>();
+            CouroutineManager.WaitCoroutine(techType.ToInventoryItem(itemTask));
+            var inventoryItem = itemTask.Get();
+#endif
             QuickLogger.Debug("2");
 
             QuickLogger.Debug($"InventoryItemLegacy returned: {Language.main.Get(inventoryItem.item.GetTechType())}");
@@ -314,14 +326,15 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
 
             if (!result)
             {
-                _manager.Crafter.ShowMessage($"Failed to add {Language.main.Get(techType)} to storage. Please build a locker, remote storage or add more space to your data storage system. Your item will be added to the autocrafter storage/");
+                _manager.Crafter.ShowMessage(
+                    $"Failed to add {Language.main.Get(techType)} to storage. Please build a locker, remote storage or add more space to your data storage system. Your item will be added to the autocrafter storage/");
                 _manager.Crafter.AddItemToStorage(techType);
                 GameObject.Destroy(inventoryItem.item.gameObject);
             }
 
             return result;
         }
-        
+
         #region EasyCraft Code
 
         public bool IsCraftRecipeFulfilledAdvanced(TechType techType)
@@ -340,13 +353,14 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
             {
                 return true;
             }
-            
+
             _consumable = new Dictionary<TechType, int>();
             _crafted = new Dictionary<TechType, int>();
             return _IsCraftRecipeFulfilledAdvanced(techType, techType, _consumable, _crafted, 0);
         }
 
-        private bool _IsCraftRecipeFulfilledAdvanced(TechType parent, TechType techType, Dictionary<TechType, int> consumable, Dictionary<TechType, int> crafted, int depth = 0)
+        private bool _IsCraftRecipeFulfilledAdvanced(TechType parent, TechType techType,
+            Dictionary<TechType, int> consumable, Dictionary<TechType, int> crafted, int depth = 0)
         {
             if (depth >= 5)
             {
@@ -367,42 +381,47 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
                     var ingredient = techData.GetIngredient(i);
 
                     TechType ingredientTechType = ingredient.techType;
-                    
+
                     if (parent == ingredientTechType)
                     {
                         return false;
                     }
 
-                    int pickupCount = /*_manager.Crafter.Storage.container.GetCount(ingredientTechType);*/ _manager.Crafter.Manager.GetItemCount(ingredientTechType);
-                    
-                    int consumableTechTypeCount = consumable.ContainsKey(ingredientTechType) ? consumable[ingredientTechType] : 0;
-                    
+                    int pickupCount = /*_manager.Crafter.Storage.container.GetCount(ingredientTechType);*/
+                        _manager.Crafter.Manager.GetItemCount(ingredientTechType);
+
+                    int consumableTechTypeCount =
+                        consumable.ContainsKey(ingredientTechType) ? consumable[ingredientTechType] : 0;
+
                     int amountRemainder = Mathf.Max(0, pickupCount - consumableTechTypeCount);
-                    
+
                     int ingredientAmount = ingredient.amount;
-                    
+
                     if (amountRemainder < ingredientAmount)
                     {
                         if (!CheckIfInvalidEquipmentType(ingredientTechType)) return false;
 
-                        QuickLogger.Debug($"PT1 | Adding Consumable: {Language.main.Get(ingredientTechType)} | Amount: {amountRemainder}");
+                        QuickLogger.Debug(
+                            $"PT1 | Adding Consumable: {Language.main.Get(ingredientTechType)} | Amount: {amountRemainder}");
 
                         consumable.Inc(ingredientTechType, amountRemainder);
 
                         for (int j = 0; j < ingredientAmount - amountRemainder; j++)
                         {
-                            if (!_IsCraftRecipeFulfilledAdvanced(parent, ingredientTechType, consumable, crafted, depth + 1))
+                            if (!_IsCraftRecipeFulfilledAdvanced(parent, ingredientTechType, consumable, crafted,
+                                    depth + 1))
                             {
                                 return false;
                             }
-                            
+
                             var ingredientTechTypeTechData = CraftDataHandler.GetTechData(ingredientTechType);
 
                             if (ingredientTechTypeTechData != null)
                             {
                                 j += ingredientTechTypeTechData.craftAmount - 1;
-                                
-                                QuickLogger.Debug($"PT2 | Adding Consumable: {Language.main.Get(ingredientTechType)} | Amount: {-ingredientTechTypeTechData.craftAmount}");
+
+                                QuickLogger.Debug(
+                                    $"PT2 | Adding Consumable: {Language.main.Get(ingredientTechType)} | Amount: {-ingredientTechTypeTechData.craftAmount}");
                                 consumable.Inc(ingredientTechType, -ingredientTechTypeTechData.craftAmount);
 
                                 if (ingredientTechTypeTechData.linkedItemCount > 0)
@@ -410,15 +429,20 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
                                     for (int k = 0; k < ingredientTechTypeTechData.linkedItemCount; k++)
                                     {
                                         TechType linkedItem = ingredientTechTypeTechData.GetLinkedItem(k);
-                                        QuickLogger.Debug($"PT3 | Adding Consumable: {Language.main.Get(linkedItem)} | Amount: -1");
+                                        QuickLogger.Debug(
+                                            $"PT3 | Adding Consumable: {Language.main.Get(linkedItem)} | Amount: -1");
                                         consumable.Inc(linkedItem, -1);
                                     }
                                 }
                             }
                         }
-                        QuickLogger.Debug($"PT4 | Adding Consumable: {Language.main.Get(ingredientTechType)} | Amount: {ingredientAmount - amountRemainder}");
+
+                        QuickLogger.Debug(
+                            $"PT4 | Adding Consumable: {Language.main.Get(ingredientTechType)} | Amount: {ingredientAmount - amountRemainder}");
                         consumable.Inc(ingredientTechType, ingredientAmount - amountRemainder);
-                        consumableTechTypeCount = (consumable.ContainsKey(ingredientTechType) ? consumable[ingredientTechType] : 0);
+                        consumableTechTypeCount = (consumable.ContainsKey(ingredientTechType)
+                            ? consumable[ingredientTechType]
+                            : 0);
                         if (pickupCount < consumableTechTypeCount)
                         {
                             return false;
@@ -426,18 +450,24 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
                     }
                     else
                     {
-                        QuickLogger.Debug($"PT5 | Adding Consumable: {Language.main.Get(ingredientTechType)} | Amount: {ingredient.amount}");
+                        QuickLogger.Debug(
+                            $"PT5 | Adding Consumable: {Language.main.Get(ingredientTechType)} | Amount: {ingredient.amount}");
 
                         consumable.Inc(ingredientTechType, ingredient.amount);
                     }
+
                     i++;
                 }
+
                 return true;
             }
+
             return false;
         }
 
-        private bool _IsCraftRecipeFulfilledAdvanced1(TechType parent, TechType techType, Dictionary<TechType, int> consumable, Dictionary<TechType, int> crafted, int depth = 0, int amountToCraft = 1)
+        private bool _IsCraftRecipeFulfilledAdvanced1(TechType parent, TechType techType,
+            Dictionary<TechType, int> consumable, Dictionary<TechType, int> crafted, int depth = 0,
+            int amountToCraft = 1)
         {
             for (int l = 0; l < amountToCraft; l++)
             {
@@ -468,7 +498,9 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
 
                         int pickupCount = _manager.Crafter.Manager.GetItemCount(ingredientTechType);
 
-                        int consumableTechTypeCount = consumable.ContainsKey(ingredientTechType) ? consumable[ingredientTechType] : 0;
+                        int consumableTechTypeCount = consumable.ContainsKey(ingredientTechType)
+                            ? consumable[ingredientTechType]
+                            : 0;
 
                         int amountRemainder = Mathf.Max(0, pickupCount - consumableTechTypeCount);
 
@@ -478,13 +510,15 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
                         {
                             if (!CheckIfInvalidEquipmentType(ingredientTechType)) return false;
 
-                            QuickLogger.Debug($"PT1 | Adding Consumable: {Language.main.Get(ingredientTechType)} | Amount: {amountRemainder}");
+                            QuickLogger.Debug(
+                                $"PT1 | Adding Consumable: {Language.main.Get(ingredientTechType)} | Amount: {amountRemainder}");
 
                             consumable.Inc(ingredientTechType, amountRemainder);
 
                             for (int j = 0; j < ingredientAmount - amountRemainder; j++)
                             {
-                                if (!_IsCraftRecipeFulfilledAdvanced(parent, ingredientTechType, consumable, crafted, depth + 1))
+                                if (!_IsCraftRecipeFulfilledAdvanced(parent, ingredientTechType, consumable, crafted,
+                                        depth + 1))
                                 {
                                     return false;
                                 }
@@ -495,7 +529,8 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
                                 {
                                     j += ingredientTechTypeTechData.craftAmount - 1;
 
-                                    QuickLogger.Debug($"PT2 | Adding Consumable: {Language.main.Get(ingredientTechType)} | Amount: {-ingredientTechTypeTechData.craftAmount}");
+                                    QuickLogger.Debug(
+                                        $"PT2 | Adding Consumable: {Language.main.Get(ingredientTechType)} | Amount: {-ingredientTechTypeTechData.craftAmount}");
                                     consumable.Inc(ingredientTechType, -ingredientTechTypeTechData.craftAmount);
 
                                     if (ingredientTechTypeTechData.linkedItemCount > 0)
@@ -503,15 +538,20 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
                                         for (int k = 0; k < ingredientTechTypeTechData.linkedItemCount; k++)
                                         {
                                             TechType linkedItem = ingredientTechTypeTechData.GetLinkedItem(k);
-                                            QuickLogger.Debug($"PT3 | Adding Consumable: {Language.main.Get(linkedItem)} | Amount: -1");
+                                            QuickLogger.Debug(
+                                                $"PT3 | Adding Consumable: {Language.main.Get(linkedItem)} | Amount: -1");
                                             consumable.Inc(linkedItem, -1);
                                         }
                                     }
                                 }
                             }
-                            QuickLogger.Debug($"PT4 | Adding Consumable: {Language.main.Get(ingredientTechType)} | Amount: {ingredientAmount - amountRemainder}");
+
+                            QuickLogger.Debug(
+                                $"PT4 | Adding Consumable: {Language.main.Get(ingredientTechType)} | Amount: {ingredientAmount - amountRemainder}");
                             consumable.Inc(ingredientTechType, ingredientAmount - amountRemainder);
-                            consumableTechTypeCount = (consumable.ContainsKey(ingredientTechType) ? consumable[ingredientTechType] : 0);
+                            consumableTechTypeCount = (consumable.ContainsKey(ingredientTechType)
+                                ? consumable[ingredientTechType]
+                                : 0);
                             if (pickupCount < consumableTechTypeCount)
                             {
                                 return false;
@@ -519,40 +559,43 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
                         }
                         else
                         {
-                            QuickLogger.Debug($"PT5 | Adding Consumable: {Language.main.Get(ingredientTechType)} | Amount: {ingredient.amount}");
+                            QuickLogger.Debug(
+                                $"PT5 | Adding Consumable: {Language.main.Get(ingredientTechType)} | Amount: {ingredient.amount}");
 
                             consumable.Inc(ingredientTechType, ingredient.amount);
                         }
+
                         i++;
                     }
                 }
+
                 return true;
             }
-            
+
             return false;
         }
 
         private void GetRequiredItems(TechType techType)
         {
             var techData = CraftDataHandler.GetTechData(techType);
-            
+
             if (techData != null)
             {
                 for (int i = 0; i < techData.ingredientCount; i++)
                 {
                     var ingredient = techData.GetIngredient(i);
                     var baseIngredientCount = _manager.Crafter.Manager.GetItemCount(ingredient.techType);
-                    _recipeItems.Inc(ingredient.techType,ingredient.amount);
+                    _recipeItems.Inc(ingredient.techType, ingredient.amount);
 
 
                     if (baseIngredientCount > 0)
                     {
-                        if(_availableItems.ContainsKey(ingredient.techType)) continue;
-                        _availableItems.Inc(ingredient.techType,ingredient.amount);
+                        if (_availableItems.ContainsKey(ingredient.techType)) continue;
+                        _availableItems.Inc(ingredient.techType, ingredient.amount);
                     }
                     else
                     {
-                        _toCraftItems.Inc(ingredient.techType,ingredient.amount);
+                        _toCraftItems.Inc(ingredient.techType, ingredient.amount);
                     }
 
                     if (CraftDataHandler.GetTechData(ingredient.techType) != null)
@@ -595,8 +638,8 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
                 for (int i = 0; i < data.ingredientCount; i++)
                 {
                     var ingredient = data.GetIngredient(i);
-                    
-                    ingredients.Add(ingredient.techType,ingredient.amount);
+
+                    ingredients.Add(ingredient.techType, ingredient.amount);
                 }
             }
 

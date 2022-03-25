@@ -33,6 +33,7 @@ namespace FCS_HomeSolutions.Mods.Microwave.Mono
 
         private HashSet<TechType> _rawTechTypes = new HashSet<TechType>
         {
+#if SUBNAUTICA
             TechType.Bladderfish,
             TechType.Boomerang,
             TechType.Eyeye,
@@ -47,10 +48,26 @@ namespace FCS_HomeSolutions.Mods.Microwave.Mono
             TechType.Reginald,
             TechType.Spadefish,
             TechType.Spinefish
+#else
+            TechType.ArcticPeeper,
+            TechType.ArrowRay,
+            TechType.Bladderfish,
+            TechType.Boomerang,
+            TechType.DiscusFish,
+            TechType.FeatherFish,
+            TechType.FeatherFishRed,
+            TechType.Hoopfish,
+            TechType.NootFish,
+            TechType.Spinefish,
+            TechType.SpinnerFish,
+            TechType.Symbiote,
+            TechType.Triops
+#endif
         };
 
         private HashSet<TechType> _curedTechTypes = new HashSet<TechType>
         {
+#if SUBNAUTICA
             TechType.CuredBladderfish,
             TechType.CuredBoomerang,
             TechType.CuredEyeye,
@@ -65,13 +82,28 @@ namespace FCS_HomeSolutions.Mods.Microwave.Mono
             TechType.CuredReginald,
             TechType.CuredSpadefish,
             TechType.CuredSpinefish,
+#else
+            TechType.CuredArcticPeeper,
+            TechType.CuredArrowRay,
+            TechType.CuredBladderfish,
+            TechType.CuredBoomerang,
+            TechType.CuredDiscusFish,
+            TechType.CuredFeatherFish,
+            TechType.CuredFeatherFishRed,
+            TechType.CuredHoopfish,
+            TechType.CuredNootFish,
+            TechType.CuredSpinefish,
+            TechType.CuredSpinnerfish,
+            TechType.CuredSymbiote,
+            TechType.CuredTriops
+#endif
         };
 
         private void Update()
         {
             if (WorldHelpers.CheckIfPaused() || _interfaceInteraction == null || _storageContainer == null ||
                 _storageContainer.container == null) return;
-            
+
             _storageContainer.enabled = !_interfaceInteraction.IsInRange;
 
             if (_cookingTime > 0)
@@ -80,19 +112,27 @@ namespace FCS_HomeSolutions.Mods.Microwave.Mono
                 _cookingTime -= Time.deltaTime;
                 _maxCookingTime -= Time.deltaTime;
                 UpdateTimerUI(_maxCookingTime);
-                if (_cookingTime <= 0 && _pendingItem.ReturnItem != TechType.None && _pendingItem.TechType != TechType.None)
+                if (_cookingTime <= 0 && _pendingItem.ReturnItem != TechType.None &&
+                    _pendingItem.TechType != TechType.None)
                 {
-                    _storageContainer.container.DestroyItem(_pendingItem.TechType);
-                    _storageContainer.container.UnsafeAdd(_pendingItem.ReturnItem.ToInventoryItemLegacy());
-                    _pendingItem = new CookingItem();
-                    _storageContainer.container.DestroyItem(TechType.Salt);
-                    if (_pendingItems.Any())
+                    if (_storageContainer.container.DestroyItem(_pendingItem.TechType))
                     {
-                        _pendingItem = _pendingItems.Dequeue();
-                        _cookingTime = MAX_COOKING_TIME;
-                        return;
+#if SUBNAUTICA_STABLE
+                        _storageContainer.container.UnsafeAdd(_pendingItem.TechType.ToInventoryItem());
+#else
+                        StartCoroutine(_pendingItem.ReturnItem.AddTechTypeToContainerUnSafe(_storageContainer.container));
+#endif
+                        _pendingItem = new CookingItem();
+                        _storageContainer.container.DestroyItem(TechType.Salt);
+                        if (_pendingItems.Any())
+                        {
+                            _pendingItem = _pendingItems.Dequeue();
+                            _cookingTime = MAX_COOKING_TIME;
+                            return;
+                        }
+
+                        _storageContainer.enabled = true;
                     }
-                    _storageContainer.enabled = true;
                 }
             }
         }
@@ -105,8 +145,8 @@ namespace FCS_HomeSolutions.Mods.Microwave.Mono
             _storageContainer.container.allowedTech = GetAllowedTech();
             _storageContainer.container.onAddItem += Container_onAddItem;
             _storageContainer.container.onRemoveItem += Container_onRemoveItem;
-            _storageContainer.container.Resize(SlotCountX,SlotCountY);
-            
+            _storageContainer.container.Resize(SlotCountX, SlotCountY);
+
             var startBTN = GameObjectHelpers.FindGameObject(gameObject, "StartBTN").GetComponent<Button>();
             _textDisplay = GameObjectHelpers.FindGameObject(gameObject, "InputField").GetComponentInChildren<Text>();
             UpdateTimerUI(0);
@@ -230,25 +270,32 @@ namespace FCS_HomeSolutions.Mods.Microwave.Mono
                 return _knownCookingData[techType];
             }
 
-            var newCookingData = new CookingItem { TechType = techType};
+            var newCookingData = new CookingItem { TechType = techType };
 
+#if SUBNAUTICA
+            TechType foodData = TechType.None;
             if (CraftData.cookedCreatureList.ContainsKey(techType))
             {
-                var foodData = CraftData.cookedCreatureList[techType]; 
+                foodData = CraftData.cookedCreatureList[techType];
+#else
+            var foodData = TechData.GetProcessed(techType);
+            if (foodData != TechType.None)
+            {
+#endif
                 if (CookingMode == CookingMode.Cooking) newCookingData.ReturnItem = foodData;
                 newCookingData.CookedItem = foodData;
             }
 
             if (Mod.CuredCreatureList.ContainsKey(techType))
             {
-                var foodData = Mod.CuredCreatureList[techType];
+                foodData = Mod.CuredCreatureList[techType];
                 if (CookingMode == CookingMode.Curing) newCookingData.ReturnItem = foodData;
                 newCookingData.CuredItem = foodData;
             }
 
             if (Mod.CustomFoods.ContainsKey(techType))
             {
-                var foodData = Mod.CustomFoods[techType];
+                foodData = Mod.CustomFoods[techType];
                 if (CookingMode == CookingMode.Custom) newCookingData.ReturnItem = foodData;
                 newCookingData.CustomItem = foodData;
             }
@@ -265,7 +312,11 @@ namespace FCS_HomeSolutions.Mods.Microwave.Mono
 
         private float GetCookingTime()
         {
+#if SUBNAUTICA
             if (CraftData.GetCraftTime(_pendingItem.ReturnItem, out var duration))
+#else
+            if (TechData.GetCraftTime(_pendingItem.ReturnItem, out var duration))
+#endif
             {
                 duration = Mathf.Max(2.7f, duration);
             }
@@ -282,7 +333,7 @@ namespace FCS_HomeSolutions.Mods.Microwave.Mono
         {
             if (_allowedTech == null)
             {
-#if SUBNAUTICA_STABLE
+#if SUBNAUTICA
                 _allowedTech = new HashSet<TechType>
                 {
                     TechType.Bladderfish,
@@ -301,6 +352,24 @@ namespace FCS_HomeSolutions.Mods.Microwave.Mono
                     TechType.Spinefish,
                     TechType.Salt
                 };
+#else
+                _allowedTech = new HashSet<TechType>
+                {
+                    TechType.ArcticPeeper,
+                    TechType.ArrowRay,
+                    TechType.Bladderfish,
+                    TechType.Boomerang,
+                    TechType.DiscusFish,
+                    TechType.FeatherFish,
+                    TechType.FeatherFishRed,
+                    TechType.Hoopfish,
+                    TechType.NootFish,
+                    TechType.Spinefish,
+                    TechType.SpinnerFish,
+                    TechType.Symbiote,
+                    TechType.Triops,
+                    TechType.Salt
+                };
 #endif
 
                 //foreach (var item in CraftData.cookedCreatureList)
@@ -317,7 +386,6 @@ namespace FCS_HomeSolutions.Mods.Microwave.Mono
                 //{
                 //    _allowedTech.Add(item.Key);
                 //}
-
             }
 
             return _allowedTech;

@@ -18,7 +18,7 @@ using WorldHelpers = FCS_AlterraHub.Helpers.WorldHelpers;
 
 namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
 {
-    internal class PeeperLoungeBarController : FcsDevice,IHandTarget
+    internal class PeeperLoungeBarController : FcsDevice, IHandTarget
     {
         private bool _runStartUpOnEnable;
         private Transform _rot;
@@ -37,6 +37,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
         private bool _introHasBeenPlayed;
         private bool _hasPlayerLeft;
         private Random _random;
+
         private readonly List<string> _welcomeChatMessages = new()
         {
             //"PLB_Hello",
@@ -61,7 +62,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
 
         private SoundEntry FindAudioClip(string trackName)
         {
-            if(!Mod.AudioClips.ContainsKey(trackName)) return  new SoundEntry();
+            if (!Mod.AudioClips.ContainsKey(trackName)) return new SoundEntry();
             return Mod.AudioClips[trackName];
         }
 
@@ -85,12 +86,10 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
-
         }
 
         public override void OnProtoDeserialize(ProtobufSerializer serializer)
         {
-
         }
 
         public override bool CanDeconstruct(out string reason)
@@ -100,13 +99,14 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
                 reason = AlterraHub.NotEmpty();
                 return false;
             }
-            reason= string.Empty;
+
+            reason = string.Empty;
             return true;
         }
 
         public override void Initialize()
         {
-            if(IsInitialized) return;
+            if (IsInitialized) return;
             _playerTrans = Player.main.transform;
             _rot = GameObjectHelpers.FindGameObject(gameObject, "anim_controller").transform;
             _nextBTN = GameObjectHelpers.FindGameObject(gameObject, "nextBTN").GetComponent<Button>();
@@ -145,12 +145,11 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
                 }
 
                 UpdateSelection();
-            });            
-            
+            });
+
             var _purchaseBTN = GameObjectHelpers.FindGameObject(gameObject, "PurchaseBTN").GetComponent<Button>();
             _purchaseBTN.onClick.AddListener(() =>
             {
-
                 if (!PlayerInteractionHelper.CanPlayerHold(_food.Key))
                 {
                     QuickLogger.ModMessage(AlterraHub.InventoryFull());
@@ -175,7 +174,6 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
                 FCSAlterraHubService.PublicAPI.AccountSystem.RemoveFinances(_food.Value);
                 PlayerInteractionHelper.GivePlayerItem(_food.Key);
                 MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
-
             });
 
             _icon = GameObjectHelpers.FindGameObject(gameObject, "icon").AddComponent<uGUI_Icon>();
@@ -227,7 +225,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
         {
             if (!IsConstructed || !IsInitialized) return;
 
-            
+
             if (CheckIfPlayingTrack())
             {
                 AudioTrack.setPaused(WorldHelpers.CheckIfPaused());
@@ -236,7 +234,10 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
             if (WorldHelpers.CheckIfInRange(Player.main.gameObject, gameObject, 5) && !uGUI.isLoading)
             {
                 _sc.enabled = false;
-                Vector3 eulerAngles = Quaternion.LookRotation(transform.InverseTransformDirection(Vector3.Normalize(_playerTrans.position - transform.position))).eulerAngles;
+                Vector3 eulerAngles = Quaternion
+                    .LookRotation(
+                        transform.InverseTransformDirection(
+                            Vector3.Normalize(_playerTrans.position - transform.position))).eulerAngles;
                 var targetYaw = eulerAngles.y;
                 _currentYaw = Mathf.LerpAngle(_currentYaw, targetYaw, Time.deltaTime * _speed);
                 _rot.localEulerAngles = new Vector3(0f, _currentYaw, 0f);
@@ -264,7 +265,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
             {
                 return;
             }
-            
+
             if (!CheckIfPlayingTrack())
             {
                 var index = _random.Next(_welcomeChatMessages.Count);
@@ -275,17 +276,15 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
                 }
                 else
                 {
-
                     PlayAudioTrack(_welcomeChatMessages[index]);
                 }
             }
 
             this.timeNextPlay = timePassedAsFloat + this.minInterval;
         }
-        
+
         public void PlayAudioTrack(string trackName)
         {
-            
             if (!GetCanPlay())
             {
                 QuickLogger.Debug("[Peeper Lounge Bar] Play SFX False", true);
@@ -306,16 +305,23 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
             };
 
             var zero = new VECTOR();
-            AudioTrack.set3DAttributes(ref pos, ref zero, ref zero);
-            
+            AudioTrack.set3DAttributes(ref pos, ref zero
+#if SUBNAUTICA
+                , ref zero
+#endif
+            );
+
             AudioTrack.isPlaying(out var isPlaying);
 
             if (!isPlaying)
             {
                 var clip = FindAudioClip(trackName);
-                Subtitles.main.Add(clip.Message, null);
+                Subtitles
+#if SUBNAUTICA
+                    .main
+#endif
+                    .Add(clip.Message, null);
                 AudioTrack = AudioUtils.PlaySound(clip.Sound, SoundChannel.Master);
-                
             }
         }
 
@@ -335,7 +341,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
 
                     if (!_introHasBeenPlayed && !uGUI.isLoading)
                     {
-                        if(!FCSAlterraHubService.PublicAPI.GetGamePlaySettings().ConditionMet("PLBIntroPlayed"))
+                        if (!FCSAlterraHubService.PublicAPI.GetGamePlaySettings().ConditionMet("PLBIntroPlayed"))
                         {
                             PlayAudioTrack("PLB_Intro");
                             _introHasBeenPlayed = true;
@@ -370,7 +376,6 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
 
         public void OnHandClick(GUIHand hand)
         {
-
         }
     }
 }

@@ -587,7 +587,7 @@ namespace FCS_AlterraHub.Helpers
 
         public static float GetOceanDepth()
         {
-#if SUBNAUTICA
+#if SUBNAUTICA_STABLE
             return Ocean.main.GetOceanLevel();
 #else
             return Ocean.GetOceanLevel();

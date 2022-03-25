@@ -154,20 +154,25 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Mono
             switch (arg1)
             {
                 case "InventoryBTN":
+                    TechType techType = (TechType) arg2;
 #if SUBNAUTICA
-                    var size = CraftData.GetItemSize((TechType)arg2);
+                    var size = CraftData.GetItemSize(techType);
 #else
-                    var size = TechData.GetItemSize((TechType)arg2);
+                    var size = TechData.GetItemSize(techType);
 #endif
                     if (Inventory.main.HasRoomFor(size.x, size.y))
                     {
-                        PlayerInteractionHelper.GivePlayerItem(RemoveItemFromContainer((TechType)arg2));
+#if SUBNAUTICA
+                        PlayerInteractionHelper.GivePlayerItem(techType);
+#else
+                        StartCoroutine(techType.AddTechTypeToContainerUnSafe(Inventory.main.container));
+#endif
                     }
                     break;
             }
         }
 
-#if SUBNAUTICA
+#if SUBNAUTICA_STABLE
         public override Pickupable RemoveItemFromContainer(TechType techType)
         {
             if (!_storage.ContainsKey(techType)) return null;

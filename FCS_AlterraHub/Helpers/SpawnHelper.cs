@@ -47,7 +47,7 @@ namespace FCS_AlterraHub.Helpers
             return PlantResourceDictionary.ContainsKey(plantKey);
         }
 
-#if SUBNAUTICA
+#if SUBNAUTICA_STABLE
         public static IEnumerator SpawnPrefabByClassID(string classId,Transform transform)
         {
             IPrefabRequest request = PrefabDatabase.GetPrefabAsync(classId);
@@ -92,7 +92,7 @@ namespace FCS_AlterraHub.Helpers
                 yield break;
             }
 
-#if SUBNAUTICA
+#if SUBNAUTICA_STABLE
             DeferredSpawner.Task deferredTask = DeferredSpawner.instance.InstantiateAsync(prefab, transform.localPosition, transform.localRotation, true);
             yield return deferredTask;
             GameObject result = deferredTask.result;
@@ -111,7 +111,7 @@ namespace FCS_AlterraHub.Helpers
             yield break;
         }
 
-#if SUBNAUTICA
+#if SUBNAUTICA_STABLE
         public static IEnumerator SpawnUWEPrefab(UWEPrefabID uwePrefab, Vector3 position, Quaternion rotation, bool removeComponents = true)
         {
             IPrefabRequest request = PrefabDatabase.GetPrefabAsync(UWEClassIDDictionary[uwePrefab]);
@@ -142,7 +142,7 @@ namespace FCS_AlterraHub.Helpers
         }
 #endif
 
-#if SUBNAUTICA
+#if SUBNAUTICA_STABLE
         public static GameObject SpawnTechType(TechType techType, Vector3 position, Quaternion rotation, bool spawnGlobal = false)
         {
             QuickLogger.Debug($"Spawning: {Language.main.Get(techType)}");

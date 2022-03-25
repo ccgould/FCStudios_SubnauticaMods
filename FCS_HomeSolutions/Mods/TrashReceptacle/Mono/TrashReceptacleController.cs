@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace FCS_HomeSolutions.Mods.TrashReceptacle.Mono
 {
-    internal class TrashReceptacleController : FcsDevice, IFCSSave<SaveData>, IHandTarget,IConstructable
+    internal class TrashReceptacleController : FcsDevice, IFCSSave<SaveData>, IHandTarget, IConstructable
     {
         private bool _runStartUpOnEnable;
         private DumpContainer _dumpContainer;
@@ -21,7 +21,8 @@ namespace FCS_HomeSolutions.Mods.TrashReceptacle.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, TrashReceptaclePatch.TrashReceptacleTabID, Mod.ModPackID);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, TrashReceptaclePatch.TrashReceptacleTabID,
+                Mod.ModPackID);
         }
 
         private void OnEnable()
@@ -39,6 +40,7 @@ namespace FCS_HomeSolutions.Mods.TrashReceptacle.Mono
                 {
                     ReadySaveData();
                 }
+
                 _colorManager.LoadTemplate(_savedData.ColorTemplate);
             }
 
@@ -60,12 +62,19 @@ namespace FCS_HomeSolutions.Mods.TrashReceptacle.Mono
 
         public override void OnHandHover(GUIHand hand)
         {
-            if(!IsInitialized || Manager == null) return;
+            if (!IsInitialized || Manager == null) return;
             var main = HandReticle.main;
             main.SetIcon(HandReticle.IconType.Info);
-            main.SetInteractText( Manager.DeviceBuilt(TrashReceptaclePatch.TrashReceptacleTabID)
-                ? AuxPatchers.ClickToOpenRecycle(TrashReceptaclePatch.TrashReceptacleFriendly)
-                : AuxPatchers.NoRecyclerConnected());
+
+#if SUBNAUTICA
+                main.SetInteractText(
+#else
+            main.SetTextRaw(HandReticle.TextType.Use,
+#endif
+
+                Manager.DeviceBuilt(TrashReceptaclePatch.TrashReceptacleTabID)
+                    ? AuxPatchers.ClickToOpenRecycle(TrashReceptaclePatch.TrashReceptacleFriendly)
+                    : AuxPatchers.NoRecyclerConnected());
         }
 
         public void OnHandClick(GUIHand hand)
@@ -91,7 +100,7 @@ namespace FCS_HomeSolutions.Mods.TrashReceptacle.Mono
             if (_storage == null)
             {
                 _storage = gameObject.AddComponent<TrashStorage>();
-                _storage.Initialize(this,_dumpContainer);
+                _storage.Initialize(this, _dumpContainer);
                 _dumpContainer.Initialize(transform, AuxPatchers.TrashReceptacleDumpLabel(), _storage);
             }
 
@@ -99,7 +108,7 @@ namespace FCS_HomeSolutions.Mods.TrashReceptacle.Mono
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject,AlterraHub.BasePrimaryCol,AlterraHub.BaseSecondaryCol);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol);
             }
 
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);

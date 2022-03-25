@@ -35,13 +35,13 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
             _statusMessage = GameObjectHelpers.FindGameObject(gameObject, "StatusMessage").GetComponent<Text>();
             _floorNumber = GameObjectHelpers.FindGameObject(gameObject, "FloorNumber").GetComponent<Text>();
             _meterAmount = GameObjectHelpers.FindGameObject(gameObject, "meterAmount").GetComponent<Text>();
-            _metersText = GameObjectHelpers.FindGameObject(gameObject, "metersText").GetComponent<Text>();            
+            _metersText = GameObjectHelpers.FindGameObject(gameObject, "metersText").GetComponent<Text>();
             _speedAmount = GameObjectHelpers.FindGameObject(gameObject, "speedAmount").GetComponent<Text>();
             _speedText = GameObjectHelpers.FindGameObject(gameObject, "speedText").GetComponent<Text>();
             _floorName = GameObjectHelpers.FindGameObject(gameObject, "FloorName").GetComponent<Text>();
-            InvokeRepeating(nameof(UpdateScreen),.2f,.2f);
+            InvokeRepeating(nameof(UpdateScreen), .2f, .2f);
         }
-        
+
         private void UpdateScreen()
         {
             if (_controller.PlatformTrigger == null) return;
@@ -93,27 +93,39 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
 
         public void OnPointerHover(PointerEventData eventData)
         {
-            if(_controller == null || !_controller.IsOperational || !WorldHelpers.CheckIfInRange(gameObject,Player.main.gameObject,1)) return;
+            if (_controller == null || !_controller.IsOperational ||
+                !WorldHelpers.CheckIfInRange(gameObject, Player.main.gameObject, 1)) return;
 
 
             var main = HandReticle.main;
 
             if (!_controller.IsOperational || !_controller.Manager.HasEnoughPower(FCSElevatorController.POWERUSAGE))
             {
-                main.SetInteractText(Language.main.Get("NoPower"));
+#if SUBNAUTICA
+                main.SetInteractText(
+#else
+                main.SetTextRaw(HandReticle.TextType.Use,
+#endif
+                    Language.main.Get("NoPower"));
                 main.SetIcon(HandReticle.IconType.HandDeny);
             }
             else
             {
-
-                main.SetInteractText("Open Control Panel");
+#if SUBNAUTICA
+                main.SetInteractText(
+#else
+                main.SetTextRaw(HandReticle.TextType.Use,
+#endif
+                    "Open Control Panel");
                 main.SetIcon(HandReticle.IconType.Hand);
             }
         }
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (_controller == null || !_controller.IsOperational || !_controller.PlatformTrigger.IsPlayerInside || !WorldHelpers.CheckIfInRange(gameObject, Player.main.gameObject, 1) || !_controller.Manager.HasEnoughPower(FCSElevatorController.POWERUSAGE)) return;
+            if (_controller == null || !_controller.IsOperational || !_controller.PlatformTrigger.IsPlayerInside ||
+                !WorldHelpers.CheckIfInRange(gameObject, Player.main.gameObject, 1) ||
+                !_controller.Manager.HasEnoughPower(FCSElevatorController.POWERUSAGE)) return;
             ElevatorHUD.Main.Show(_controller);
         }
     }

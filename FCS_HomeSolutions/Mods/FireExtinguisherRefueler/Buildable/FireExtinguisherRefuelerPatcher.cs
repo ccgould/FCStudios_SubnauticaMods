@@ -26,22 +26,27 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Buildable
         internal const string FireExtinguisherRefuelerClassID = "FireExtinguisherRefueler";
         internal const string FireExtinguisherRefuelerFriendly = "Fire Extinguisher Refueler";
 
-        internal const string FireExtinguisherRefuelerDescription = "Keep your habitat safe! Holds and recharges Fire Extinguishers. Wall-mounted.";
+        internal const string FireExtinguisherRefuelerDescription =
+            "Keep your habitat safe! Holds and recharges Fire Extinguishers. Wall-mounted.";
 
         internal const string FireExtinguisherRefuelerPrefabName = "FCS_FireExtinguisherRefueler";
         internal const string FireExtinguisherRefuelerKitClassID = "FireExtinguisherRefueler_Kit";
         internal const string FireExtinguisherRefuelerTabID = "FER";
-        public FireExtinguisherRefuelerBuildable() : base(FireExtinguisherRefuelerClassID, FireExtinguisherRefuelerFriendly, FireExtinguisherRefuelerDescription)
+
+        public FireExtinguisherRefuelerBuildable() : base(FireExtinguisherRefuelerClassID,
+            FireExtinguisherRefuelerFriendly, FireExtinguisherRefuelerDescription)
         {
             _prefab = ModelPrefab.GetPrefabFromGlobal(FireExtinguisherRefuelerPrefabName);
             OnStartedPatching += () =>
             {
-                var miniFountainKit = new FCSKit(FireExtinguisherRefuelerKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
+                var miniFountainKit = new FCSKit(FireExtinguisherRefuelerKitClassID, FriendlyName,
+                    Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 miniFountainKit.Patch();
             };
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, FireExtinguisherRefuelerKitClassID.ToTechType(), 60000, StoreCategory.Home);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType,
+                    FireExtinguisherRefuelerKitClassID.ToTechType(), 60000, StoreCategory.Home);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
             };
         }
@@ -53,11 +58,11 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Buildable
                 var prefab = GameObject.Instantiate(_prefab);
 
                 prefab.name = this.PrefabFileName;
-                
+
                 var center = new Vector3(0.002549291f, 0.04286739f, 0.2148812f);
                 var size = new Vector3(0.9426436f, 0.5879701f, 0.4037365f);
 
-                GameObjectHelpers.AddConstructableBounds(prefab,size,center);
+                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
 
                 // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
                 var lwe = prefab.AddComponent<LargeWorldEntity>();
@@ -90,10 +95,17 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Buildable
 
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<FMOD_CustomLoopingEmitter>();
-                
-                var feItemSize = CraftData.GetItemSize(TechType.FireExtinguisher);
 
-                UWEHelpers.CreateStorageContainer(prefab, prefab.FindChild("StorageRoot"), ClassID, "Fire Extinguisher Receptacle",feItemSize.x, feItemSize.y);
+                var feItemSize =
+#if SUBNAUTICA
+                    CraftData.GetItemSize
+#else
+                    TechData.GetItemSize
+#endif
+                        (TechType.FireExtinguisher);
+
+                UWEHelpers.CreateStorageContainer(prefab, prefab.FindChild("StorageRoot"), ClassID,
+                    "Fire Extinguisher Receptacle", feItemSize.x, feItemSize.y);
 
                 prefab.AddComponent<FireExtinguisherRefuelerController>();
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", ClassID);
@@ -113,7 +125,7 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Buildable
         {
             QuickLogger.Debug($"Creating recipe...");
             // Create and associate recipe to the new TechType
-            var customFabRecipe = new TechData()
+            var customFabRecipe = new RecipeData()
             {
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()

@@ -45,13 +45,18 @@ namespace FCS_StorageSolutions.Patches
     }
 
 
+#if SUBNAUTICA
     [HarmonyPatch(typeof(StorageContainer))]
-    [HarmonyPatch("OnConstructedChanged")]
+    [HarmonyPatch(nameof(StorageContainer.OnConstructedChanged))]
+#else
+    [HarmonyPatch(typeof(Constructable))]
+    [HarmonyPatch(nameof(Constructable.OnConstructedChanged))]
+#endif
     internal class StorageContainerOnConstructedChangedPatcher
     {
 
         [HarmonyPostfix]
-        internal static void Postfix(bool constructed, StorageContainer __instance)
+        internal static void Postfix(bool constructed, Constructable __instance)
         {
             if (__instance == null || !constructed /*|| __instance.gameObject.GetComponentInParent<FcsDevice>()*/)
             {
@@ -59,11 +64,12 @@ namespace FCS_StorageSolutions.Patches
             }
 
             var fcsdevice = __instance.gameObject.GetComponentInChildren<FcsDevice>();
+            var storageContainer = __instance.gameObject.GetComponentInChildren<StorageContainer>(true);
             if(fcsdevice != null && fcsdevice.StorageType == StorageType.OtherStorage) return;
 
             QuickLogger.Debug($"OnConstructedChanged: FCSDevice: {fcsdevice} || Is Bypassing: {fcsdevice?.BypassFCSDeviceCheck} || {fcsdevice?.StorageType}", true);
 
-            var manager = BaseManager.FindManager(__instance.prefabRoot);
+            var manager = BaseManager.FindManager(__instance.gameObject);
 
             if (manager == null)
             {
@@ -71,7 +77,7 @@ namespace FCS_StorageSolutions.Patches
                 return;
             }
 
-            manager.AlertNewStorageContainerPlaced(__instance);
+            manager.AlertNewStorageContainerPlaced(storageContainer);
         }
     }
 }

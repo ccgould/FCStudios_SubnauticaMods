@@ -1,4 +1,5 @@
-﻿using FCS_HomeSolutions.Configuration;
+﻿using System;
+using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Enumerators;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Interface;
 using FCSCommon.Utilities;
@@ -28,16 +29,17 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
                     CheckTeleportationComplete();
                     _timeLeft = 0f;
                 }
-                
             }
         }
 
-        internal static void TeleportPlayer(IQuantumTeleporter currentTeleporter, IQuantumTeleporter destinationTeleporter, QTTeleportTypes tab)
+        internal static void TeleportPlayer(IQuantumTeleporter currentTeleporter,
+            IQuantumTeleporter destinationTeleporter, QTTeleportTypes tab)
         {
             //Check if any of the teleporters return null if so cancel
-            QuickLogger.Debug($"In Teleport Player Main",true);
+            QuickLogger.Debug($"In Teleport Player Main", true);
 
-            if (currentTeleporter == null || destinationTeleporter == null /*|| currentTeleporter.Manager == null */ || destinationTeleporter.Manager == null)
+            if (currentTeleporter == null || destinationTeleporter == null /*|| currentTeleporter.Manager == null */ ||
+                destinationTeleporter.Manager == null)
             {
                 if (currentTeleporter == null)
                 {
@@ -64,7 +66,9 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
         private static void TeleportPlayer()
         {
             _currentTeleporter.PowerManager.TakePower(_tab);
-            _destinationTeleporter.PowerManager.TakePower(_tab == QTTeleportTypes.Vehicle ? QTTeleportTypes.Global : _tab);
+            _destinationTeleporter.PowerManager.TakePower(_tab == QTTeleportTypes.Vehicle
+                ? QTTeleportTypes.Global
+                : _tab);
             ToggleWarpScreen(true);
             _teleportComplete = false;
             _startTeleportCheck = true;
@@ -79,7 +83,6 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
                 Inventory.main.quickSlots.SetIgnoreHotkeyInput(true);
                 Player.main.GetPDA().SetIgnorePDAInput(true);
                 Player.main.playerController.SetEnabled(false);
-
             }
         }
 
@@ -99,6 +102,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
                     {
                         gameObject = collider.gameObject;
                     }
+
                     Creature component = gameObject.GetComponent<Creature>();
                     LiveMixin component2 = gameObject.GetComponent<LiveMixin>();
                     if (component != null && component2 != null)
@@ -107,7 +111,11 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
                     }
                 }
 
-                vehicle.TeleportVehicle(_destinationTeleporter.GetTarget(Player.main.inSeamoth ? TeleportItemType.Seamoth : TeleportItemType.Exosuit, vehicle.gameObject.GetComponent<PrefabIdentifier>()?.Id).position, Quaternion.Euler(new Vector3(0f, 0f, 0f)));
+                vehicle.TeleportVehicle(
+                    _destinationTeleporter
+                        .GetTarget(Player.main.inSeamoth ? TeleportItemType.Seamoth : TeleportItemType.Exosuit,
+                            vehicle.gameObject.GetComponent<PrefabIdentifier>()?.Id).position,
+                    Quaternion.Euler(new Vector3(0f, 0f, 0f)));
             }
             else
             {
@@ -118,14 +126,16 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
                 //Player.main.gameObject.transform.position = _destinationTeleporter.GetTarget().position;
             }
         }
-        
+
         private static void CheckTeleportationComplete()
         {
             if (LargeWorldStreamer.main.IsWorldSettled())
             {
                 if (_tab != QTTeleportTypes.Vehicle)
                 {
-                    Player.main.SetCurrentSub(_destinationTeleporter.IsInside() ? _destinationTeleporter.Manager.Habitat : null);
+                    Player.main.SetCurrentSub(_destinationTeleporter.IsInside()
+                        ? _destinationTeleporter.Manager.Habitat
+                        : null);
                     Inventory.main.quickSlots.SetIgnoreHotkeyInput(false);
                     Player.main.GetPDA().SetIgnorePDAInput(false);
                     Player.main.playerController.inputEnabled = true;
@@ -155,6 +165,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
                     component.freezeStats = true;
                 }
             }
+
             _freezeStatsCount++;
         }
 
@@ -173,7 +184,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
             else if (_freezeStatsCount < 0)
             {
                 Debug.LogError("UnfreezeStats when not frozen");
-                _freezeStatsCount = 0; 
+                _freezeStatsCount = 0;
             }
         }
 
@@ -185,9 +196,14 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
             {
                 _teleportEffects = Player.main.camRoot.mainCam.GetComponentInChildren<TeleportScreenFXController>();
             }
+
             if (activate)
             {
-                _teleportEffects.StartTeleport();
+                _teleportEffects.StartTeleport(
+#if BELOWZERO
+                    String.Empty
+#endif
+                );
             }
             else
             {

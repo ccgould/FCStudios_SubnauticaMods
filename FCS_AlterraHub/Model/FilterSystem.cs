@@ -178,7 +178,7 @@ namespace FCS_AlterraHub.Model
             TechType.Coffee,
             TechType.DisinfectedWater,
             TechType.FilteredWater,
-#if SUBNAUTICA
+#if SUBNAUTICA_STABLE
                   TechType.StillsuitWater,      
 #endif
         };
@@ -243,7 +243,7 @@ namespace FCS_AlterraHub.Model
             TechType.RadiationSuit,
             TechType.ReinforcedDiveSuit,
             TechType.ReinforcedGloves,
-#if SUBNAUTICA
+#if SUBNAUTICA_STABLE
                   TechType.Stillsuit,      
 #endif
             TechType.SwimChargeFins,

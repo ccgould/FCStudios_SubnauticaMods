@@ -30,8 +30,10 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         private const float LerpSpeed = 10f;
         private bool _isRangeVisible;
         private float _currentDistance;
+
         private readonly List<PistonBobbing> _pistons = new();
         //public override bool AllowsTransceiverPulling { get; } = true;
+
         #endregion
 
         #region Internal Properties
@@ -39,13 +41,14 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         public override bool CanBeSeenByTransceiver { get; set; }
         internal FCSDeepDrillerLavaPitHandler LavaPitHandler { get; private set; }
         public override bool IsConstructed { get; set; }
-        public  FCSDeepDrillerPowerHandler DeepDrillerPowerManager { get;  set; }
+        public FCSDeepDrillerPowerHandler DeepDrillerPowerManager { get; set; }
         internal FCSDeepDrillerDisplay DisplayHandler { get; private set; }
         internal DumpContainer PowercellDumpContainer { get; set; }
         public FCSDeepDrillerUpgradeManager UpgradeManager { get; private set; }
         public FCSDeepDrillerTransferManager TransferManager { get; set; }
         public override bool IsVisible => IsConstructed && IsInitialized;
         public override int MaxItemAllowForTransfer { get; } = 6;
+
         public override TechType[] AllowedTransferItems { get; } =
         {
             TechType.Lubricant
@@ -59,7 +62,8 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 
         internal override void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, FCSDeepDrillerBuildable.DeepDrillerMk3TabID, Mod.ModPackID);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, FCSDeepDrillerBuildable.DeepDrillerMk3TabID,
+                Mod.ModPackID);
             DisplayHandler?.UpdateUnitID();
             base.Start();
         }
@@ -89,11 +93,12 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
                 {
                     SetPingName(_saveData.BeaconName);
                 }
+
                 ToggleVisibility(_saveData.IsPingVisible);
                 UpdateEmission();
             }
         }
-        
+
         internal override void Update()
         {
             if (_line == null) return;
@@ -101,7 +106,8 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 
             if (_isRangeVisible)
             {
-                CreatePoints(Mathf.Clamp(_currentDistance + DayNightCycle.main.deltaTime * LerpSpeed * 1, 0, QPatch.Configuration.DDDrillAlterraStorageRange));
+                CreatePoints(Mathf.Clamp(_currentDistance + DayNightCycle.main.deltaTime * LerpSpeed * 1, 0,
+                    QPatch.Configuration.DDDrillAlterraStorageRange));
             }
             else
             {
@@ -123,7 +129,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         public override void Save(SaveData saveDataList, ProtobufSerializer serializer = null)
         {
             if (!IsInitialized || _colorManager == null || DeepDrillerPowerManager == null ||
-                DeepDrillerContainer == null || OreGenerator == null || OilHandler == null || 
+                DeepDrillerContainer == null || OreGenerator == null || OilHandler == null ||
                 UpgradeManager == null || TransferManager == null)
             {
                 QuickLogger.Error($"Failed to save driller {GetPrefabID()}");
@@ -166,13 +172,12 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 
             _saveData.AllowedToExport = TransferManager.IsAllowedToExport();
             saveDataList.DeepDrillerMk2Entries.Add(_saveData);
-
         }
 
         #endregion
 
         #region Private Methods
-        
+
         private void ChangePistonState(bool isRunning = true)
         {
             foreach (var piston in _pistons)
@@ -216,7 +221,6 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
                     DisplayHandler.LoadFromSave(_saveData);
                 }
             }
-            
         }
 
         private void OnGenerate()
@@ -231,7 +235,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
                 _allPlateFormsFound = true;
             }
         }
-        
+
         private void CreatePoints(float radius)
         {
             _currentDistance = radius;
@@ -253,23 +257,26 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
             }
         }
 
-
-
         #endregion
 
         #region Internal Methods
 
         public override void Initialize()
         {
-
             base.Initialize();
 
-            _pistons.Add(gameObject.transform.FirstOrDefault(x => x.name == "hover_piston_pump_01").gameObject.AddComponent<PistonBobbing>());
-            _pistons.Add(gameObject.transform.FirstOrDefault(x => x.name == "hover_piston_pump_02").gameObject.AddComponent<PistonBobbing>());
-            _pistons.Add(gameObject.transform.FirstOrDefault(x => x.name == "hover_piston_pump_03").gameObject.AddComponent<PistonBobbing>());
-            _pistons.Add(gameObject.transform.FirstOrDefault(x => x.name == "hover_piston_pump_04").gameObject.AddComponent<PistonBobbing>());
-            _pistons.Add(gameObject.transform.FirstOrDefault(x => x.name == "hover_piston_pump_05").gameObject.AddComponent<PistonBobbing>());
-            _pistons.Add(gameObject.transform.FirstOrDefault(x => x.name == "hover_piston_pump_06").gameObject.AddComponent<PistonBobbing>());
+            _pistons.Add(gameObject.transform.FirstOrDefault(x => x.name == "hover_piston_pump_01").gameObject
+                .AddComponent<PistonBobbing>());
+            _pistons.Add(gameObject.transform.FirstOrDefault(x => x.name == "hover_piston_pump_02").gameObject
+                .AddComponent<PistonBobbing>());
+            _pistons.Add(gameObject.transform.FirstOrDefault(x => x.name == "hover_piston_pump_03").gameObject
+                .AddComponent<PistonBobbing>());
+            _pistons.Add(gameObject.transform.FirstOrDefault(x => x.name == "hover_piston_pump_04").gameObject
+                .AddComponent<PistonBobbing>());
+            _pistons.Add(gameObject.transform.FirstOrDefault(x => x.name == "hover_piston_pump_05").gameObject
+                .AddComponent<PistonBobbing>());
+            _pistons.Add(gameObject.transform.FirstOrDefault(x => x.name == "hover_piston_pump_06").gameObject
+                .AddComponent<PistonBobbing>());
 
             _pistons[1].Invert = true;
             _pistons[3].Invert = true;
@@ -333,6 +340,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
                 ChangePistonState(false);
             }
         }
+
         internal override void ReadySaveData()
         {
             QuickLogger.Debug("In OnProtoDeserialize");
@@ -347,8 +355,8 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         }
 
         public override bool IsOperational => DeepDrillerPowerManager.HasEnoughPowerToOperate() &&
-                   DeepDrillerPowerManager.GetPowerState() == FCSPowerStates.Powered &&
-                   OilHandler.HasOil() && !DeepDrillerContainer.IsFull && !_isBreakSet;
+                                              DeepDrillerPowerManager.GetPowerState() == FCSPowerStates.Powered &&
+                                              OilHandler.HasOil() && !DeepDrillerContainer.IsFull && !_isBreakSet;
 
         internal bool GetIsRangeVisible()
         {
@@ -359,7 +367,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         {
             _isRangeVisible = !_isRangeVisible;
         }
-        
+
         internal override bool IsPowerAvailable()
         {
             return DeepDrillerPowerManager?.IsPowerAvailable() ?? false;
@@ -377,7 +385,8 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 
         public override void OnHandHover(GUIHand hand)
         {
-            if (DeepDrillerPowerManager == null || !DeepDrillerPowerManager.IsInitialized || DisplayHandler == null || DisplayHandler.IsInteraction()) return;
+            if (DeepDrillerPowerManager == null || !DeepDrillerPowerManager.IsInitialized || DisplayHandler == null ||
+                DisplayHandler.IsInteraction()) return;
 
             base.OnHandHover(hand);
 
@@ -386,17 +395,24 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
                 _sb.Clear();
                 _sb.Append(UnitID);
                 _sb.Append(Environment.NewLine);
-                _sb.Append(AuxPatchers.PressKeyToOperate(GameInput.GetBindingName(GameInput.Button.Exit, GameInput.BindingSet.Primary), FCSDeepDrillerBuildable.DeepDrillerMk3FriendlyName));
+                _sb.Append(AuxPatchers.PressKeyToOperate(
+                    GameInput.GetBindingName(GameInput.Button.Exit, GameInput.BindingSet.Primary),
+                    FCSDeepDrillerBuildable.DeepDrillerMk3FriendlyName));
                 _sb.Append(Environment.NewLine);
-                _sb.Append(Language.main.GetFormat<int, int>("ThermalPlantStatus", Mathf.RoundToInt(DeepDrillerPowerManager.GetSourcePower(DeepDrillerPowerSources.Thermal)), Mathf.RoundToInt(DeepDrillerPowerManager.GetSourcePowerCapacity(DeepDrillerPowerSources.Thermal))));
+                _sb.Append(Language.main.GetFormat<int, int>("ThermalPlantStatus",
+                    Mathf.RoundToInt(DeepDrillerPowerManager.GetSourcePower(DeepDrillerPowerSources.Thermal)),
+                    Mathf.RoundToInt(DeepDrillerPowerManager.GetSourcePowerCapacity(DeepDrillerPowerSources.Thermal))));
                 _sb.Append(Environment.NewLine);
-                _sb.Append(Language.main.GetFormat<int, int, int>("SolarPanelStatus", Mathf.RoundToInt(DeepDrillerPowerManager.GetRechargeScalar() * 100f), Mathf.RoundToInt(DeepDrillerPowerManager.GetSourcePower(DeepDrillerPowerSources.Solar)), Mathf.RoundToInt(DeepDrillerPowerManager.GetSourcePowerCapacity(DeepDrillerPowerSources.Solar))));
+                _sb.Append(Language.main.GetFormat<int, int, int>("SolarPanelStatus",
+                    Mathf.RoundToInt(DeepDrillerPowerManager.GetRechargeScalar() * 100f),
+                    Mathf.RoundToInt(DeepDrillerPowerManager.GetSourcePower(DeepDrillerPowerSources.Solar)),
+                    Mathf.RoundToInt(DeepDrillerPowerManager.GetSourcePowerCapacity(DeepDrillerPowerSources.Solar))));
 
 #if SUBNAUTICA
                 HandReticle.main.SetInteractText(_sb.ToString(), AlterraHub.ViewInPDA(),false,false,HandReticle.Hand.None);
 #else
                 _sb.Append(AlterraHub.ViewInPDA());
-                HandReticle.main.SetTextRaw(HandReticle.TextType.Hand ,_sb.ToString());
+                HandReticle.main.SetTextRaw(HandReticle.TextType.Hand, _sb.ToString());
 #endif
                 HandReticle.main.SetIcon(HandReticle.IconType.Info, 1f);
             }
@@ -404,13 +420,12 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 
         public void OnHandClick(GUIHand hand)
         {
-
         }
 
         public override bool CanBeStored(int amount, TechType techType)
         {
             var result = OilHandler.CanBeStored(amount, techType);
-            QuickLogger.Debug($"Drill can be stored result: {result}",true);
+            QuickLogger.Debug($"Drill can be stored result: {result}", true);
             return result;
         }
 
@@ -427,7 +442,8 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 
         public override TechType GetRandomTechTypeFromDevice()
         {
-            if (!IsConstructed || !IsInitialized || DeepDrillerContainer == null || !DeepDrillerContainer.HasItems()) return TechType.None;
+            if (!IsConstructed || !IsInitialized || DeepDrillerContainer == null || !DeepDrillerContainer.HasItems())
+                return TechType.None;
 
             return DeepDrillerContainer.GetRandomItem();
         }
@@ -441,14 +457,16 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         {
             var result = DeepDrillerContainer.OnlyRemoveItemFromContainer(techType);
 
-            if (result)
-            {
-                return techType.ToPickupable();
-            }
-
-            return null;
+            if (!result) return null;
+#if SUBNAUTICA
+            return techType.ToPickupable();
+#else
+            var itemTask = new TaskResult<InventoryItem>();
+            CouroutineManager.WaitCoroutine(techType.ToInventoryItem(itemTask));
+            return itemTask.Get().item;
+#endif
         }
-        
+
         #endregion
     }
 }

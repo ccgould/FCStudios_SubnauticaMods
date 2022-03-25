@@ -318,14 +318,14 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
 
 
+#if SUBNAUTICA_STABLE
         public DroneController SpawnDrone()
         {
-#if SUBNAUTICA
             var drone = Instantiate(CraftData.GetPrefabForTechType(Mod.AlterraTransportDroneTechType), _spawnPoint.transform.position, _spawnPoint.transform.rotation);
             _assignedDrone  = drone.GetComponent<DroneController>();
-#endif
             return _assignedDrone;
         }
+#endif
 
         public IEnumerator SpawnDrone(Action<DroneController> callback)
         {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Extensions;
@@ -19,7 +20,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
     {
         private const float MaxPlantsHeight = 3f;
         private TechType _currentItemTech;
-        private readonly Dictionary<TechType,int> _trackedItems = new();
+        private readonly Dictionary<TechType, int> _trackedItems = new();
 
         #region Actions
 
@@ -45,13 +46,13 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
 
             if (ItemsContainer == null)
             {
-                ItemsContainer = new ItemsContainer(1,1,gameObject.transform,"HarvesterTempStorage",null);
+                ItemsContainer = new ItemsContainer(1, 1, gameObject.transform, "HarvesterTempStorage", null);
             }
         }
 
         internal void UpdateSlotCounts(InventoryItem item)
         {
-            QuickLogger.Debug("Update Slots",true);
+            QuickLogger.Debug("Update Slots", true);
 
             foreach (PlantSlot slot in Slots)
             {
@@ -69,23 +70,15 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
 #if SUBNAUTICA_STABLE
             ItemsContainer.UnsafeAdd(data.PickType.ToInventoryItemLegacy());
 #else
-            StartCoroutine(AsyncExtensions.AddToContainerAsync(data.PickType,ItemsContainer));
+            StartCoroutine(data.PickType.AddTechTypeToContainerUnSafe(ItemsContainer));
 #endif
         }
 
-        internal void AddSample(TechType type,int slotID)
+        internal void AddSample(TechType type, int slotID)
         {
-            var item = type.ToInventoryItem();
-            if (item != null)
-            {
-                AddItemToContainer(item,slotID);
-            }
-            else
-            {
-                QuickLogger.Error($"To inventory item failed to create with techtype {type}");
-            }
+            StartCoroutine(AddItemToContainer(type, slotID));
         }
-        
+
         private bool FindPots()
         {
             try
@@ -98,7 +91,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
                 {
                     var planter = planters.GetChild(i);
                     var slot = planter.gameObject.AddComponent<PlantSlot>();
-                    slot.Initialize(this,i);
+                    slot.Initialize(this, i);
                     Slots[i] = slot;
                 }
             }
@@ -130,6 +123,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
                 QuickLogger.Debug("SlotById returned null");
                 return;
             }
+
             HarvesterController.EffectsManager.ChangeEffectState(FindEffectType(slotByID), slotByID.Id, false);
             slotByID.Clear();
             SetSlotOccupiedState(slotID, false);
@@ -137,14 +131,14 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
 
         internal static EffectType FindEffectType(PlantSlot slotByID)
         {
-            QuickLogger.Debug($"PlantSlot: {slotByID.GetPlantable().underwater}",true);
+            QuickLogger.Debug($"PlantSlot: {slotByID.GetPlantable().underwater}", true);
             return slotByID.GetPlantable().underwater ? EffectType.Bubbles : EffectType.Smoke;
         }
 
         private void AddItem(Plantable plantable, int slotID)
         {
             PlantSlot slotByID = GetSlotByID(slotID);
-            
+
             if (slotByID == null)
             {
                 return;
@@ -156,7 +150,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
             }
 
             this.SetSlotOccupiedState(slotID, true);
-         
+
             GameObject gameObject = plantable.Spawn(slotByID.transform, HarvesterController.IsInBase());
 
             this.SetupRenderers(gameObject, HarvesterController.IsInBase());
@@ -171,9 +165,10 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
             if (growingPlant != null)
             {
                 var fcsGrowing = gameObject.AddComponent<FCSGrowingPlant>();
-                fcsGrowing.Initialize(growingPlant, this,slotByID.SlotBounds.GetComponent<Collider>().bounds.size, null);
-                
-                var pickPrefab = growingPlant.grownModelPrefab.GetComponentInChildren<PickPrefab>();
+                fcsGrowing.Initialize(growingPlant, this, slotByID.SlotBounds.GetComponent<Collider>().bounds.size,
+                    null);
+
+                //var pickPrefab = growingPlant.grownModelPrefab.GetComponentInChildren<PickPrefab>();
 
                 slotByID.GrowingPlant = fcsGrowing;
                 Destroy(growingPlant);
@@ -185,7 +180,6 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
             }
 
             HarvesterController.DisplayManager.UpdateUI();
-
         }
 
         public void SetupRenderers(GameObject gameObject, bool interior)
@@ -213,23 +207,37 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
             return Slots?.Any(plantSlot => plantSlot != null && plantSlot.IsOccupied) ?? false;
         }
 
-        public bool AddItemToContainer(InventoryItem item, int slotId)
+        public IEnumerator AddItemToContainer(TechType techType, int slotId)
         {
-            _currentItemTech = item.item.GetTechType();
-            Plantable component = item.item.GetComponent<Plantable>();
-            item.item.SetTechTypeOverride(component.plantTechType);
-            item.isEnabled = false;
-            AddItem(component, slotId);
-            return true;
+#if SUBNAUTICA
+            var item = techType.ToInventoryItem();
+#else
+            var itemTask = new TaskResult<InventoryItem>();
+            yield return techType.ToInventoryItem(itemTask);
+            var item = itemTask.Get();
+#endif
+            if (item != null)
+            {
+                Plantable component = item.item.GetComponent<Plantable>();
+                item.item.SetTechTypeOverride(component.plantTechType);
+                item.isEnabled = false;
+                AddItem(component, slotId);
+            }
+            else
+            {
+                QuickLogger.Error($"To inventory item failed to create with techtype {techType}");
+            }
+            yield break;
         }
 
         public void SetSpeedMode(HarvesterSpeedModes result)
         {
-            QuickLogger.Debug($"Setting SpeedMode to {result}",true);
+            QuickLogger.Debug($"Setting SpeedMode to {result}", true);
             foreach (PlantSlot plantSlot in Slots)
             {
                 plantSlot.CurrentHarvesterSpeedMode = result;
             }
+
             HarvesterController.DisplayManager.UpdateUI();
         }
 
@@ -256,16 +264,16 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
         public void Load(HydroponicHarvesterDataEntry savedData)
         {
             SetSpeedMode(savedData.HarvesterSpeedMode);
-            
+
             if (savedData.SlotData.Count != 3) return;
 
             for (int i = 0; i < savedData.SlotData.Count; i++)
             {
                 var slot = Slots[i];
                 var data = savedData.SlotData[i];
-                
-                if(data.TechType == TechType.None) continue;
-                
+
+                if (data.TechType == TechType.None) continue;
+
                 slot.GenerationProgress = data.GenerationProgress;
 
                 slot.SetCount(data.Amount);
@@ -274,7 +282,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
                 {
                     AddItemToItemsContainer(data.TechType);
                 }
-                
+
                 slot.GetTab().Load(data.TechType);
 
                 if (slot.GrowingPlant != null)
@@ -292,15 +300,29 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
         {
             data.SlotData = new List<SlotsData>
             {
-                new SlotsData{Amount = Slots[0].GetCount(),TechType = Slots[0].GetPlantSeedTechType(), GenerationProgress = Slots[0].GenerationProgress,PlantProgress = Slots[0].GrowingPlant?.GetProgress() ?? 0},
-                new SlotsData{Amount = Slots[1].GetCount(),TechType = Slots[1].GetPlantSeedTechType(), GenerationProgress = Slots[1].GenerationProgress,PlantProgress = Slots[1].GrowingPlant?.GetProgress() ?? 0},
-                new SlotsData{Amount = Slots[2].GetCount(),TechType = Slots[2].GetPlantSeedTechType(), GenerationProgress = Slots[2].GenerationProgress,PlantProgress = Slots[2].GrowingPlant?.GetProgress() ?? 0},
+                new SlotsData
+                {
+                    Amount = Slots[0].GetCount(), TechType = Slots[0].GetPlantSeedTechType(),
+                    GenerationProgress = Slots[0].GenerationProgress,
+                    PlantProgress = Slots[0].GrowingPlant?.GetProgress() ?? 0
+                },
+                new SlotsData
+                {
+                    Amount = Slots[1].GetCount(), TechType = Slots[1].GetPlantSeedTechType(),
+                    GenerationProgress = Slots[1].GenerationProgress,
+                    PlantProgress = Slots[1].GrowingPlant?.GetProgress() ?? 0
+                },
+                new SlotsData
+                {
+                    Amount = Slots[2].GetCount(), TechType = Slots[2].GetPlantSeedTechType(),
+                    GenerationProgress = Slots[2].GenerationProgress,
+                    PlantProgress = Slots[2].GrowingPlant?.GetProgress() ?? 0
+                },
             };
         }
 
-        public void TakeItem(TechType techType,int slotId)
+        public void TakeItem(TechType techType, int slotId)
         {
-            
             if (PlayerInteractionHelper.CanPlayerHold(techType))
             {
                 var slot = GetSlotByID(slotId);
@@ -371,10 +393,8 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
                         break;
                     }
                 }
-
-                Destroy(pickupable.gameObject);
-
-                return techType.ToPickupable();
+                
+                return pickupable;
             }
 
             return null;
@@ -387,6 +407,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
             {
                 _trackedItems.Add(item.Key, item.Value.items.Count);
             }
+
             return _trackedItems;
         }
 

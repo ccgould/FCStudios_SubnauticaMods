@@ -308,7 +308,13 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
         public void OnPointerHover(PointerEventData eventData)
         {
             HandReticle main = HandReticle.main;
+            
+#if SUBNAUTICA
             main.SetInteractTextRaw(_fullName,"Click to play");
+#else
+            main.SetTextRaw(HandReticle.TextType.Use, _fullName);
+            main.SetTextRaw(HandReticle.TextType.UseSubscript, "Click to play");
+#endif
         }
     }
 }

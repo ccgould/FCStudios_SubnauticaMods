@@ -117,7 +117,7 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Buildables
         {
             QuickLogger.Debug($"Creating recipe...");
             // Create and associate recipe to the new TechType
-            var customFabRecipe = new TechData()
+            var customFabRecipe = new RecipeData()
             {
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()

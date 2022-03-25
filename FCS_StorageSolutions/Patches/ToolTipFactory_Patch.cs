@@ -12,7 +12,11 @@ namespace DataStorageSolutions.Patches
     {
         private static TechType _serverTechType;
 
+#if SUBNAUTICA
         public static void GetToolTip(InventoryItem item, ref string __result)
+#else
+        public static void GetToolTip(InventoryItem item, TooltipData data)
+#endif
         {
             if (!QPatch.Configuration.ShowServerCustomToolTip) return;
 
@@ -33,8 +37,14 @@ namespace DataStorageSolutions.Patches
             GetFilters(sb, isFormatted, controller);
             GetItems(controller, sb);
 
+#if SUBNAUTICA
             __result = sb.ToString();
+#else
+            data.prefix.Clear();
+            data.prefix.AppendFormat(sb.ToString());
+#endif
         }
+
 
         private static void GetItems(DSSServerController controller, StringBuilder sb)
         {
@@ -44,7 +54,8 @@ namespace DataStorageSolutions.Patches
 
             if (itemCount > 0)
             {
-                sb.AppendFormat("\n<size=20><color=#FFA500FF>{0}:</color>\n<color=#DDDEDEFF>{1}</color></size>", $"Items",
+                sb.AppendFormat("\n<size=20><color=#FFA500FF>{0}:</color>\n<color=#DDDEDEFF>{1}</color></size>",
+                    $"Items",
                     FormatData(controller.GetItemsWithin()));
             }
         }
@@ -56,7 +67,8 @@ namespace DataStorageSolutions.Patches
 
             if (isFormatted)
             {
-                sb.AppendFormat("\n<size=20><color=#FFA500FF>{0}:</color>\n<color=#DDDEDEFF>{1}</color></size>", $"{AuxPatchers.Filters()}",
+                sb.AppendFormat("\n<size=20><color=#FFA500FF>{0}:</color>\n<color=#DDDEDEFF>{1}</color></size>",
+                    $"{AuxPatchers.Filters()}",
                     controller.FormatFiltersData());
             }
         }
@@ -73,7 +85,6 @@ namespace DataStorageSolutions.Patches
 
         private static string FormatData(IEnumerable<KeyValuePair<TechType, int>> items)
         {
-
             var sb = new StringBuilder();
 
             for (int i = 0; i < items.Count(); i++)
@@ -88,7 +99,6 @@ namespace DataStorageSolutions.Patches
                     sb.Append($"And More.....");
                     break;
                 }
-
             }
 
             return sb.ToString();

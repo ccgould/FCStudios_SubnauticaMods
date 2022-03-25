@@ -9,13 +9,13 @@ namespace FCS_HomeSolutions.Mods.Shower.Mono
         private ParticleSystem _shower;
         private AudioSource _showerFx;
         private bool _wasPlaying;
-        public string TurnOffText { get; set; }= "Turn Off Shower";
-        public string TurnOnText { get; set; }= "Turn On Shower";
+        public string TurnOffText { get; set; } = "Turn Off Shower";
+        public string TurnOnText { get; set; } = "Turn On Shower";
+
         private void Update()
         {
             if (_showerFx != null)
             {
-
                 if (_showerFx.isPlaying && WorldHelpers.CheckIfPaused())
                 {
                     _showerFx.Pause();
@@ -39,13 +39,19 @@ namespace FCS_HomeSolutions.Mods.Shower.Mono
         public void OnHandHover(GUIHand hand)
         {
             HandReticle main = HandReticle.main;
-            main.SetInteractText(_isOn ? TurnOffText : TurnOnText);
+
+#if SUBNAUTICA
+                main.SetInteractText(
+#else
+            main.SetTextRaw(HandReticle.TextType.Use,
+#endif
+                _isOn ? TurnOffText : TurnOnText);
             main.SetIcon(HandReticle.IconType.Hand);
         }
 
         public void OnHandClick(GUIHand hand)
         {
-            if(_isOn)
+            if (_isOn)
             {
                 _shower.Stop();
                 _showerFx?.Stop();

@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Buildables;
+using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
@@ -21,7 +24,7 @@ namespace FCS_HomeSolutions.Mods.Stove.Mono
         private bool _fromSave;
         private StoveDataEntry _saveData;
         private static HashSet<TechType> _allowedTech;
-        private static Dictionary<TechType,CookingItem> _knownCookingData = new();
+        private static Dictionary<TechType, CookingItem> _knownCookingData = new();
         private Text _clock;
         internal Cooker Cooker { get; set; }
         internal FCSStorage StorageSystem { get; set; }
@@ -87,7 +90,7 @@ namespace FCS_HomeSolutions.Mods.Stove.Mono
 
                 StorageSystem.OnContainerOpened += () =>
                 {
-                    if (StorageSystem.container != null && (StorageSystem.container.allowedTech ==null ||!StorageSystem.container.allowedTech.Any()))
+                    if (StorageSystem.container != null && (StorageSystem.container.allowedTech == null || !StorageSystem.container.allowedTech.Any()))
                     {
                         StorageSystem.container.allowedTech = GetAllowedTech();
                     }
@@ -115,19 +118,26 @@ namespace FCS_HomeSolutions.Mods.Stove.Mono
             {
                 _allowedTech = new HashSet<TechType>();
 
+#if SUBNAUTICA
                 foreach (var item in CraftData.cookedCreatureList)
                 {
-                    _allowedTech.Add(item.Key);
+                    _allowedTech.AddIfNotPresent(item.Key);
                 }
-
+#else
+                foreach (TechType techType in Enum.GetValues(typeof(TechType)))
+                {
+                    if (TechData.GetProcessed(techType) != TechType.None)
+                        _allowedTech.AddIfNotPresent(techType);
+                }
+#endif
                 foreach (var item in Mod.CuredCreatureList)
                 {
-                    _allowedTech.Add(item.Key);
+                    _allowedTech.AddIfNotPresent(item.Key);
                 }
 
                 foreach (var item in Mod.CustomFoods)
                 {
-                    _allowedTech.Add(item.Key);
+                    _allowedTech.AddIfNotPresent(item.Key);
                 }
 
             }
@@ -164,7 +174,7 @@ namespace FCS_HomeSolutions.Mods.Stove.Mono
             {
                 Initialize();
             }
-            
+
             _fromSave = true;
         }
 
@@ -211,15 +221,22 @@ namespace FCS_HomeSolutions.Mods.Stove.Mono
             newSaveData.StoveDataEntries.Add(_saveData);
         }
 
-        internal void SendToSeaBreeze(InventoryItem inventoryItem)
+        internal IEnumerator SendToSeaBreeze(TechType techType)
         {
             var seabreezes = Manager.GetDevices(SeaBreezeBuildable.SeaBreezeTabID);
             foreach (FcsDevice device in seabreezes)
             {
                 if (!device.IsConstructed) continue;
-                if (device.CanBeStored(1, inventoryItem.item.GetTechType()))
+                if (device.CanBeStored(1, techType))
                 {
-                    device.AddItemToContainer(inventoryItem);
+#if SUBNAUTICA_STABLE
+                    device.AddItemToContainer(techType.ToInventoryItem());
+                    yield break;
+#else
+                    var itemTask = new TaskResult<InventoryItem>();
+                    yield return techType.ToInventoryItem(itemTask);
+                    device.AddItemToContainer(itemTask.Get());
+#endif
                 }
             }
         }
@@ -235,9 +252,9 @@ namespace FCS_HomeSolutions.Mods.Stove.Mono
         }
         public override void OnHandHover(GUIHand hand)
         {
-            if(!IsInitialized || !IsConstructed) return;
+            if (!IsInitialized || !IsConstructed) return;
             base.OnHandHover(hand);
-            
+
             var data = new[]
             {
                 AlterraHub.PowerPerMinute(GetPowerUsage() * 60)
@@ -257,9 +274,17 @@ namespace FCS_HomeSolutions.Mods.Stove.Mono
                 return _knownCookingData[techType];
             }
 
+#if SUBNAUTICA 
+            TechType foodData = TechType.None;
             if (CraftData.cookedCreatureList.ContainsKey(techType))
             {
-                var foodData = CraftData.cookedCreatureList[techType];
+                foodData = CraftData.cookedCreatureList[techType];
+#else
+
+            var foodData = TechData.GetProcessed(techType);
+            if (foodData != TechType.None)
+            {
+#endif
                 var newCookingData = new CookingItem { TechType = techType, ReturnItem = foodData };
                 _knownCookingData.Add(techType, newCookingData);
                 return newCookingData;
@@ -268,15 +293,15 @@ namespace FCS_HomeSolutions.Mods.Stove.Mono
 
             if (Mod.CuredCreatureList.ContainsKey(techType))
             {
-                var foodData = Mod.CuredCreatureList[techType];
-                var newCookingData = new CookingItem {TechType = techType, ReturnItem = foodData};
-                _knownCookingData.Add(techType,newCookingData);
+                foodData = Mod.CuredCreatureList[techType];
+                var newCookingData = new CookingItem { TechType = techType, ReturnItem = foodData };
+                _knownCookingData.Add(techType, newCookingData);
                 return newCookingData;
             }
 
             if (Mod.CustomFoods.ContainsKey(techType))
             {
-                var foodData = Mod.CustomFoods[techType];
+                foodData = Mod.CustomFoods[techType];
                 var newCookingData = new CookingItem { TechType = techType, ReturnItem = foodData };
                 _knownCookingData.Add(techType, newCookingData);
                 return newCookingData;

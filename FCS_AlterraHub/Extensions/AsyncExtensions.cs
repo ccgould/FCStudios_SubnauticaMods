@@ -18,7 +18,7 @@ namespace FCS_AlterraHub.Extensions
 
             return item;
         }
-#if SUBNAUTICA
+#if SUBNAUTICA_STABLE
         public static Pickupable ToPickupable(this TechType techType)
         {
             GameObject gameObject = CraftData.InstantiateFromPrefab(techType);
@@ -77,6 +77,16 @@ namespace FCS_AlterraHub.Extensions
 
 #else
 
+        public static IEnumerator AddTechTypeToContainerUnSafe(this TechType techType, ItemsContainer container)
+        {
+            if (techType != TechType.None)
+            {
+                var itemResult = new TaskResult<InventoryItem>();
+                yield return techType.ToInventoryItem(itemResult);
+                container.UnsafeAdd(itemResult.Get());
+            }
+        }
+        
         public static IEnumerator ToInventoryItem(this TechType techType, TaskResult<InventoryItem> item)
         {
             if (techType != TechType.None)

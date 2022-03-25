@@ -28,7 +28,7 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Mono
 
         #region Public Properties
 
-        internal Fridge FridgeComponent { get; private set; }
+        internal FCSFridge FridgeComponent { get; private set; }
         internal SeaBreezePowerManager PowerManager { get; private set; }
         internal NameController NameController { get; private set; }
         public Action<string, NameController> OnLabelChanged { get; set; }
@@ -125,7 +125,7 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Mono
 
             if (FridgeComponent == null)
             {
-                FridgeComponent = gameObject.AddComponent< Fridge>();
+                FridgeComponent = gameObject.AddComponent<FCSFridge>();
                 FridgeComponent.OnContainerUpdate += OnFridgeContainerUpdate;
                 FridgeComponent.Initialize(this,QPatch.Configuration.SeaBreezeStorageLimit);
                 FridgeComponent.SetModMode(QPatch.Configuration.SeaBreezeModMode);

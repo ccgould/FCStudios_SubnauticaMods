@@ -71,11 +71,22 @@ namespace FCS_HomeSolutions.Mods.Shower.Mono
             HandReticle main = HandReticle.main;
             if (IsOpen)
             {
-                main.SetInteractText("Close Door");
+#if SUBNAUTICA
+                main.SetInteractText(
+#else
+                main.SetTextRaw(HandReticle.TextType.Use,
+#endif
+                "Close Door");
             }
             else
             {
-                main.SetInteractText("Open Door");
+                
+#if SUBNAUTICA
+                main.SetInteractText(
+#else
+                main.SetTextRaw(HandReticle.TextType.Use,
+#endif
+                "Open Door");
             }
 
             main.SetIcon(HandReticle.IconType.Hand);

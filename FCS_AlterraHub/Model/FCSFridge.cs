@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace FCS_AlterraHub.Model
 {
-    public class Fridge : MonoBehaviour, IFCSStorage
+    public class FCSFridge : MonoBehaviour, IFCSStorage
     { 
         private int _itemLimit;
         public Action<int, int> OnContainerUpdate { get; set; }
@@ -307,7 +307,7 @@ namespace FCS_AlterraHub.Model
         public void RemoveItem(TechType techType, EatableType eatableType)
         {
 
-#if SUBNAUTICA
+#if SUBNAUTICA_STABLE
             var pickupable = techType.ToPickupable();
 #else
             var pickupable = TechTypeHelpers.ConvertToPickupable(techType,(pickupable =>

@@ -8,6 +8,7 @@ using FCS_HomeSolutions.Mods.MiniFountainFilter.Buildables;
 using FCS_HomeSolutions.Mods.MiniFountainFilter.Mono;
 using FCSCommon.Utilities;
 using UnityEngine;
+using UWE;
 
 namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Managers
 {
@@ -114,7 +115,7 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Managers
             for (int i = 0; i < waterBottleCount; i++)
             {
                 var result = new TaskResult<InventoryItem>();
-                yield return TechType.BigFilteredWater.ToInventoryItem(result); 
+                yield return TechType.BigFilteredWater.ToInventoryItem(result);
                 _container.UnsafeAdd(result.value);
             }
 
@@ -148,8 +149,12 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Managers
 
         private void SpawnBottle()
         {
+#if SUBNAUTICA
             var newInventoryItem = TechType.BigFilteredWater.ToInventoryItem();
             _container.UnsafeAdd(newInventoryItem);
+#else
+            CoroutineHost.StartCoroutine(TechType.BigFilteredWater.AddTechTypeToContainerUnSafe(_container));
+#endif
             OnWaterAdded?.Invoke();
         }
 
@@ -161,8 +166,16 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Managers
                 var result = PlayerInteractionHelper.GivePlayerItem(techType);
                 if (result)
                 {
+#if SUBNAUTICA
                     //uGUI_IconNotifier.main.Play(techType, uGUI_IconNotifier.AnimationType.From, null);
                     FMODUWE.PlayOneShot(CraftData.GetPickupSound(techType), Player.main.transform.position, 1f);
+#else
+                    FMODAsset pickupSound = Player.main.GetPickupSound(TechData.GetSoundType(techType));
+                    if (pickupSound)
+                    {
+                        Utils.PlayFMODAsset(pickupSound, Player.main.transform.position, 20f);
+                    }
+#endif
                     _mono.TankManager.RemoveWater(50);
                 }
 

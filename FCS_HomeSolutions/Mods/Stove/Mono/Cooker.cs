@@ -24,14 +24,15 @@ namespace FCS_HomeSolutions.Mods.Stove.Mono
         private float _cookingTime;
         public bool PauseUpdates { get; set; }
         public bool IsFull => _mono.StorageSystem.GetFreeSpace() == 0;
-        public bool NotAllowToCook => PauseUpdates || _mono == null ||!_mono.IsConstructed || _cookingQueue.Count == 0;
+        public bool NotAllowToCook => PauseUpdates || _mono == null || !_mono.IsConstructed || _cookingQueue.Count == 0;
         public bool IsCooking => GenerationProgress > -1;
+
         internal float GenerationProgress
         {
             get => _progress[(int)CookingPhases.Cooking];
             set => _progress[(int)CookingPhases.Cooking] = value;
         }
-        
+
         private void Update()
         {
             Cook();
@@ -56,7 +57,7 @@ namespace FCS_HomeSolutions.Mods.Stove.Mono
             }
 
             var energyToConsume = DayNightCycle.main.deltaTime;
-            
+
 
             if (!_mono.HasPowerToConsume())
                 return;
@@ -74,10 +75,9 @@ namespace FCS_HomeSolutions.Mods.Stove.Mono
             {
                 // Is currently generating clone
                 GenerationProgress = Mathf.Min(_cookingTime, GenerationProgress + energyToConsume);
-
             }
-            
-            if(_cookingQueue?.Count == 0)
+
+            if (_cookingQueue?.Count == 0)
             {
                 GenerationProgress = -1;
             }
@@ -138,21 +138,32 @@ namespace FCS_HomeSolutions.Mods.Stove.Mono
 
         private void AddItemToStorage()
         {
-            var item  = _cookingQueue.Dequeue();
+            var item = _cookingQueue.Dequeue();
 
             if (_mono.IsSendingToSeaBreeze)
             {
-                _mono.SendToSeaBreeze(item.CookedTechType.ToInventoryItem());
+                StartCoroutine(_mono.SendToSeaBreeze(item.CookedTechType));
             }
             else
             {
-                _mono.StorageSystem.AddItemToContainer(item.CookedTechType.ToInventoryItem());
+#if SUBNAUTICA_STABLE
+                _mono.StorageSystem.container.UnsafeAdd(item.CookedTechType.ToInventoryItem());
+#else
+                StartCoroutine(item.CookedTechType.AddTechTypeToContainerUnSafe(_mono.StorageSystem.container));
+#endif
             }
         }
 
         private float GetCookingTime()
         {
-            if (CraftData.GetCraftTime(_cookingQueue.Peek().CookedTechType, out var duration))
+            if (
+#if SUBNAUTICA
+                CraftData.GetCraftTime
+#else
+                TechData.GetCraftTime
+#endif
+
+                    (_cookingQueue.Peek().CookedTechType, out var duration))
             {
                 duration = Mathf.Max(2.7f, duration);
             }
@@ -160,6 +171,7 @@ namespace FCS_HomeSolutions.Mods.Stove.Mono
             {
                 duration = 2.7f;
             }
+
             QuickLogger.Debug($"Cooking Time Set to: {TimeConverters.SecondsToMS(duration)}");
             return duration;
         }
@@ -170,7 +182,7 @@ namespace FCS_HomeSolutions.Mods.Stove.Mono
             {
                 _mono = mono;
 
-                if(_cookingQueue == null)
+                if (_cookingQueue == null)
                 {
                     _cookingQueue = new Queue<CookingQueue>();
                 }
@@ -187,10 +199,10 @@ namespace FCS_HomeSolutions.Mods.Stove.Mono
             _isInitialized = true;
         }
 
-        internal void AddToQueue( CookingItem cookingItem)
+        internal void AddToQueue(CookingItem cookingItem)
         {
-            if(!_isInitialized || _cookingQueue.Count >= MaxQueue) return;
-            QuickLogger.Debug($"Adding {cookingItem.TechType} to queue",true);
+            if (!_isInitialized || _cookingQueue.Count >= MaxQueue) return;
+            QuickLogger.Debug($"Adding {cookingItem.TechType} to queue", true);
             _cookingQueue.Enqueue(new CookingQueue(cookingItem));
         }
 
@@ -204,7 +216,11 @@ namespace FCS_HomeSolutions.Mods.Stove.Mono
             {
                 RawTechType = cookingItem.TechType;
                 CookedTechType = cookingItem.ReturnItem;
+#if SUBNAUTICA
                 CraftData.craftingTimes.TryGetValue(cookingItem.ReturnItem, out float value);
+#else
+                TechData.GetCraftTime(cookingItem.ReturnItem, out float value);
+#endif
                 CookingTime = value;
             }
         }
@@ -216,7 +232,7 @@ namespace FCS_HomeSolutions.Mods.Stove.Mono
             CoolDown = 2
         }
 
-        public Tuple<Queue<CookingQueue>,float> Save()
+        public Tuple<Queue<CookingQueue>, float> Save()
         {
             return new Tuple<Queue<CookingQueue>, float>(_cookingQueue, GenerationProgress);
         }

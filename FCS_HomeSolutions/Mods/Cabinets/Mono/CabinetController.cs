@@ -141,12 +141,16 @@ namespace FCS_HomeSolutions.Mods.Cabinets.Mono
 
         public override bool CanDeconstruct(out string reason)
         {
+            reason = string.Empty;
             if (_storageContainer == null)
             {
-                reason = string.Empty;
                 return true;
             }
-            return _storageContainer.CanDeconstruct(out reason);
+
+            if (!_storageContainer.preventDeconstructionIfNotEmpty || _storageContainer.IsEmpty()) return true;
+            
+            reason = Language.main.Get("DeconstructNonEmptyStorageContainerError");
+            return false;
         }
 
         public override void OnConstructedChanged(bool constructed)

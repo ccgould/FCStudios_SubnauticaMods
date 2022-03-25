@@ -7,6 +7,7 @@ using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Mono;
 using FCSCommon.Utilities;
 using UnityEngine;
+using UWE;
 
 namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 {
@@ -66,7 +67,11 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
                     var canBeStored = deviceStorage.CanBeStored(1, techType);
                     if (canBeStored)
                     {
+                        #if SUBNAUTICA
                         deviceStorage.AddItemToContainer(techType.ToInventoryItem());
+#else
+                        CoroutineHost.StartCoroutine(techType.AddTechTypeToContainerUnSafe(deviceStorage.ItemsContainer));
+#endif
                     }
                 }
             }

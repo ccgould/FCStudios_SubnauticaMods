@@ -39,7 +39,8 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Mono
 
         internal void AddItem(InventoryItem item)
         {
-            var data = CraftData.Get(item.item.GetTechType());
+
+            var data = CraftDataHandler.GetTechData(item.item.GetTechType());
 
             if(data != null && data.linkedItemCount > 0)
             {
@@ -56,7 +57,7 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Mono
                     count++;
                 }
 
-                ItemsContainer inventory = Inventory.main?.container;
+                ItemsContainer inventory = Inventory.main != null? Inventory.main.container: null;
                 List<InventoryItem> inventoryItems = new List<InventoryItem>();
 
                 if (inventory != null)
@@ -74,16 +75,15 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Mono
                             }
                         }
                     }
-                }
+                    if(count > inventoryItems.Count)
+                    {
+                        inventoryItems.ForEach((x) => inventory.UnsafeAdd(x));
+                        inventory.UnsafeAdd(item);
+                        return;
+                    }
 
-                if(count > inventoryItems.Count)
-                {
-                    inventoryItems.ForEach((x) => inventory.UnsafeAdd(x));
-                    inventory.UnsafeAdd(item);
-                    return;
+                    inventoryItems.ForEach((x) => Destroy(x.item.gameObject));
                 }
-
-                inventoryItems.ForEach((x) => Destroy(x.item.gameObject));
             }
 
             double time = DayNightCycle.main.timePassed;
@@ -124,7 +124,12 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Mono
                 EnergyMixin component = gameObject.GetComponent<EnergyMixin>();
                 if (component)
                 {
-                    GameObject battery = component.GetBattery();
+                    GameObject battery = component
+#if SUBNAUTICA
+                        .GetBattery();
+#else
+                        .GetBatteryGameObject();
+#endif
                     if (battery)
                     {
                         QuickLogger.Debug($"Removing Battery from {Language.main.Get(techType)}", true);
@@ -144,7 +149,7 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Mono
 
         private IEnumerator RecycleCoroutine(TechType techType, List<Ingredient> list)
         {
-            foreach (IIngredient ingredient in list)
+            foreach (Ingredient ingredient in list)
             {
                 for (int i = 0; i < ingredient.amount; i++)
                 {

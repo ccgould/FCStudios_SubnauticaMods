@@ -136,7 +136,7 @@
     <Compile Include="Model\FCSToolTip.cs" />
     <Compile Include="Model\Filter.cs" />
     <Compile Include="Model\FilterSystem.cs" />
-    <Compile Include="Model\Fridge.cs" />
+    <Compile Include="Model\FCSFridge.cs" />
     <Compile Include="Model\GUI\FCSGuiToggle.cs" />
     <Compile Include="Model\IngredientItem.cs" />
     <Compile Include="Model\InterfaceInteraction.cs" />

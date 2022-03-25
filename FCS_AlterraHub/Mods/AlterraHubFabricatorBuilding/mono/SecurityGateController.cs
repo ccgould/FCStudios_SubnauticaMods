@@ -167,7 +167,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                 spark.SetActive(true);
             }
 
-#if SUBNAUTICA
+#if SUBNAUTICA_STABLE
             _liveMixin.initialHealth = 0;
 #endif
             _liveMixin.health = 0;

@@ -232,7 +232,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
 #if SUBNAUTICA_STABLE
             ItemsContainer.UnsafeAdd(_targetItem.ToInventoryItemLegacy());
 #else
- StartCoroutine(AsyncExtensions.AddToContainerAsync(_targetItem, ItemsContainer));
+            StartCoroutine(_targetItem.AddTechTypeToContainerUnSafe(ItemsContainer));
 #endif
         }
 

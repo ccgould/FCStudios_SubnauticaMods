@@ -9,6 +9,7 @@ using Oculus.Newtonsoft.Json;
 #else
 using Newtonsoft.Json;
 #endif
+
 namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models
 {
     public class CraftingOperation
@@ -23,7 +24,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models
         public int AmountCompleted { get; set; }
         public TechType TechType { get; set; }
         public bool IsComplete => GetIsComplete();
-        public int ReturnAmount { get;}
+        public int ReturnAmount { get; }
         public int LinkedItemCount { get; }
         public Action<CraftingOperation> OnOperationDeleted { get; set; }
         public string ParentMachineUnitID { get; set; }
@@ -36,7 +37,6 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models
 
         public CraftingOperation()
         {
-            
         }
 
         public CraftingOperation(string unitID, TechType techType, int amount, bool isRecursive)
@@ -44,13 +44,9 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models
             ParentMachineUnitID = unitID;
             TechType = techType;
             Amount = amount;
-#if SUBNAUTICA
-            var data =  CraftDataHandler.Main.GetTechData(techType);
+            var data = CraftDataHandler.Main.GetTechData(techType);
             var returnAmount = data?.craftAmount ?? 1;
             var linkedItems = data?.LinkedItems;
-#else
-            var returnAmount = CraftDataHandler.Main.GetRecipeData(techType)?.craftAmount ?? 1;
-#endif
             if (linkedItems != null)
             {
                 LinkedItems = linkedItems;
@@ -60,14 +56,13 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models
             ReturnAmount = returnAmount == 0 ? 1 : returnAmount;
             IsRecursive = isRecursive;
         }
-        
+
 
         private void AddDevice(string unitID)
         {
             Devices.Add(unitID);
             if (!IsRecursive)
             {
-
             }
         }
 
@@ -97,12 +92,12 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models
 
         private readonly Dictionary<TechType, TechType> _techTypeFixes = new()
         {
-            {"FCSGlass".ToTechType(),TechType.Glass }
+            {"FCSGlass".ToTechType(), TechType.Glass}
         };
 
         private readonly List<TechType> _techTypeBypasses = new()
         {
-            { "FCSGlass".ToTechType() }
+            {"FCSGlass".ToTechType()}
         };
 
         public TechType FixCustomTechType()

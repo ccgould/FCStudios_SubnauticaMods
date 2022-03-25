@@ -31,7 +31,7 @@ namespace FCS_HomeSolutions.Configuration
         internal const string ModBundleName = "fcshomesolutionsbundle";
 
         internal const string DecorationItemTabId = "DI";
-        
+
         internal const string EmptyObservationTankClassID = "EmptyObservationTank";
         internal const string EmptyObservationTankFriendly = "Observation Tank";
 
@@ -43,9 +43,10 @@ namespace FCS_HomeSolutions.Configuration
 
         public static Dictionary<string, SoundEntry> AudioClips = new();
 
-        internal static readonly Dictionary<TechType, TechType> CuredCreatureList =
+        internal static Dictionary<TechType, TechType> CuredCreatureList =
             new Dictionary<TechType, TechType>(TechTypeExtensions.sTechTypeComparer)
             {
+#if SUBNAUTICA
                 {
                     TechType.Bladderfish,
                     TechType.CuredBladderfish
@@ -102,12 +103,67 @@ namespace FCS_HomeSolutions.Configuration
                     TechType.Spinefish,
                     TechType.CuredSpinefish
                 }
+#else
+                {
+                    TechType.ArcticPeeper,
+                    TechType.CuredArcticPeeper
+                },
+                {
+                    TechType.ArrowRay,
+                    TechType.CuredArrowRay
+                },
+                {
+                    TechType.Bladderfish,
+                    TechType.CuredBladderfish
+                },
+                {
+                    TechType.Boomerang,
+                    TechType.CuredBoomerang
+                },
+                {
+                    TechType.DiscusFish,
+                    TechType.CuredDiscusFish
+                },
+                {
+                    TechType.FeatherFish,
+                    TechType.CuredFeatherFish
+                },
+                {
+                    TechType.FeatherFishRed,
+                    TechType.CuredFeatherFishRed
+                },
+                {
+                    TechType.Hoopfish,
+                    TechType.CuredHoopfish
+                },
+                {
+                    TechType.NootFish,
+                    TechType.CuredNootFish
+                },
+                {
+                    TechType.Spinefish,
+                    TechType.CuredSpinefish
+                },
+                {
+                    TechType.SpinnerFish,
+                    TechType.CuredSpinnerfish
+                },
+                {
+                    TechType.Symbiote,
+                    TechType.CuredSymbiote
+                },
+                {
+                    TechType.Triops,
+                    TechType.CuredTriops
+                }
+
+#endif
             };
 
 #if SUBNAUTICA
         internal static TechData EmptyObservationTankIngredients => new TechData
 #elif BELOWZERO
-                internal static RecipeData EmptyObservationTankIngredients => new RecipeData
+        internal static RecipeData EmptyObservationTankIngredients => new RecipeData
 #endif
         {
             craftAmount = 1,
@@ -120,7 +176,7 @@ namespace FCS_HomeSolutions.Configuration
 #if SUBNAUTICA
         internal static TechData LedLightStickLongIngredients => new TechData
 #elif BELOWZERO
-                internal static RecipeData LedLightStickLongIngredients => new RecipeData
+        internal static RecipeData LedLightStickLongIngredients => new RecipeData
 #endif
         {
             craftAmount = 1,
@@ -133,7 +189,7 @@ namespace FCS_HomeSolutions.Configuration
 #if SUBNAUTICA
         internal static TechData LedLightStickShortIngredients => new TechData
 #elif BELOWZERO
-                internal static RecipeData LedLightStickShortIngredients => new RecipeData
+        internal static RecipeData LedLightStickShortIngredients => new RecipeData
 #endif
         {
             craftAmount = 1,
@@ -147,7 +203,7 @@ namespace FCS_HomeSolutions.Configuration
 #if SUBNAUTICA
         internal static TechData LedLightStickWallIngredients => new TechData
 #elif BELOWZERO
-                internal static RecipeData DeskLEDIngredients => new RecipeData
+        internal static RecipeData DeskLEDIngredients => new RecipeData
 #endif
         {
             craftAmount = 1,
@@ -178,7 +234,11 @@ namespace FCS_HomeSolutions.Configuration
             Ingredients =
             {
                 new Ingredient(TechType.AdvancedWiringKit, 1),
+#if SUBNAUTICA
                 new Ingredient(TechType.Bleach, 2),
+#else
+                new Ingredient(TechType.Salt, 2),
+#endif
                 new Ingredient(TechType.FiberMesh, 2),
                 new Ingredient(TechType.Titanium, 1),
                 new Ingredient(TechType.Glass, 1)
@@ -189,7 +249,7 @@ namespace FCS_HomeSolutions.Configuration
 #if SUBNAUTICA
         internal static TechData CurtainIngredients => new TechData
 #elif BELOWZERO
-                internal static RecipeData CurtainIngredients => new RecipeData
+        internal static RecipeData CurtainIngredients => new RecipeData
 #endif
         {
             craftAmount = 1,
@@ -198,6 +258,7 @@ namespace FCS_HomeSolutions.Configuration
                 new Ingredient("Curtain_Kit".ToTechType(), 1),
             }
         };
+
         internal static Action<SaveData> OnDataLoaded { get; set; }
 
         internal static string SaveDataFilename => $"{ModPackID}SaveData.json";
@@ -318,7 +379,7 @@ namespace FCS_HomeSolutions.Configuration
         internal static void LoadData()
         {
             QuickLogger.Info("Loading Save Data...");
-            
+
             ModUtils.LoadSaveData<SaveData>(SaveDataFilename, GetSaveFileDirectory(), (data) =>
             {
                 _saveData = data;
@@ -426,7 +487,7 @@ namespace FCS_HomeSolutions.Configuration
                 }
             }
 
-            return new StoveDataEntry { Id = id };
+            return new StoveDataEntry {Id = id};
         }
 
         internal static void RegisterPaintTool(PaintToolController paintTool)
@@ -441,7 +502,6 @@ namespace FCS_HomeSolutions.Configuration
             {
                 _registeredPaintTool.Add(paintTool);
             }
-
         }
 
         internal static void UnRegisterPaintTool(PaintToolController paintTool)
@@ -456,7 +516,6 @@ namespace FCS_HomeSolutions.Configuration
                 QuickLogger.Debug($"UnRegistered Paint tool: {paintTool.GetPrefabID()}");
                 _registeredPaintTool.Remove(paintTool);
             }
-
         }
 
         internal static bool IsModPatched(string mod)
@@ -844,7 +903,7 @@ namespace FCS_HomeSolutions.Configuration
                 }
             }
 
-            return new StairsDataEntry() { Id = id };
+            return new StairsDataEntry() {Id = id};
         }
 
         public static DisplayBoardDataEntry DisplayBoardEntrySaveData(string id)
@@ -863,7 +922,7 @@ namespace FCS_HomeSolutions.Configuration
                 }
             }
 
-            return new DisplayBoardDataEntry() { Id = id };
+            return new DisplayBoardDataEntry() {Id = id};
         }
 
         public static QuantumPowerBankDataEntry GetQuantumPowerBankEntrySaveData(string id)
@@ -882,7 +941,7 @@ namespace FCS_HomeSolutions.Configuration
                 }
             }
 
-            return new QuantumPowerBankDataEntry() { Id = id };
+            return new QuantumPowerBankDataEntry() {Id = id};
         }
 
         public static void RegisterQuantumPowerBank(QuantumPowerBankController quantumPowerBankController)
@@ -911,7 +970,7 @@ namespace FCS_HomeSolutions.Configuration
                 }
             }
 
-            return new QuantumPowerBankChargerDataEntry() { Id = id };
+            return new QuantumPowerBankChargerDataEntry() {Id = id};
         }
 
         public static QuantumTeleporterVehiclePadDataEntry GetQuantumTeleporterVehiclePadSaveData(string id)
@@ -930,7 +989,7 @@ namespace FCS_HomeSolutions.Configuration
                 }
             }
 
-            return new QuantumTeleporterVehiclePadDataEntry() { Id = id };
+            return new QuantumTeleporterVehiclePadDataEntry() {Id = id};
         }
     }
 }

@@ -287,7 +287,13 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
         public override Pickupable RemoveItemFromContainer(TechType techType)
         {
             Destroy(GrowBedManager.RemoveItemFromContainer(techType).gameObject);
+#if SUBNAUTICA
             return techType.ToPickupable();
+#else
+            var itemTask = new TaskResult<InventoryItem>();
+            CouroutineManager.WaitCoroutine(techType.ToInventoryItem(itemTask));
+            return itemTask.Get().item;
+#endif
         }
 
         public override void OnHandHover(GUIHand hand)
