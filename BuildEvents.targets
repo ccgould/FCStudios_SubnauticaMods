@@ -5,8 +5,8 @@
 		<PreBuildEvent>
 			if not exist "$(Dependencies)" (
 			mkdir "$(Dependencies)"
-			Echo $(SolutionDir)nstrip.exe -p -cg -cg-exclude-events "$(ManagedDir)" "$(Dependencies)"
-			$(SolutionDir)nstrip.exe -p -cg -cg-exclude-events "$(ManagedDir)" "$(Dependencies)" &gt; nul
+			Echo "$(SolutionDir)nstrip.exe" -p -cg -cg-exclude-events "$(ManagedDir)" "$(Dependencies)"
+			"$(SolutionDir)nstrip.exe" -p -cg -cg-exclude-events "$(ManagedDir)" "$(Dependencies)" &gt; nul
 			)
 
 			if exist "$(ProjectDir)mod_$(Configuration).json" (

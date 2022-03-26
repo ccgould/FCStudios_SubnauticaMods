@@ -26,7 +26,7 @@ namespace FCS_EnergySolutions.Patches
                 {
                    var baseTPowerManager = __instance.gameObject.EnsureComponent<BaseTelepowerPylonManager>();
                    baseTPowerManager.SubRoot = __instance;
-                   BaseTelepowerPylonManager.TelePowerPylonBases.Add(baseTPowerManager);
+                   BaseTelepowerPylonManager.RegisterPylonManager(baseTPowerManager);
                 }
             }
         }
@@ -43,7 +43,7 @@ namespace FCS_EnergySolutions.Patches
             if (QPatch.Configuration.IsTelepowerPylonEnabled)
             {
                 var baseTPowerManager = __instance.gameObject.GetComponent<BaseTelepowerPylonManager>();
-                BaseTelepowerPylonManager.TelePowerPylonBases.Remove(baseTPowerManager);
+                BaseTelepowerPylonManager.UnRegisterPylonManager(baseTPowerManager);
             }
 
             QuickLogger.Debug("On Kill",true);

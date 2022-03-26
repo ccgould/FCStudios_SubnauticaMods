@@ -12,6 +12,8 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         private Text _text;
         private Toggle _toggleBtn;
 
+        //TODO The Push mode base toggle is checking because it has the connections but a pull wouldnt
+
         internal void Initialize(BaseTelepowerPylonManager targetController, BaseTelepowerPylonManager parent)
         {
             TargetController = targetController;
@@ -66,11 +68,17 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             }));
 
             InvokeRepeating(nameof(RefreshBaseName),1f,1f);
+            InvokeRepeating(nameof(RefreshToggleState),1f,1f);
         }
 
         private void RefreshBaseName()
         {
             _text.text = $"Base Name : {TargetController.GetBaseName()}";
+        }
+
+        private void RefreshToggleState()
+        {
+            _toggleBtn.SetIsOnWithoutNotify(TargetController.GetIsConnected(ParentController.GetBaseID()));
         }
 
         public void UnCheck(bool notify = false)
