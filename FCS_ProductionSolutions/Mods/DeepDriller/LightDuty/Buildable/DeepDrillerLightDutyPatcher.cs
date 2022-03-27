@@ -36,17 +36,22 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.LightDuty.Buildable
         internal const string DeepDrillerLightDutyPrefabName = "FCS_DeepDrillerLightDuty";
         internal const string DeepDrillerLightDutyDescription = "LLight Duty Automated drill platform suitable for all biomes. Requires lubricant and external power.";
 
-
+        private TechType kitTechType;
 
         public DeepDrillerLightDutyBuildable() : base(DeepDrillerLightDutyClassName, DeepDrillerLightDutyFriendlyName, DeepDrillerLightDutyDescription)
         {
             _prefab = ModelPrefab.GetPrefab(DeepDrillerLightDutyPrefabName);
 
-            OnFinishedPatching += () =>
+            OnStartedPatching += () =>
             {
                 var deepDrillerLightDutyKit = new FCSKit(DeepDrillerLightDutyKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 deepDrillerLightDutyKit.Patch();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, deepDrillerLightDutyKit.TechType, 250000, StoreCategory.Production);
+                kitTechType = deepDrillerLightDutyKit.TechType;
+            };
+
+            OnFinishedPatching += () =>
+            {
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, kitTechType, 250000, StoreCategory.Production);
             };
         }
 

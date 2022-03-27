@@ -78,6 +78,11 @@
             The modification station that upgrades your equipment.
             </summary>
         </member>
+        <member name="F:SMLHelper.V2.Assets.CustomFabricator.Models.MoonPool">
+            <summary>
+            The style of fabricator found in the Moon Pool and the Cyclops sub.
+            </summary>
+        </member>
         <member name="F:SMLHelper.V2.Assets.CustomFabricator.Models.Custom">
             <summary>
             Use this option only if you want to provide your own custom model for your fabricator.<para/>
@@ -204,7 +209,7 @@
             </summary>
             <param name="craftTreeType"></param>
         </member>
-        <member name="M:SMLHelper.V2.Assets.CustomFabricator.AddTabNode(System.String,System.String,UnityEngine.Sprite,System.String)">
+        <member name="M:SMLHelper.V2.Assets.CustomFabricator.AddTabNode(System.String,System.String,Atlas.Sprite,System.String)">
             <summary>
             Adds a new tab node to the custom crafting tree of this fabricator.
             </summary>
@@ -480,7 +485,7 @@
             The internal identifier of this sprite when it isn't associated to an item.
             </summary>
         </member>
-        <member name="M:SMLHelper.V2.Assets.ModSprite.#ctor(TechType,UnityEngine.Sprite)">
+        <member name="M:SMLHelper.V2.Assets.ModSprite.#ctor(TechType,Atlas.Sprite)">
             <summary>
             Creates a new ModSprite to be used with a specific TechType.
             Created with an Atlas Sprite.
@@ -488,7 +493,7 @@
             <param name="type">The techtype paired to this sprite.</param>
             <param name="sprite">The sprite to be added.</param>
         </member>
-        <member name="M:SMLHelper.V2.Assets.ModSprite.#ctor(SpriteManager.Group,System.String,UnityEngine.Sprite)">
+        <member name="M:SMLHelper.V2.Assets.ModSprite.#ctor(SpriteManager.Group,System.String,Atlas.Sprite)">
             <summary>
             Creates a new ModSprite to be used with a specific group and internal ID.
             Created with an Atlas Sprite.
@@ -497,12 +502,29 @@
             <param name="id">The sprite internal identifier.</param>
             <param name="sprite">The sprite to be added.</param>
         </member>
-        <member name="M:SMLHelper.V2.Assets.ModSprite.#ctor(SpriteManager.Group,TechType,UnityEngine.Sprite)">
+        <member name="M:SMLHelper.V2.Assets.ModSprite.#ctor(SpriteManager.Group,TechType,Atlas.Sprite)">
             <summary>
             Creates a new ModSprite to be used with a specific group and internal ID.
             Created with an Atlas Sprite.
             </summary>
             <param name="group">The sprite group.</param>
+            <param name="type">The techtype paired to this sprite.</param>
+            <param name="sprite">The sprite to be added.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Assets.ModSprite.#ctor(SpriteManager.Group,System.String,UnityEngine.Sprite)">
+            <summary>
+            Creates a new ModSprite to be used with a specific group and internal ID.
+            Created with a UnityEngine Sprite.
+            </summary>
+            <param name="group">The sprite group this sprite will be added to.</param>
+            <param name="id">The sprite internal identifier.</param>
+            <param name="sprite">The sprite to be added.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Assets.ModSprite.#ctor(TechType,UnityEngine.Sprite)">
+            <summary>
+            Creates a new ModSprite to be used with a specific TechType.
+            Created with a UnityEngine Sprite.
+            </summary>
             <param name="type">The techtype paired to this sprite.</param>
             <param name="sprite">The sprite to be added.</param>
         </member>
@@ -585,7 +607,7 @@
         </member>
         <member name="M:SMLHelper.V2.Assets.PdaItem.GetBlueprintRecipe">
             <summary>
-            This provides the <see cref="T:SMLHelper.V2.Crafting.RecipeData"/> instance used to designate how this item is crafted or constructed.
+            This provides the <see cref="T:SMLHelper.V2.Crafting.TechData"/> instance used to designate how this item is crafted or constructed.
             </summary>
         </member>
         <member name="T:SMLHelper.V2.Assets.Spawnable">
@@ -708,10 +730,10 @@
         </member>
         <member name="M:SMLHelper.V2.Assets.Spawnable.GetItemSprite">
             <summary>
-            Determines thee <see cref="T:UnityEngine.Sprite"/> to be used for this spawnable's icon.<para/>
+            Determines thee <see cref="T:Atlas.Sprite"/> to be used for this spawnable's icon.<para/>
             Default behavior will look for a PNG file named <see cref="P:SMLHelper.V2.Assets.Spawnable.IconFileName"/> inside <see cref="P:SMLHelper.V2.Assets.Spawnable.AssetsFolder"/>.
             </summary>
-            <returns>Returns the <see cref="T:UnityEngine.Sprite"/> that will be used in the <see cref="M:SMLHelper.V2.Handlers.SpriteHandler.RegisterSprite(TechType,UnityEngine.Sprite)"/> call.</returns>
+            <returns>Returns the <see cref="T:Atlas.Sprite"/> that will be used in the <see cref="M:SMLHelper.V2.Handlers.SpriteHandler.RegisterSprite(TechType,Atlas.Sprite)"/> call.</returns>
         </member>
         <member name="T:SMLHelper.V2.Commands.ConsoleCommand">
             <summary>
@@ -840,6 +862,15 @@
             <summary>
             The child nodes linked bellow this node.
             </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Crafting.ModCraftTreeLinkingNode.AddTabNode(System.String,System.String,Atlas.Sprite)">
+            <summary>
+            Creates a new tab node for the crafting tree and links it to the calling node.
+            </summary>
+            <param name="nameID">The name/ID of this node.</param>
+            <param name="displayText">The hover text to display in-game.</param>
+            <param name="sprite">The custom sprite to display on this tab node.</param>
+            <returns>A new tab node linked to the root node and ready to use.</returns>
         </member>
         <member name="M:SMLHelper.V2.Crafting.ModCraftTreeLinkingNode.AddTabNode(System.String,System.String,UnityEngine.Sprite)">
             <summary>
@@ -995,13 +1026,13 @@
             </summary>
             <seealso cref="T:SMLHelper.V2.Crafting.ModCraftTreeLinkingNode" />
         </member>
-        <member name="T:SMLHelper.V2.Crafting.RecipeData">
+        <member name="T:SMLHelper.V2.Crafting.TechData">
             <summary>
             A class that fully describes a recipe for a <see cref="T:TechType"/> identified item.
             </summary>
-            <seealso cref="T:TechData" />
+            <seealso cref="T:ITechData" />
         </member>
-        <member name="P:SMLHelper.V2.Crafting.RecipeData.craftAmount">
+        <member name="P:SMLHelper.V2.Crafting.TechData.craftAmount">
             <summary>
             Gets or sets the how many copies of the item are created when crafting this recipe.
             </summary>
@@ -1009,7 +1040,7 @@
             The quantity of the item this recipe yields.
             </value>
         </member>
-        <member name="P:SMLHelper.V2.Crafting.RecipeData.ingredientCount">
+        <member name="P:SMLHelper.V2.Crafting.TechData.ingredientCount">
             <summary>
             Gets the number of different ingredients for this recipe.
             </summary>
@@ -1017,7 +1048,7 @@
             The number of ingredients for this recipe.
             </value>
         </member>
-        <member name="P:SMLHelper.V2.Crafting.RecipeData.linkedItemCount">
+        <member name="P:SMLHelper.V2.Crafting.TechData.linkedItemCount">
             <summary>
             Gets the number of items linked to this recipe.
             </summary>
@@ -1025,46 +1056,76 @@
             The number of linked items.
             </value>
         </member>
-        <member name="F:SMLHelper.V2.Crafting.RecipeData.Ingredients">
+        <member name="F:SMLHelper.V2.Crafting.TechData.Ingredients">
             <summary>
             The list of ingredients required for this recipe.
             </summary>
         </member>
-        <member name="F:SMLHelper.V2.Crafting.RecipeData.LinkedItems">
+        <member name="F:SMLHelper.V2.Crafting.TechData.LinkedItems">
             <summary>
             The items that will also be created when this recipe is crafted.
             </summary>
         </member>
-        <member name="M:SMLHelper.V2.Crafting.RecipeData.#ctor">
+        <member name="M:SMLHelper.V2.Crafting.TechData.#ctor">
             <summary>
-            Initializes a new instance of the <see cref="T:TechData"/> class a custom recipe.
+            Initializes a new instance of the <see cref="T:SMLHelper.V2.Crafting.TechData"/> class a custom recipe.
             </summary>
         </member>
-        <member name="M:SMLHelper.V2.Crafting.RecipeData.#ctor(System.Collections.Generic.List{Ingredient})">
+        <member name="M:SMLHelper.V2.Crafting.TechData.#ctor(System.Collections.Generic.List{SMLHelper.V2.Crafting.Ingredient})">
             <summary>
-            Initializes a new instance of the <see cref="T:TechData"/> class for a custom recipe with a list of ingridients.
-            </summary>
-            <param name="ingredients">The ingredients.</param>
-        </member>
-        <member name="M:SMLHelper.V2.Crafting.RecipeData.#ctor(Ingredient[])">
-            <summary>
-            Initializes a new instance of the <see cref="T:TechData"/> class for a custom recipe with a collection of ingridients.
+            Initializes a new instance of the <see cref="T:SMLHelper.V2.Crafting.TechData"/> class for a custom recipe with a list of ingridients.
             </summary>
             <param name="ingredients">The ingredients.</param>
         </member>
-        <member name="M:SMLHelper.V2.Crafting.RecipeData.GetIngredient(System.Int32)">
+        <member name="M:SMLHelper.V2.Crafting.TechData.#ctor(SMLHelper.V2.Crafting.Ingredient[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:SMLHelper.V2.Crafting.TechData"/> class for a custom recipe with a collection of ingridients.
+            </summary>
+            <param name="ingredients">The ingredients.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Crafting.TechData.GetIngredient(System.Int32)">
             <summary>
             Gets the ingredient at the specified index.
             </summary>
             <param name="index">The index.</param>
-            <returns>The <see cref="T:Ingredient"/> at the requested the index if the index is value; Otherwise returns null.</returns>
+            <returns>The <see cref="T:IIngredient"/> at the requested the index if the index is value; Otherwise returns null.</returns>
         </member>
-        <member name="M:SMLHelper.V2.Crafting.RecipeData.GetLinkedItem(System.Int32)">
+        <member name="M:SMLHelper.V2.Crafting.TechData.GetLinkedItem(System.Int32)">
             <summary>
             Gets the linked item at the specified index.
             </summary>
             <param name="index">The index.</param>
             <returns>The <see cref="T:TechType"/> at the requested the index if the index is value; Otherwise returns null.</returns>
+        </member>
+        <member name="T:SMLHelper.V2.Crafting.Ingredient">
+            <summary>
+            A class for representing a required ingredient in a recipe.
+            </summary>
+            <seealso cref="T:IIngredient" />
+            <seealso cref="T:SMLHelper.V2.Crafting.TechData"/>
+        </member>
+        <member name="P:SMLHelper.V2.Crafting.Ingredient.techType">
+            <summary>
+            Gets or sets the item ID.
+            </summary>
+            <value>
+            The item ID.
+            </value>
+        </member>
+        <member name="P:SMLHelper.V2.Crafting.Ingredient.amount">
+            <summary>
+            Gets or sets the number of this item required for the recipe.
+            </summary>
+            <value>
+            The amount of this item needed for the recipe.
+            </value>
+        </member>
+        <member name="M:SMLHelper.V2.Crafting.Ingredient.#ctor(TechType,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SMLHelper.V2.Crafting.Ingredient"/> class.
+            </summary>
+            <param name="techType">The item ID.</param>
+            <param name="amount">The number of instances of this item required for the recipe.</param>
         </member>
         <member name="T:SMLHelper.V2.FMod.Interfaces.IFModSound">
             <summary>
@@ -1123,7 +1184,7 @@
             Main entry point for all calls to this handler.
             </summary>
         </member>
-        <member name="M:SMLHelper.V2.Handlers.BackgroundTypeHandler.SMLHelper#V2#Interfaces#IBackgroundTypeHandler#AddBackgroundType(System.String,UnityEngine.Sprite)">
+        <member name="M:SMLHelper.V2.Handlers.BackgroundTypeHandler.SMLHelper#V2#Interfaces#IBackgroundTypeHandler#AddBackgroundType(System.String,Atlas.Sprite)">
             <summary>
             adds a new <see cref="T:CraftData.BackgroundType"/> into the game.
             </summary>
@@ -1146,7 +1207,7 @@
             <param name="backgroundTypeString">The string used to define the BackgroundType.</param>
             <returns><see langword="true"/> if the item was found; otherwise <see langword="false"/>.</returns>
         </member>
-        <member name="M:SMLHelper.V2.Handlers.BackgroundTypeHandler.AddBackgroundType(System.String,UnityEngine.Sprite)">
+        <member name="M:SMLHelper.V2.Handlers.BackgroundTypeHandler.AddBackgroundType(System.String,Atlas.Sprite)">
             <summary>
             adds a new <see cref="T:CraftData.BackgroundType"/> into the game.
             </summary>
@@ -1639,7 +1700,7 @@
             Main entry point for all calls to this handler.
             </summary>
         </member>
-        <member name="M:SMLHelper.V2.Handlers.PingHandler.RegisterNewPingType(System.String,UnityEngine.Sprite)">
+        <member name="M:SMLHelper.V2.Handlers.PingHandler.RegisterNewPingType(System.String,Atlas.Sprite)">
             <summary>
             Registers a ping type for use when creating a beacon
             </summary>
@@ -1655,7 +1716,7 @@
             <param name="moddedPingType">The PingType enum value. Defaults to <see cref="F:PingType.None"/> when the PingType was not found.</param>
             <returns><c>True</c> if the PingType was found; Otherwise <c>false</c></returns>
         </member>
-        <member name="M:SMLHelper.V2.Handlers.PingHandler.SMLHelper#V2#Interfaces#IPingHandler#RegisterNewPingType(System.String,UnityEngine.Sprite)">
+        <member name="M:SMLHelper.V2.Handlers.PingHandler.SMLHelper#V2#Interfaces#IPingHandler#RegisterNewPingType(System.String,Atlas.Sprite)">
             <summary>
             Registers a ping type for use when creating a beacon
             </summary>
@@ -1868,7 +1929,7 @@
         <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SetQuickSlotType(TechType,QuickSlotType)">
             <summary>
             <para>Allows you to edit QuickSlotType for TechTypes. Can be used for existing TechTypes too.</para>
-            <para>Careful: This has to be called after <see cref="M:SMLHelper.V2.Handlers.CraftDataHandler.SetTechData(TechType,SMLHelper.V2.Crafting.RecipeData)"/>.</para>
+            <para>Careful: This has to be called after <see cref="M:SMLHelper.V2.Handlers.CraftDataHandler.SetTechData(TechType,SMLHelper.V2.Crafting.TechData)"/> and <see cref="M:SMLHelper.V2.Handlers.CraftDataHandler.SetTechData(TechType,SMLHelper.V2.Crafting.TechData)"/>.</para>
             </summary>
             <param name="techType">The TechType whose QuickSlotType you want to edit.</param>
             <param name="slotType">The QuickSlotType for that TechType.</param>
@@ -1998,66 +2059,23 @@
             <param name="category">The TechCategory in which the TechType is located.</param>
             <param name="techType">The TechType which you want to remove.</param>
         </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SetTechData(TechType,SMLHelper.V2.Crafting.RecipeData)">
+        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SetTechData(TechType,ITechData)">
             <summary>
-            <para>Allows you to edit recipes, i.e. RecipeData for TechTypes.</para>
+            <para>Allows you to edit recipes, i.e. TechData for TechTypes.</para>
             <para>Can be used for existing TechTypes too.</para>
             </summary>
             <param name="techType">The TechType whose TechData you want to edit.</param>
-            <param name="recipeData">The TechData for that TechType.</param>
-            <seealso cref="T:SMLHelper.V2.Crafting.RecipeData"/>
+            <param name="techData">The TechData for that TechType.</param>
+            <seealso cref="T:SMLHelper.V2.Crafting.TechData"/>
         </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SetIngredients(TechType,System.Collections.Generic.ICollection{Ingredient})">
+        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SetTechData(TechType,SMLHelper.V2.Crafting.TechData)">
             <summary>
-            <para>Allows you to add ingredients for a TechType crafting recipe.</para>
+            <para>Allows you to edit recipes, i.e. TechData for TechTypes.</para>
             <para>Can be used for existing TechTypes too.</para>
             </summary>
-            <param name="techType">The TechType whose ingredient list you want to edit.</param>
-            <param name="ingredients">The collection of Ingredients for that TechType.</param>
-            <seealso cref="T:Ingredient"/>
-        </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SetColdResistance(TechType,System.Int32)">
-            <summary>
-            <para>Allows you to edit the Cold Resistance for TechTypes.</para>
-            <para>Can be used for existing TechTypes too.</para>
-            </summary>
-            <param name="techType">The TechType whose Cold Resistance you want to edit.</param>
-            <param name="resistance">The int value for the Cold Resistance.</param>
-        </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SetLinkedItems(TechType,System.Collections.Generic.ICollection{TechType})">
-            <summary>
-            <para>Allows you to add linked items for a TechType crafting recipe.</para>
-            <para>Can be used for existing TechTypes too.</para>
-            </summary>
-            <param name="techType">The TechType whose ingredient list you want to edit.</param>
-            <param name="linkedItems">The collection of linked items for that TechType</param>
-        </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.GetRecipeData(TechType)">
-            <summary>
-            Safely accesses the crafting data from a modded or vanilla item.<para/>
-            WARNING: This method is highly dependent on mod load order. 
-            Make sure your mod is loading after the mod whose TechData you are trying to access.
-            </summary>
-            <param name="techType">The TechType whose TechData you want to access.</param>
-            <returns>The JsonValue from the modded item if it exists; Otherwise, returns <c>null</c>.</returns>
-        </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.GetTechData(TechType)">
-            <summary>
-            Safely accesses the crafting data from a modded or vanilla item.<para/>
-            WARNING: This method is highly dependent on mod load order. 
-            Make sure your mod is loading after the mod whose TechData you are trying to access.
-            </summary>
-            <param name="techType">The TechType whose TechData you want to access.</param>
-            <returns>The JsonValue from the modded item if it exists; Otherwise, returns <c>null</c>.</returns>
-        </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.GetModdedRecipeData(TechType)">
-            <summary>
-            Safely accesses the crafting data from a modded item.<para/>
-            WARNING: This method is highly dependent on mod load order. 
-            Make sure your mod is loading after the mod whose TechData you are trying to access.
-            </summary>
-            <param name="techType">The TechType whose TechData you want to access.</param>
-            <returns>The JsonValue from the modded item if it exists; Otherwise, returns <c>null</c>.</returns>
+            <param name="techType">The TechType whose TechData you want to edit.</param>
+            <param name="techData">The TechData for that TechType.</param>
+            <seealso cref="T:SMLHelper.V2.Crafting.TechData"/>
         </member>
         <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.GetModdedTechData(TechType)">
             <summary>
@@ -2066,82 +2084,50 @@
             Make sure your mod is loading after the mod whose TechData you are trying to access.
             </summary>
             <param name="techType">The TechType whose TechData you want to access.</param>
-            <returns>The JsonValue from the modded item if it exists; Otherwise, returns <c>null</c>.</returns>
+            <returns>The ITechData from the modded item if it exists; Otherwise, returns <c>null</c>.</returns>
         </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SetMaxCharge(TechType,System.Single)">
+        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.GetTechData(TechType)">
             <summary>
-            Sets the maximum charge.
-            </summary>
-            <param name="techType">The TechType whose MaxCharge you want to edit.</param>
-            <param name="maxCharge">The maximum charge.</param>
-        </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SetEnergyCost(TechType,System.Single)">
-            <summary>
-            Sets the energy cost.
-            </summary>
-            <param name="techType">The TechType whose EnergyCost you want to edit.</param>
-            <param name="energyCost">The energy cost.</param>
-        </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SetSoundType(TechType,TechData.SoundType)">
-            <summary>
-            Sets the type of the sound.
-            </summary>
-            <param name="techType">Type of the tech.</param>
-            <param name="soundType">Type of the sound.</param>
-        </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#SetTechData(TechType,SMLHelper.V2.Crafting.RecipeData)">
-            <summary>
-            <para>Allows you to add or edit RecipeData for TechTypes.</para>
-            <para>Can be used for existing TechTypes too.</para>
-            </summary>
-            <param name="techType">The TechType whose TechData you want to edit.</param>
-            <param name="recipeData">The TechData for that TechType.</param>
-            <seealso cref="T:SMLHelper.V2.Crafting.RecipeData"/>
-        </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#SetIngredients(TechType,System.Collections.Generic.ICollection{Ingredient})">
-            <summary>
-            <para>Allows you to edit recipes for TechTypes.</para>
-            <para>Can be used for existing TechTypes too.</para>
-            </summary>
-            <param name="techType">The TechType whose TechData you want to edit.</param>
-            <param name="ingredients">The collection of Ingredients for that TechType.</param>
-            <seealso cref="T:Ingredient"/>
-        </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#SetLinkedItems(TechType,System.Collections.Generic.ICollection{TechType})">
-            <summary>
-            <para>Allows you to edit Linked Items for TechTypes.</para>
-            <para>Can be used for existing TechTypes too.</para>
-            </summary>
-            <param name="techType">The TechType whose TechData you want to edit.</param>
-            <param name="linkedItems">The collection of Ingredients for that TechType.</param>
-            <seealso cref="T:Ingredient"/>
-        </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#GetRecipeData(TechType)">
-            <summary>
-            Safely accesses the crafting data from a Modded or Vanilla item.<para/>
+            Safely accesses the crafting data from any item.<para/>
             WARNING: This method is highly dependent on mod load order. 
             Make sure your mod is loading after the mod whose TechData you are trying to access.
             </summary>
             <param name="techType">The TechType whose TechData you want to access.</param>
-            <returns>The RecipeData from the item if it exists; Otherwise, returns <c>null</c>.</returns>
+            <returns>Returns TechData if it exists; Otherwise, returns <c>null</c>.</returns>
         </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#GetTechData(TechType)">
+        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SetEatingSound(TechType,System.String)">
             <summary>
-            Safely accesses the crafting data from a modded or vanilla item.<para/>
-            WARNING: This method is highly dependent on mod load order. 
-            Make sure your mod is loading after the mod whose TechData you are trying to access.
+            Sets the eating sound for the provided TechType.
             </summary>
-            <param name="techType">The TechType whose TechData you want to access.</param>
-            <returns>The JsonValue from the modded item if it exists; Otherwise, returns <c>null</c>.</returns>
+            <param name="consumable">The item being consumed during <see cref="M:Survival.Eat(UnityEngine.GameObject)"/>.</param>
+            <param name="soundPath">
+            The sound path.
+            <para>
+            Value values are
+            - "event:/player/drink"
+            - "event:/player/drink_stillsuit"
+            - "event:/player/use_first_aid"
+            - "event:/player/eat" (default)
+            </para>
+            </param>
         </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#GetModdedRecipeData(TechType)">
+        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#SetTechData(TechType,ITechData)">
             <summary>
-            Safely accesses the crafting data from a Modded item.<para/>
-            WARNING: This method is highly dependent on mod load order. 
-            Make sure your mod is loading after the mod whose TechData you are trying to access.
+            <para>Allows you to edit recipes, i.e. TechData for TechTypes.</para>
+            <para>Can be used for existing TechTypes too.</para>
             </summary>
-            <param name="techType">The TechType whose TechData you want to access.</param>
-            <returns>The RecipeData from the modded item if it exists; Otherwise, returns <c>null</c>.</returns>
+            <param name="techType">The TechType whose TechData you want to edit.</param>
+            <param name="techData">The TechData for that TechType.</param>
+            <seealso cref="T:SMLHelper.V2.Crafting.TechData"/>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#SetTechData(TechType,SMLHelper.V2.Crafting.TechData)">
+            <summary>
+            <para>Allows you to edit recipes, i.e. TechData for TechTypes.</para>
+            <para>Can be used for existing TechTypes too.</para>
+            </summary>
+            <param name="techType">The TechType whose TechData you want to edit.</param>
+            <param name="techData">The TechData for that TechType.</param>
+            <seealso cref="T:SMLHelper.V2.Crafting.TechData"/>
         </member>
         <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#SetEquipmentType(TechType,EquipmentType)">
             <summary>
@@ -2154,7 +2140,7 @@
         <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#SetQuickSlotType(TechType,QuickSlotType)">
             <summary>
             <para>Allows you to edit QuickSlotType for TechTypes. Can be used for existing TechTypes too.</para>
-            <para>Careful: This has to be called after <see cref="M:SMLHelper.V2.Handlers.CraftDataHandler.SetTechData(TechType,SMLHelper.V2.Crafting.RecipeData)"/>.</para>
+            <para>Careful: This has to be called after <see cref="M:SMLHelper.V2.Handlers.CraftDataHandler.SetTechData(TechType,ITechData)"/> and <see cref="M:SMLHelper.V2.Handlers.CraftDataHandler.SetTechData(TechType,SMLHelper.V2.Crafting.TechData)"/>.</para>
             </summary>
             <param name="techType">The TechType whose QuickSlotType you want to edit.</param>
             <param name="slotType">The QuickSlotType for that TechType.</param>
@@ -2216,14 +2202,6 @@
             <param name="uncooked">The TechType whose cooked creature counterpart to edit.</param>
             <param name="cooked">The cooked creature counterpart for that TechType.</param>
         </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#SetColdResistance(TechType,System.Int32)">
-            <summary>
-            <para>Allows you to edit the Cold Resistance of a TechType.</para>
-            <para>Can be used for existing TechTypes too.</para>
-            </summary>
-            <param name="uncooked">The TechType whose Cold Resistance to edit.</param>
-            <param name="resistance">The Cold Resistance for that TechType.</param>
-        </member>
         <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#SetBackgroundType(TechType,CraftData.BackgroundType)">
             <summary>
             <para>Allows you to edit inventory background colors for TechTypes.</para>
@@ -2238,26 +2216,39 @@
             </summary>
             <param name="techType">The TechType which you want to add to the buildable list.</param>
         </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#SetMaxCharge(TechType,System.Single)">
+        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#GetModdedTechData(TechType)">
             <summary>
-            Sets the maximum charge.
+            Safely accesses the crafting data from a modded item.<para/>
+            WARNING: This method is highly dependent on mod load order. 
+            Make sure your mod is loading after the mod whose TechData you are trying to access.
             </summary>
-            <param name="techType">The TechType whose MaxCharge you want to edit.</param>
-            <param name="maxCharge">The maximum charge.</param>
+            <param name="techType">The TechType whose TechData you want to access.</param>
+            <returns>The ITechData from the modded item if it exists; Otherwise, returns <c>null</c>.</returns>
         </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#SetEnergyCost(TechType,System.Single)">
+        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#GetTechData(TechType)">
             <summary>
-            Sets the energy cost.
+            Safely accesses the crafting data from any item.<para/>
+            WARNING: This method is highly dependent on mod load order. 
+            Make sure your mod is loading after the mod whose TechData you are trying to access.
             </summary>
-            <param name="techType">The TechType whose EnergyCost you want to edit.</param>
-            <param name="energyCost">The energy cost.</param>
+            <param name="techType">The TechType whose TechData you want to access.</param>
+            <returns>Returns TechData if it exists; Otherwise, returns <c>null</c>.</returns>
         </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#SetSoundType(TechType,TechData.SoundType)">
+        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#SetEatingSound(TechType,System.String)">
             <summary>
-            Sets the type of the sound.
+            Sets the eating sound for the provided TechType.
             </summary>
-            <param name="techType">Type of the tech.</param>
-            <param name="soundType">Type of the sound.</param>
+            <param name="consumable">The item being consumed during <see cref="M:Survival.Eat(UnityEngine.GameObject)"/>.</param>
+            <param name="soundPath">
+            The sound path.
+            <para>
+            Value values are
+            - "event:/player/drink"
+            - "event:/player/drink_stillsuit"
+            - "event:/player/use_first_aid"
+            - "event:/player/eat" (default)
+            </para>
+            </param>
         </member>
         <member name="T:SMLHelper.V2.Handlers.CraftTreeHandler">
             <summary>
@@ -2327,6 +2318,29 @@
             <param name="name">The ID of the tab node. Must be unique!</param>
             <param name="displayName">The display name of the tab, which will show up when you hover your mouse on the tab.</param>
             <param name="sprite">The sprite of the tab.</param>        
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CraftTreeHandler.AddTabNode(CraftTree.Type,System.String,System.String,Atlas.Sprite)">
+            <summary>
+            Adds a new tab node to the root of the specified crafting tree.
+            </summary>
+            <param name="craftTree">The target craft tree to edit.</param>
+            <param name="name">The ID of the tab node. Must be unique!</param>
+            <param name="displayName">The display name of the tab, which will show up when you hover your mouse on the tab.</param>
+            <param name="sprite">The sprite of the tab.</param>        
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CraftTreeHandler.AddTabNode(CraftTree.Type,System.String,System.String,Atlas.Sprite,System.String[])">
+            <summary>
+            Adds a new tab node to the root of the specified crafting tree, at the specified tab location.
+            </summary>
+            <param name="craftTree">The target craft tree to edit.</param>
+            <param name="name">The ID of the tab node. Must be unique!</param>
+            <param name="displayName">The display name of the tab, which will show up when you hover your mouse on the tab.</param>
+            <param name="sprite">The sprite of the tab.</param>
+            <param name="stepsToTab">
+            <para>The steps to the target tab.</para>
+            <para>These must match the id value of the CraftNode in the crafting tree you're targeting.</para>
+            <para>Do not include "root" in this path.</para>
+            </param>        
         </member>
         <member name="M:SMLHelper.V2.Handlers.CraftTreeHandler.AddTabNode(CraftTree.Type,System.String,System.String,UnityEngine.Sprite,System.String[])">
             <summary>
@@ -2405,7 +2419,7 @@
             <param name="craftTree">The target craft tree to edit.</param>
             <param name="craftingItem">The item to craft.</param>
         </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftTreeHandler.SMLHelper#V2#Interfaces#ICraftTreeHandler#AddTabNode(CraftTree.Type,System.String,System.String,UnityEngine.Sprite)">
+        <member name="M:SMLHelper.V2.Handlers.CraftTreeHandler.SMLHelper#V2#Interfaces#ICraftTreeHandler#AddTabNode(CraftTree.Type,System.String,System.String,Atlas.Sprite)">
             <summary>
             Adds a new tab node to the root of the specified crafting tree.
             </summary>
@@ -2413,6 +2427,29 @@
             <param name="name">The ID of the tab node. Must be unique!</param>
             <param name="displayName">The display name of the tab, which will show up when you hover your mouse on the tab.</param>
             <param name="sprite">The sprite of the tab.</param>        
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CraftTreeHandler.SMLHelper#V2#Interfaces#ICraftTreeHandler#AddTabNode(CraftTree.Type,System.String,System.String,UnityEngine.Sprite)">
+            <summary>
+            Adds a new tab node to the root of the specified crafting tree.
+            </summary>
+            <param name="craftTree">The target craft tree to edit.</param>
+            <param name="name">The ID of the tab node. Must be unique!</param>
+            <param name="displayName">The display name of the tab, which will show up when you hover your mouse on the tab.</param>
+            <param name="sprite">The sprite of the tab.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CraftTreeHandler.SMLHelper#V2#Interfaces#ICraftTreeHandler#AddTabNode(CraftTree.Type,System.String,System.String,Atlas.Sprite,System.String[])">
+            <summary>
+            Adds a new tab node to the root of the specified crafting tree, at the specified tab location.
+            </summary>
+            <param name="craftTree">The target craft tree to edit.</param>
+            <param name="name">The ID of the tab node. Must be unique!</param>
+            <param name="displayName">The display name of the tab, which will show up when you hover your mouse on the tab.</param>
+            <param name="sprite">The sprite of the tab.</param>
+            <param name="stepsToTab">
+            <para>The steps to the target tab.</para>
+            <para>These must match the id value of the CraftNode in the crafting tree you're targeting.</para>
+            <para>Do not include "root" in this path.</para>
+            </param>        
         </member>
         <member name="M:SMLHelper.V2.Handlers.CraftTreeHandler.SMLHelper#V2#Interfaces#ICraftTreeHandler#AddTabNode(CraftTree.Type,System.String,System.String,UnityEngine.Sprite,System.String[])">
             <summary>
@@ -3088,6 +3125,21 @@
             Main entry point for all calls to this handler.
             </summary>
         </member>
+        <member name="M:SMLHelper.V2.Handlers.SpriteHandler.RegisterSprite(TechType,Atlas.Sprite)">
+            <summary>
+            Registers a new sprite to the game.
+            </summary>
+            <param name="type">The techtype paired to this sprite.</param>
+            <param name="sprite">The sprite to be added.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.SpriteHandler.RegisterSprite(SpriteManager.Group,System.String,Atlas.Sprite)">
+            <summary>
+            Registers a new sprite to the game.
+            </summary>
+            <param name="group">The sprite group.</param>
+            <param name="id">The sprite internal identifier.</param>
+            <param name="sprite">The sprite to be added.</param>
+        </member>
         <member name="M:SMLHelper.V2.Handlers.SpriteHandler.RegisterSprite(SpriteManager.Group,System.String,UnityEngine.Sprite)">
             <summary>
             Registers a new sprite to the game.
@@ -3142,6 +3194,21 @@
             <para>https://docs.unity3d.com/ScriptReference/TextureFormat.BC7.html</para>
             <para>Don't change this unless you really know what you're doing.</para></param>
             <seealso cref="M:SMLHelper.V2.Utility.ImageUtils.LoadSpriteFromFile(System.String,UnityEngine.TextureFormat)" />
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.SpriteHandler.SMLHelper#V2#Interfaces#ISpriteHandler#RegisterSprite(TechType,Atlas.Sprite)">
+            <summary>
+            Registers a new sprite to the game.
+            </summary>
+            <param name="type">The techtype paired to this sprite.</param>
+            <param name="sprite">The sprite to be added.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.SpriteHandler.SMLHelper#V2#Interfaces#ISpriteHandler#RegisterSprite(SpriteManager.Group,System.String,Atlas.Sprite)">
+            <summary>
+            Registers a new sprite to the game.
+            </summary>
+            <param name="group">The sprite group.</param>
+            <param name="id">The sprite internal identifier.</param>
+            <param name="sprite">The sprite to be added.</param>
         </member>
         <member name="M:SMLHelper.V2.Handlers.SpriteHandler.SMLHelper#V2#Interfaces#ISpriteHandler#RegisterSprite(SpriteManager.Group,System.String,UnityEngine.Sprite)">
             <summary>
@@ -3248,6 +3315,27 @@
             <param name="unlockAtStart">Whether this TechType should be unlocked on game start, or not. By default, <see langword="true"/>.</param>
             <returns>The new <see cref="T:TechType"/> that is created.</returns>
         </member>
+        <member name="M:SMLHelper.V2.Handlers.TechTypeHandler.AddTechType(System.String,System.String,System.String,Atlas.Sprite)">
+            <summary>
+            Adds a new <see cref="T:TechType"/> into the game, with a sprite. This new techtype will be unlocked at the start of a the game.
+            </summary>
+            <param name="internalName">The internal name of the TechType. Should not contain special characters.</param>
+            <param name="displayName">The display name of the TechType. Can be anything.</param>
+            <param name="tooltip">The tooltip, displayed when hovered in an inventory. Can be anything.</param>
+            <param name="sprite">The sprite that will related to this TechType.</param>
+            <returns>The new <see cref="T:TechType"/> that is created.</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.TechTypeHandler.AddTechType(System.String,System.String,System.String,Atlas.Sprite,System.Boolean)">
+            <summary>
+            Adds a new <see cref="T:TechType"/> into the game, with a sprite.
+            </summary>
+            <param name="internalName">The internal name of the TechType. Should not contain special characters.</param>
+            <param name="displayName">The display name of the TechType. Can be anything.</param>
+            <param name="tooltip">The tooltip, displayed when hovered in an inventory. Can be anything.</param>
+            <param name="sprite">The sprite that will related to this TechType.</param>
+            <param name="unlockAtStart">Whether this TechType should be unlocked on game start, or not. By default, <see langword="true"/>.</param>
+            <returns>The new <see cref="T:TechType"/> that is created.</returns>
+        </member>
         <member name="M:SMLHelper.V2.Handlers.TechTypeHandler.AddTechType(System.String,System.String,System.String,UnityEngine.Sprite)">
             <summary>
             Adds a new <see cref="T:TechType"/> into the game, with a sprite. This new techtype will be unlocked at the start of a the game.
@@ -3313,6 +3401,27 @@
             <param name="internalName">The internal name of the TechType. Should not contain special characters.</param>
             <param name="displayName">The display name of the TechType. Can be anything.</param>
             <param name="tooltip">The tooltip, displayed when hovered in an inventory. Can be anything.</param>
+            <returns>The new <see cref="T:TechType"/> that is created.</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.TechTypeHandler.SMLHelper#V2#Interfaces#ITechTypeHandler#AddTechType(System.String,System.String,System.String,Atlas.Sprite,System.Boolean)">
+            <summary>
+            Adds a new <see cref="T:TechType"/> into the game, with a sprite.
+            </summary>
+            <param name="internalName">The internal name of the TechType. Should not contain special characters.</param>
+            <param name="displayName">The display name of the TechType. Can be anything.</param>
+            <param name="tooltip">The tooltip, displayed when hovered in an inventory. Can be anything.</param>
+            <param name="sprite">The sprite that will related to this TechType.</param>
+            <param name="unlockAtStart">Whether this TechType should be unlocked on game start, or not. By default, <c>true</c>.</param>
+            <returns>The new <see cref="T:TechType"/> that is created.</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.TechTypeHandler.SMLHelper#V2#Interfaces#ITechTypeHandler#AddTechType(System.String,System.String,System.String,Atlas.Sprite)">
+            <summary>
+            Adds a new <see cref="T:TechType"/> into the game, with a sprite. This new techtype will be unlocked at the start of a the game.
+            </summary>
+            <param name="internalName">The internal name of the TechType. Should not contain special characters.</param>
+            <param name="displayName">The display name of the TechType. Can be anything.</param>
+            <param name="tooltip">The tooltip, displayed when hovered in an inventory. Can be anything.</param>
+            <param name="sprite">The sprite that will related to this TechType.</param>
             <returns>The new <see cref="T:TechType"/> that is created.</returns>
         </member>
         <member name="M:SMLHelper.V2.Handlers.TechTypeHandler.SMLHelper#V2#Interfaces#ITechTypeHandler#AddTechType(System.String,System.String,System.String,UnityEngine.Sprite,System.Boolean)">
@@ -3408,7 +3517,7 @@
             A handler interface for everything related to creating new BackgroundTypes.
             </summary>
         </member>
-        <member name="M:SMLHelper.V2.Interfaces.IBackgroundTypeHandler.AddBackgroundType(System.String,UnityEngine.Sprite)">
+        <member name="M:SMLHelper.V2.Interfaces.IBackgroundTypeHandler.AddBackgroundType(System.String,Atlas.Sprite)">
             <summary>
             adds a new <see cref="T:CraftData.BackgroundType"/> into the game.
             </summary>
@@ -3732,7 +3841,7 @@
             A handler related to PingTypes
             </summary>
         </member>
-        <member name="M:SMLHelper.V2.Interfaces.IPingHandler.RegisterNewPingType(System.String,UnityEngine.Sprite)">
+        <member name="M:SMLHelper.V2.Interfaces.IPingHandler.RegisterNewPingType(System.String,Atlas.Sprite)">
             <summary>
             Registers a ping type for use when creating a beacon
             </summary>
@@ -3887,7 +3996,7 @@
         <member name="M:SMLHelper.V2.Interfaces.ICraftDataHandler.SetQuickSlotType(TechType,QuickSlotType)">
             <summary>
             <para>Allows you to edit QuickSlotType for TechTypes. Can be used for existing TechTypes too.</para>
-            <para>Careful: This has to be called after <see cref="M:SMLHelper.V2.Interfaces.ICraftDataHandler.SetTechData(TechType,SMLHelper.V2.Crafting.RecipeData)"/>.</para>
+            <para>Careful: This has to be called after <see cref="M:SMLHelper.V2.Interfaces.ICraftDataHandler.SetTechData(TechType,SMLHelper.V2.Crafting.TechData)"/> and <see cref="M:SMLHelper.V2.Interfaces.ICraftDataHandler.SetTechData(TechType,ITechData)"/>.</para>
             </summary>
             <param name="techType">The TechType whose QuickSlotType you want to edit.</param>
             <param name="slotType">The QuickSlotType for that TechType.</param>
@@ -3990,87 +4099,57 @@
             <param name="category">The TechCategory in which the TechType is located.</param>
             <param name="techType">The TechType which you want to remove.</param>
         </member>
-        <member name="M:SMLHelper.V2.Interfaces.ICraftDataHandler.SetTechData(TechType,SMLHelper.V2.Crafting.RecipeData)">
+        <member name="M:SMLHelper.V2.Interfaces.ICraftDataHandler.SetTechData(TechType,ITechData)">
             <summary>
-            <para>Allows you to edit RecipeData for TechTypes.</para>
+            <para>Allows you to edit recipes, i.e. TechData for TechTypes.</para>
             <para>Can be used for existing TechTypes too.</para>
             </summary>
             <param name="techType">The TechType whose TechData you want to edit.</param>
             <param name="techData">The TechData for that TechType.</param>
-            <seealso cref="T:SMLHelper.V2.Crafting.RecipeData"/>
+            <seealso cref="T:SMLHelper.V2.Crafting.TechData"/>
         </member>
-        <member name="M:SMLHelper.V2.Interfaces.ICraftDataHandler.GetRecipeData(TechType)">
+        <member name="M:SMLHelper.V2.Interfaces.ICraftDataHandler.SetTechData(TechType,SMLHelper.V2.Crafting.TechData)">
+            <summary>
+            <para>Allows you to edit recipes, i.e. TechData for TechTypes.</para>
+            <para>Can be used for existing TechTypes too.</para>
+            </summary>
+            <param name="techType">The TechType whose TechData you want to edit.</param>
+            <param name="techData">The TechData for that TechType.</param>
+            <seealso cref="T:SMLHelper.V2.Crafting.TechData"/>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ICraftDataHandler.GetModdedTechData(TechType)">
             <summary>
             Safely accesses the crafting data from a modded item.<para/>
             WARNING: This method is highly dependent on mod load order. 
             Make sure your mod is loading after the mod whose TechData you are trying to access.
             </summary>
             <param name="techType">The TechType whose TechData you want to access.</param>
-            <returns>The RecipeData from the modded item if it exists; Otherwise, returns <c>null</c>.</returns>
+            <returns>The ITechData from the modded item if it exists; Otherwise, returns <c>null</c>.</returns>
         </member>
         <member name="M:SMLHelper.V2.Interfaces.ICraftDataHandler.GetTechData(TechType)">
             <summary>
-            Safely accesses the crafting data from a modded item.<para/>
+            Safely accesses the crafting data from any item.<para/>
             WARNING: This method is highly dependent on mod load order. 
             Make sure your mod is loading after the mod whose TechData you are trying to access.
             </summary>
             <param name="techType">The TechType whose TechData you want to access.</param>
-            <returns>The RecipeData from the modded item if it exists; Otherwise, returns <c>null</c>.</returns>
+            <returns>Returns TechData if it exists; Otherwise, returns <c>null</c>.</returns>
         </member>
-        <member name="M:SMLHelper.V2.Interfaces.ICraftDataHandler.GetModdedRecipeData(TechType)">
+        <member name="M:SMLHelper.V2.Interfaces.ICraftDataHandler.SetEatingSound(TechType,System.String)">
             <summary>
-            Safely accesses the crafting data from a modded item.<para/>
-            WARNING: This method is highly dependent on mod load order. 
-            Make sure your mod is loading after the mod whose TechData you are trying to access.
+            Sets the eating sound for the provided TechType.
             </summary>
-            <param name="techType">The TechType whose TechData you want to access.</param>
-            <returns>The RecipeData from the modded item if it exists; Otherwise, returns <c>null</c>.</returns>
-        </member>
-        <member name="M:SMLHelper.V2.Interfaces.ICraftDataHandler.SetIngredients(TechType,System.Collections.Generic.ICollection{Ingredient})">
-            <summary>
-            <para>Allows you to set ingredients for a TechType crafting recipe.</para>
-            <para>Can be used for existing TechTypes too.</para>
-            </summary>
-            <param name="techType">The TechType whose ingredient list you want to edit.</param>
-            <param name="ingredients">The collection of Ingredients for that TechType.</param>
-            <seealso cref="T:Ingredient"/>
-        </member>
-        <member name="M:SMLHelper.V2.Interfaces.ICraftDataHandler.SetLinkedItems(TechType,System.Collections.Generic.ICollection{TechType})">
-            <summary>
-            <para>Allows you to set linked items for a TechType crafting recipe.</para>
-            <para>Can be used for existing TechTypes too.</para>
-            </summary>
-            <param name="techType">The TechType whose ingredient list you want to edit.</param>
-            <param name="linkedItems">The collection of linked items for that TechType</param>
-        </member>
-        <member name="M:SMLHelper.V2.Interfaces.ICraftDataHandler.SetColdResistance(TechType,System.Int32)">
-            <summary>
-            <para>Allows you to edit the Cold Resistance for TechTypes.</para>
-            <para>Can be used for existing TechTypes too.</para>
-            </summary>
-            <param name="techType">The TechType whose Cold Resistance you want to edit.</param>
-            <param name="resistance">The int value for the Cold Resistance.</param>
-        </member>
-        <member name="M:SMLHelper.V2.Interfaces.ICraftDataHandler.SetMaxCharge(TechType,System.Single)">
-            <summary>
-            Sets the maximum charge.
-            </summary>
-            <param name="techType">The TechType whose MaxCharge you want to edit.</param>
-            <param name="maxCharge">The maximum charge.</param>
-        </member>
-        <member name="M:SMLHelper.V2.Interfaces.ICraftDataHandler.SetEnergyCost(TechType,System.Single)">
-            <summary>
-            Sets the energy cost.
-            </summary>
-            <param name="techType">The TechType whose EnergyCost you want to edit.</param>
-            <param name="energyCost">The energy cost.</param>
-        </member>
-        <member name="M:SMLHelper.V2.Interfaces.ICraftDataHandler.SetSoundType(TechType,TechData.SoundType)">
-            <summary>
-            Sets the type of the sound.
-            </summary>
-            <param name="techType">Type of the tech.</param>
-            <param name="soundType">Type of the sound.</param>
+            <param name="consumable">The item being consumed during <see cref="M:Survival.Eat(UnityEngine.GameObject)"/>.</param>
+            <param name="soundPath">
+            The sound path.
+            <para>
+            Value values are
+            - "event:/player/drink"
+            - "event:/player/drink_stillsuit"
+            - "event:/player/use_first_aid"
+            - "event:/player/eat" (default)
+            </para>
+            </param>
         </member>
         <member name="T:SMLHelper.V2.Interfaces.ICraftTreeHandler">
             <summary>
@@ -4135,6 +4214,29 @@
             <param name="name">The ID of the tab node. Must be unique!</param>
             <param name="displayName">The display name of the tab, which will show up when you hover your mouse on the tab.</param>
             <param name="sprite">The sprite of the tab.</param>        
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ICraftTreeHandler.AddTabNode(CraftTree.Type,System.String,System.String,Atlas.Sprite)">
+            <summary>
+            Adds a new tab node to the root of the specified crafting tree.
+            </summary>
+            <param name="craftTree">The target craft tree to edit.</param>
+            <param name="name">The ID of the tab node. Must be unique!</param>
+            <param name="displayName">The display name of the tab, which will show up when you hover your mouse on the tab.</param>
+            <param name="sprite">The sprite of the tab.</param>        
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ICraftTreeHandler.AddTabNode(CraftTree.Type,System.String,System.String,Atlas.Sprite,System.String[])">
+            <summary>
+            Adds a new tab node to the root of the specified crafting tree, at the specified tab location.
+            </summary>
+            <param name="craftTree">The target craft tree to edit.</param>
+            <param name="name">The ID of the tab node. Must be unique!</param>
+            <param name="displayName">The display name of the tab, which will show up when you hover your mouse on the tab.</param>
+            <param name="sprite">The sprite of the tab.</param>
+            <param name="stepsToTab">
+            <para>The steps to the target tab.</para>
+            <para>These must match the id value of the CraftNode in the crafting tree you're targeting.</para>
+            <para>Do not include "root" in this path.</para>
+            </param>        
         </member>
         <member name="M:SMLHelper.V2.Interfaces.ICraftTreeHandler.AddTabNode(CraftTree.Type,System.String,System.String,UnityEngine.Sprite,System.String[])">
             <summary>
@@ -4528,6 +4630,21 @@
             A handler class for adding custom sprites into the game.
             </summary>
         </member>
+        <member name="M:SMLHelper.V2.Interfaces.ISpriteHandler.RegisterSprite(TechType,Atlas.Sprite)">
+            <summary>
+            Registers a new sprite to the game.
+            </summary>
+            <param name="type">The techtype paired to this sprite.</param>
+            <param name="sprite">The sprite to be added.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ISpriteHandler.RegisterSprite(SpriteManager.Group,System.String,Atlas.Sprite)">
+            <summary>
+            Registers a new sprite to the game.
+            </summary>
+            <param name="group">The sprite group.</param>
+            <param name="id">The sprite internal identifier.</param>
+            <param name="sprite">The sprite to be added.</param>
+        </member>
         <member name="M:SMLHelper.V2.Interfaces.ISpriteHandler.RegisterSprite(SpriteManager.Group,System.String,UnityEngine.Sprite)">
             <summary>
             Registers a new sprite to the game.
@@ -4604,6 +4721,27 @@
             <param name="internalName">The internal name of the TechType. Should not contain special characters.</param>
             <param name="displayName">The display name of the TechType. Can be anything.</param>
             <param name="tooltip">The tooltip, displayed when hovered in an inventory. Can be anything.</param>
+            <param name="unlockAtStart">Whether this TechType should be unlocked on game start, or not. By default, <c>true</c>.</param>
+            <returns>The new <see cref="T:TechType"/> that is created.</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ITechTypeHandler.AddTechType(System.String,System.String,System.String,Atlas.Sprite)">
+            <summary>
+            Adds a new <see cref="T:TechType"/> into the game, with a sprite. This new techtype will be unlocked at the start of a the game.
+            </summary>
+            <param name="internalName">The internal name of the TechType. Should not contain special characters.</param>
+            <param name="displayName">The display name of the TechType. Can be anything.</param>
+            <param name="tooltip">The tooltip, displayed when hovered in an inventory. Can be anything.</param>
+            <param name="sprite">The sprite that will related to this TechType.</param>
+            <returns>The new <see cref="T:TechType"/> that is created.</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ITechTypeHandler.AddTechType(System.String,System.String,System.String,Atlas.Sprite,System.Boolean)">
+            <summary>
+            Adds a new <see cref="T:TechType"/> into the game, with a sprite.
+            </summary>
+            <param name="internalName">The internal name of the TechType. Should not contain special characters.</param>
+            <param name="displayName">The display name of the TechType. Can be anything.</param>
+            <param name="tooltip">The tooltip, displayed when hovered in an inventory. Can be anything.</param>
+            <param name="sprite">The sprite that will related to this TechType.</param>
             <param name="unlockAtStart">Whether this TechType should be unlocked on game start, or not. By default, <c>true</c>.</param>
             <returns>The new <see cref="T:TechType"/> that is created.</returns>
         </member>
@@ -4754,13 +4892,13 @@
             </summary>
             <param name="useColor">The text color to use</param>
         </member>
-        <member name="M:SMLHelper.V2.Interfaces.IBasicText.SetFont(TMPro.TMP_FontAsset)">
+        <member name="M:SMLHelper.V2.Interfaces.IBasicText.SetFont(UnityEngine.Font)">
             <summary>
             Sets the font 
             </summary>
             <param name="useFont">The font to render the text as.</param>
         </member>
-        <member name="M:SMLHelper.V2.Interfaces.IBasicText.SetFontStyle(TMPro.FontStyles)">
+        <member name="M:SMLHelper.V2.Interfaces.IBasicText.SetFontStyle(UnityEngine.FontStyle)">
             <summary>
             Sets the font style.
             </summary>
@@ -5970,7 +6108,7 @@
             Resets to using "cloned" size of Subnautica default.
             </summary>
         </member>
-        <member name="M:SMLHelper.V2.Utility.BasicText.SetFont(TMPro.TMP_FontAsset)">
+        <member name="M:SMLHelper.V2.Utility.BasicText.SetFont(UnityEngine.Font)">
             <summary>
             Sets the font 
             </summary>
@@ -5981,7 +6119,7 @@
             Resets to using "cloned" font of Subnautica default.
             </summary>
         </member>
-        <member name="M:SMLHelper.V2.Utility.BasicText.SetFontStyle(TMPro.FontStyles)">
+        <member name="M:SMLHelper.V2.Utility.BasicText.SetFontStyle(UnityEngine.FontStyle)">
             <summary>
             Sets the font style.
             </summary>
@@ -6055,7 +6193,7 @@
         </member>
         <member name="M:SMLHelper.V2.Utility.ImageUtils.LoadSpriteFromFile(System.String,UnityEngine.TextureFormat)">
             <summary>
-            Creates a new <see cref="T:UnityEngine.Sprite" /> from an image file.
+            Creates a new <see cref="T:Atlas.Sprite" /> from an image file.
             </summary>
             <param name="filePathToImage">The path to the image file.</param>
             <param name="format">
@@ -6063,15 +6201,15 @@
             https://docs.unity3d.com/ScriptReference/TextureFormat.BC7.html <br/>
             Don't change this unless you really know what you're doing.
             </param>
-            <returns>Will return a new <see cref="T:UnityEngine.Sprite"/> instance if the file exists; Otherwise returns null.</returns>
+            <returns>Will return a new <see cref="T:Atlas.Sprite"/> instance if the file exists; Otherwise returns null.</returns>
         </member>
         <member name="M:SMLHelper.V2.Utility.ImageUtils.LoadSpriteFromTexture(UnityEngine.Texture2D)">
             <summary>
-            Creates a new <see cref="T:UnityEngine.Sprite" /> from an image file.
+            Creates a new <see cref="T:Atlas.Sprite" /> from an image file.
             </summary>
             <param name="texture2D">The 2D texture to convert into a sprite.</param>
             <returns>
-            Will return a new <see cref="T:UnityEngine.Sprite" /> instance using the provided texture.
+            Will return a new <see cref="T:Atlas.Sprite" /> instance using the provided texture.
             </returns>
         </member>
         <member name="T:SMLHelper.V2.Utility.IOUtilities">

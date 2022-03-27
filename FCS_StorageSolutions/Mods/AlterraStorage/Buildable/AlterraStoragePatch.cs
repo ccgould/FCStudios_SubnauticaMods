@@ -22,14 +22,20 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Buildable
         public override TechGroup GroupForPDA => TechGroup.Miscellaneous;
         public override TechCategory CategoryForPDA => TechCategory.Misc;
         public override string AssetsFolder => Mod.GetAssetPath();
+        private TechType kitTechType = TechType.None;
 
         public AlterraStoragePatch() : base(Mod.AlterraStorageClassName, Mod.AlterraStorageFriendlyName, Mod.AlterraStorageDescription)
         {
-            OnFinishedPatching += () =>
+            OnStartedPatching += () =>
             {
                 var AlterraStorageKit = new FCSKit(Mod.AlterraStorageKitClassID, Mod.AlterraStorageFriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 AlterraStorageKit.Patch();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, AlterraStorageKit.TechType, 94500, StoreCategory.Storage);
+                kitTechType = AlterraStorageKit.TechType;
+            };
+
+            OnFinishedPatching += () =>
+            {
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, kitTechType, 94500, StoreCategory.Storage);
             };
         }
 

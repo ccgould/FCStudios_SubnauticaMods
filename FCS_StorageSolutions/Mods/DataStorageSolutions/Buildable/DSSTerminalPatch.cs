@@ -26,10 +26,14 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
 
         public DSSTerminalPatch() : base(Mod.DSSTerminalClassName, Mod.DSSTerminalFriendlyName, Mod.DSSTerminalDescription)
         {
-            OnFinishedPatching += () =>
+            OnStartedPatching += () =>
             {
                 var dssTerminalKit = new FCSKit(Mod.DSSTerminalKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 dssTerminalKit.Patch();
+            };
+
+            OnFinishedPatching += () =>
+            {
                 FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.DSSTerminalKitClassID.ToTechType(), 126000, StoreCategory.Storage);
             };
         }

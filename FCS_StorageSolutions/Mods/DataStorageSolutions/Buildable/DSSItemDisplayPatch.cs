@@ -26,10 +26,14 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
 
         public DSSItemDisplayPatch() : base(Mod.DSSItemDisplayClassName, Mod.DSSItemDisplayFriendlyName, Mod.DSSItemDisplayDescription)
         {
-            OnFinishedPatching += () =>
+            OnStartedPatching += () =>
             {
                 var dssItemDisplayKit = new FCSKit(Mod.DSSItemDisplayKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 dssItemDisplayKit.Patch();
+            };
+
+            OnFinishedPatching += () =>
+            {
                 FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.DSSItemDisplayKitClassID.ToTechType(), 37500, StoreCategory.Storage);
             };
         }

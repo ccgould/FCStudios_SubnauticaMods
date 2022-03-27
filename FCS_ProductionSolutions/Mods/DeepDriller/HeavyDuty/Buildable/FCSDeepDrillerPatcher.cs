@@ -35,13 +35,21 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Buildable
         internal const string DeepDrillerMk3PrefabName = "DeepDrillerMK3";
         internal const string DeepDrillerMk3Description = "Heavy Duty Automated drill platform suitable for all biomes with integrated solar and thermal generators. Requires lubricant.";
 
+        private TechType kitTechType;
+
         public FCSDeepDrillerBuildable() : base(DeepDrillerMk3ClassName, DeepDrillerMk3FriendlyName, DeepDrillerMk3Description)
         {
-            OnFinishedPatching += () =>
+
+            OnStartedPatching += () =>
             {
                 var deepDrillerMk2Kit = new FCSKit(DeepDrillerMk3KitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 deepDrillerMk2Kit.Patch();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, deepDrillerMk2Kit.TechType, 700000, StoreCategory.Production);
+                kitTechType = deepDrillerMk2Kit.TechType;
+            };
+
+            OnFinishedPatching += () =>
+            {
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, kitTechType, 700000, StoreCategory.Production);
                 AdditionalPatching();
             };
         }

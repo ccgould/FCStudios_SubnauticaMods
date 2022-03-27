@@ -20,8 +20,7 @@ namespace FCS_HomeSolutions.Mods.LedLights.Buildable
             groupForPda = TechGroup.Miscellaneous,
             size = Vector3.zero,
             center = Vector3.zero,
-            prefab = ModelPrefab.GetPrefabFromGlobal("FCS_LedLightStick_01"),
-            TechData = Mod.LedLightStickShortIngredients
+            prefab = null
         })
         {
         }

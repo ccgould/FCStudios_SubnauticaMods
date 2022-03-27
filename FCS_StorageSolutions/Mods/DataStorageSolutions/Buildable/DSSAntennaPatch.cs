@@ -27,10 +27,14 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
 
         public DSSAntennaPatch() : base(Mod.DSSAntennaClassName, Mod.DSSAntennaFriendlyName, Mod.DSSAntennaDescription)
         {
-            OnFinishedPatching += () =>
+            OnStartedPatching += () =>
             {
                 var dssAntennaKit = new FCSKit(Mod.DSSAntennaKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 dssAntennaKit.Patch();
+            };
+
+            OnFinishedPatching += () =>
+            {
                 FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.DSSAntennaKitClassID.ToTechType(), 210000, StoreCategory.Storage);
             };
         }

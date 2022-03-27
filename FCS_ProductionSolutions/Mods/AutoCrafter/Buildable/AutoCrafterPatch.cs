@@ -39,10 +39,14 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Buildable
 
             _prefab = ModelPrefab.GetPrefab(AutoCrafterPrefabName);
 
-            OnFinishedPatching += () =>
+            OnStartedPatching += () =>
             {
                 var AutoCrafterKit = new FCSKit(AutoCrafterKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 AutoCrafterKit.Patch();
+            };
+
+            OnFinishedPatching += () =>
+            {
                 FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, AutoCrafterKitClassID.ToTechType(), 236250, StoreCategory.Production);
             };
         }

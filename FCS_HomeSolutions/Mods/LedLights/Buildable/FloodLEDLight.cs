@@ -24,18 +24,9 @@ namespace FCS_HomeSolutions.Mods.LedLights.Buildable
             groupForPda = TechGroup.ExteriorModules,
             size = Vector3.zero,
             center = Vector3.zero,
-            prefab = ModelPrefab.GetPrefabFromGlobal("FCS_FloodLight"),
-            TechData = LedLightStickWallIngredients
+            prefab = ModelPrefab.GetPrefabFromGlobal("FCS_FloodLight")
         })
         {
         }
-        internal static RecipeData LedLightStickWallIngredients => new RecipeData
-        {
-            craftAmount = 1,
-            Ingredients =
-            {
-                new Ingredient("FloodLEDLight_Kit".ToTechType(), 1)
-            }
-        };
     }
 }

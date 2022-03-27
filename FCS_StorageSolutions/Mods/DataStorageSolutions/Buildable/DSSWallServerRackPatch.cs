@@ -24,13 +24,20 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
         public override TechCategory CategoryForPDA => TechCategory.InteriorModule;
         public override string AssetsFolder => Mod.GetAssetPath();
 
+        private TechType kitTechType;
+
         public DSSWallServerRackPatch() : base(Mod.DSSWallServerRackClassName, Mod.DSSWallServerRackFriendlyName, Mod.DSSWallServerRackDescription)
         {
-            OnFinishedPatching += () =>
+            OnStartedPatching += () =>
             {
                 var DSSWallServerRackKit = new FCSKit(Mod.DSSWallServerRackKitClassID, Mod.DSSWallServerRackFriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 DSSWallServerRackKit.Patch();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, DSSWallServerRackKit.TechType, 65625, StoreCategory.Storage);
+                kitTechType = DSSWallServerRackKit.TechType;
+            };
+
+            OnFinishedPatching += () =>
+            {
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, kitTechType, 65625, StoreCategory.Storage);
             };
         }
 

@@ -29,17 +29,27 @@ namespace FCS_LifeSupportSolutions.Mods.BaseOxygenTank.Buildable
         private string _assetFolder => Mod.GetAssetFolder();
         public override string AssetsFolder => _assetFolder;
 
+        private TechType kitTechType = TechType.None;
+
         public BaseOxygenTankPatch(string classID, string iconName,bool isKitType = false) : base(classID, Mod.BaseOxygenTankFriendly, Mod.BaseOxygenTankDescription)
         {
             _iconName = iconName;
             _isKitType = isKitType;
-            OnFinishedPatching += () =>
+
+            OnStartedPatching+= () =>
             {
                 if (!isKitType) return;
                 var baseOxygenTank = new FCSKit($"{Mod.BaseOxygenTankClassID}_Kit", FriendlyName,
                     Path.Combine(AssetsFolder, $"{iconName}.png"));
                 baseOxygenTank.Patch();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, baseOxygenTank.TechType, 49250, StoreCategory.LifeSupport);
+                kitTechType = baseOxygenTank.TechType;
+            };
+
+
+            OnFinishedPatching += () =>
+            {
+                if (!isKitType) return;
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, kitTechType, 49250, StoreCategory.LifeSupport);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
             };
         }

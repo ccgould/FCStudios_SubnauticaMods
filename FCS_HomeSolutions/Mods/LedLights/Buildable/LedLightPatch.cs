@@ -25,6 +25,7 @@ namespace FCS_HomeSolutions.Mods.LedLights.Buildable
         public override TechCategory CategoryForPDA { get; }
         public override string AssetsFolder => Mod.GetAssetPath();
 
+        private TechType kitTechType;
 
         public LedLightPatch(LedLightData data) : base(data.classId, data.friendlyName, data.description)
         {
@@ -37,6 +38,7 @@ namespace FCS_HomeSolutions.Mods.LedLights.Buildable
                 var ledLightKit = new FCSKit($"{data.classId}_Kit", FriendlyName,
                     Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 ledLightKit.Patch();
+                kitTechType = ledLightKit.TechType;
 
             };
 
@@ -105,7 +107,14 @@ namespace FCS_HomeSolutions.Mods.LedLights.Buildable
 
         protected override RecipeData GetBlueprintRecipe()
         {
-            return _data.TechData;
+            return new RecipeData()
+            {
+                craftAmount = 1,
+                Ingredients = new System.Collections.Generic.List<Ingredient>()
+                    {
+                        new Ingredient(kitTechType, 1)
+                    }
+            };
         }
 
         protected override Sprite GetItemSprite()
@@ -128,7 +137,6 @@ namespace FCS_HomeSolutions.Mods.LedLights.Buildable
         public bool allowedOnGround;
         public bool allowedInSub;
         public GameObject prefab;
-        public RecipeData TechData;
         public bool allowedOnContructables;
     }
 }

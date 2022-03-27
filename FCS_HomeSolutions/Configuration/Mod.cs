@@ -173,46 +173,6 @@ namespace FCS_HomeSolutions.Configuration
             }
         };
 
-#if SUBNAUTICA
-        internal static TechData LedLightStickLongIngredients => new TechData
-#elif BELOWZERO
-        internal static RecipeData LedLightStickLongIngredients => new RecipeData
-#endif
-        {
-            craftAmount = 1,
-            Ingredients =
-            {
-                new Ingredient("LedLightStickLong_Kit".ToTechType(), 1)
-            }
-        };
-
-#if SUBNAUTICA
-        internal static TechData LedLightStickShortIngredients => new TechData
-#elif BELOWZERO
-        internal static RecipeData LedLightStickShortIngredients => new RecipeData
-#endif
-        {
-            craftAmount = 1,
-            Ingredients =
-            {
-                new Ingredient("LedLightStickShort_Kit".ToTechType(), 1)
-            }
-        };
-
-
-#if SUBNAUTICA
-        internal static TechData LedLightStickWallIngredients => new TechData
-#elif BELOWZERO
-        internal static RecipeData DeskLEDIngredients => new RecipeData
-#endif
-        {
-            craftAmount = 1,
-            Ingredients =
-            {
-                new Ingredient("LedLightStickWall_Kit".ToTechType(), 1)
-            }
-        };
-
 
 #if SUBNAUTICA
         internal static TechData MiniFountainFilterKitIngredients => new TechData

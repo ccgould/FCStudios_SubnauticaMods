@@ -22,13 +22,19 @@ namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Buildable
 {
     internal class MatterAnalyzerPatch : SMLHelper.V2.Assets.Buildable
     {
+        private TechType kitTechType;
         public MatterAnalyzerPatch() : base(Mod.MatterAnalyzerClassName, Mod.MatterAnalyzerFriendlyName, Mod.MatterAnalyzerDescription)
         {
-            OnFinishedPatching += () =>
+            OnStartedPatching += () =>
             {
                 var matterAnalyzerKit = new FCSKit(Mod.MatterAnalyzerKitClassID, Mod.MatterAnalyzerFriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 matterAnalyzerKit.Patch();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, matterAnalyzerKit.TechType, 270000, StoreCategory.Production);
+                kitTechType = matterAnalyzerKit.TechType;
+            };
+
+            OnFinishedPatching += () =>
+            {
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, kitTechType, 270000, StoreCategory.Production);
 
             };
         }

@@ -20,13 +20,20 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Buildable
 {
     internal class HydroponicHarvesterPatch : SMLHelper.V2.Assets.Buildable
     {
+        private TechType kitTechType;
+
         public HydroponicHarvesterPatch() : base(Mod.HydroponicHarvesterModClassName, Mod.HydroponicHarvesterModFriendlyName, Mod.HydroponicHarvesterModDescription)
         {
-            OnFinishedPatching += () =>
+            OnStartedPatching += () =>
             {
                 var hydroponicHarvesterKit = new FCSKit(Mod.HydroponicHarvesterKitClassID, Mod.HydroponicHarvesterModFriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 hydroponicHarvesterKit.Patch();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, hydroponicHarvesterKit.TechType, 196875, StoreCategory.Production);
+                kitTechType = hydroponicHarvesterKit.TechType;
+            };
+
+            OnFinishedPatching += () =>
+            {
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, kitTechType, 196875, StoreCategory.Production);
             };
         }
         public override TechGroup GroupForPDA => TechGroup.Miscellaneous;

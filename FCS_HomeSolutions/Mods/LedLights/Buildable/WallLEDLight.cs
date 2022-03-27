@@ -21,12 +21,7 @@ namespace FCS_HomeSolutions.Mods.LedLights.Buildable
             groupForPda = TechGroup.InteriorModules,
             size = Vector3.zero,
             center = Vector3.zero,
-            prefab = ModelPrefab.GetPrefabFromGlobal("FCS_LedLightStick_02"),
-#if SUBNAUTICA
-            TechData = Mod.LedLightStickWallIngredients
-#else
-            TechData = Mod.DeskLEDIngredients
-#endif
+            prefab = ModelPrefab.GetPrefabFromGlobal("FCS_LedLightStick_02")
         })
         {
         }

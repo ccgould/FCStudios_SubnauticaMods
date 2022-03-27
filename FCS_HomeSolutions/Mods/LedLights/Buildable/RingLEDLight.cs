@@ -25,19 +25,10 @@ namespace FCS_HomeSolutions.Mods.LedLights.Buildable
             groupForPda = TechGroup.InteriorModules,
             center = new Vector3(0f, 0.2182536f, 0f),
             size = new Vector3(0.3452354f, 0.3483996f, 0.1863832f),
-            prefab = ModelPrefab.GetPrefabFromGlobal("FCS_RingLamp"),
-            TechData = DeskLEDIngredients
+            prefab = ModelPrefab.GetPrefabFromGlobal("FCS_RingLamp")
         }) 
         {
         }
 
-        internal static RecipeData DeskLEDIngredients => new RecipeData
-        {
-            craftAmount = 1,
-            Ingredients =
-            {
-                new Ingredient("RingLight_Kit".ToTechType(), 1)
-            }
-        };
     }
 }

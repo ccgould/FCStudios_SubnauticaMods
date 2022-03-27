@@ -44,11 +44,16 @@ namespace FCS_HomeSolutions.Mods.PaintTool.Spawnable
         public PaintToolSpawnable() : base(PaintToolClassID, PaintToolFriendly, PaintToolDescription)
         {
             _prefab = ModelPrefab.GetPrefab(PaintToolPrefabName);
-            OnFinishedPatching += () =>
+
+            OnStartedPatching += () =>
             {
                 var paintToolKit = new FCSKit(PaintToolKitClassID, PaintToolFriendly, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 paintToolKit.Patch();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, TechType,1,7500, StoreCategory.Home,true);
+            };
+
+            OnFinishedPatching += () =>
+            {
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, TechType, 1, 7500, StoreCategory.Home, true);
             };
         }
 

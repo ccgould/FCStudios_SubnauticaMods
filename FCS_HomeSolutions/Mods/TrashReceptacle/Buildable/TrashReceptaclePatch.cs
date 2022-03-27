@@ -35,14 +35,21 @@ namespace FCS_HomeSolutions.Mods.TrashReceptacle.Buildable
         internal const string TrashReceptacleKitClassID = "TrashReceptacle_Kit";
         internal const string TrashReceptacleTabID = "TR";
 
+        private TechType kitTechType;
+
         public TrashReceptaclePatch() : base(TrashReceptacleClassID, TrashReceptacleFriendly, TrashReceptacleDescription)
         {
             _prefab = _prefab = ModelPrefab.GetPrefabFromGlobal(TrashReceptaclePrefabName);
-            OnFinishedPatching += () =>
+            OnStartedPatching += () =>
             {
                 var trashReceptacleKit = new FCSKit(TrashReceptacleKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 trashReceptacleKit.Patch();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, trashReceptacleKit.TechType, 78750, StoreCategory.Home);
+                kitTechType = trashReceptacleKit.TechType;
+            };
+
+            OnFinishedPatching += () =>
+            {
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, kitTechType, 78750, StoreCategory.Home);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
             };
         }
