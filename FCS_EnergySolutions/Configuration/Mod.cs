@@ -8,10 +8,12 @@ using FCS_AlterraHub.Model.Utilities;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_EnergySolutions.Mods.AlterraGen.Enumerators;
-using FCSCommon.Utilities;
+ using FCS_EnergySolutions.Mods.TelepowerPylon.Model;
+ using FCSCommon.Utilities;
 using HarmonyLib;
 using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Utility;
+ using SMLHelper.V2.Json.ExtensionMethods;
+ using SMLHelper.V2.Utility;
 using UnityEngine;
 
 namespace FCS_EnergySolutions.Configuration
@@ -170,6 +172,11 @@ namespace FCS_EnergySolutions.Configuration
                         QuickLogger.Debug($"Saving device: {controller.Value.UnitID}");
                         ((IFCSSave<SaveData>)controller.Value).Save(newSaveData,serializer);
                     }
+                }
+
+                foreach (var manager in BaseTelepowerPylonManager.GetGlobalTelePowerPylonsManagers())
+                {
+                    newSaveData.BaseTelePowerSaves.Add(manager.Save());
                 }
 
                 _saveData = newSaveData;
@@ -390,6 +397,26 @@ namespace FCS_EnergySolutions.Configuration
             }
 
             return new UniversalChargerDataEntry() { Id = id };
+        }
+
+        public static BaseTelePowerSave GetBaseTelePowerPylonSaveData(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id)) return null;
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.BaseTelePowerSaves)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new BaseTelePowerSave() { Id = id };
         }
     }
 }

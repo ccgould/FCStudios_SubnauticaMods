@@ -61,7 +61,7 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
 
             UpdateIsMoving();
 
-            UpdatePosition();
+            UpdatePosition(); //TODO Words from the almighty purple change to a coroutine
         }
 
         private void UpdatePosition()

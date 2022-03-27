@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using FCS_AlterraHub.Mono;
+using FCS_EnergySolutions.Configuration;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Interfaces;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Mono;
 using FCSCommon.Utilities;
@@ -10,7 +13,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Model
 {
     internal class BaseTelepowerPylonManager : MonoBehaviour,IPylonPowerManager
     {
-        internal static HashSet<BaseTelepowerPylonManager> TelePowerPylonBases { get; set; } = new();
+        private static List<BaseTelepowerPylonManager> _globalTelePowerPylonManagers = new();
         private static HashSet<TelepowerPylonController> _basePylons = new();
 
         public Dictionary<string, BaseTelepowerPylonManager> _connections = new();
@@ -20,13 +23,16 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Model
         private PowerRelay _connectedPowerSource;
         private bool _pauseUpdates;
         private TelepowerPylonMode _mode = TelepowerPylonMode.PUSH;
+        private BaseTelePowerSave _savedData;
 
 
         private void Awake()
         {
             FindManager();
-            InvokeRepeating(nameof(UpdateConnections), 1f, 1f);
 
+
+
+            InvokeRepeating(nameof(UpdateConnections), 1f, 1f);
         }
 
         private void FindManager()
@@ -44,6 +50,20 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Model
                 {
                     QuickLogger.DebugError($"Failed to find base manager for {nameof(BaseTelepowerPylonManager)}.");
                     return;
+                }
+
+                if (_savedData == null)
+                {
+                    _savedData = Mod.GetBaseTelePowerPylonSaveData(manager.BaseFriendlyID);
+                }
+
+                if (_savedData != null)
+                {
+                    _mode = _savedData.Mode;
+                    foreach (var connection in _savedData.Connections)
+                    {
+                        _connections.Add(connection,_globalTelePowerPylonManagers.FirstOrDefault(x=>x.GetBaseID().Equals(connection)));
+                    }
                 }
 
                 _manager = manager;
@@ -170,5 +190,42 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Model
         {
             _basePylons.Remove(controller);
         }
+
+        public static void RegisterPylonManager(BaseTelepowerPylonManager manager)
+        {
+            _globalTelePowerPylonManagers.Add(manager);
+        }
+
+        public static void UnRegisterPylonManager(BaseTelepowerPylonManager manager)
+        {
+            _globalTelePowerPylonManagers.Remove(manager);
+        }
+
+        public static List<BaseTelepowerPylonManager> GetGlobalTelePowerPylonsManagers()
+        {
+            return _globalTelePowerPylonManagers;
+        }
+
+        internal BaseTelePowerSave Save()
+        {
+            return new()
+            {
+                Id = _manager.GetBaseFriendlyId(), 
+                Mode = _mode,
+                Connections = _connections.Keys.ToList()
+            };
+        }
+
+        public bool GetIsConnected(string id)
+        {
+            return _connections.ContainsKey(id);
+        }
+    }
+
+    internal class BaseTelePowerSave
+    {
+        public string Id { get; set; }
+        public TelepowerPylonMode Mode { get; set; }
+        public List<string> Connections { get; set; } = new();
     }
 }

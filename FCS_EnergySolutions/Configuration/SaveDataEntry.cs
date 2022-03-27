@@ -131,5 +131,6 @@ namespace FCS_EnergySolutions.Configuration
         [JsonProperty] internal List<TelepowerPylonDataEntry> TelepowerPylonEntries = new();
         [JsonProperty] internal List<WindSurferOperatorDataEntry> WindSurferOperatorEntries = new();
         [JsonProperty] internal List<WindSurferDataEntry> WindSurferEntries = new();
+        [JsonProperty] internal List<BaseTelePowerSave> BaseTelePowerSaves = new();
     }
 }

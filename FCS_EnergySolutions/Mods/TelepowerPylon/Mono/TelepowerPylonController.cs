@@ -514,7 +514,8 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
 
             QuickLogger.Debug($"Telepower Pylon Count: {FCSAlterraHubService.PublicAPI.GetRegisteredDevicesOfId(TelepowerPylonBuildable.TelepowerPylonTabID).Count}");
 
-            foreach (var telePowerPylonBase in BaseTelepowerPylonManager.TelePowerPylonBases)
+
+            foreach (var telePowerPylonBase in BaseTelepowerPylonManager.GetGlobalTelePowerPylonsManagers())
             {
                 if (telePowerPylonBase == null) return;
                 AttemptToAddToGrid(telePowerPylonBase);
@@ -699,23 +700,23 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             
             RefreshUI();
 
-            if (_savedData?.CurrentConnections != null)
-            {
+            //if (_savedData?.CurrentConnections != null)
+            //{
 
-                foreach (string connection in _savedData.CurrentConnections)
-                {
-                    QuickLogger.Debug($"Does Current Connections Contain Key: {connection} = {_powerManager.GetConnections().ContainsKey(connection)}");
+            //    foreach (string connection in _savedData.CurrentConnections)
+            //    {
+            //        QuickLogger.Debug($"Does Current Connections Contain Key: {connection} = {_powerManager.GetConnections().ContainsKey(connection)}");
                     
-                    if (_powerManager.GetConnections().ContainsKey(connection)) continue;
+            //        if (_powerManager.GetConnections().ContainsKey(connection)) continue;
                     
-                    var item = _trackedPullFrequencyItem.SingleOrDefault(x => x.Key.Equals(connection));
+            //        var item = _trackedPullFrequencyItem.SingleOrDefault(x => x.Key.Equals(connection));
                     
-                    if (item.Value != null)
-                    {
-                        item.Value.Check(true);
-                    }
-                }
-            }
+            //        if (item.Value != null)
+            //        {
+            //            item.Value.Check(true);
+            //        }
+            //    }
+            //}
 
             _attemptedToLoadConnections = true;
             _loadingFromSave = false;
