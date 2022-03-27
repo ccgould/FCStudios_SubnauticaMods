@@ -163,14 +163,16 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Mono
                     if (Inventory.main.HasRoomFor(size.x, size.y))
                     {
 #if SUBNAUTICA
-                        PlayerInteractionHelper.GivePlayerItem(techType);
+                        PlayerInteractionHelper.GivePlayerItem(RemoveItemFromContainer(techType));
 #else
-                        StartCoroutine(techType.AddTechTypeToContainerUnSafe(Inventory.main.container));
+                        
+                        StartCoroutine(RemoveAndGivePlayerItem(techType));
 #endif
                     }
                     break;
             }
         }
+
 
 #if SUBNAUTICA_STABLE
         public override Pickupable RemoveItemFromContainer(TechType techType)
@@ -186,7 +188,14 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Mono
             return techType.ToPickupable();
         }
 #else
-        public override IEnumerator RemoveItemFromContainer(TechType techType, Action<Pickupable> callBack)
+        private IEnumerator RemoveAndGivePlayerItem(TechType techType)
+        {
+            var pickupableTask = new TaskResult<Pickupable>();
+            yield return RemoveItemFromContainer(techType, pickupableTask);
+            PlayerInteractionHelper.GivePlayerItem(pickupableTask.Get());
+        }
+
+        public IEnumerator RemoveItemFromContainer(TechType techType, IOut<Pickupable> pickupableTask)
         {
             if (!_storage.ContainsKey(techType)) yield break;
             _storage[techType] -= 1;
@@ -196,10 +205,9 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Mono
             }
             _inventoryGrid.DrawPage();
 
-            CoroutineHost.StartCoroutine(TechTypeHelpers.ConvertToPickupable(techType, pickupable =>
-            {
-                callBack?.Invoke(pickupable);
-            }));
+            var itemTask = new TaskResult<InventoryItem>();
+            yield return techType.ToInventoryItem(itemTask);
+            pickupableTask.Set(itemTask.Get().item);
 
             yield break;
         }
