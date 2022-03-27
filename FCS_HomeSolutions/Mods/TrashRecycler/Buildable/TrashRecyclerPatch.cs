@@ -40,7 +40,7 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Buildable
         public TrashRecyclerPatch() : base(RecyclerClassID, RecyclerFriendly, RecyclerDescription)
         {
             _prefab = _prefab = ModelPrefab.GetPrefabFromGlobal( RecyclerPrefabName);
-            OnFinishedPatching += () =>
+            OnStartedPatching += () =>
             {
                 var recyclerKit = new FCSKit(RecyclerKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 recyclerKit.Patch(); 
