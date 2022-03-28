@@ -93,10 +93,11 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             else
             {
               _powerManager =   Manager.Habitat.gameObject.GetComponentInChildren<BaseTelepowerPylonManager>();
+              UpdateStatus();
             }
             InvokeRepeating(nameof(CheckTeleportationComplete), 0.2f, 0.2f);
             Manager.NotifyByID(TelepowerPylonBuildable.TelepowerPylonTabID, "PylonBuilt");
-            BaseTelepowerPylonManager.RegisterPylon(this);
+            _powerManager.RegisterPylon(this);
         }
 
         private void CheckTeleportationComplete()
@@ -185,8 +186,8 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
                 }
             }
 
+            _powerManager?.UnRegisterPylon(this);
             Manager?.NotifyByID(TelepowerPylonBuildable.TelepowerPylonTabID, "PylonDestroy");
-            BaseTelepowerPylonManager.UnRegisterPylon(this);
 
         }
 
@@ -218,16 +219,15 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
 
             InitializeGrids();
 
-            QuickLogger.Debug("1");
             _status = GameObjectHelpers.FindGameObject(gameObject, "Status")?.GetComponent<Text>();
-            QuickLogger.Debug("2");
+
             InitializeUpgradeButton();
 
             _maxConnectionLimit = DEFAULT_CONNECTIONS_LIMIT;
-            QuickLogger.Debug("3");
+
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
             MaterialHelpers.ChangeSpecSettings(AlterraHub.BaseDecalsExterior, AlterraHub.TBaseSpec, gameObject, 2.61f, 8f);
-            QuickLogger.Debug("4");
+
             InitializeToggles();
 
             InitializePylonTrigger();
@@ -241,11 +241,9 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
 
             _cameraPosition = GameObjectHelpers.FindGameObject(gameObject, "CameraPosition");
             _screenBlock = GameObjectHelpers.FindGameObject(gameObject, "MainBlocker");
-            QuickLogger.Debug("5");
-            _playerBody = Player.main.playerController.gameObject.FindChild("body");
-            QuickLogger.Debug("6");
-            UpdateStatus();
 
+            _playerBody = Player.main.playerController.gameObject.FindChild("body");
+            
             InitializeIPC();
             
             RefreshUI();
@@ -517,7 +515,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
 
             foreach (var telePowerPylonBase in BaseTelepowerPylonManager.GetGlobalTelePowerPylonsManagers())
             {
-                if (telePowerPylonBase == null) return;
+                if (telePowerPylonBase != null && !telePowerPylonBase.HasPylon()) return;
                 AttemptToAddToGrid(telePowerPylonBase);
             }
 

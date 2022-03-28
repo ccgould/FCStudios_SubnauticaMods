@@ -14,7 +14,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Model
     internal class BaseTelepowerPylonManager : MonoBehaviour,IPylonPowerManager
     {
         private static List<BaseTelepowerPylonManager> _globalTelePowerPylonManagers = new();
-        private static HashSet<TelepowerPylonController> _basePylons = new();
+        private HashSet<TelepowerPylonController> _basePylons = new();
 
         public Dictionary<string, BaseTelepowerPylonManager> _connections = new();
         private BaseManager _manager;
@@ -181,12 +181,12 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Model
             return SubRoot.gameObject;
         }
 
-        public static void RegisterPylon(TelepowerPylonController controller)
+        public void RegisterPylon(TelepowerPylonController controller)
         {
             _basePylons.Add(controller);
         }
 
-        public static void UnRegisterPylon(TelepowerPylonController controller)
+        public void UnRegisterPylon(TelepowerPylonController controller)
         {
             _basePylons.Remove(controller);
         }
@@ -219,6 +219,11 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Model
         public bool GetIsConnected(string id)
         {
             return _connections.ContainsKey(id);
+        }
+
+        public bool HasPylon()
+        {
+            return _basePylons.Any();
         }
     }
 

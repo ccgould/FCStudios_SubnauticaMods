@@ -78,7 +78,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
 
         private void RefreshToggleState()
         {
-            _toggleBtn.SetIsOnWithoutNotify(TargetController.GetIsConnected(ParentController.GetBaseID()));
+            _toggleBtn.SetIsOnWithoutNotify(TargetController.GetIsConnected(ParentController.GetBaseID()) || ParentController.GetIsConnected(TargetController.GetBaseID()));
         }
 
         public void UnCheck(bool notify = false)
