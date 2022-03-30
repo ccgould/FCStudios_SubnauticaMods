@@ -1,4 +1,5 @@
-﻿using FCS_AlterraHub.Buildables;
+﻿using System.Collections.Generic;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
@@ -8,6 +9,7 @@ using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.Mods.HydroponicHarvester.Enumerators;
+using FCS_ProductionSolutions.Structs;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -27,7 +29,9 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
         public EffectsManager EffectsManager => _effectsManager;
         public GrowBedManager GrowBedManager { get; set; }
         public override bool IsOperational => IsOperationalCheck();
-        
+        //private Dictionary<TechType, PickReturnsData> _pickData => WorldHelpers.PickReturns;
+        //private List<FCSDNASampleData> _knownTechType => Mod.GetHydroponicKnownTech();
+
         #region Unity Methods
 
         private void Start()

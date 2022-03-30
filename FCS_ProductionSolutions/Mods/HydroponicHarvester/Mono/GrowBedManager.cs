@@ -19,7 +19,6 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
     internal class GrowBedManager : MonoBehaviour, IFCSGrowBed, IFCSStorage
     {
         private const float MaxPlantsHeight = 3f;
-        private TechType _currentItemTech;
         private readonly Dictionary<TechType, int> _trackedItems = new();
 
         #region Actions
@@ -135,7 +134,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
             return slotByID.GetPlantable().underwater ? EffectType.Bubbles : EffectType.Smoke;
         }
 
-        private void AddItem(Plantable plantable, int slotID)
+        private void AddItem(Plantable plantable, int slotID,TechType techType)
         {
             PlantSlot slotByID = GetSlotByID(slotID);
 
@@ -158,7 +157,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
             slotByID.SetPlantable(plantable);
             slotByID.PlantModel = gameObject;
             slotByID.SetMaxPlantHeight(MaxPlantsHeight);
-            slotByID.SetSeedType(_currentItemTech);
+            slotByID.SetSeedType(techType);
             HarvesterController.EffectsManager.ChangeEffectState(FindEffectType(slotByID), slotByID.Id, true);
             var growingPlant = gameObject.GetComponent<GrowingPlant>();
 
@@ -221,7 +220,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
                 Plantable component = item.item.GetComponent<Plantable>();
                 item.item.SetTechTypeOverride(component.plantTechType);
                 item.isEnabled = false;
-                AddItem(component, slotId);
+                AddItem(component, slotId,WorldHelpers.PickReturns[techType].ReturnType);
             }
             else
             {

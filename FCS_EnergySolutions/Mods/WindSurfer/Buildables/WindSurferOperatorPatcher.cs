@@ -11,6 +11,7 @@ using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_EnergySolutions.Buildable;
 using FCS_EnergySolutions.Configuration;
+using FCS_EnergySolutions.Mods.TelepowerPylon.Model;
 using FCS_EnergySolutions.Mods.WindSurfer.Mono;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Assets;
@@ -318,6 +319,22 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Buildables
             this.modulesRoot = gameObject.transform;
             this.powerRelay = GetComponent<BasePowerRelay>();
             BaseManager.FindManager(this);
+
+            if (QPatch.Configuration.IsTelepowerPylonEnabled)
+            {
+                var baseTPowerManager = gameObject.EnsureComponent<BaseTelepowerPylonManager>();
+                baseTPowerManager.SubRoot = this;
+                BaseTelepowerPylonManager.RegisterPylonManager(baseTPowerManager);
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (QPatch.Configuration.IsTelepowerPylonEnabled)
+            {
+                var baseTPowerManager = gameObject.GetComponent<BaseTelepowerPylonManager>();
+                BaseTelepowerPylonManager.UnRegisterPylonManager(baseTPowerManager);
+            }
         }
     }
 

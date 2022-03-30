@@ -263,16 +263,6 @@ namespace FCS_ProductionSolutions.Configuration
             return new AutoCrafterDataEntry() { ID = id };
         }
 
-        internal static HashSet<TechType> IsNonePlantableAllowedList = new()
-        {
-            TechType.StalkerTooth,
-            TechType.GasPod,
-            TechType.JeweledDiskPiece,
-            TechType.Floater,
-            TechType.TreeMushroomPiece,
-            TechType.CoralChunk,
-            TechType.CrashPowder,
-        };
         #endregion
 
         #region Private Methods
@@ -310,6 +300,7 @@ namespace FCS_ProductionSolutions.Configuration
         {
             QuickLogger.Debug($"Checking if {techType} is known tech",true);
             data = new FCSDNASampleData();
+
             if (_hydroponicKnownTech == null)
             {
                 _hydroponicKnownTech = new List<FCSDNASampleData>();
@@ -317,7 +308,7 @@ namespace FCS_ProductionSolutions.Configuration
 
             foreach (FCSDNASampleData sampleData in _hydroponicKnownTech)
             {
-                if (sampleData.TechType == techType || sampleData.PickType == techType)
+                if (sampleData.IsSame(techType))
                 {
                     data = sampleData;
                     QuickLogger.Debug($"{techType} is known tech", true);
@@ -335,7 +326,7 @@ namespace FCS_ProductionSolutions.Configuration
 
             if (WorldHelpers.KnownPickTypesContains(techType))
             {
-                if (IsNonePlantableAllowedList.Contains(techType))
+                if (WorldHelpers.IsNonePlantableAllowedList.Contains(techType))
                 {
                     data = new FCSDNASampleData { PickType = techType, TechType = techType };
                     return true;

@@ -113,8 +113,8 @@ namespace FCS_ProductionSolutions.Configuration
         {
             if (UWE.Utils.TryParseEnum(techTypeAsString, out TechType techType))
             {
-                if ((MatterAnalyzerStorage.ValidSeeds.Contains(techType) ||
-                     Mod.IsNonePlantableAllowedList.Contains(techType)) &&
+                if ((WorldHelpers.KnownPickTypesContains(techType) ||
+                     WorldHelpers.IsNonePlantableAllowedList.Contains(techType)) &&
                     !Mod.IsHydroponicKnownTech(techType, out var omit))
                 {
                     if (Mod.CreateNewDNASampleData(techType, out var data))
@@ -127,6 +127,36 @@ namespace FCS_ProductionSolutions.Configuration
                 return $"{Language.main.Get(techType)} is not scannable by the Matter Analyzer.";
             }
             return $"Could not parse {techTypeAsString} as TechType";
+        }
+
+        [ConsoleCommand("UnlockAllDNA")]
+        public static string UnlockAllDNA()
+        {
+
+            foreach (var seed in WorldHelpers.PickReturns.Keys)
+            {
+                if (!Mod.IsHydroponicKnownTech(seed, out var omit1))
+                {
+                    if (Mod.CreateNewDNASampleData(seed, out var data))
+                    {
+                        Mod.AddHydroponicKnownTech(data);
+                    }
+                }
+            }
+
+
+            foreach (var plant in WorldHelpers.IsNonePlantableAllowedList)
+            {
+                if (!Mod.IsHydroponicKnownTech(plant, out var omit2))
+                {
+                    if (Mod.CreateNewDNASampleData(plant, out var data))
+                    {
+                        Mod.AddHydroponicKnownTech(data);
+                    }
+                }
+            }
+
+            return "All dna samples were unlocked.";
         }
 
 

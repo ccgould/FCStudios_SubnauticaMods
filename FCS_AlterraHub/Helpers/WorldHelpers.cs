@@ -9,7 +9,6 @@ using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
 using UnityEngine;
 #if SUBNAUTICA
-using Sprite = Atlas.Sprite;
 using RecipeData = SMLHelper.V2.Crafting.TechData;
 #endif
 
@@ -183,6 +182,18 @@ namespace FCS_AlterraHub.Helpers
             {
                 TechType.JeweledDiskPiece, new PickReturnsData { ReturnType = TechType.JeweledDiskPiece, IsLandPlant = false }
             },
+        };
+
+        public static HashSet<TechType> IsNonePlantableAllowedList = new()
+        {
+
+            TechType.StalkerTooth,
+            TechType.GasPod,
+            TechType.JeweledDiskPiece,
+            TechType.Floater,
+            TechType.TreeMushroomPiece,
+            TechType.CoralChunk,
+            TechType.CrashPowder,
         };
 
         public static HashSet<TechType> Eatables = new HashSet<TechType>

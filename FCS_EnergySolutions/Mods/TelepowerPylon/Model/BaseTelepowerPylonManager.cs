@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using FCS_AlterraHub.Extensions;
+using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mono;
 using FCS_EnergySolutions.Configuration;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Interfaces;
@@ -23,16 +25,83 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Model
         private PowerRelay _connectedPowerSource;
         private bool _pauseUpdates;
         private TelepowerPylonMode _mode = TelepowerPylonMode.PUSH;
+        private TelepowerPylonUpgrade _currentUpgrade = TelepowerPylonUpgrade.MK1;
+        internal static TechType Mk2UpgradeTechType;
+        internal static TechType Mk3UpgradeTechType;
+        private int _maxConnectionLimit;
+        private const int DEFAULT_CONNECTIONS_LIMIT = 6;
         private BaseTelePowerSave _savedData;
 
 
         private void Awake()
         {
-            FindManager();
+            _maxConnectionLimit = DEFAULT_CONNECTIONS_LIMIT;
 
-
+            if (Mk2UpgradeTechType == TechType.None || Mk3UpgradeTechType == TechType.None)
+            {
+                Mk2UpgradeTechType = "TelepowerMk2Upgrade".ToTechType();
+                Mk3UpgradeTechType = "TelepowerMk3Upgrade".ToTechType();
+            }
 
             InvokeRepeating(nameof(UpdateConnections), 1f, 1f);
+        }
+
+        internal int GetMaxConnectionLimit()
+        {
+            return _maxConnectionLimit;
+        }
+
+        private void Start()
+        {
+            FindManager();
+
+            if (_savedData == null && _manager != null)
+            {
+                _savedData = Mod.GetBaseTelePowerPylonSaveData(_manager.BaseFriendlyID);
+            }
+
+            if (_savedData != null)
+            {
+                QuickLogger.Debug("Loading Telepower Base Save Data", true);
+
+                _mode = _savedData.Mode;
+                foreach (var connection in _savedData.Connections)
+                {
+                    _connections.Add(connection, _globalTelePowerPylonManagers.FirstOrDefault(x => x.GetBaseID().Equals(connection)));
+                }
+
+
+                if (_savedData.Upgrade == TelepowerPylonUpgrade.MK2)
+                {
+                    AttemptUpgrade(Mk2UpgradeTechType);
+                }
+
+                if (_savedData.Upgrade == TelepowerPylonUpgrade.MK3)
+                {
+                    AttemptUpgrade(Mk3UpgradeTechType);
+                }
+            }
+        }
+
+        internal bool AttemptUpgrade(TechType techType)
+        {
+            if (techType == Mk2UpgradeTechType && _currentUpgrade == TelepowerPylonUpgrade.MK1)
+            {
+                _currentUpgrade = TelepowerPylonUpgrade.MK2;
+                _maxConnectionLimit = 8;
+                ChangePylonColors(Color.cyan);
+                return true;
+            }
+
+            if (techType == Mk3UpgradeTechType && _currentUpgrade != TelepowerPylonUpgrade.MK3)
+            {
+                _currentUpgrade = TelepowerPylonUpgrade.MK3;
+                _maxConnectionLimit = 10;
+                ChangePylonColors(Color.green);
+                return true;
+            }
+
+            return false;
         }
 
         private void FindManager()
@@ -51,21 +120,6 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Model
                     QuickLogger.DebugError($"Failed to find base manager for {nameof(BaseTelepowerPylonManager)}.");
                     return;
                 }
-
-                if (_savedData == null)
-                {
-                    _savedData = Mod.GetBaseTelePowerPylonSaveData(manager.BaseFriendlyID);
-                }
-
-                if (_savedData != null)
-                {
-                    _mode = _savedData.Mode;
-                    foreach (var connection in _savedData.Connections)
-                    {
-                        _connections.Add(connection,_globalTelePowerPylonManagers.FirstOrDefault(x=>x.GetBaseID().Equals(connection)));
-                    }
-                }
-
                 _manager = manager;
             }
         }
@@ -116,6 +170,14 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Model
             }
         }
 
+        private void ChangePylonColors(Color color)
+        {
+            foreach (var basePylon in _basePylons)
+            {
+                basePylon.ChangeEffectColor(color);
+            }
+        }
+
         private void UnCheckItem(BaseTelepowerPylonManager baseTelepowerPylonManager)
         {
             foreach (var basePylon in _basePylons)
@@ -123,7 +185,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Model
                 basePylon.UnCheckFrequencyItem(baseTelepowerPylonManager.GetBaseID());
             }
         }
-
+        
         public IPowerInterface GetPowerRelay()
         {
             return _connectedPowerSource;
@@ -152,9 +214,10 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Model
 
         public void SetCurrentMode(TelepowerPylonMode mode)
         {
+            QuickLogger.Debug($"Setting Current Pylon Mode to {mode}",true);
             _mode = mode;
         }
-
+        
         public string GetBaseID()
         {
             if(_manager == null) FindManager();
@@ -184,11 +247,26 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Model
         public void RegisterPylon(TelepowerPylonController controller)
         {
             _basePylons.Add(controller);
+            controller.GoToPage(_mode);
         }
 
         public void UnRegisterPylon(TelepowerPylonController controller)
         {
             _basePylons.Remove(controller);
+
+
+            if (GetPylonCount() == 1)
+            {
+                switch (_currentUpgrade)
+                {
+                    case TelepowerPylonUpgrade.MK2:
+                        PlayerInteractionHelper.GivePlayerItem(Mk2UpgradeTechType);
+                        break;
+                    case TelepowerPylonUpgrade.MK3:
+                        PlayerInteractionHelper.GivePlayerItem(Mk3UpgradeTechType);
+                        break;
+                }
+            }
         }
 
         public static void RegisterPylonManager(BaseTelepowerPylonManager manager)
@@ -208,11 +286,13 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Model
 
         internal BaseTelePowerSave Save()
         {
+            if (_manager == null || _connections == null) return new BaseTelePowerSave();
             return new()
             {
                 Id = _manager.GetBaseFriendlyId(), 
                 Mode = _mode,
-                Connections = _connections.Keys.ToList()
+                Connections = _connections.Keys.ToList(),
+                Upgrade = _currentUpgrade
             };
         }
 
@@ -225,12 +305,23 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Model
         {
             return _basePylons.Any();
         }
+
+        public TelepowerPylonUpgrade GetUpgrade()
+        {
+            return _currentUpgrade;
+        }
+
+        public int GetPylonCount()
+        {
+            return _basePylons.Count;
+        }
     }
 
     internal class BaseTelePowerSave
     {
         public string Id { get; set; }
-        public TelepowerPylonMode Mode { get; set; }
+        public TelepowerPylonMode Mode { get; set; } = TelepowerPylonMode.PUSH;
         public List<string> Connections { get; set; } = new();
+        public TelepowerPylonUpgrade Upgrade { get; set; } = TelepowerPylonUpgrade.MK1;
     }
 }

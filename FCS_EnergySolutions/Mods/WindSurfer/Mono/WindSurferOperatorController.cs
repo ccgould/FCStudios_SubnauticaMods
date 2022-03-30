@@ -196,7 +196,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
             _windSurferKitTechType = Mod.WindSurferKitClassID.ToTechType();
             _operatorKitTechType = Mod.WindSurferOperatorKitClassID.ToTechType();
             _windSurferPlatformKitTechType = Mod.WindSurferPlatformKitClassID.ToTechType();
-            
+            _basePylonManager = gameObject.GetComponentInChildren<BaseTelepowerPylonManager>();
             InvokeRepeating(nameof(CheckTeleportationComplete), 0.2f, 0.2f);
             InvokeRepeating(nameof(UpdateData), 0.1f, 0.1f);
             
@@ -218,6 +218,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
         private bool _removingPlatform;
         private FCSStorage _storage;
         private List<LadderController> _ladders = new();
+        private BaseTelepowerPylonManager _basePylonManager;
 
         private void UpdateData()
         {
@@ -759,7 +760,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
 
         public BaseTelepowerPylonManager GetPowerManager()
         {
-            throw new NotImplementedException();
+            return _basePylonManager;
         }
 
 

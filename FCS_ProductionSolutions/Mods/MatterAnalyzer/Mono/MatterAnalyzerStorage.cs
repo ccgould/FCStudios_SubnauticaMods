@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Mono;
 using FCS_ProductionSolutions.Configuration;
@@ -109,14 +110,12 @@ namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono
             var techType = pickupable.GetTechType();
 
             if (!Mod.IsHydroponicKnownTech(techType, out var data1) &&
-                Mod.IsNonePlantableAllowedList.Contains(techType))
+                WorldHelpers.IsNonePlantableAllowedList.Contains(techType))
             {
                 return true;
             }
 
             var plantable = pickupable.gameObject.GetComponentInChildren<Plantable>();
-
-            _currentPlant = plantable;
 
             if (plantable == null || !plantable.isSeedling || !IsValidSeedling(pickupable.GetTechType())) return false;
 
@@ -125,7 +124,7 @@ namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono
 
         private bool IsValidSeedling(TechType techType)
         {
-            return ValidSeeds.Contains(techType);
+            return WorldHelpers.KnownPickTypesContains(techType);
         }
 
         public bool IsAllowedToRemoveItems()
@@ -154,52 +153,5 @@ namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono
         {
             return ItemsContainer?.count ?? 0;
         }
-
-        internal static HashSet<TechType> ValidSeeds = new HashSet<TechType>
-        {
-            TechType.BluePalmSeed,
-            TechType.PurpleBranchesSeed,
-            TechType.EyesPlantSeed,
-            TechType.FernPalmSeed,
-            TechType.RedRollPlantSeed,
-            TechType.GabeSFeatherSeed,
-            TechType.RedGreenTentacleSeed,
-            TechType.OrangePetalsPlantSeed,
-            TechType.OrangeMushroomSpore,
-            TechType.SnakeMushroomSpore,
-            TechType.MembrainTreeSeed,
-            TechType.PurpleVasePlantSeed,
-            TechType.SmallFanSeed,
-            TechType.RedBushSeed,
-            TechType.RedConePlantSeed,
-            TechType.RedBasketPlantSeed,
-            TechType.SeaCrownSeed,
-            TechType.ShellGrassSeed,
-            TechType.PurpleRattleSpore,
-            TechType.SpottedLeavesPlantSeed,
-            TechType.SpikePlantSeed,
-            TechType.PurpleFanSeed,
-            TechType.PurpleStalkSeed,
-            TechType.PinkFlowerSeed,
-            TechType.PurpleTentacleSeed,
-            TechType.PurpleBrainCoralPiece,
-            TechType.PinkMushroomSpore,
-            TechType.MelonSeed,
-            TechType.HangingFruit,
-            TechType.BulboTreePiece,
-            TechType.PurpleVegetable,
-            TechType.KooshChunk,
-            TechType.BloodOil,
-            TechType.AcidMushroomSpore,
-            TechType.WhiteMushroomSpore,
-            TechType.JellyPlantSeed,
-            TechType.TreeMushroomPiece,
-            TechType.RedGreenTentacleSeed,
-            TechType.CreepvinePiece,
-            TechType.CreepvineSeedCluster,
-            TechType.EyesPlantSeed,
-        };
-
-        private Plantable _currentPlant;
     }
 }

@@ -5,6 +5,7 @@ using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.Mods.HydroponicHarvester.Models;
 using FCS_ProductionSolutions.Structs;
+using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -70,6 +71,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
             }
             else
             {
+                QuickLogger.DebugError($"Sample Not Known on Set Icon for SlotItem class:\n TechType: {sampleData.TechType} PickType: {sampleData.PickType} Is Land Plant: {sampleData.IsLandPlant}");
                 _icon.sprite = SpriteManager.Get(TechType.None);
             }
         }

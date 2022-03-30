@@ -90,7 +90,6 @@ namespace FCS_EnergySolutions.Configuration
         [JsonProperty] internal FCSPowerStates PowerState { get; set; }
         [JsonProperty] internal TelepowerPylonMode PylonMode { get; set; }
         [JsonProperty] internal List<string> CurrentConnections { get; set; }
-        [JsonProperty] internal TelepowerPylonUpgrade Upgrade { get; set; }
     }    
     internal class WindSurferOperatorDataEntry : ISaveDataEntry
     {

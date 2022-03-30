@@ -379,7 +379,7 @@ namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono
         private void OnStorageOnContainerAddItem(FcsDevice device, TechType techType)
         {
             if (device == null || techType == TechType.None) return;
-            if (Mod.IsNonePlantableAllowedList.Contains(techType))
+            if (WorldHelpers.IsNonePlantableAllowedList.Contains(techType))
             {
                 PickTech = techType;
                 _currentTechType = techType;

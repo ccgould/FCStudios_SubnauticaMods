@@ -163,6 +163,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Mono
                     if (Inventory.main.HasRoomFor(size.x, size.y))
                     {
 #if SUBNAUTICA
+                        QuickLogger.Debug($"Trying to remove techtype {Language.main.Get(techType)} | {techType}",true);
                         PlayerInteractionHelper.GivePlayerItem(RemoveItemFromContainer(techType));
 #else
                         
