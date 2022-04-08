@@ -7,7 +7,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
     {
         private float terminationSqrDistance = 4f;
         private Player player;
-#if BELOWZERO
+#if !SUBNAUTICA_STABLE
         private RectTransform rt;
 #endif
 
@@ -15,7 +15,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
         public override void Awake()
         {
             base.Awake();
-#if BELOWZERO
+#if !SUBNAUTICA_STABLE
             rt = GetComponent<RectTransform>();
 #endif
             terminationSqrDistance = Mathf.Pow(3f, 2f);

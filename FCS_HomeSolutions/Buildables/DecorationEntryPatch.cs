@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
@@ -99,7 +100,11 @@ namespace FCS_HomeSolutions.Buildables
             return null;
         }
 
-
+        public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
+        {
+            gameObject.Set(GetGameObject());
+            yield break;
+        }
 
         protected override RecipeData GetBlueprintRecipe()
         {

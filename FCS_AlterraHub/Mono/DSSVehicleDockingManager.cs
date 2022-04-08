@@ -235,7 +235,7 @@ namespace FCS_AlterraHub.Mono
                 Player main = Player.main;
                 PDA pda = main.GetPDA();
                 Inventory.main.SetUsedStorage(container);
-#if SUBNAUTICA
+#if SUBNAUTICA_STABLE
                 pda.Open(PDATab.Inventory, null, null, 4f);
 #else
                 pda.Open(PDATab.Inventory);

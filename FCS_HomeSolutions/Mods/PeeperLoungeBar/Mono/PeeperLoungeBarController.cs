@@ -306,7 +306,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
 
             var zero = new VECTOR();
             AudioTrack.set3DAttributes(ref pos, ref zero
-#if SUBNAUTICA
+#if SUBNAUTICA_STABLE
                 , ref zero
 #endif
             );

@@ -8,9 +8,7 @@ namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono
         #region Private Members
         private readonly FMOD_CustomLoopingEmitter _loopingEmitter;
         private bool _soundPlaying;
-        private FMODAsset _loop;
-        private const string BeaconAudioLoop = "water_filter_loop";
-        private const string BeaconAudioLoopPath = "Submarine/Build/FiltrationMachine";
+        private static FMODAsset _loop;
         #endregion
 
         #region Constructor
@@ -20,38 +18,18 @@ namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono
         /// </summary>
         internal AudioManager(FMOD_CustomLoopingEmitter emitter)
         {
-            LoadFModAssets();
+            if (_loop == null)
+            {
+                _loop = ScriptableObject.CreateInstance<FMODAsset>();
+                _loop.id = "{9acfd1ce-b2cd-4f93-9ba2-1f5e95dd0355}";
+                _loop.path = "event:/sub/base/water_filter_loop";
+            }
 
             _loopingEmitter = emitter;
 
             _loopingEmitter.asset = _loop;
         }
 
-        #endregion
-
-        #region Private Methods
-        private void LoadFModAssets()
-        {
-            FMODAsset[] fmods = Resources.FindObjectsOfTypeAll<FMODAsset>();
-
-            foreach (FMODAsset fmod in fmods)
-            {
-                switch (fmod.name.ToLower())
-                {
-                    case BeaconAudioLoop:
-                        QuickLogger.Debug($"{BeaconAudioLoop} found!", true);
-                        this._loop = fmod;
-                        break;
-                }
-            }
-
-            if (_loop == null)
-            {
-                QuickLogger.Debug($"{BeaconAudioLoop} not found trying to search again...", true);
-                Resources.Load<GameObject>(BeaconAudioLoopPath);
-                LoadFModAssets();
-            }
-        }
         #endregion
 
         #region Internal Methods    

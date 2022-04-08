@@ -125,6 +125,11 @@ namespace CyclopsUpgradeConsole.Mono
             ToggleSlot(slot, false);
         }
 
+        public bool IsDeconstructionObstacle()
+        {
+            return true;
+        }
+
         public bool CanDeconstruct(out string reason)
         {
             if (_slots.Any(slot => slot != null && slot.activeSelf))

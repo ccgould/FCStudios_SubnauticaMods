@@ -134,7 +134,7 @@ namespace FCS_HomeSolutions.Mods.PartitionWalls.Patches
                         (hit.collider.gameObject.name.StartsWith(DrillTargetObjectName)))
                     {
                         var result = Builder.CheckAsSubModule(
-#if BELOWZERO
+#if !SUBNAUTICA_STABLE
                             out _
 #endif
                         );

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
@@ -106,13 +107,13 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
 
             if (_fromSave)
             {
-                var powerBanks = _storage.container.GetItems(QuantumPowerBankSpawnable.PatchedTechType);
+                var powerBanks = _storage.container.GetItems(QuantumPowerBankSpawnable.PatchedTechType) ?? new List<InventoryItem>();
                 if (powerBanks.Any())
                 {
                     MountPowerBank(powerBanks[0]);
                 }
 
-                var ionCubes = _storage.container.GetItems(TechType.PrecursorIonCrystal);
+                var ionCubes = _storage.container.GetItems(TechType.PrecursorIonCrystal) ?? new List<InventoryItem>();
                 if (ionCubes.Any())
                 {
                     MountIonCube(ionCubes[0]);

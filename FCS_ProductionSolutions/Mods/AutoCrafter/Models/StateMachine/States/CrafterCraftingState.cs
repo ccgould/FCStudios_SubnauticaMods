@@ -7,7 +7,7 @@ using FCS_ProductionSolutions.Mods.AutoCrafter.Helpers;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Patches;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Handlers;
-#if SUBNAUTICA
+#if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
 #else
 using Newtonsoft.Json;
@@ -277,7 +277,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
                     {
                         for (int i = 0; i < Mathf.Abs(keyValuePair2.Value); i++)
                         {
-#if SUBNAUTICA
+#if SUBNAUTICA_STABLE
                             _manager.Crafter.Manager.AddItemToContainer(keyValuePair2.Key.ToInventoryItem());
 #else
                             CoroutineHost.StartCoroutine(AttemptToAddToContainerAsync(keyValuePair2.Key));
@@ -288,7 +288,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
             }
         }
 
-#if BELOWZERO
+#if !SUBNAUTICA_STABLE
         private IEnumerator AttemptToAddToContainerAsync(TechType techType)
         {
             TaskResult<InventoryItem> taskResult = new TaskResult<InventoryItem>();
@@ -309,7 +309,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
         private bool AttemptToAddToNetwork(TechType techType)
         {
             QuickLogger.Debug("1");
-#if SUBNAUTICA
+#if SUBNAUTICA_STABLE
             var inventoryItem = techType.ToInventoryItem();
 #else
             var itemTask = new TaskResult<InventoryItem>();

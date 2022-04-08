@@ -134,7 +134,7 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Managers
             PDA pda = main.GetPDA();
             Inventory.main.SetUsedStorage(_container, false);
             pda.Open(PDATab.Inventory, null, null
-#if SUBNAUTICA
+#if SUBNAUTICA_STABLE
                 , 4f
 #endif
             );
@@ -149,7 +149,7 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Managers
 
         private void SpawnBottle()
         {
-#if SUBNAUTICA
+#if SUBNAUTICA_STABLE
             var newInventoryItem = TechType.BigFilteredWater.ToInventoryItem();
             _container.UnsafeAdd(newInventoryItem);
 #else

@@ -236,14 +236,22 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                 if (item == null)
                 {
                     batterySlot.RemoveItem();
+#if SUBNAUTICA_EXP
+                    Inventory.main.StartCoroutine(Inventory.main.ForcePickupAsync(storedItem.item));
+#else
                     Inventory.main.ForcePickup(storedItem.item);
+#endif
                     return;
                 }
                 if (storedItem != item)
                 {
                     batterySlot.RemoveItem();
                     batterySlot.AddItem(item);
+#if SUBNAUTICA_EXP
+                    Inventory.main.StartCoroutine(Inventory.main.ForcePickupAsync(storedItem.item));
+#else
                     Inventory.main.ForcePickup(storedItem.item);
+#endif
                     Pickupable item2 = item.item;
                     if (item2 != null)
                     {

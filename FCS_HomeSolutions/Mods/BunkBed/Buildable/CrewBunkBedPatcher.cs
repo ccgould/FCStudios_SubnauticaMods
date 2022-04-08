@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.API;
@@ -24,17 +25,19 @@ namespace FCS_HomeSolutions.Mods.BunkBed.Buildable
 {
     internal class CrewBunkBedPatcher : SMLHelper.V2.Assets.Buildable
     {
-        private GameObject _narrowBed;
         private readonly string _kitClassID;
-        private GameObject _gameObject;
+        private readonly GameObject _gameObject;
 
         public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
         public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
 
-        internal CrewBunkBedPatcher(string classID, string friendly, string description, string kitClassID, string prefabName, decimal cost) : base(classID, friendly, description)
+        internal CrewBunkBedPatcher(string classID, string friendly, string description, string kitClassID,
+            string prefabName, decimal cost) : base(classID, friendly, description)
         {
             _kitClassID = kitClassID;
-            _gameObject = FCSAssetBundlesService.PublicAPI.GetPrefabByName(prefabName, FCSAssetBundlesService.PublicAPI.GlobalBundleName);
+            _gameObject =
+                FCSAssetBundlesService.PublicAPI.GetPrefabByName(prefabName,
+                    FCSAssetBundlesService.PublicAPI.GlobalBundleName);
             OnStartedPatching += () =>
             {
                 var kit = new FCSKit(kitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
@@ -42,65 +45,23 @@ namespace FCS_HomeSolutions.Mods.BunkBed.Buildable
             };
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, kitClassID.ToTechType(), cost, StoreCategory.Home);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, kitClassID.ToTechType(), cost,
+                    StoreCategory.Home);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
             };
-
-            _narrowBed = Resources.Load<GameObject>("Submarine/Build/NarrowBed");
-
         }
 
+#if SUBNAUTICA_STABLE
         public override GameObject GetGameObject()
         {
             try
             {
-                var prefab = AddChair();
-                
+                var prefab = AddChair(CraftData.GetPrefabForTechType(TechType.NarrowBed, false));
+
                 var mesh = GameObject.Instantiate(_gameObject);
                 mesh.SetActive(false);
 
-                prefab.name = this.PrefabFileName;
-
-                var center = new Vector3(0f, 1.621534f, 0.2475206f);
-                var size = new Vector3(2.043587f, 1.623069f, 3.731261f);
-                GameObjectHelpers.AddConstructableBounds(mesh, size, center);
-
-                var model = mesh.FindChild("model");
-                model.transform.localScale = new Vector3(0.9f, 0.9f, 0.9f);
-
-                SkyApplier skyApplier = mesh.AddComponent<SkyApplier>();
-                skyApplier.renderers = model.GetComponentsInChildren<MeshRenderer>();
-                skyApplier.anchorSky = Skies.Auto;
-
-                //========== Allows the building animation and material colors ==========// 
-
-                //Add constructible
-                var constructable = prefab.GetComponent<Constructable>();
-                constructable.allowedOnWall = false;
-                constructable.allowedOnGround = true;
-                constructable.allowedInSub = true;
-                constructable.allowedInBase = true;
-                constructable.allowedOnCeiling = false;
-                constructable.allowedOutside = false;
-                constructable.allowedOnConstructables = true;
-                constructable.rotationEnabled = true;
-                constructable.model = model;
-                constructable.techType = TechType;
-
-                mesh.transform.SetParent(prefab.transform, false);
-                mesh.transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
-                mesh.transform.localScale = new Vector3(0.9f, 0.9f, 0.9f);
-                mesh.transform.localEulerAngles = new Vector3(0.0f, 0.0f, 0.0f);
-                mesh.SetActive(true);
-
-                PrefabIdentifier prefabID = prefab.GetComponent<PrefabIdentifier>();
-                prefabID.ClassId = ClassID;
-
-                prefab.EnsureComponent<TechTag>().type = TechType;
-
-                prefab.AddComponent<BunkBedController>();
-                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, mesh, Color.cyan);
-                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
+                ProcessBed(prefab, mesh);
 
                 return prefab;
             }
@@ -110,16 +71,85 @@ namespace FCS_HomeSolutions.Mods.BunkBed.Buildable
                 return null;
             }
         }
+#endif
+
+        public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
+        {
+            var task = new TaskResult<GameObject>();
+            yield return CraftData.GetPrefabForTechTypeAsync(TechType.NarrowBed, false, task);
+            try
+            {
+                var prefab = AddChair(task.Get());
+
+                var mesh = GameObject.Instantiate(_gameObject);
+                mesh.SetActive(false);
+                ProcessBed(prefab, mesh);
+                gameObject.Set(prefab);
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error(e.Message);
+                gameObject.Set(null);
+            }
+        }
+
+        private void ProcessBed(GameObject prefab, GameObject mesh)
+        {
+            prefab.name = this.PrefabFileName;
+
+            var center = new Vector3(0f, 1.621534f, 0.2475206f);
+            var size = new Vector3(2.043587f, 1.623069f, 3.731261f);
+            GameObjectHelpers.AddConstructableBounds(mesh, size, center);
+
+            var model = mesh.FindChild("model");
+            model.transform.localScale = new Vector3(0.9f, 0.9f, 0.9f);
+
+            SkyApplier skyApplier = mesh.AddComponent<SkyApplier>();
+            skyApplier.renderers = model.GetComponentsInChildren<MeshRenderer>();
+            skyApplier.anchorSky = Skies.Auto;
+
+            //========== Allows the building animation and material colors ==========// 
+
+            //Add constructible
+            var constructable = prefab.GetComponent<Constructable>();
+            constructable.allowedOnWall = false;
+            constructable.allowedOnGround = true;
+            constructable.allowedInSub = true;
+            constructable.allowedInBase = true;
+            constructable.allowedOnCeiling = false;
+            constructable.allowedOutside = false;
+            constructable.allowedOnConstructables = true;
+            constructable.rotationEnabled = true;
+            constructable.model = model;
+            constructable.techType = TechType;
+
+            mesh.transform.SetParent(prefab.transform, false);
+            mesh.transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
+            mesh.transform.localScale = new Vector3(0.9f, 0.9f, 0.9f);
+            mesh.transform.localEulerAngles = new Vector3(0.0f, 0.0f, 0.0f);
+            mesh.SetActive(true);
+
+            PrefabIdentifier prefabID = prefab.GetComponent<PrefabIdentifier>();
+            prefabID.ClassId = ClassID;
+
+            prefab.EnsureComponent<TechTag>().type = TechType;
+
+            prefab.AddComponent<BunkBedController>();
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, mesh, Color.cyan);
+            MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
+        }
 
         public override string AssetsFolder { get; } = Mod.GetAssetPath();
 
-        public GameObject AddChair()
+        public GameObject AddChair(GameObject _narrowBed)
         {
-            var narrowBed = GameObject.Instantiate(_narrowBed);
+            GameObject narrowBed = GameObject.Instantiate(_narrowBed);
 
             foreach (Transform tr in narrowBed.transform)
             {
-                tr.localPosition = new Vector3(tr.localPosition.x, tr.localPosition.y + -0.2f, tr.localPosition.z);
+                var localPosition = tr.localPosition;
+                localPosition = new Vector3(localPosition.x, localPosition.y + -0.2f, localPosition.z);
+                tr.localPosition = localPosition;
             }
 
             Renderer[] renderers = narrowBed.GetComponentsInChildren<Renderer>();
@@ -213,8 +243,9 @@ namespace FCS_HomeSolutions.Mods.BunkBed.Buildable
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol, AlterraHub.BaseLightsEmissiveController);
-                _colorManager.ChangeColor(new ColorTemplate { SecondaryColor = Color.gray });
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol,
+                    AlterraHub.BaseLightsEmissiveController);
+                _colorManager.ChangeColor(new ColorTemplate {SecondaryColor = Color.gray});
             }
 
             IsInitialized = true;
@@ -247,7 +278,6 @@ namespace FCS_HomeSolutions.Mods.BunkBed.Buildable
 
             if (constructed)
             {
-
                 if (isActiveAndEnabled)
                 {
                     if (!IsInitialized)
@@ -271,6 +301,7 @@ namespace FCS_HomeSolutions.Mods.BunkBed.Buildable
             {
                 _saveData = new DecorationDataEntry();
             }
+
             _saveData.Id = id;
             _saveData.ColorTemplate = _colorManager.SaveTemplate();
             newSaveData.DecorationEntries.Add(_saveData);

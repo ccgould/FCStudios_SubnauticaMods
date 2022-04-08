@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -17,6 +18,7 @@ namespace FCS_HomeSolutions.Mods.Sofas.Buildable
         {
         }
 
+#if SUBNAUTICA_STABLE
         public override GameObject GetGameObject()
         {
             try
@@ -28,6 +30,11 @@ namespace FCS_HomeSolutions.Mods.Sofas.Buildable
                 QuickLogger.Error(e.Message);
                 return null;
             }
+        }
+#endif
+        public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
+        {
+            yield return CreateGameObjectAsync(gameObject, 0.38f);
         }
     }
 }

@@ -155,7 +155,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
             if (AudioManager == null)
                 AudioManager = new AudioManager(gameObject.GetComponent<FMOD_CustomLoopingEmitter>());
 
-            AudioManager.LoadFModAssets("/env/use_teleporter_use_loop", "use_teleporter_use_loop");
+            AudioManager.LoadFModAssets("{b39da9ff-1a97-48e6-a1b6-4cafcd6abadb}", "event:/env/use_teleporter_use_loop");
 
             if (PowerManager == null)
             {
@@ -164,9 +164,9 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
 
             IPCMessage += message =>
             {
-                if (message.Equals("RefreshDisplay"))
+                if (message.Equals("RefreshDisplay") && DisplayManager != null)
                 {
-                    DisplayManager?.RefreshTabs();
+                    DisplayManager.RefreshTabs();
                 }
 
                 if (message.Equals("UpdateTeleporterEffects"))

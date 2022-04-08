@@ -119,7 +119,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         {
             if (_timeLeft - KDayInSeconds >= 0)
             {
-#if SUBNAUTICA
+#if SUBNAUTICA_STABLE
             return techType.ToPickupable();
 #else
                 var itemTask = new TaskResult<InventoryItem>();

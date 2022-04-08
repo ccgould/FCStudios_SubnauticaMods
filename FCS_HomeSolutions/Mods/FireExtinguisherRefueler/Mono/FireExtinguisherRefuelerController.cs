@@ -318,7 +318,7 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
             {
                 Inventory.main.SetUsedStorage(_storageContainer.container);
                 pda.Open(PDATab.Inventory, null, OnDumpClose
-#if SUBNAUTICA
+#if SUBNAUTICA_STABLE
                     , 4f
 #endif
                 );

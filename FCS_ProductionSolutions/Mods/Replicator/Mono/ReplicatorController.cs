@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Enumerators;
@@ -42,7 +43,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.ReplicatorTabID, Mod.ModPackID);
-            if(Manager == null)
+            if (Manager == null)
             {
                 _canvas.SetActive(false);
             }
@@ -75,18 +76,18 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             if (_fromSave)
             {
                 _colorManager.LoadTemplate(_saveData.ColorTemplate);
-                
+
                 _speedBTN.SetSpeedMode(_saveData.HarvesterSpeed);
 
                 if (_saveData.TargetItem != TechType.None)
                 {
                     QuickLogger.Debug("Loading Replicator save");
-                    _replicatorSlot.ChangeTargetItem(_saveData.TargetItem,true);
+                    _replicatorSlot.ChangeTargetItem(_saveData.TargetItem, true);
                     _replicatorSlot.SetItemCount(_saveData.ItemCount);
                     _replicatorSlot.CurrentHarvesterSpeedMode = _saveData.HarvesterSpeed;
                     _replicatorSlot.GenerationProgress = _saveData.Progress;
                     _techTypeIcon.sprite = SpriteManager.Get(_saveData.TargetItem);
-                    SpawnModel(_saveData.TargetItem);
+                    StartCoroutine(SpawnModel(_saveData.TargetItem));
                 }
 
                 UpdateUI();
@@ -113,8 +114,10 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
 
             foreach (var sample in knownSamples)
             {
-                if (sample.TechType == TechType.None || _loadedDNASamples.Contains(sample.TechType) || !WorldHelpers.IsNonePlantableAllowedList.Contains(sample.TechType)) continue;
-                var button = GameObject.Instantiate(ModelPrefab.HydroponicDNASamplePrefab).AddComponent<InterfaceButton>();
+                if (sample.TechType == TechType.None || _loadedDNASamples.Contains(sample.TechType) ||
+                    !WorldHelpers.IsNonePlantableAllowedList.Contains(sample.TechType)) continue;
+                var button = GameObject.Instantiate(ModelPrefab.HydroponicDNASamplePrefab)
+                    .AddComponent<InterfaceButton>();
                 var icon = GameObjectHelpers.FindGameObject(button.gameObject, "Icon").AddComponent<uGUI_Icon>();
                 icon.sprite = SpriteManager.Get(sample.TechType);
                 button.TextLineOne = Language.main.Get((sample.TechType));
@@ -127,8 +130,8 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
                     if (!_replicatorSlot.IsOccupied)
                     {
                         Clear();
-                        var techType = (TechType)o;
-                        SpawnModel(techType);
+                        var techType = (TechType) o;
+                        StartCoroutine(SpawnModel(techType));
                         _techTypeIcon.sprite = SpriteManager.Get(techType);
                         _replicatorSlot.ChangeTargetItem(techType);
                         UpdateUI();
@@ -153,7 +156,8 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
 
         public override float GetPowerUsage()
         {
-            if (!IsOperational || _replicatorSlot == null || !_replicatorSlot.IsOccupied || _replicatorSlot.IsFull) return 0f;
+            if (!IsOperational || _replicatorSlot == null || !_replicatorSlot.IsOccupied ||
+                _replicatorSlot.IsFull) return 0f;
 
             switch (_replicatorSlot.CurrentHarvesterSpeedMode)
             {
@@ -175,18 +179,20 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
         public override void Initialize()
         {
             _canvas = gameObject.GetComponentInChildren<Canvas>().gameObject;
-            
+
             var prxy = _canvas.EnsureComponent<ProximityActivate>();
             prxy.Initialize(_canvas, gameObject, 2);
-            
+
             _samplesGrid = GameObjectHelpers.FindGameObject(gameObject, "Grid");
-            _techTypeIcon = GameObjectHelpers.FindGameObject(gameObject, "CurrentTechTypeIcon").EnsureComponent<uGUI_Icon>();
+            _techTypeIcon = GameObjectHelpers.FindGameObject(gameObject, "CurrentTechTypeIcon")
+                .EnsureComponent<uGUI_Icon>();
             _techTypeIcon.sprite = SpriteManager.Get(TechType.None);
             _unitPerSecond = GameObjectHelpers.FindGameObject(gameObject, "UnitPerSecond").GetComponent<Text>();
-            _powerUsagePerSecond = GameObjectHelpers.FindGameObject(gameObject, "PowerUsagePerSecond").GetComponent<Text>();
+            _powerUsagePerSecond =
+                GameObjectHelpers.FindGameObject(gameObject, "PowerUsagePerSecond").GetComponent<Text>();
             _containerAmount = GameObjectHelpers.FindGameObject(gameObject, "Amount").GetComponent<Text>();
             _spawnPoint = GameObjectHelpers.FindGameObject(gameObject, "SpawnPnt");
-            
+
             var bobbing = _spawnPoint.AddComponent<Bobbing>();
             bobbing.SetState(true);
 
@@ -197,7 +203,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             var clearBTNObj = InterfaceHelpers.FindGameObject(gameObject, "RemoveDNABTN");
             InterfaceHelpers.CreateButton(clearBTNObj, "ClearBtn", InterfaceButtonMode.Background,
                 OnButtonClick, Color.gray, Color.white, 5);
-            
+
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
@@ -221,7 +227,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             UpdateUI();
 
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
-            MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController,gameObject,5f);
+            MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, gameObject, 5f);
 
             var canvas = gameObject.GetComponentInChildren<Canvas>();
             _interactionHelper = canvas.gameObject.AddComponent<InterfaceInteraction>();
@@ -240,6 +246,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
                     {
                         PlayerInteractionHelper.GivePlayerItem(techType);
                     }
+
                     break;
                 case "ClearBtn":
                     Clear();
@@ -259,7 +266,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
 
         private void Clear()
         {
-            QuickLogger.Debug("Trying to clear.",true);
+            QuickLogger.Debug("Trying to clear.", true);
             if (_replicatorSlot.TryClear())
             {
                 if (_spawnPoint.transform.childCount > 0)
@@ -276,18 +283,20 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
 
         private void OnIpcMessage(string message)
         {
-            QuickLogger.Debug($"Recieving Message: {message}",true);
-            
+            QuickLogger.Debug($"Recieving Message: {message}", true);
+
             if (message.Equals("UpdateDNA"))
             {
                 LoadKnownSamples();
-                QuickLogger.Debug("Loading DNA Samples",true);
+                QuickLogger.Debug("Loading DNA Samples", true);
             }
         }
 
         internal void UpdateUI()
         {
-            _unitPerSecond.text = AuxPatchers.GenerationTimeMinutesOnlyFormat(Convert.ToSingle(_replicatorSlot.CurrentHarvesterSpeedMode));
+            _unitPerSecond.text =
+                AuxPatchers.GenerationTimeMinutesOnlyFormat(
+                    Convert.ToSingle(_replicatorSlot.CurrentHarvesterSpeedMode));
             _powerUsagePerSecond.text = AuxPatchers.PowerUsagePerSecondFormat(GetPowerUsage());
             _containerAmount.text = $"{_replicatorSlot.GetCount()}/{_replicatorSlot.GetMaxCount()}";
             UpdateTerminals();
@@ -298,7 +307,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             BaseManager.GlobalNotifyByID("DTC", "ItemUpdateDisplay");
         }
 
-        private void SpawnModel(TechType techType)
+        private IEnumerator SpawnModel(TechType techType)
         {
             if (_spawnPoint.transform.childCount > 0)
             {
@@ -308,66 +317,66 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
                 }
             }
 
-            if (PrefabDatabase.TryGetPrefabFilename(CraftData.GetClassIdForTechType(techType), out string filepath))
+            var task = new TaskResult<GameObject>();
+            yield return CraftData.GetPrefabForTechTypeAsync(techType, false, task);
+            GameObject prefab = task.Get();
+
+            if (prefab == null) yield break;
+            
+            var go = Instantiate(prefab);
+            var collider = go.GetComponent<Collider>();
+            if (collider != null)
             {
-                GameObject prefab = Resources.Load<GameObject>(filepath);
-
-                if (prefab != null)
-                {
-                    var go = GameObject.Instantiate(prefab);
-                    var collider = go.GetComponent<Collider>();
-                    if (collider != null)
-                    {
-                        Destroy(collider);
-                    };
-
-                    var rg = go.GetComponent<Rigidbody>();
-                    if (rg != null)
-                    {
-                        Destroy(rg);
-                    }
-
-                    var wf = go.GetComponent<WorldForces>();
-                    if (wf != null)
-                    {
-                        Destroy(wf);
-                    }
-
-                    var pickup = go.GetComponent<Pickupable>();
-                    if (pickup != null)
-                    {
-                        Destroy(pickup);
-                    }
-
-                    var pf = go.GetComponent<PrefabIdentifier>();
-                    if (pf != null)
-                    {
-                        Destroy(pf);
-                    }
-
-                    var eniTag = go.GetComponent<EntityTag>();
-                    if (eniTag != null)
-                    {
-                        Destroy(eniTag);
-                    }
-                    var gaspod = go.GetComponent<GasPod>();
-                    if (gaspod != null)
-                    {
-                        Destroy(gaspod);
-                    }
-
-                    var resourceTracker = go.GetComponent<ResourceTracker>();
-                    if (resourceTracker != null)
-                    {
-                        Destroy(resourceTracker);
-                    }
-
-                    go.transform.parent = _spawnPoint.transform;
-                    UWE.Utils.ZeroTransform(go);
-                    go.transform.Rotate(0f, 90, 90, Space.Self);
-                }
-
+                Destroy(collider);
             }
+
+            ;
+
+            var rg = go.GetComponent<Rigidbody>();
+            if (rg != null)
+            {
+                Destroy(rg);
+            }
+
+            var wf = go.GetComponent<WorldForces>();
+            if (wf != null)
+            {
+                Destroy(wf);
+            }
+
+            var pickup = go.GetComponent<Pickupable>();
+            if (pickup != null)
+            {
+                Destroy(pickup);
+            }
+
+            var pf = go.GetComponent<PrefabIdentifier>();
+            if (pf != null)
+            {
+                Destroy(pf);
+            }
+
+            var eniTag = go.GetComponent<EntityTag>();
+            if (eniTag != null)
+            {
+                Destroy(eniTag);
+            }
+
+            var gaspod = go.GetComponent<GasPod>();
+            if (gaspod != null)
+            {
+                Destroy(gaspod);
+            }
+
+            var resourceTracker = go.GetComponent<ResourceTracker>();
+            if (resourceTracker != null)
+            {
+                Destroy(resourceTracker);
+            }
+
+            go.transform.parent = _spawnPoint.transform;
+            UWE.Utils.ZeroTransform(go);
+            go.transform.Rotate(0f, 90, 90, Space.Self);
         }
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
@@ -397,7 +406,6 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
 
             if (constructed)
             {
-
                 if (isActiveAndEnabled)
                 {
                     if (!IsInitialized)
@@ -421,6 +429,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             {
                 _saveData = new ReplicatorDataEntry();
             }
+
             _saveData.ID = id;
             _saveData.ColorTemplate = _colorManager.SaveTemplate();
             _saveData.TargetItem = _replicatorSlot.GetTargetItem();
@@ -449,7 +458,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             if (!IsInitialized || !IsConstructed || _replicatorSlot == null || _interactionHelper.IsInRange) return;
 
             base.OnHandHover(hand);
-            
+
             if (Manager == null)
             {
                 var data = new[]
@@ -466,20 +475,20 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             {
                 AlterraHub.PowerPerMinute(GetPowerUsage() * 60)
             };
-            data1.HandHoverPDAHelperEx(GetTechType(), HandReticle.IconType.Progress, _replicatorSlot.GetPercentageDone());
+            data1.HandHoverPDAHelperEx(GetTechType(), HandReticle.IconType.Progress,
+                _replicatorSlot.GetPercentageDone());
         }
 
         public void OnHandClick(GUIHand hand)
         {
-
         }
     }
 
     internal class Bobbing : MonoBehaviour
     {
         // User Inputs
-        public float amplitude = -0.1f;//0.5f;
-        public float frequency = 0.6f;//1f;
+        public float amplitude = -0.1f; //0.5f;
+        public float frequency = 0.6f; //1f;
         public float rotationsPerMinute = 10.0f;
 
         // Position Storage Variable

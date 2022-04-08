@@ -10,37 +10,24 @@ namespace FCS_AlterraHub.Helpers
 {
     public static class SpawnHelper
     {
-
         private static Dictionary<string, string> PlantResourceDictionary = new Dictionary<string, string>
         {
-            { "[CORAL_REEF_PLANT_MIDDLE]","WorldEntities/Doodads/Coral_reef/coral_reef_plant_middle_03"},
-            { "[CORAL_REEF_G3]","WorldEntities/Doodads/Coral_reef/coral_reef_grass_03"},
-            { "[CORAL_REEF_SMALL_DECO]","WorldEntities/Doodads/Coral_reef/coral_reef_small_deco_14"},
-            { "[PURPLE_FAN]","WorldEntities/Doodads/Coral_reef/Coral_reef_purple_fan"},
+            {"[CORAL_REEF_PLANT_MIDDLE]", "WorldEntities/Doodads/Coral_reef/coral_reef_plant_middle_03"},
+            {"[CORAL_REEF_G3]", "WorldEntities/Doodads/Coral_reef/coral_reef_grass_03"},
+            {"[CORAL_REEF_SMALL_DECO]", "WorldEntities/Doodads/Coral_reef/coral_reef_small_deco_14"},
+            {"[PURPLE_FAN]", "WorldEntities/Doodads/Coral_reef/Coral_reef_purple_fan"},
         };
 
         private static Dictionary<UWEPrefabID, string> UWEClassIDDictionary = new Dictionary<UWEPrefabID, string>
         {
-            {UWEPrefabID.UnderwaterElecSourceMedium,"ff8e782e-e6f3-40a6-9837-d5b6dcce92bc"},
-            {UWEPrefabID.FloatingPapers,"b4ec5044-5519-4743-b61b-92a8b6fe4a32"},
-            {UWEPrefabID.BubbleColumnSmall,"5ec8b8a6-b9b1-412b-9048-62701346cca2"},
-            {UWEPrefabID.BubbleColumnBig,"0dbd3431-62cc-4dd2-82d5-7d60c71a9edf"},
-            {UWEPrefabID.StarshipGirder10,"99c0da07-a612-4cb7-9e16-e2e6bd3d6207"},
-            {UWEPrefabID.DataBoxLight,"08e6c2a8-76df-41de-87fd-5cba315a8aa4"},
-            {UWEPrefabID.Platform,"e9b75112-f920-45a9-97cc-838ee9b389bb"}
+            {UWEPrefabID.UnderwaterElecSourceMedium, "ff8e782e-e6f3-40a6-9837-d5b6dcce92bc"},
+            {UWEPrefabID.FloatingPapers, "b4ec5044-5519-4743-b61b-92a8b6fe4a32"},
+            {UWEPrefabID.BubbleColumnSmall, "5ec8b8a6-b9b1-412b-9048-62701346cca2"},
+            {UWEPrefabID.BubbleColumnBig, "0dbd3431-62cc-4dd2-82d5-7d60c71a9edf"},
+            {UWEPrefabID.StarshipGirder10, "99c0da07-a612-4cb7-9e16-e2e6bd3d6207"},
+            {UWEPrefabID.DataBoxLight, "08e6c2a8-76df-41de-87fd-5cba315a8aa4"},
+            {UWEPrefabID.Platform, "e9b75112-f920-45a9-97cc-838ee9b389bb"}
         };
-
-        public static GameObject SpawnAtPoint(string location, Transform trans, float scale = 0.179f)
-        {
-            var obj = GameObject.Instantiate(Resources.Load<GameObject>(PlantResourceDictionary[location]));
-            MaterialHelpers.ChangeWavingSpeed(obj,new Vector4(0f,0f,0.10f,0f));
-            obj.transform.SetParent(trans,false);
-            obj.transform.position = trans.position;
-            obj.transform.localScale *= scale;
-            Object.Destroy(obj.GetComponent<Rigidbody>());
-            Object.Destroy(obj.GetComponent<WorldForces>());
-            return obj;
-        }
 
         public static bool ContainsPlant(string plantKey)
         {
@@ -64,7 +51,8 @@ namespace FCS_AlterraHub.Helpers
                 yield break;
             }
 
-            DeferredSpawner.Task deferredTask = DeferredSpawner.instance.InstantiateAsync(prefab, transform.localPosition, transform.localRotation, true);
+            DeferredSpawner.Task deferredTask =
+ DeferredSpawner.instance.InstantiateAsync(prefab, transform.localPosition, transform.localRotation, true);
             yield return deferredTask;
             GameObject result = deferredTask.result;
             DeferredSpawner.instance.ReturnTask(deferredTask);
@@ -76,7 +64,8 @@ namespace FCS_AlterraHub.Helpers
         }
 #endif
 
-        public static IEnumerator SpawnUWEPrefab(UWEPrefabID uwePrefab, Transform transform,Action<GameObject> callBack = null,bool removeComponents = true)
+        public static IEnumerator SpawnUWEPrefab(UWEPrefabID uwePrefab, Transform transform,
+            Action<GameObject> callBack = null, bool removeComponents = true)
         {
             IPrefabRequest request = PrefabDatabase.GetPrefabAsync(UWEClassIDDictionary[uwePrefab]);
             yield return request;
@@ -93,7 +82,8 @@ namespace FCS_AlterraHub.Helpers
             }
 
 #if SUBNAUTICA_STABLE
-            DeferredSpawner.Task deferredTask = DeferredSpawner.instance.InstantiateAsync(prefab, transform.localPosition, transform.localRotation, true);
+            DeferredSpawner.Task deferredTask =
+ DeferredSpawner.instance.InstantiateAsync(prefab, transform.localPosition, transform.localRotation, true);
             yield return deferredTask;
             GameObject result = deferredTask.result;
             DeferredSpawner.instance.ReturnTask(deferredTask);
@@ -112,7 +102,8 @@ namespace FCS_AlterraHub.Helpers
         }
 
 #if SUBNAUTICA_STABLE
-        public static IEnumerator SpawnUWEPrefab(UWEPrefabID uwePrefab, Vector3 position, Quaternion rotation, bool removeComponents = true)
+        public static IEnumerator SpawnUWEPrefab(UWEPrefabID uwePrefab, Vector3 position, Quaternion rotation, bool removeComponents
+ = true)
         {
             IPrefabRequest request = PrefabDatabase.GetPrefabAsync(UWEClassIDDictionary[uwePrefab]);
             yield return request;
@@ -128,7 +119,8 @@ namespace FCS_AlterraHub.Helpers
                 yield break;
             }
 
-            DeferredSpawner.Task deferredTask = DeferredSpawner.instance.InstantiateAsync(prefab, position, rotation, true);
+            DeferredSpawner.Task deferredTask =
+ DeferredSpawner.instance.InstantiateAsync(prefab, position, rotation, true);
             yield return deferredTask;
             GameObject result = deferredTask.result;
             DeferredSpawner.instance.ReturnTask(deferredTask);
@@ -143,7 +135,8 @@ namespace FCS_AlterraHub.Helpers
 #endif
 
 #if SUBNAUTICA_STABLE
-        public static GameObject SpawnTechType(TechType techType, Vector3 position, Quaternion rotation, bool spawnGlobal = false)
+        public static GameObject SpawnTechType(TechType techType, Vector3 position, Quaternion rotation, bool spawnGlobal
+ = false)
         {
             QuickLogger.Debug($"Spawning: {Language.main.Get(techType)}");
             if (CraftData.IsAllowed(techType))
@@ -179,34 +172,34 @@ namespace FCS_AlterraHub.Helpers
             return false;
         }
 #else
-        public static IEnumerator SpawnTechTypeAsync(TechType techType, Vector3 position, Quaternion rotation, bool spawnGlobal, Action<GameObject, bool> callBack)
+        public static IEnumerator SpawnTechTypeAsync(TechType techType, Vector3 position, Quaternion rotation,
+            bool spawnGlobal, IOut<GameObject> gameObject)
         {
             CoroutineTask<GameObject> request = CraftData.GetPrefabForTechTypeAsync(techType, true);
             yield return request;
 
             if (request.GetResult() != null)
             {
-                GameObject gameObject = Utils.CreatePrefab(request.GetResult());
-                LargeWorldEntity.Register(gameObject);
-                CrafterLogic.NotifyCraftEnd(gameObject, techType);
-                gameObject.SendMessage("StartConstruction", SendMessageOptions.DontRequireReceiver);
-                gameObject.transform.position = position;
-                gameObject.transform.localRotation = rotation;
-                if (spawnGlobal) gameObject.transform.parent = null;
-                {
-                    callBack?.Invoke(gameObject, true);
-                }
+                GameObject go = Utils.CreatePrefab(request.GetResult());
+                LargeWorldEntity.Register(go);
+                CrafterLogic.NotifyCraftEnd(go, techType);
+                go.SendMessage("StartConstruction", SendMessageOptions.DontRequireReceiver);
+                go.transform.position = position;
+                go.transform.localRotation = rotation;
+                if (spawnGlobal) go.transform.parent = null;
+
+                gameObject.Set(go);
+                yield break;
             }
 
             ErrorMessage.AddDebug("Could not find prefab for TechType = " + techType);
-            callBack?.Invoke(null, false);
-            yield break;
+            gameObject.Set(null);
         }
 #endif
 
 
-
-        public static GameObject SpawnPrefab(GameObject prefab, Vector3 position, Quaternion rotation, bool spawnGlobal = false)
+        public static GameObject SpawnPrefab(GameObject prefab, Vector3 position, Quaternion rotation,
+            bool spawnGlobal = false)
         {
             if (prefab != null)
             {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -15,7 +16,7 @@ namespace FCS_HomeSolutions.Mods.Sofas.Buildable
         public Sofa3Buildable() : base(Sofa3ClassID, Sofa3Friendly, Sofa3Description, Sofa3KitClassID, Sofa3PrefabName, 9000)
         {
         }
-
+#if SUBNAUTICA_STABLE
         public override GameObject GetGameObject()
         {
             try
@@ -27,6 +28,11 @@ namespace FCS_HomeSolutions.Mods.Sofas.Buildable
                 QuickLogger.Error(e.Message);
                 return null;
             }
+        }
+#endif
+        public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
+        {
+            yield return CreateGameObjectAsync(gameObject, 0.15f);
         }
     }
 }

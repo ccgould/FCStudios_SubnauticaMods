@@ -22,39 +22,11 @@ namespace FCS_AlterraHub.Managers
 
         #region Private Methods
 
-        public void LoadFModAssets(string audioPath, string trackName)
+        public void LoadFModAssets(string id, string audioPath)
         {
-            int Count = 0;
-            while (Count < 2)
-            {
-                FMODAsset[] fMods = Resources.FindObjectsOfTypeAll<FMODAsset>();
-
-                FMODAsset scanLoop = null;
-                foreach (FMODAsset fmod in fMods)
-                {
-                    if (fmod.name.ToLower() != trackName) continue;
-                    QuickLogger.Debug($"{trackName} found!", true);
-                    scanLoop = fmod;
-                }
-
-                if (scanLoop != null)
-                {
-                    _loopingEmitter.asset = scanLoop;
-                }
-                else
-                {
-                    QuickLogger.Debug($"{trackName} not found trying to search again...", true);
-                    Resources.Load<GameObject>(audioPath);
-                    Count++;
-                    continue;
-                }
-
-                break;
-            }
-            if(Count == 2)
-            {
-                QuickLogger.Debug($"{trackName} not found", true);
-            }
+            _loopingEmitter.asset = ScriptableObject.CreateInstance<FMODAsset>();
+            _loopingEmitter.asset.id = id;
+            _loopingEmitter.asset.path = audioPath;
         }
 
         #endregion

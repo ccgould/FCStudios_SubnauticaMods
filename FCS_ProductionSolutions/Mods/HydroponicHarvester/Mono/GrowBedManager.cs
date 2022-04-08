@@ -208,7 +208,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
 
         public IEnumerator AddItemToContainer(TechType techType, int slotId)
         {
-#if SUBNAUTICA
+#if SUBNAUTICA_STABLE
             var item = techType.ToInventoryItem();
 #else
             var itemTask = new TaskResult<InventoryItem>();

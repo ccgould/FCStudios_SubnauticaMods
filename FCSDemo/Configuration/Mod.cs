@@ -11,6 +11,9 @@ using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Json;
 using SMLHelper.V2.Utility;
 using UnityEngine;
+#if SUBNAUTICA
+using RecipeData = SMLHelper.V2.Crafting.TechData;
+#endif
 
 namespace FCSDemo.Configuration
 {

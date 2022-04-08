@@ -150,7 +150,6 @@
     <Compile Include="Model\UpgradeFunction.cs" />
     <Compile Include="Model\Utilities\ModSaver.cs" />
     <Compile Include="Model\Utilities\ModUtils.cs" />
-    <Compile Include="Model\Utilities\TechUtil.cs" />
     <Compile Include="Mods\AlterraHubDepot\Buildable\AlterraHubDepotPatcher.cs" />
     <Compile Include="Mods\AlterraHubDepot\Mono\AlterraHubDepotController.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\AlterraFabricatorStationController.cs" />

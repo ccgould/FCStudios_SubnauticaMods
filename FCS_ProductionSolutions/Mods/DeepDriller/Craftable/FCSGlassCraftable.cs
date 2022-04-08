@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using FCS_AlterraHub.Extensions;
 using FCS_ProductionSolutions.Configuration;
@@ -26,27 +27,18 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Craftable
 
         }
 
+#if SUBNAUTICA_STABLE
         public override GameObject GetGameObject()
         {
-            try
-            {
-                if (PrefabDatabase.TryGetPrefabFilename(CraftData.GetClassIdForTechType(TechType.Glass), out string filepath))
-                {
-                    GameObject prefab = Resources.Load<GameObject>(filepath);
-
-                    if (prefab != null)
-                    {
-                        var Obj = GameObject.Instantiate(prefab);
-                        return Obj;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                QuickLogger.Error(e.Message);
-            }
-
-            return null;
+            return CraftData.InstantiateFromPrefab(TechType.Glass);
+        }
+#endif
+        
+        public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
+        {
+            var task = new TaskResult<GameObject>();
+            yield return CraftData.GetPrefabForTechTypeAsync(TechType.Glass, false, task);
+            gameObject.Set(GameObject.Instantiate(task.Get()));
         }
 
         protected override RecipeData GetBlueprintRecipe()

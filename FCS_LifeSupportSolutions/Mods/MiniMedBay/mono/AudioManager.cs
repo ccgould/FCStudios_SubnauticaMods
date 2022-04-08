@@ -8,7 +8,7 @@ namespace FCS_LifeSupportSolutions.Mods.MiniMedBay.mono
         #region Private Members
         private readonly FMOD_CustomLoopingEmitter _loopingEmitter;
         private bool _soundPlaying;
-        private FMODAsset _scanLoop;
+        private static FMODAsset _scanLoop;
         #endregion
 
         #region Constructor
@@ -17,36 +17,16 @@ namespace FCS_LifeSupportSolutions.Mods.MiniMedBay.mono
         /// </summary>
         public AudioManager(FMOD_CustomLoopingEmitter emitter)
         {
-            LoadFModAssets();
-
+            if (_scanLoop == null)
+            {
+                _scanLoop = ScriptableObject.CreateInstance<FMODAsset>();
+                _scanLoop.id = "{d321180b-6948-49c3-b109-f8b7268644eb}";
+                _scanLoop.path = "event:/tools/scanner/scan_loop";
+            }
+            
             _loopingEmitter = emitter;
 
             _loopingEmitter.asset = _scanLoop;
-        }
-        #endregion
-
-        #region Private Methods
-        private void LoadFModAssets()
-        {
-            FMODAsset[] fmods = Resources.FindObjectsOfTypeAll<FMODAsset>();
-
-            foreach (FMODAsset fmod in fmods)
-            {
-                switch (fmod.name.ToLower())
-                {
-                    case "scan_loop":
-                        QuickLogger.Debug("SCAN_LOOP found!", true);
-                        this._scanLoop = fmod;
-                        break;
-                }
-            }
-
-            if (_scanLoop == null)
-            {
-                QuickLogger.Debug("Scan_Loop not found trying to search again...", true);
-                Resources.Load<GameObject>("WorldEntities/Tools/Scanner");
-                LoadFModAssets();
-            }
         }
         #endregion
 

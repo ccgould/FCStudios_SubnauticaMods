@@ -28,7 +28,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Helpers
 #endif
         }
 
-#if BELOWZERO
+#if !SUBNAUTICA_STABLE
          private  static IEnumerator AttemptToAddToNetworkAsync(TechType techType, BaseManager manager,List<TechType> _storedItems)
         {
             TaskResult<InventoryItem> taskResult = new TaskResult<InventoryItem>();

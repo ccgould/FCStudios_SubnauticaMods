@@ -291,7 +291,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
         public override Pickupable RemoveItemFromContainer(TechType techType)
         {
             Destroy(GrowBedManager.RemoveItemFromContainer(techType).gameObject);
-#if SUBNAUTICA
+#if SUBNAUTICA_STABLE
             return techType.ToPickupable();
 #else
             var itemTask = new TaskResult<InventoryItem>();

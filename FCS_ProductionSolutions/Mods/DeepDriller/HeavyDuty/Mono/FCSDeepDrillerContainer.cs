@@ -15,18 +15,18 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
     {
         public int GetContainerFreeSpace => CalculateFreeSpace();
 
-       public Action<int, int> OnContainerUpdate { get; set; } // Not being used casing lag on large transfers
-       public Action<FcsDevice, TechType> OnContainerAddItem { get; set; }
-       public Action<FcsDevice, TechType> OnContainerRemoveItem { get; set; }
+        public Action<int, int> OnContainerUpdate { get; set; } // Not being used casing lag on large transfers
+        public Action<FcsDevice, TechType> OnContainerAddItem { get; set; }
+        public Action<FcsDevice, TechType> OnContainerRemoveItem { get; set; }
 
-       private int CalculateFreeSpace()
+        private int CalculateFreeSpace()
         {
             var total = GetContainerTotal();
             return Mathf.Max(0, _storageSize - total);
         }
 
-        public bool IsFull => IsContainerFull(); 
-        private Dictionary<TechType,int> _container = new Dictionary<TechType, int>();
+        public bool IsFull => IsContainerFull();
+        private Dictionary<TechType, int> _container = new Dictionary<TechType, int>();
         private int _storageSize = QPatch.Configuration.DDStorageSize;
 
         internal void OverrideContainerSize(int newSize)
@@ -67,10 +67,11 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
                     var canBeStored = deviceStorage.CanBeStored(1, techType);
                     if (canBeStored)
                     {
-                        #if SUBNAUTICA
+#if SUBNAUTICA_STABLE
                         deviceStorage.AddItemToContainer(techType.ToInventoryItem());
 #else
-                        CoroutineHost.StartCoroutine(techType.AddTechTypeToContainerUnSafe(deviceStorage.ItemsContainer));
+                        CoroutineHost.StartCoroutine(
+                            techType.AddTechTypeToContainerUnSafe(deviceStorage.ItemsContainer));
 #endif
                     }
                 }
@@ -83,7 +84,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 
             return true;
         }
-        
+
         /// <summary>
         /// Checks if the item can be stored in this container.
         /// </summary>
@@ -127,7 +128,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
                 }
                 else
                 {
-                    _container.Add(item,1);
+                    _container.Add(item, 1);
                 }
 
                 OnContainerUpdate?.Invoke(GetContainerTotal(), _storageSize);
@@ -138,6 +139,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
                 QuickLogger.Error<FCSDeepDrillerContainer>(e.StackTrace);
                 return false;
             }
+
             return true;
         }
 
@@ -151,10 +153,9 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
             try
             {
                 if (!PlayerInteractionHelper.CanPlayerHold(item)) return false;
-                
+
                 if (_container.ContainsKey(item))
                 {
-
                     if (PlayerInteractionHelper.GivePlayerItem(item))
                     {
                         if (_container[item] == 1)
@@ -175,6 +176,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
                 Console.WriteLine(e);
                 throw;
             }
+
             return true;
         }
 
@@ -201,6 +203,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
                 Console.WriteLine(e);
                 throw;
             }
+
             return true;
         }
 
@@ -236,11 +239,12 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         }
 
         public ItemsContainer ItemsContainer { get; set; }
+
         public int StorageCount()
         {
             return GetContainerTotal();
         }
-        
+
         public bool HasItems()
         {
             return _container.Count > 0;
@@ -252,7 +256,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
             _container = dataItems;
         }
 
-        public Dictionary<TechType,int> SaveData()
+        public Dictionary<TechType, int> SaveData()
         {
             return _container;
         }

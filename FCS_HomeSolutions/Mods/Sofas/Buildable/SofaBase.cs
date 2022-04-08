@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.API;
@@ -24,7 +25,6 @@ namespace FCS_HomeSolutions.Mods.Sofas.Buildable
 {
     internal abstract class SofaBase : SMLHelper.V2.Assets.Buildable
     {
-        private GameObject _stairShipChair;
         private readonly string _kitClassID;
         private GameObject _gameObject;
 
@@ -46,59 +46,18 @@ namespace FCS_HomeSolutions.Mods.Sofas.Buildable
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
             };
 
-            _stairShipChair = Resources.Load<GameObject>("Submarine/Build/StarshipChair");
-
         }
 
+        #if SUBNAUTICA_STABLE
         public GameObject CreateGameObject(float additionalHeight = 0f)
         {
             try
             {
-                var prefab = AddChair(additionalHeight);
-
+                var prefab = AddChair(CraftData.GetPrefabForTechType(TechType.StarshipChair, false), additionalHeight);
                 var mesh = GameObject.Instantiate(_gameObject);
                 mesh.SetActive(false);
                 
-                prefab.name = this.PrefabFileName;
-
-                //var center = new Vector3(0.03977585f, 1.502479f, 0.4276283f);
-                //var size = new Vector3(2.949196f, 1.283838f, 1.457463f);
-                //GameObjectHelpers.AddConstructableBounds(prefab, size, center);
-
-                var model = mesh.FindChild("model");
-
-                SkyApplier skyApplier = mesh.AddComponent<SkyApplier>();
-                skyApplier.renderers = model.GetComponentsInChildren<MeshRenderer>();
-                skyApplier.anchorSky = Skies.Auto;
-
-                //========== Allows the building animation and material colors ==========// 
-
-                //Add constructible
-                var constructable = prefab.GetComponent<Constructable>();
-                constructable.allowedOnWall = false;
-                constructable.allowedOnGround = true;
-                constructable.allowedInSub = true;
-                constructable.allowedInBase = true;
-                constructable.allowedOnCeiling = false;
-                constructable.allowedOutside = false;
-                constructable.allowedOnConstructables = true;
-                constructable.rotationEnabled = true;
-                constructable.model = model;
-                constructable.techType = TechType;
-
-                mesh.transform.SetParent(prefab.transform,false);
-                //mesh.transform.localPosition = new Vector3(0.0f, 0.07f, 0.0f);
-                //mesh.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
-                //mesh.transform.localEulerAngles = new Vector3(0.0f, 0.0f, 0.0f);
-                mesh.SetActive(true);
-
-                PrefabIdentifier prefabID = prefab.GetComponent<PrefabIdentifier>();
-                prefabID.ClassId = ClassID;
-
-                prefab.EnsureComponent<TechTag>().type = TechType;
-
-                prefab.AddComponent<SofaController>();
-                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, mesh, Color.cyan);
+                ProcessChair(prefab, mesh);
 
                 return prefab;
             }
@@ -108,10 +67,76 @@ namespace FCS_HomeSolutions.Mods.Sofas.Buildable
                 return null;
             }
         }
+        #endif
+
+        public IEnumerator CreateGameObjectAsync(IOut<GameObject> gameObject, float additionalHeight = 0f)
+        {
+            var task = new TaskResult<GameObject>();
+            yield return CraftData.GetPrefabForTechTypeAsync(TechType.StarshipChair, false, task);
+            try
+            {
+                var prefab = AddChair(task.Get(), additionalHeight);
+                var mesh = GameObject.Instantiate(_gameObject);
+                mesh.SetActive(false);
+                
+                ProcessChair(prefab, mesh);
+
+                gameObject.Set(prefab);
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error(e.Message);
+                gameObject.Set(null);
+            }
+        }
+
+        private void ProcessChair(GameObject prefab, GameObject mesh)
+        {
+            prefab.name = this.PrefabFileName;
+
+            //var center = new Vector3(0.03977585f, 1.502479f, 0.4276283f);
+            //var size = new Vector3(2.949196f, 1.283838f, 1.457463f);
+            //GameObjectHelpers.AddConstructableBounds(prefab, size, center);
+
+            var model = mesh.FindChild("model");
+
+            SkyApplier skyApplier = mesh.AddComponent<SkyApplier>();
+            skyApplier.renderers = model.GetComponentsInChildren<MeshRenderer>();
+            skyApplier.anchorSky = Skies.Auto;
+
+            //========== Allows the building animation and material colors ==========// 
+
+            //Add constructible
+            var constructable = prefab.GetComponent<Constructable>();
+            constructable.allowedOnWall = false;
+            constructable.allowedOnGround = true;
+            constructable.allowedInSub = true;
+            constructable.allowedInBase = true;
+            constructable.allowedOnCeiling = false;
+            constructable.allowedOutside = false;
+            constructable.allowedOnConstructables = true;
+            constructable.rotationEnabled = true;
+            constructable.model = model;
+            constructable.techType = TechType;
+
+            mesh.transform.SetParent(prefab.transform, false);
+            //mesh.transform.localPosition = new Vector3(0.0f, 0.07f, 0.0f);
+            //mesh.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+            //mesh.transform.localEulerAngles = new Vector3(0.0f, 0.0f, 0.0f);
+            mesh.SetActive(true);
+
+            PrefabIdentifier prefabID = prefab.GetComponent<PrefabIdentifier>();
+            prefabID.ClassId = ClassID;
+
+            prefab.EnsureComponent<TechTag>().type = TechType;
+
+            prefab.AddComponent<SofaController>();
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, mesh, Color.cyan);
+        }
 
         public override string AssetsFolder { get; } = Mod.GetAssetPath();
 
-        public GameObject AddChair(float additionalHeight)
+        public GameObject AddChair(GameObject _stairShipChair, float additionalHeight)
         {
             var starShipChair = GameObject.Instantiate(_stairShipChair);
 

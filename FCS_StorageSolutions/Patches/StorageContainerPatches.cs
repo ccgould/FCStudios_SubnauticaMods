@@ -45,7 +45,7 @@ namespace FCS_StorageSolutions.Patches
     }
 
 
-#if SUBNAUTICA
+#if SUBNAUTICA_STABLE
     [HarmonyPatch(typeof(StorageContainer))]
     [HarmonyPatch(nameof(StorageContainer.OnConstructedChanged))]
 #else

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.API;
@@ -22,7 +23,6 @@ namespace FCS_HomeSolutions.Mods.Sofas.Buildable
 {
     internal class Sofa1Buildable : SMLHelper.V2.Assets.Buildable
     {
-        private readonly GameObject _bench;
         private readonly GameObject _prefab;
         public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
         public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
@@ -48,74 +48,18 @@ namespace FCS_HomeSolutions.Mods.Sofas.Buildable
                 FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Sofa1KitClassID.ToTechType(), 9000, StoreCategory.Home);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
             };
-
-            _bench = Resources.Load<GameObject>("Submarine/Build/Bench");
         }
 
+        #if SUBNAUTICA_STABLE
         public override GameObject GetGameObject()
         {
             try
             {
-                var prefab = AddChair();
-
+                var prefab = AddChair(CraftData.GetPrefabForTechType(TechType.Bench, false));
                 var mesh = GameObject.Instantiate(_prefab);
                 mesh.SetActive(false);
 
-                prefab.name = this.PrefabFileName;
-
-                // Disable renderers
-                Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
-                foreach (Renderer rend in renderers)
-                    rend.enabled = false;
-
-                var model = mesh.FindChild("model");
-
-                SkyApplier skyApplier = mesh.AddComponent<SkyApplier>();
-                skyApplier.renderers = model.GetComponentsInChildren<MeshRenderer>();
-                skyApplier.anchorSky = Skies.Auto;
-
-                //========== Allows the building animation and material colors ==========// 
-
-                //Add constructible
-                var constructable = prefab.GetComponent<Constructable>();
-                constructable.allowedOnWall = false;
-                constructable.allowedOnGround = true;
-                constructable.allowedInSub = true;
-                constructable.allowedInBase = true;
-                constructable.allowedOnCeiling = false;
-                constructable.allowedOutside = false;
-                constructable.allowedOnConstructables = true;
-                constructable.rotationEnabled = true;
-                constructable.model = model;
-                constructable.techType = TechType;
-
-                mesh.transform.SetParent(prefab.transform, false);
-                mesh.SetActive(true);
-
-                PrefabIdentifier prefabID = prefab.GetComponent<PrefabIdentifier>();
-                prefabID.ClassId = ClassID;
-
-                // Get bench
-                var bench = prefab.GetComponent<Bench>();
-                bench.cinematicController.animatedTransform.localPosition = new Vector3(bench.cinematicController.animatedTransform.localPosition.x, bench.cinematicController.animatedTransform.localPosition.y, bench.cinematicController.animatedTransform.localPosition.z + 0.31f);
-
-                // Update constructable bounds
-                var constructableBounds = prefab.GetComponent<ConstructableBounds>();
-                constructableBounds.bounds = new OrientedBounds(new Vector3(constructableBounds.bounds.position.x, constructableBounds.bounds.position.y, constructableBounds.bounds.position.z),
-                    new Quaternion(constructableBounds.bounds.rotation.x, constructableBounds.bounds.rotation.y, constructableBounds.bounds.rotation.z, constructableBounds.bounds.rotation.w),
-                    new Vector3(constructableBounds.bounds.extents.x * 0.3f, constructableBounds.bounds.extents.y, constructableBounds.bounds.extents.z * 0.3f));
-
-                // Modify box colliders
-                var collider = prefab.FindChild("Collider").GetComponent<BoxCollider>();
-                collider.size = new Vector3(0.85f, 0.43f, 0.85f);
-                var builderTrigger = prefab.FindChild("Builder Trigger").GetComponent<BoxCollider>();
-                builderTrigger.size = new Vector3(0.85f, 0.43f, 0.85f);
-                
-                prefab.EnsureComponent<TechTag>().type = TechType;
-
-                prefab.AddComponent<SofaController>();
-                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, mesh, Color.cyan);
-                MaterialHelpers.ChangeMaterialColor(AlterraHub.BaseSecondaryCol, mesh, Color.gray);
+                ProcessBench(prefab, mesh);
                 return prefab;
             }
             catch (Exception e)
@@ -124,8 +68,95 @@ namespace FCS_HomeSolutions.Mods.Sofas.Buildable
                 return null;
             }
         }
+        #endif
 
-        public GameObject AddChair(float additionalHeight = 0f)
+        public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
+        {
+            var task = new TaskResult<GameObject>();
+            yield return CraftData.GetPrefabForTechTypeAsync(TechType.Bench, false, task);
+            try
+            {
+                var prefab = AddChair(task.Get());
+                var mesh = GameObject.Instantiate(_prefab);
+                mesh.SetActive(false);
+
+                ProcessBench(prefab, mesh);
+                gameObject.Set(prefab); 
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error(e.Message);
+                gameObject.Set(null); 
+            }
+        }
+
+        private void ProcessBench(GameObject prefab, GameObject mesh)
+        {
+            prefab.name = this.PrefabFileName;
+
+            // Disable renderers
+            Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
+            foreach (Renderer rend in renderers)
+                rend.enabled = false;
+
+            var model = mesh.FindChild("model");
+
+            SkyApplier skyApplier = mesh.AddComponent<SkyApplier>();
+            skyApplier.renderers = model.GetComponentsInChildren<MeshRenderer>();
+            skyApplier.anchorSky = Skies.Auto;
+
+            //========== Allows the building animation and material colors ==========// 
+
+            //Add constructible
+            var constructable = prefab.GetComponent<Constructable>();
+            constructable.allowedOnWall = false;
+            constructable.allowedOnGround = true;
+            constructable.allowedInSub = true;
+            constructable.allowedInBase = true;
+            constructable.allowedOnCeiling = false;
+            constructable.allowedOutside = false;
+            constructable.allowedOnConstructables = true;
+            constructable.rotationEnabled = true;
+            constructable.model = model;
+            constructable.techType = TechType;
+
+            mesh.transform.SetParent(prefab.transform, false);
+            mesh.SetActive(true);
+
+            PrefabIdentifier prefabID = prefab.GetComponent<PrefabIdentifier>();
+            prefabID.ClassId = ClassID;
+
+            // Get bench
+            var bench = prefab.GetComponent<Bench>();
+            bench.cinematicController.animatedTransform.localPosition = new Vector3(
+                bench.cinematicController.animatedTransform.localPosition.x,
+                bench.cinematicController.animatedTransform.localPosition.y,
+                bench.cinematicController.animatedTransform.localPosition.z + 0.31f);
+
+            // Update constructable bounds
+            var constructableBounds = prefab.GetComponent<ConstructableBounds>();
+            constructableBounds.bounds = new OrientedBounds(
+                new Vector3(constructableBounds.bounds.position.x, constructableBounds.bounds.position.y,
+                    constructableBounds.bounds.position.z),
+                new Quaternion(constructableBounds.bounds.rotation.x, constructableBounds.bounds.rotation.y,
+                    constructableBounds.bounds.rotation.z, constructableBounds.bounds.rotation.w),
+                new Vector3(constructableBounds.bounds.extents.x * 0.3f, constructableBounds.bounds.extents.y,
+                    constructableBounds.bounds.extents.z * 0.3f));
+
+            // Modify box colliders
+            var collider = prefab.FindChild("Collider").GetComponent<BoxCollider>();
+            collider.size = new Vector3(0.85f, 0.43f, 0.85f);
+            var builderTrigger = prefab.FindChild("Builder Trigger").GetComponent<BoxCollider>();
+            builderTrigger.size = new Vector3(0.85f, 0.43f, 0.85f);
+
+            prefab.EnsureComponent<TechTag>().type = TechType;
+
+            prefab.AddComponent<SofaController>();
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, mesh, Color.cyan);
+            MaterialHelpers.ChangeMaterialColor(AlterraHub.BaseSecondaryCol, mesh, Color.gray);
+        }
+
+        public GameObject AddChair(GameObject _bench, float additionalHeight = 0f)
         {
             var starShipChair = GameObject.Instantiate(_bench);
 

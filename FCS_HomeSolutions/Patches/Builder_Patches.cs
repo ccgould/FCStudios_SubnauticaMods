@@ -10,7 +10,7 @@ namespace FCS_HomeSolutions.Patches
     {
         public static List<TechType> acceptableColliders = new List<TechType>() { TechType.BaseRoom, TechType.BaseMoonpool, TechType.BaseReinforcement, TechType.BaseCorridor, TechType.BaseCorridorGlass };
 
-#if SUBNAUTICA
+#if SUBNAUTICA_STABLE
         [HarmonyPatch(typeof(Builder), nameof(Builder.CheckSpace), new Type[] { typeof(Vector3), typeof(Quaternion), typeof(Vector3), typeof(int), typeof(Collider), })]
         internal class Builder_CheckSpace_Patch
         {

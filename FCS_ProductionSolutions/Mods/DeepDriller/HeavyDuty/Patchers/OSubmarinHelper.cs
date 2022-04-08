@@ -209,7 +209,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Patchers
                          hit.collider.gameObject.name.StartsWith(PlatformTargetObjectName)))
                     {
                         var result = Builder.CheckAsSubModule(
-#if BELOWZERO
+#if !SUBNAUTICA_STABLE
                             out _
 #endif
                         );

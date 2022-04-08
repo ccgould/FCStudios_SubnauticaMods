@@ -151,7 +151,7 @@ namespace FCS_AlterraHub.Extensions
         }
 
 
-#if BELOWZERO
+#if !SUBNAUTICA_STABLE
         public static IEnumerator ToInventoryItemAsync(TechType techType, IOut<InventoryItem> result2)
         {
             TaskResult<GameObject> result = new TaskResult<GameObject>();

@@ -33,7 +33,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         private void AddSpark()
         {
             var sparkPnt = GameObjectHelpers.FindGameObject(gameObject, "xElecSource");
-            StartCoroutine(SpawnHelper.SpawnUWEPrefab(UWEPrefabID.UnderwaterElecSourceMedium, sparkPnt.transform, OnEmissionAdded));
+            StartCoroutine(SpawnHelper.SpawnUWEPrefab(UWEPrefabID.UnderwaterElecSourceMedium, sparkPnt.transform,
+                OnEmissionAdded));
         }
 
         private void OnEmissionAdded(GameObject obj)
@@ -45,6 +46,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                 var main = particleSystem.main;
                 main.scalingMode = ParticleSystemScalingMode.Hierarchy;
             }
+
             obj.transform.localScale = new Vector3(0.4f, 0.4f, 0.4f);
             _spark = obj;
 
@@ -72,8 +74,10 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             _spark?.SetActive(false);
             if (forceFullHealth)
             {
-#if SUBNAUTICA
+#if SUBNAUTICA_STABLE
                 _liveMixin.initialHealth = 1;
+#else
+                _liveMixin.defaultHealth = 1;
 #endif
                 _liveMixin.health = 100;
             }
@@ -99,8 +103,10 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         {
             _plate.SetActive(false);
             _spark?.SetActive(true);
-#if SUBNAUTICA
+#if SUBNAUTICA_STABLE
             _liveMixin.initialHealth = 0;
+#else
+            _liveMixin.defaultHealth = 0;
 #endif
             _liveMixin.health = 0;
         }

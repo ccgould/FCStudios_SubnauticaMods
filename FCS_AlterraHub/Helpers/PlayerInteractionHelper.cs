@@ -10,17 +10,18 @@ namespace FCS_AlterraHub.Helpers
     {
         public static bool GivePlayerItem(TechType techType)
         {
-            QuickLogger.Debug($"Giving Player Item: {Language.main.Get(techType)}",true);
+            QuickLogger.Debug($"Giving Player Item: {Language.main.Get(techType)}", true);
             var size = TechDataHelpers.GetItemSize(techType);
-            if (Player.main.HasInventoryRoom(size.x,size.y))
+            if (Player.main.HasInventoryRoom(size.x, size.y))
             {
                 CraftData.AddToInventory(techType, 1, false, false);
                 return true;
             }
+
             return false;
         }
 
-        public static bool GivePlayerItem(TechType techType,int amount)
+        public static bool GivePlayerItem(TechType techType, int amount)
         {
             for (int i = 0; i < amount; i++)
             {
@@ -38,16 +39,12 @@ namespace FCS_AlterraHub.Helpers
 
             return true;
         }
-        
+
 
         public static void GivePlayerItem(InventoryItem inventoryItem)
         {
             if (inventoryItem == null) return;
-
-            if (Player.main.HasInventoryRoom(inventoryItem.item))
-            {
-                Inventory.main.Pickup(inventoryItem.item);
-            }
+            GivePlayerItem(inventoryItem.item);
         }
 
         public static void GivePlayerItem(Pickupable pickupable)
@@ -56,10 +53,13 @@ namespace FCS_AlterraHub.Helpers
 
             if (Player.main.HasInventoryRoom(pickupable))
             {
+#if SUBNAUTICA_EXP
+                Inventory.main.StartCoroutine(Inventory.main.PickupAsync(pickupable, new TaskResult<bool>(), false));
+#else
                 Inventory.main.Pickup(pickupable);
+#endif
             }
         }
-
 
         public static bool HasCard()
         {
@@ -77,7 +77,8 @@ namespace FCS_AlterraHub.Helpers
             return Inventory.main.container.Contains(techType);
         }
 
-        public static bool TakeItemFromInventory(TechType techType, Action<Pickupable> itemCallBack = null, bool destroyItem = true ,int amountToTake = 1)
+        public static bool TakeItemFromInventory(TechType techType, Action<Pickupable> itemCallBack = null,
+            bool destroyItem = true, int amountToTake = 1)
         {
             try
             {

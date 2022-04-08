@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -12,10 +13,12 @@ namespace FCS_HomeSolutions.Mods.Sofas.Buildable
         internal const string Sofa2PrefabName = "Sofia02";
         internal const string Sofa2KitClassID = "Sofa2_Kit";
 
-        public Sofa2Buildable() : base(Sofa2ClassID, Sofa2Friendly, Sofa2Description, Sofa2KitClassID, Sofa2PrefabName, 9000)
+        public Sofa2Buildable() : base(Sofa2ClassID, Sofa2Friendly, Sofa2Description, Sofa2KitClassID, Sofa2PrefabName,
+            9000)
         {
         }
 
+#if SUBNAUTICA_STABLE
         public override GameObject GetGameObject()
         {
             try
@@ -27,6 +30,11 @@ namespace FCS_HomeSolutions.Mods.Sofas.Buildable
                 QuickLogger.Error(e.Message);
                 return null;
             }
+        }
+#endif
+        public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
+        {
+            yield return CreateGameObjectAsync(gameObject);
         }
     }
 }
