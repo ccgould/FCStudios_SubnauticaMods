@@ -34,7 +34,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.LightDuty.Buildable
         internal static string DeepDrillerLightDutyKitClassID => $"{DeepDrillerLightDutyClassName}_Kit";
         internal const string DeepDrillerLightDutyClassName = "DeepDrillerLightDuty";
         internal const string DeepDrillerLightDutyPrefabName = "FCS_DeepDrillerLightDuty";
-        internal const string DeepDrillerLightDutyDescription = "LLight Duty Automated drill platform suitable for all biomes. Requires lubricant and external power.";
+        internal const string DeepDrillerLightDutyDescription = "Light Duty Automated drill platform suitable for all biomes. Requires lubricant and external power.";
 
         private TechType kitTechType;
 

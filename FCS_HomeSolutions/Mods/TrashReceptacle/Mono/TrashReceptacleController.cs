@@ -72,7 +72,7 @@ namespace FCS_HomeSolutions.Mods.TrashReceptacle.Mono
             main.SetTextRaw(HandReticle.TextType.Use,
 #endif
 
-                Manager.DeviceBuilt(TrashReceptaclePatch.TrashReceptacleTabID)
+                Manager.IsDeviceBuilt(TrashReceptaclePatch.TrashReceptacleTabID)
                     ? AuxPatchers.ClickToOpenRecycle(TrashReceptaclePatch.TrashReceptacleFriendly)
                     : AuxPatchers.NoRecyclerConnected());
         }
@@ -81,7 +81,7 @@ namespace FCS_HomeSolutions.Mods.TrashReceptacle.Mono
         {
             if (!IsInitialized || Manager == null) return;
 
-            if (Manager.DeviceBuilt(TrashReceptaclePatch.TrashReceptacleTabID))
+            if (Manager.IsDeviceBuilt(TrashReceptaclePatch.TrashReceptacleTabID))
             {
                 _dumpContainer.OpenStorage();
             }

@@ -51,6 +51,10 @@ namespace FCS_AlterraHub.Helpers
                 new PickReturnsData { ReturnType = TechType.CreepvineSeedCluster, IsLandPlant = false }
             },
             {
+                TechType.CreepvinePiece,
+                new PickReturnsData { ReturnType = TechType.CreepvinePiece, IsLandPlant = false }
+            },
+            {
                 TechType.WhiteMushroomSpore,
                 new PickReturnsData { ReturnType = TechType.WhiteMushroomSpore, IsLandPlant = false }
             },
@@ -142,6 +146,10 @@ namespace FCS_AlterraHub.Helpers
             {
                 TechType.OrangeMushroomSpore,
                 new PickReturnsData { ReturnType = TechType.OrangeMushroomSpore, IsLandPlant = true }
+            },
+            {
+                TechType.OrangePetalsPlantSeed,
+                new PickReturnsData { ReturnType = TechType.OrangePetalsPlantSeed, IsLandPlant = true }
             },
             {
                 TechType.HangingFruit,

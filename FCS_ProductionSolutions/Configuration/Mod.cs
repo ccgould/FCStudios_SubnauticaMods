@@ -93,10 +93,12 @@ namespace FCS_ProductionSolutions.Configuration
         {
             if (!IsSaving())
             {
+                QuickLogger.Debug($"=================== Saving {ModPackID} ===================");
                 _saveObject = new GameObject().AddComponent<ModSaver>();
 
                 SaveData newSaveData = new SaveData();
-
+                newSaveData.CraftingOperations = CraftingOperations;
+                newSaveData.HydroponicHarvesterKnownTech = _hydroponicKnownTech;
                 foreach (var controller in FCSAlterraHubService.PublicAPI.GetRegisteredDevices())
                 {
                     if (controller.Value.PackageId == ModPackID)
@@ -105,13 +107,11 @@ namespace FCS_ProductionSolutions.Configuration
                         ((IFCSSave<SaveData>)controller.Value).Save(newSaveData,serializer);
                     }
                 }
-
-                newSaveData.CraftingOperations = CraftingOperations;
-                newSaveData.HydroponicHarvesterKnownTech = _hydroponicKnownTech;
-
+                
                 _saveData = newSaveData;
 
                 ModUtils.Save<SaveData>(_saveData, SaveDataFilename, GetSaveFileDirectory(), OnSaveComplete);
+                QuickLogger.Debug($"=================== Saved {ModPackID} ===================");
             }
         }
 
@@ -273,6 +273,7 @@ namespace FCS_ProductionSolutions.Configuration
                 yield return null;
             }
             GameObject.DestroyImmediate(_saveObject.gameObject);
+            PurgeData();
             _saveObject = null;
         }
 
@@ -341,10 +342,18 @@ namespace FCS_ProductionSolutions.Configuration
 
         public static void Purge()
         {
-            QuickLogger.Debug("Purging Production Data",true);
+            //Delayed purging because harvester data was being purged before save in hardcore mode
+            QuickLogger.Debug("Pending Purging Production Data", true);
+            _isPurging = true;
+        }
+
+        private static void PurgeData()
+        {
+            if (!_isPurging) return;
+            QuickLogger.Debug("Purging Production Data", true);
             _saveData = null;
             _hydroponicKnownTech = new List<FCSDNASampleData>();
-
+            _isPurging = false;
         }
 
         public static void RemoveCraftingOperation(string unitID)
@@ -365,6 +374,7 @@ namespace FCS_ProductionSolutions.Configuration
         }
 
         private static Dictionary<string, CraftingOperation> CraftingOperations = new();
+        private static bool _isPurging;
 
         public static DeepDrillerLightDutySaveDataEntry GetDeepDrillerLightDutySaveData(string id)
         {

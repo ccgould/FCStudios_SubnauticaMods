@@ -168,7 +168,7 @@ namespace FCS_AlterraHub.Mono
                         if (operation.Device.CanBeStored(1, item) && operation.Device.GetStorage() != null && operation.Device.GetStorage()?.StorageCount() < operation.MaxAmount)
                         {
 #if SUBNAUTICA_STABLE
-                            var result = TakeItem(item).GetTechType().ToInventoryItem();
+                            var result = TakeItem(item).Pickup(false).GetTechType().ToInventoryItem();
                             operation.Device.AddItemToContainer(result);
                             #else
                             CoroutineHost.StartCoroutine(AddItemToDevice(operation.Device, item));
@@ -503,7 +503,7 @@ namespace FCS_AlterraHub.Mono
         /// </summary>
         /// <param name="tabID"></param>
         /// <returns></returns>
-        public bool DeviceBuilt(string tabID)
+        public bool IsDeviceBuilt(string tabID)
         {
             return _registeredDevices.Any(x => x.Key.StartsWith(tabID, StringComparison.OrdinalIgnoreCase));
         }
@@ -516,7 +516,7 @@ namespace FCS_AlterraHub.Mono
         /// <returns></returns>
         public bool DeviceBuilt(string tabID, out IEnumerable<KeyValuePair<string, FcsDevice>> device)
         {
-            if (DeviceBuilt(tabID))
+            if (IsDeviceBuilt(tabID))
             {
                 device = _registeredDevices.Where(x => x.Key.StartsWith(tabID, StringComparison.OrdinalIgnoreCase) && x.Value.IsConstructed);
                 return device.Any();

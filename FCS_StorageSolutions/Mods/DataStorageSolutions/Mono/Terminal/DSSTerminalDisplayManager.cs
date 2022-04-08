@@ -169,7 +169,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         
         internal void Refresh()
         {
-            _itemGrid?.DrawPage(0);
+            _itemGrid?.DrawPage();
             _itemTransceiverPage?.RefreshList();
         }
 

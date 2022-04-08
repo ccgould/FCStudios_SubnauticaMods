@@ -91,7 +91,10 @@ namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
 
         public void CheckIfConnected()
         {
-            if (_mono.Manager?.Habitat == null) return;
+            var habitat = _mono?.Manager?.Habitat;
+
+            if (habitat == null || habitat.powerRelay == null) return;
+
             if (!_mono.Manager.Habitat.powerRelay.inboundPowerSources.Contains(_powerSource))
             {
                 _mono.Manager.Habitat.powerRelay.AddInboundPower(_powerSource);

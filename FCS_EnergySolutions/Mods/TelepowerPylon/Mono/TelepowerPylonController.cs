@@ -495,22 +495,48 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
 
         public void AddItemToPullGrid(BaseTelepowerPylonManager targetController)
         {
-            if (IsPullFrequencyItem(targetController.GetBaseID())) return;
+            var baseID = targetController.GetBaseID();
+            if (string.IsNullOrWhiteSpace(baseID) || IsPullFrequencyItem(targetController.GetBaseID())) return;
+
             var prefab = Instantiate(ModelPrefab.FrequencyItemPrefab);
             var freqItem = prefab.AddComponent<FrequencyItemController>();
             freqItem.Initialize(targetController, _baseTelepowerPylonManager);
-            _trackedPullFrequencyItem.Add(targetController.GetBaseID(), freqItem);
+
+
+            //Check is the frequencyItem is already in the list
+            if (_trackedPullFrequencyItem.ContainsKey(baseID))
+            {
+                _trackedPullFrequencyItem[baseID] = freqItem;
+            }
+            else
+            {
+                _trackedPullFrequencyItem.Add(targetController.GetBaseID(), freqItem);
+            }
+
             prefab.transform.SetParent(_pullGridContent.transform, false);
             QuickLogger.Debug($"Added to Grid {targetController.GetBaseID()} to PULL grid");
         }
 
         public void AddItemToPushGrid(BaseTelepowerPylonManager targetController)
         {
-            if (IsPushFrequencyItem(targetController.GetBaseID())) return;
+            var baseID = targetController.GetBaseID();
+            if (string.IsNullOrWhiteSpace(baseID) || IsPushFrequencyItem(targetController.GetBaseID())) return;
+
             var prefab = Instantiate(ModelPrefab.FrequencyItemPrefab);
             var freqItem = prefab.AddComponent<FrequencyItemController>();
             freqItem.Initialize(targetController, _baseTelepowerPylonManager);
-            _trackedPushFrequencyItem.Add(targetController.GetBaseID(), freqItem);
+
+
+            //Check is the frequencyItem is already in the list
+            if (_trackedPushFrequencyItem.ContainsKey(baseID))
+            {
+                _trackedPushFrequencyItem[baseID] = freqItem;
+            }
+            else
+            {
+                _trackedPushFrequencyItem.Add(targetController.GetBaseID(), freqItem);
+            }
+
             prefab.transform.SetParent(_pushGridContent.transform, false);
             QuickLogger.Debug($"Added to Grid {targetController.GetBaseID()} to PUSH grid");
         }

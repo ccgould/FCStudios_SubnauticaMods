@@ -192,7 +192,7 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Mono
 
         public bool IsAllowedToAdd(TechType techType)
         {
-            return false;
+            throw new NotImplementedException("This method cannot be used please use IsAllowedToAdd(Pickupable pickupable, bool verbose).");
         }
 
         public bool IsAllowedToAdd(Pickupable pickupable)

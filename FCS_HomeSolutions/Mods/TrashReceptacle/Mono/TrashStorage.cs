@@ -93,7 +93,7 @@ namespace FCS_HomeSolutions.Mods.TrashReceptacle.Mono
 
             QuickLogger.Debug($"[Trash Receptical] Total Recycler Space {totalRecyclerSpace} | Dump Container Total: {dumpContainerTotal} | Item Ingredient Count: {itemIngredientCount}",true);
 
-            return dumpContainerTotal + itemIngredientCount <= totalRecyclerSpace;
+            return dumpContainerTotal + itemIngredientCount <= totalRecyclerSpace && IsAllowedToAdd(pickupable);
         }
 
         private int GetDumpContainerTotal()
@@ -122,6 +122,18 @@ namespace FCS_HomeSolutions.Mods.TrashReceptacle.Mono
             }
 
             return amount;
+        }
+
+        private bool IsAllowedToAdd(Pickupable pickupable)
+        {
+            var recyclers = _mono.Manager.GetDevices(TrashRecyclerPatch.RecyclerTabID).FirstOrDefault();
+            QuickLogger.Debug($"Found Recycler: {recyclers != null}",true);
+            if (recyclers != null)
+            {
+                return ((TrashRecyclerController)recyclers).IsAllowedToAdd(pickupable, false);
+            }
+
+            return false;
         }
 
         public bool IsAllowedToRemoveItems()
