@@ -7,7 +7,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
     internal class WindSurferPowerController : HandTarget,IHandTarget
     {
         private float _time;
-        private float MaxTurbineEnergyPerSecond = 2.66f;
+        private float MaxTurbineEnergyPerSecond = 7.67f;// Old Value2.66f;
         private float _energyPerSec;
         private PowerSource _powerSource;
         private bool _isInitialized;

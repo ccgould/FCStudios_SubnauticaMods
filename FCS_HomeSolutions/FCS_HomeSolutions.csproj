@@ -41,6 +41,7 @@
     <Compile Include="Mods\DisplayBoard\Buildable\DisplayBoardPatcher.cs" />
     <Compile Include="Mods\DisplayBoard\Mono\DisplayBoardController.cs" />
     <Compile Include="Mods\DisplayBoard\Mono\DisplayScreenController.cs" />
+    <Compile Include="Mods\JukeBox\Buildable\JukeBoxSubWooferPatcher.cs" />
     <Compile Include="Mods\LedLights\Buildable\RingLEDLight.cs" />
     <Compile Include="Mods\LedLights\Buildable\FloodLEDLight.cs" />
     <Compile Include="Mods\Microwave\Buildable\CookerPatch.cs" />
@@ -188,6 +189,11 @@
     <Folder Include="Mods\AlienChef\Buildable\" />
     <Folder Include="Mods\Sofas\Mono\" />
     <Folder Include="Mono\BaseOperator\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="NAudio">
+      <HintPath>$(SolutionDir)\Libs\$(Configuration)\NAudio.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\BuildEvents.targets" />

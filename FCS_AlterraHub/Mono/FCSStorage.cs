@@ -116,10 +116,10 @@ namespace FCS_AlterraHub.Mono
         public void Initialize(int slots, int storageWidth, int storageHeight,string storageName, string classID)
         {
             SlotsAssigned = slots;
-            height = storageHeight;
-            width = storageWidth;
             storageLabel = storageName;
             Initialize(classID);
+            Resize(storageWidth, storageHeight);
+
         }
 
         public override void Open(Transform useTransform)

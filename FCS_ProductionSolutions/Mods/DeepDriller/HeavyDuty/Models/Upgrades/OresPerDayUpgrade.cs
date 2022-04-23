@@ -4,13 +4,13 @@ using FCS_AlterraHub.Model;
 using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Buildable;
 using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono;
 using FCSCommon.Utilities;
+using UnityEngine;
 
 namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Models.Upgrades
 {
     internal class OresPerDayUpgrade : UpgradeFunction
     {
         private int _oreCount;
-
         public int OreCount
         {
             get => _oreCount;
@@ -30,7 +30,13 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Models.Upgrades
 
         private float CalculatePowerUsage()
         {
-            return QPatch.Configuration.DDOrePerDayUpgradePowerUsage + (OreCount * QPatch.Configuration.DDOreReductionValue);
+            ;
+            if (OreCount <= QPatch.Configuration.DDDefaultOrePerDay)
+            {
+                return QPatch.Configuration.DDDefaultOperationalPowerUsage + OreCount * QPatch.Configuration.DDOrePowerUsageBelowDefault;
+            }
+            
+            return Mathf.Pow((QPatch.Configuration.DDDefaultOperationalPowerUsage + QPatch.Configuration.DDOrePowerUsage) * (OreCount / QPatch.Configuration.DDDefaultOrePerDay), 1.2f);
         }
 
         public override float Damage { get; }
@@ -74,10 +80,11 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Models.Upgrades
                     QuickLogger.Message(FCSDeepDrillerBuildable.IncorrectAmountOfParameterFormat("1", paraResults.Length), true);
                     return false;
                 }
-
+                
                 if (int.TryParse(paraResults[0], out var result))
                 {
-                    amountPerDay = Convert.ToInt32(result);
+                    if (result is < 0 or > 100) return false;
+                    amountPerDay = result;
                 }
                 else
                 {

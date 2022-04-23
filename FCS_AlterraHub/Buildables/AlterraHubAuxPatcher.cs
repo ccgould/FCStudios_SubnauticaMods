@@ -82,7 +82,8 @@ namespace FCS_AlterraHub.Buildables
             { $"{ModKey}_MustBeBuiltOnBasePlatform","Must be built on Base Platform"},
             { $"{ModKey}_HolsterPaintTool","To change color and pattern/image use the Paint Tool."},
             { $"{ModKey}_Error404", "Connection to station failed! Please visit the AlterraHub Fabrication Facility for assistance." },
-            { $"{ModKey}_OrderBeingShipped", "Your order is being shipped to base" },
+            { $"{ModKey}_OrderBeingShipped", "Your order is now being shipped to base" },
+            { $"{ModKey}_OrderHasBeenShipped", "Your order has been shipped to base" },
             { $"{ModKey}_NoPowerEmergencyMode", "NO POWER SYSTEM IN EMERGENCY MODE" },
             { $"{ModKey}_BaseIDFormat", "Base ID: {0}" }
         };
@@ -480,6 +481,11 @@ namespace FCS_AlterraHub.Buildables
         public static string OrderBeingShipped()
         {
             return GetLanguage("OrderBeingShipped");
+        }
+
+        public static string OrderHasBeenShipped()
+        {
+            return GetLanguage("OrderHasBeenShipped");
         }
 
         public static string NoPowerEmergencyMode()

@@ -42,7 +42,7 @@ namespace FCS_EnergySolutions.AlterraSolarCluster.Buildables
             
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.AlterraSolarClusterKitClassID.ToTechType(), 180000, StoreCategory.Energy);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.AlterraSolarClusterKitClassID.ToTechType(), 450000, StoreCategory.Energy);
             };
         }
 
@@ -98,7 +98,7 @@ namespace FCS_EnergySolutions.AlterraSolarCluster.Buildables
                 PowerRelay solarPowerRelay = CraftData.GetPrefabForTechType(TechType.SolarPanel).GetComponent<PowerRelay>();
 
                 var ps = prefab.AddComponent<PowerSource>();
-                ps.maxPower = 2975f;
+                ps.maxPower = 350f;
 
                 var pFX = prefab.AddComponent<PowerFX>();
                 pFX.vfxPrefab = solarPowerRelay.powerFX.vfxPrefab;

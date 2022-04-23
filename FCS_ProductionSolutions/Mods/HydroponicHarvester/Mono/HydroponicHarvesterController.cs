@@ -65,9 +65,19 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
                         EffectsManager.TurnOffLights();
                         DisplayManager.SetLightGraphicOff();
                     }
-
                     
                     _isInBase = _savedData.IsInBase;
+
+                    QuickLogger.Debug($"=============== Attempting Harvester {UnitID} Cleaning ===============");
+                    //Check if any ghost objects and clean
+                    foreach (Plantable plantable in gameObject.GetComponentsInChildren<Plantable>(true))
+                    {
+                        Destroy(plantable.gameObject);
+                        QuickLogger.Debug($"Destroyed Item {plantable.plantTechType.AsString()}");
+
+                    }
+                    QuickLogger.Debug($"=============== Attempting Harvester {UnitID} Cleaning Completed ===============");
+
                     GrowBedManager.Load(_savedData);
                 }
 
@@ -157,10 +167,10 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
 
             var canvas = gameObject.GetComponentInChildren<Canvas>();
             _interactionHelper = GameObjectHelpers.FindGameObject(gameObject, "Canvas2").AddComponent<InterfaceInteraction>();
-
+            //InvokeRepeating(nameof(CheckIfWorldSettled), 1f, 1f);
             IsInitialized = true;
         }
-
+        
         private void UpdateTerminals(InventoryItem item)
         {
             BaseManager.GlobalNotifyByID("DTC", "ItemUpdateDisplay");
@@ -290,6 +300,8 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
 
         public override Pickupable RemoveItemFromContainer(TechType techType)
         {
+            QuickLogger.Debug("Hydroponics Remove From Container",true);
+
             Destroy(GrowBedManager.RemoveItemFromContainer(techType).gameObject);
 #if SUBNAUTICA_STABLE
             return techType.ToPickupable();

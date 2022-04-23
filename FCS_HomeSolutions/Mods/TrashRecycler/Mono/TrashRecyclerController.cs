@@ -384,7 +384,8 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Mono
 
         public bool IsAllowedToAdd(TechType techType, bool verbose)
         {
-            throw new NotImplementedException("This method cannot be used please use IsAllowedToAdd(Pickupable pickupable, bool verbose).");
+            QuickLogger.DebugError("This method cannot be used please use IsAllowedToAdd(Pickupable pickupable, bool verbose).");
+            return false;
         }
 
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)

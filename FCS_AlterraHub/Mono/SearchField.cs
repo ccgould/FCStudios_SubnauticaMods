@@ -102,5 +102,18 @@ namespace FCS_AlterraHub.Mono
 
             return false;
         }
+
+        public void ChangeText(string value,bool notify)
+        {
+            if (notify)
+            {
+                _inputField?.SetText(value);
+            }
+            else
+            {
+                _inputField?.SetTextWithoutNotify(value);
+            }
+
+        }
     }
 }

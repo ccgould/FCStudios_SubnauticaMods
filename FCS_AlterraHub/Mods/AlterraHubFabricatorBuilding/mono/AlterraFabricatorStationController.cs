@@ -549,8 +549,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                         _currentOrder = purchase.Value;
                         _pendingPurchase.Remove(purchase.Key);
 
-                        VoiceNotificationSystem.main.ShowSubtitle(
-                            $"Your order is now being shipped to base {purchase.Value.Port.GetBaseName()}");
+                        VoiceNotificationSystem.main.ShowSubtitle($"{AlterraHub.OrderBeingShipped()} {purchase.Value.Port.GetBaseName()}"); 
 
                         Mod.GamePlaySettings.CurrentOrder = _currentOrder;
                     }

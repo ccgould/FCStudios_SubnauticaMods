@@ -8,17 +8,18 @@ namespace FCS_AlterraHub.Model
     /// </summary>
     public class EatableEntities
     {
-        public TechType TechType { get; set; }
-        public string Name { get; set; }
         private float WaterValue { get; set; }
         private float FoodValue { get; set; }
         private float KDecayRate { get; set; }
-        public bool Decomposes { get; set; }
-        public float TimeDecayStart { get; set; }
         private bool _decayPaused;
         private float _currentWaterValue;
         private float _currentFoodValue;
+
+        public bool Decomposes { get; set; }
         public float TimeDecayPause { get; set; }
+        public float TimeDecayStart { get; set; }
+        public TechType TechType { get; set; }
+        public string Name { get; set; }
 
         public void Initialize(Pickupable food, bool destroy = true)
         {

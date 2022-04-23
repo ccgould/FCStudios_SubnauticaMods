@@ -393,6 +393,14 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
                     }
                 }
                 
+                // if Eatable reset the time;
+
+                if (pickupable.gameObject.GetComponent<Eatable>() != null)
+                {
+                    var eatable = pickupable.gameObject.GetComponent<Eatable>();
+                    eatable.timeDecayStart = DayNightCycle.main.timePassedAsFloat;
+                }
+
                 return pickupable;
             }
 

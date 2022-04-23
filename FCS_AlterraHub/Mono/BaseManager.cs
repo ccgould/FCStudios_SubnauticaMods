@@ -74,7 +74,12 @@ namespace FCS_AlterraHub.Mono
             "recycler",
             "alterrahubdepot",
             "neonplanter",
-            "autocrafter"
+            "autocrafter",
+            "fcsstove",
+            "fcsmicrowave",
+            "fcsCuringCabinet",
+            "maproomupgrades",
+            "planter"
         };
         public readonly HashSet<StorageContainer> BaseStorageLockers = new();
         public readonly HashSet<FcsDevice> BaseServers = new();
@@ -668,8 +673,22 @@ namespace FCS_AlterraHub.Mono
                 {
                     if (baseRack != null && baseRack.HasItem(techType))
                     {
+                        QuickLogger.Debug("Took Item from Sever",true);
                         return baseRack.RemoveItemFromRack(techType);
                     }
+                }
+            }
+            
+            if (storageFilter == StorageType.OtherStorage || storageFilter == StorageType.All)
+            {
+                foreach (FcsDevice device in BaseFcsStorage)
+                {
+                    var storage = device?.GetStorage()?.ItemsContainer;
+
+                    if (storage == null || !storage.Contains(techType)) continue;
+
+                    QuickLogger.Debug("Took Item from FCSDevice", true);
+                    return device.GetStorage().RemoveItemFromContainer(techType);
                 }
             }
 
@@ -684,20 +703,9 @@ namespace FCS_AlterraHub.Mono
 
                     if (locker.container.Contains(techType))
                     {
+                        QuickLogger.Debug("Took Item from Storage Container", true);
                         return locker.container.RemoveItem(techType);
                     }
-                }
-            }
-
-            if (storageFilter == StorageType.OtherStorage || storageFilter == StorageType.All)
-            {
-                foreach (FcsDevice device in BaseFcsStorage)
-                {
-                    var storage = device?.GetStorage()?.ItemsContainer;
-
-                    if (storage == null || !storage.Contains(techType)) continue;
-
-                    return device.GetStorage().RemoveItemFromContainer(techType);
                 }
             }
 

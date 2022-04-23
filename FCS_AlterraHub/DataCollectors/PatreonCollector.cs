@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using FCSCommon.Utilities;
 #if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
@@ -15,7 +16,7 @@ namespace FCS_AlterraHub.DataCollectors
     internal static class PatreonCollector
     {
         public const string accessToken = "a-MV8cgqaGxL7StA8jmRRCHtc1TrjqnKmw9BkPIZ_yY";
-        private static List<string> users = new List<string>();
+        private static HashSet<string> users = new();
         [SerializeField] private static bool _isRunning;
         private static bool _dataHasBeenCollected;
 
@@ -97,7 +98,7 @@ namespace FCS_AlterraHub.DataCollectors
 
         public static string GetPatreon(int index)
         {
-            return users[index];
+            return users.ElementAt(index);
         }
 
         public static bool GetIsRunning()

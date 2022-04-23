@@ -17,6 +17,7 @@ using FCS_HomeSolutions.Mods.DisplayBoard.Buildable;
 using FCS_HomeSolutions.Mods.Elevator.Buildable;
 using FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Buildable;
 using FCS_HomeSolutions.Mods.HologramPoster.Buildable;
+using FCS_HomeSolutions.Mods.JukeBox.Buildable;
 using FCS_HomeSolutions.Mods.LedLights.Buildable;
 using FCS_HomeSolutions.Mods.Microwave.Buildable;
 using FCS_HomeSolutions.Mods.MiniFountainFilter.Buildables;
@@ -190,11 +191,14 @@ namespace FCS_HomeSolutions
             var sink = new SinkBuildable();
             sink.Patch();
 
-            //var jukeBox = new JukeBoxBuildable();
-            //jukeBox.Patch();
+            var jukeBox = new JukeBoxBuildable();
+            jukeBox.Patch();
 
-            //var jukeboxSpeaker = new JukeBoxSpeakerBuildable();
-            //jukeboxSpeaker.Patch();
+            var jukeboxSpeaker = new JukeBoxSpeakerBuildable();
+            jukeboxSpeaker.Patch();
+
+            var JukeBoxSubWoofer = new JukeBoxSubWooferBuildable();
+            JukeBoxSubWoofer.Patch();
 
             if (Configuration.IsHatchStairwayEnabled)
             {

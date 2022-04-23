@@ -63,7 +63,7 @@ namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
                 {
                     AuxPatchers.SolarClusterHover(Mathf.RoundToInt(GetRechargeScalar() * 100f),
                         Mathf.RoundToInt(_powerSource.GetPower()), Mathf.RoundToInt(_powerSource.GetMaxPower()),
-                        Mathf.RoundToInt((GetRechargeScalar() * 0.25f * 5f) * 13f)),
+                        Mathf.RoundToInt((GetRechargeScalar() * 0.20f/*0.25f old value */ * 5f) * 13f)),
                     string.Empty
                 };
                 data.HandHoverPDAHelperEx(_mono.GetTechType());

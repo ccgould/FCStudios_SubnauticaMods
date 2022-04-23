@@ -4,6 +4,7 @@ using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.Controllers;
+using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Buildable;
 using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono;
 using FCS_ProductionSolutions.Mods.DeepDriller.Managers;
 using FCSCommon.Utilities;
@@ -32,6 +33,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Patchers
         private DeepDrillerGUIOilPage _lubricantPage;
         private FCSMessageBox _messageBox;
         private Text _filterPageInformation;
+        private Text _biomeLbl;
 
         public override void Update()
         {
@@ -62,6 +64,9 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Patchers
 
             _batteryMeter = InterfaceHelpers.FindGameObject(gameObject, "BatteryMeter")?.AddComponent<BatteryMeterController>();
             _batteryMeter?.Initialize(QPatch.Configuration.DDInternalBatteryCapacity);
+
+            _biomeLbl = InterfaceHelpers.FindGameObject(gameObject, "Biome").GetComponent<Text>();
+
 
             _lubeMeter = InterfaceHelpers.FindGameObject(gameObject, "LubeMeter")?.AddComponent<BatteryMeterController>();
             _lubeMeter?.Initialize();
@@ -125,7 +130,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Patchers
             try
             {
                 _unitID.text = _sender.UnitID;
-
+                _biomeLbl.text = FCSDeepDrillerBuildable.BiomeFormat(_sender.CurrentBiome);
                 OnBatteryLevelChange(_sender.GetBatteryPowerData());
                 OnOilLevelChange(_sender.GetOilPercentage());
                 _oresPerDayAmount.text = _sender.GetOresPerDayCount();

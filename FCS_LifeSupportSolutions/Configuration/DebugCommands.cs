@@ -38,5 +38,18 @@ namespace FCS_LifeSupportSolutions.Configuration
             _survival.water = Mathf.Clamp(value, 0, 100f);
             return $"Parameters: {value}";
         }
+
+        [ConsoleCommand("setvitals")]
+        public static string SetVitalsValueCommand(float value)
+        {
+            if (_survival == null)
+            {
+                _survival = Player.mainObject.GetComponent<Survival>();
+            }
+            Player.main.liveMixin.health = Mathf.Clamp(value, 0, 100f);
+            _survival.water = Mathf.Clamp(value, 0, 100f);
+            _survival.food = Mathf.Clamp(value, 0, 100f);
+            return $"Parameters: {value}";
+        }
     }
 }

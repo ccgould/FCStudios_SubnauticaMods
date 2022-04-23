@@ -59,7 +59,7 @@ namespace FCS_EnergySolutions.Configuration
         [Toggle("[PowerStorage] Is Mod Enabled", Tooltip = "Enables/Disables PowerStorage from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsPowerStorageEnabled = true;
 
-        [Slider("[PowerStorage] Power Drain Per Second", 1, 10, Step = 0.1f, Format = "{0:F2}", DefaultValue = 1,
+        [Slider("[PowerStorage] Power Drain Per Second", 1, 50, Step = 0.1f, Format = "{0:F2}", DefaultValue = 1,
             Order = 1, Tooltip = "Allows you to adjust the power drain of powerstorage. (The higher the faster Power Storage will charge.")]
         public float PowerStoragePowerDrainPerSecond = 1f;
         [Toggle("[AlterraGen] Is Mod Enabled", Tooltip = "Enables/Disables AlterraGen from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
@@ -68,7 +68,7 @@ namespace FCS_EnergySolutions.Configuration
         [Toggle("[WindSurfer] Is Mod Enabled", Tooltip = "Enables/Disables WindSurfer from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsWindSurferEnabled = true;
 
-        public Dictionary<string, float> JetStreamT242BiomeSpeeds { get; set; } = new Dictionary<string, float>
+        internal Dictionary<string, float> JetStreamT242BiomeSpeeds { get; set; } = new Dictionary<string, float>
         {
             {"kelpforest",283f },
             {"mushroomforest",200f },

@@ -115,24 +115,25 @@ namespace FCS_HomeSolutions.Mods.Microwave.Mono
                 if (_cookingTime <= 0 && _pendingItem.ReturnItem != TechType.None &&
                     _pendingItem.TechType != TechType.None)
                 {
-                    if (_storageContainer.container.DestroyItem(_pendingItem.TechType))
-                    {
 #if SUBNAUTICA_STABLE
-                        _storageContainer.container.UnsafeAdd(_pendingItem.TechType.ToInventoryItem());
+                    _storageContainer.container.UnsafeAdd(_pendingItem.ReturnItem.ToInventoryItem());
 #else
                         StartCoroutine(_pendingItem.ReturnItem.AddTechTypeToContainerUnSafe(_storageContainer.container));
 #endif
-                        _pendingItem = new CookingItem();
-                        _storageContainer.container.DestroyItem(TechType.Salt);
-                        if (_pendingItems.Any())
-                        {
-                            _pendingItem = _pendingItems.Dequeue();
-                            _cookingTime = MAX_COOKING_TIME;
-                            return;
-                        }
-
-                        _storageContainer.enabled = true;
+                    _pendingItem = new CookingItem();
+                    _storageContainer.container.DestroyItem(TechType.Salt);
+                    if (_pendingItems.Any())
+                    {
+                        _pendingItem = _pendingItems.Dequeue();
+                        _cookingTime = MAX_COOKING_TIME;
+                        return;
                     }
+
+                    _storageContainer.enabled = true;
+                    //if (_storageContainer.container.DestroyItem(_pendingItem.TechType))
+                    //{
+
+                    //}
                 }
             }
         }

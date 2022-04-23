@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -128,17 +129,15 @@ namespace FCS_AlterraHub.Model
                 eatable.timeDecayStart = eatableEntities.TimeDecayStart;
 
 #if SUBNAUTICA
-                var item = new InventoryItem(food.gameObject.GetComponent<Pickupable>());//if you get items on load this is why you removed pickup false
+                var item = new InventoryItem(food.gameObject.GetComponent<Pickupable>());
+                //if you get items on load this is why you removed pickup false.
 #elif BELOWZERO
                 Pickupable pickupable = food.gameObject.GetComponent<Pickupable>();
                 pickupable.Pickup(false);
                 var item = new InventoryItem(pickupable);
 #endif
-
                 AddItem(item,true,eatableEntities.TimeDecayPause);
-
-                QuickLogger.Debug(
-                    $"Load Item {item.item.name}|| Decompose: {eatable.decomposes} || DRate: {eatable.kDecayRate}");
+                QuickLogger.Debug($"Load Item {item.item.name}|| Decompose: {eatable.decomposes} || DRate: {eatable.kDecayRate}");
             }
         }
 
@@ -173,6 +172,7 @@ namespace FCS_AlterraHub.Model
         }
 
         public int GetContainerFreeSpace => _itemLimit - NumberOfItems;
+        
         public bool CanBeStored(int amount, TechType techType = TechType.None)
         {
             return amount < GetContainerFreeSpace;

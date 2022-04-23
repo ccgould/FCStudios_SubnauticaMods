@@ -86,7 +86,7 @@ namespace FCS_HomeSolutions.Mods.Stove.Mono
             if (StorageSystem == null)
             {
                 StorageSystem = gameObject.GetComponent<FCSStorage>();
-                StorageSystem.SlotsAssigned = 48;
+                StorageSystem.SlotsAssigned = 16;
 
                 StorageSystem.OnContainerOpened += () =>
                 {

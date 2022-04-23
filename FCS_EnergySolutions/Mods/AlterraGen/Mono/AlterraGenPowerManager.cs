@@ -16,7 +16,7 @@ namespace FCS_EnergySolutions.Mods.AlterraGen.Mono
     internal class AlterraGenPowerManager : FCSPowerManager, IFCSStorage
     {
         private float _toConsume;
-		private const float PowerPerSecond = 0.8333333f;
+        private const float PowerPerSecond = 1.167f; // Old Value 0.8333333f;
         private readonly List<TechType> _container = new();
         private readonly List<TechType> _toRemove = new();
         private AlterraGenController _mono;
@@ -25,6 +25,8 @@ namespace FCS_EnergySolutions.Mods.AlterraGen.Mono
         private PowerSource _powerSource;
         private float _storedPower;
         private FCSPowerStates _powerState = FCSPowerStates.Powered;
+        public float _targetEnergyValue { get; private set; }
+        private float _multiplier;
         internal int MaxSlots => 9;
 
         internal bool ProducingPower
@@ -77,7 +79,8 @@ namespace FCS_EnergySolutions.Mods.AlterraGen.Mono
             if (this.ProducingPower)
             {
                 float num = PowerPerSecond * DayNightCycle.main.deltaTime;
-                float num2 = this._powerSource.maxPower - this._powerSource.power;
+
+                float num2 = _powerSource.maxPower - _powerSource.power;
                 if (num2 > 0f)
                 {
                     if (num2 < num)
@@ -85,43 +88,73 @@ namespace FCS_EnergySolutions.Mods.AlterraGen.Mono
                         num = num2;
                     }
                     float amount = this.ProducePower(num);
-                    float num3;
-                    this._powerSource.AddEnergy(amount, out num3);
+                    _powerSource.AddEnergy(amount, out var num3);
                 }
             }
         }
 
+        private float GetMultiplier(TechType techType)
+        {
+            var multiplier = 0f;
+
+#if SUBNAUTICA
+            var size = CraftData.GetItemSize(techType);
+#else
+                    var size = TechData.GetItemSize(techType);
+#endif
+
+            if (size.x > 1 || size.y > 1)
+            {
+                multiplier = 2.2f;
+            }
+            else
+            {
+                multiplier = 1f;
+            }
+            return multiplier;
+        }
+
         private float ProducePower(float requested)
         {
-            float num = 0f;
+            float modifiedAmount = 0f;
             if (requested > 0f && this._container.Count > 0)
             {
                 _toConsume += requested;
-                num = requested;
-                foreach (TechType inventoryItem in _container)
+
+                modifiedAmount = requested;
+                
+                foreach (TechType techType in _container)
                 {
-                    TechType techType = inventoryItem;
-                    float num2 = 0f;
-                    if (Mod.GetBioChargeValues().TryGetValue(techType, out num2) && this._toConsume >= num2)
+                    if (Mod.GetBioChargeValues().TryGetValue(techType, out var value))
                     {
-                        _toConsume -= num2;
-                        _toRemove.Add(techType);
+                        _multiplier = GetMultiplier(techType);
+                        _targetEnergyValue = _multiplier * value;
+
+                        if (_toConsume >= _targetEnergyValue)
+                        {
+                            _toConsume -= _targetEnergyValue;
+                            _toRemove.Add(techType);
+                        }
                     }
                 }
+
+
                 for (int i = _toRemove.Count - 1; i >= 0; i--)
                 {
                     TechType techType = _toRemove[i];
                     _container.Remove(techType);
                     OnContainerUpdate?.Invoke(_container.Count, MaxSlots);
 				}
+                
                 _toRemove.Clear();
+                
                 if (_container.Count == 0)
                 {
-                    num -= _toConsume;
+                    modifiedAmount -= _toConsume;
                     _toConsume = 0f;
                 }
             }
-            return num;
+            return modifiedAmount;
         }
 
         #region IFCSStorage

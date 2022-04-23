@@ -92,6 +92,7 @@ namespace FCS_AlterraHub.Model.GUI
         {
             _icon.sprite = SpriteManager.Get(TechType.None);
             _techType = TechType.None;
+            Deselect();
         }
 
         public TechType GetTechType()

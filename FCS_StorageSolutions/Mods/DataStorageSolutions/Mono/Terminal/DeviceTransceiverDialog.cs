@@ -32,6 +32,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         private Toggle _isEnabled;
         private bool _isResetting;
         private GameObject _performPullOperationObj;
+        private SearchField _pullAmount;
 
 
         internal void Initialize()
@@ -41,9 +42,9 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             _isEnabled = GameObjectHelpers.FindGameObject(gameObject, "IsEnabledToggle").GetComponent<Toggle>();
 
             var pullAmountInput = GameObjectHelpers.FindGameObject(gameObject, "PullAmount");
-            var pullAmount = pullAmountInput.AddComponent<SearchField>();
-            pullAmount.HoverMessage = "Pulls from server is the item count is greater than the set number.";
-            pullAmount.OnSearchValueChanged += UpdatePullAmount;
+            _pullAmount = pullAmountInput.AddComponent<SearchField>();
+            _pullAmount.HoverMessage = "Pulls from server is the item count is greater than the set number.";
+            _pullAmount.OnSearchValueChanged += UpdatePullAmount;
 
 
             #region Search
@@ -208,6 +209,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
         public void Show(FcsDevice fcsDevice)
         {
+            gameObject.SetActive(true);
+
             _fcsDevice = fcsDevice;
 
             _performPullOperationObj.SetActive(fcsDevice.AllowsTransceiverPulling);
@@ -236,9 +239,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             
             _techTypeGrid.DrawPage();
 
-
-
-            gameObject.SetActive(true);
+            _pullAmount.ChangeText(_operation.PullWhenAmountIsAbove.ToString(),false);
         }        
         
         public void Hide()

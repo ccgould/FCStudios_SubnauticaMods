@@ -63,6 +63,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         private Toggle _isVisibleToggle;
         private Text _pingInformation;
         private Text _filterPageInformation;
+        private Text _biomeLbl;
         private const string InventoryPoolTag = "Inventory";
         private const string FunctionPoolTag = "Function";
 
@@ -92,6 +93,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
                 UpdateDisplayValues();
                 TurnOnDisplay();
                 InvokeRepeating(nameof(Updater), 0.3f, 0.3f);
+                UpdateCurrentBiome();
                 _libraryGrid.DrawPage();
             }
         }
@@ -370,10 +372,9 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 
                 #endregion
 
-                #region Power Consumption
+                #region Biome
 
-                var biome = InterfaceHelpers.FindGameObject(homePage, "Biome").GetComponent<Text>();
-                biome.text = FCSDeepDrillerBuildable.BiomeFormat(_mono.CurrentBiome);
+                _biomeLbl = InterfaceHelpers.FindGameObject(homePage, "Biome").GetComponent<Text>();
 
                 #endregion
 
@@ -1046,6 +1047,11 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         public Text GetStatusField()
         {
             return _statusLabel;
+        }
+
+        internal void UpdateCurrentBiome()
+        {
+            _biomeLbl.text = FCSDeepDrillerBuildable.BiomeFormat(_mono.CurrentBiome);
         }
     }
 

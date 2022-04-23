@@ -7,6 +7,7 @@ using FCS_AlterraHub.Mono;
 using FCS_ProductionSolutions.Buildable;
 using FCSCommon.Utilities;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace FCS_ProductionSolutions.Mods.DeepDriller.Patchers
@@ -16,7 +17,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Patchers
         private FCSButton _toggleFilterBTN;
         private FCSButton _toggleBlackListBTN;
         private GridHelper _filterGrid;
-        private readonly Dictionary<TechType, uGUI_FCSDisplayItem> _trackedFilterState = new();
+        private readonly HashSet<uGUI_FCSDisplayItem> _trackedFilterState = new();
         private Text _filterPageInformation;
 
         public override void Awake()
@@ -58,7 +59,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Patchers
             _filterGrid = gameObject.AddComponent<GridHelper>();
             _filterGrid.OnLoadDisplay += OnLoadFilterGrid;
             _filterGrid.Setup(6, ModelPrefab.DeepDrillerOreBTNPrefab, gameObject, Color.gray, Color.white, OnButtonClick, 5, "PrevBTN", "NextBTN", "Grid", "Paginator", string.Empty);
-
+            
             #endregion
 
             _filterPageInformation = GameObjectHelpers.FindGameObject(gameObject, "FilterPageInformation")?.GetComponent<Text>();
@@ -79,33 +80,19 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Patchers
             {
                 if (IsBeingDestroyed) return;
 
+                if (_trackedFilterState.Count < 6)
+                {
+                    CreateOreButtons();
+                }
+
                 QuickLogger.Debug($"OnLoadFilterGrid : {data.ItemsGrid}");
 
-                if (_trackedFilterState.Count <= 0)
-                {
-                    //Create all filters
-                    var grouped = Hud.GetSender().OreGenerator.AllowedOres;
-                    foreach (TechType techType in grouped)
-                    {
-                        GameObject buttonPrefab = Instantiate(data.ItemsPrefab);
-                        buttonPrefab.transform.SetParent(data.ItemsGrid.transform, false);
-                        var itemBTN = buttonPrefab.AddComponent<uGUI_FCSDisplayItem>();
-                        itemBTN.Initialize(techType,true);
-                        itemBTN.Subscribe((value =>
-                        {
-                            if (value)
-                            {
-                                Hud.GetSender().OreGenerator.AddFocus(techType);
-                            }
-                            else
-                            {
-                                Hud.GetSender().OreGenerator.RemoveFocus(techType);
-                            }
-                        }));
-                        itemBTN .Hide();
-                        _trackedFilterState.Add(techType, itemBTN);
-                    }
-                }
+                //if (_trackedFilterState.Count <= 0)
+                //{
+                //    //Create all filters
+                //    var grouped = Hud.GetSender().OreGenerator.AllowedOres;
+                    
+                //}
 
                 var allowedOres = Hud.GetSender().OreGenerator.AllowedOres;
 
@@ -114,14 +101,29 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Patchers
                     data.EndPosition = allowedOres.Count;
                 }
 
-                foreach (KeyValuePair<TechType, uGUI_FCSDisplayItem> toggle in _trackedFilterState)
+                foreach (uGUI_FCSDisplayItem toggle in _trackedFilterState)
                 {
-                    toggle.Value.Hide();
+                    toggle.Hide();
+                    toggle.Clear();
+                    toggle.UnSubscribe(delegate (bool b) { OnFilterButtonClick(b,null); });
                 }
+
+                int w = 0;
 
                 for (int i = data.StartPosition; i < data.EndPosition; i++)
                 {
-                    _trackedFilterState.ElementAt(i).Value.Show();
+                    QuickLogger.Debug($"Index: {w} | Tracked Filter State {_trackedFilterState.Count}",true);
+                    var button = _trackedFilterState.ElementAt(w);
+                    QuickLogger.Debug($"Button: {button?.GetTechType()}", true);
+                    button.Set(allowedOres[i]);
+                    button.Subscribe(delegate (bool b) { OnFilterButtonClick(b,button); });
+                    button.Show();
+                    w++;
+
+                    if (Hud.GetSender().OreGenerator.GetFocusedOres().Contains(button.GetTechType()))
+                    {
+                        button.Select();
+                    }
                 }
 
                 _filterGrid.UpdaterPaginator(allowedOres.Count);
@@ -134,6 +136,18 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Patchers
             }
         }
 
+        private void OnFilterButtonClick(bool value, uGUI_FCSDisplayItem button)
+        {
+            if (value)
+            {
+                Hud.GetSender().OreGenerator.AddFocus(button.GetTechType());
+            }
+            else
+            {
+                Hud.GetSender().OreGenerator.RemoveFocus(button.GetTechType());
+            }
+        }
+
         private void OnButtonClick(string arg1, object arg2)
         {
             QuickLogger.Debug($"Arg:{arg1} || Object: {arg2}",true);
@@ -142,7 +156,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Patchers
         public override void Show()
         {
             base.Show();
-            
+
             if (Hud.GetSender().OreGenerator.GetInBlackListMode())
             {
                 _toggleBlackListBTN.Check();
@@ -163,22 +177,36 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Patchers
             
             foreach (var displayItem in _trackedFilterState)
             {
-                if (Hud.GetSender().OreGenerator.GetFocusedOres().Contains(displayItem.Value.GetTechType()))
+                if (Hud.GetSender().OreGenerator.GetFocusedOres().Contains(displayItem.GetTechType()))
                 {
-                    displayItem.Value.Select();
+                    displayItem.Select();
                 }
                 else
                 {
-                    displayItem.Value.Deselect();
+                    displayItem.Deselect();
                 }
             }
 
             UpdateInformation();
         }
 
+        private void CreateOreButtons()
+        {
+            if (_trackedFilterState.Count >= 6) return;
+            for (int i = 0; i < 6; i++)
+            {
+                GameObject buttonPrefab = Instantiate(ModelPrefab.DeepDrillerOreBTNPrefab);
+                buttonPrefab.transform.SetParent(_filterGrid.GetGrid().transform, false);
+                var itemBTN = buttonPrefab.AddComponent<uGUI_FCSDisplayItem>();
+                itemBTN.Initialize(TechType.None, true);
+                _trackedFilterState.Add(itemBTN);
+                itemBTN.Hide();
+            }
+        }
+
         public override void Hide()
         {
-            _filterGrid?.DrawPage();
+            _filterGrid?.DrawPage(0);
             base.Hide();
 
         }

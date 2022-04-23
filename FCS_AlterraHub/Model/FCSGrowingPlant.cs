@@ -161,10 +161,23 @@ namespace FCS_AlterraHub.Model
                         }
                     }
 
-                    var intermittentInstantiate = GetComponentInChildren<IntermittentInstantiate>();
+                    
+                    var intermittentInstantiate = go.GetComponentInChildren<IntermittentInstantiate>();
                     if (intermittentInstantiate != null)
                     {
                         Destroy(intermittentInstantiate);
+                    }
+
+                    var rangeAttacker = go.GetComponentInChildren<RangeAttacker>();
+                    if (rangeAttacker != null)
+                    {
+                        Destroy(rangeAttacker);
+                    }
+
+                    var rangeTargeter = go.GetComponentInChildren<RangeTargeter>();
+                    if (rangeTargeter != null)
+                    {
+                        Destroy(rangeTargeter);
                     }
                 }
             }

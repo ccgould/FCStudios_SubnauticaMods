@@ -64,24 +64,28 @@ namespace FCS_ProductionSolutions.Configuration
         [Slider("[Deep Driller] Master Volume", 0.0f, 1.0f, DefaultValue = 0.1f, Step = 0.01f, Format = "{0:P0}", Order = 1, Tooltip = "This control affects all drills.")]
         public float MasterDeepDrillerVolume { get; set; } = 0.1f;
 
+        internal float DDEnergyPerOre = 0.1064f;
 
+
+        internal float DDDefaultOrePerDay = 25.0f;
+        internal float DDDefaultOperationalPowerUsage = 2.00f;
+        public float DDOrePowerUsageBelowDefault = 0.0264f;
+        internal float DDOrePowerUsage = 0.66f;
         public float DDOilTimePeriodInDays  = 30.0f;
         public float DDOilRestoresInDays  = 5.0f;
         public Dictionary<string, List<string>> DDAdditionalBiomeOres  = new Dictionary<string, List<string>>();
         public float DDMaxOreCountUpgradePowerUsage  = 0.2f;
-        public float DDOrePerDayUpgradePowerUsage  = 1.0f;
         public float DDInternalBatteryCapacity  = 1000f;
         public float DDDrillAlterraStorageRange  = 30f;
         public int DDStorageSize = 300;
-        public float DDPowerDraw = 0.7f;
-        public float DDChargePullAmount = 1.5f;
         public float DDSolarCapacity = 125;
-        [JsonIgnore] internal float DDOreReductionValue => 0.08f;
 
         [Toggle("[Auto Crafter]] Is Mod Enabled", Tooltip = "Enables/Disables Auto Crafter from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsAutocrafterEnabled = true;
 
         [JsonIgnore] internal Dictionary<string, List<TechType>> DDBiomeOresTechType  = new Dictionary<string, List<TechType>>();
+
+
 
         internal void Convert()
         {

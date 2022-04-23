@@ -32,11 +32,12 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         private string _textHistory = "Enter Function";
 
         private FCSDeepDrillerController _mono;
+        private int _maxOresPerDay = 100;
 
         internal void Initialize(FCSDeepDrillerController mono)
         {
             _mono = mono;
-            ImplementCommand("os.OresPerDay(12);");
+            ImplementCommand("os.OresPerDay(25);");
         }
 
         private void ImplementCommand(string functionString, out UpgradeFunction upgrade)
@@ -300,9 +301,10 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 
             if (check)
             {
-                QuickLogger.Message("Function already implemented. Updating Value", true);
                 var upgradeFunc = Upgrades.Single(x => x.UpgradeType == UpgradeFunctions.OresPerDay);
+                
                 bool validFunc = OresPerDayUpgrade.IsValid(paraResults, out var orePerDayFunc);
+                
                 if (validFunc)
                 {
                     ((OresPerDayUpgrade) upgradeFunc).OreCount = orePerDayFunc;
@@ -310,8 +312,10 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
                 else
                 {
                     QuickLogger.Debug($"Invalid Function: {functionString}", true);
+                    return;
                 }
 
+                QuickLogger.Message("Function already implemented. Updating Value", true);
                 return;
             }
 

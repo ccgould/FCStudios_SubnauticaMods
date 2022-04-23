@@ -77,6 +77,7 @@ namespace FCS_EnergySolutions.Mods.JetStreamT242.Mono
                 if (_time <= 0)
                 {
                     var thermalPower = MaxThermalEnergyPerSecond * addPowerInterval * Mathf.Clamp01(Mathf.InverseLerp(25f, 100f, this._temperature));
+                    QuickLogger.Debug($"Turbine Thermal Power: {thermalPower}");
                     _energyPerSec = MaxTurbineEnergyPerSecond + thermalPower;
                     _powerSource.AddEnergy(_energyPerSec, out float num2);
                     _time = 1f;

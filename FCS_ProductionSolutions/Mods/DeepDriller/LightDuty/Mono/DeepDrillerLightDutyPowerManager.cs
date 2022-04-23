@@ -168,10 +168,10 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.LightDuty.Mono
 
         public override float GetPowerUsage()
         {
-            return BasePowerDraw + (QPatch.Configuration.DDOreReductionValue * 12);
+            return BasePowerDraw;
         }
 
-        private float BasePowerDraw = QPatch.Configuration.DDOrePerDayUpgradePowerUsage + QPatch.Configuration.DDPowerDraw;
+        private float BasePowerDraw = QPatch.Configuration.DDDefaultOperationalPowerUsage + QPatch.Configuration.DDOrePowerUsage;
 
 
         public override float GetDevicePowerCharge()

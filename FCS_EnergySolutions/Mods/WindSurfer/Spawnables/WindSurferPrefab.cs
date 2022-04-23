@@ -83,7 +83,7 @@ namespace FCS_EnergySolutions.Spawnables
                 }
 
                 var ps = prefab.AddComponent<PowerSource>();
-                ps.maxPower = 500f;
+                ps.maxPower = 1100; //Old Value 500f;
 
                 prefab.AddComponent<WindSurferController>();
                 return prefab;

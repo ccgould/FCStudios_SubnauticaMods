@@ -138,6 +138,11 @@ namespace FCS_AlterraHub.Mono
                 _currentPage = _maxPage;
             }
         }
+
+        public GameObject GetGrid()
+        {
+            return _itemsGrid;
+        }
     }
     public struct DisplayData
     {

@@ -141,7 +141,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
             AlterraFabricatorStationController.Main.ClearCurrentOrder();
 
-            VoiceNotificationSystem.main.DisplayMessage( $"{AlterraHub.OrderBeingShipped()} {GetBaseName()}");
+            VoiceNotificationSystem.main.DisplayMessage( $"{AlterraHub.OrderHasBeenShipped()} {GetBaseName()}");
         }
 
         private static void OffloadItemsInBase(Shipment order, IEnumerable<FcsDevice> devices)

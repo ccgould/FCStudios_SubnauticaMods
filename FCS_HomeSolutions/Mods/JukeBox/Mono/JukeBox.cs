@@ -3,7 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using FCSCommon.Utilities;
+using NAudio.Wave;
 using UnityEngine;
 using UnityEngine.Networking;
 using SearchOption = System.IO.SearchOption;
@@ -34,8 +37,9 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
 
         private static readonly HashSet<string> _supportedExtensions = new(StringComparer.OrdinalIgnoreCase)
         {
-            /*".mp3",
+            /*
             ".ogg",*/
+            ".mp3",
             ".wav",
             //".flac"
         };
@@ -60,8 +64,10 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
                 {
                     if (_supportedExtensions.Contains(fileInfo.Extension))
                     {
+                        string fileName;
+                        fileName = fileInfo.Extension.Equals(".mp3") ? GetWaveFromMp3(fileInfo.FullName) : fileInfo.FullName;
                         //var clip = await LoadClip(fileInfo.FullName);
-                        UnityWebRequest request = GetAudioFromFile(fileInfo.FullName);
+                        UnityWebRequest request = GetAudioFromFile(fileName);
                         yield return request.SendWebRequest();
                         Playlist.Add(new TrackData {Index=Playlist.Count,  Path = fileInfo.Name, AudioClip = DownloadHandlerAudioClip.GetContent(request) });
                     }
@@ -71,6 +77,71 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
             callBack?.Invoke();
             _musicScanned = true;
         }
+
+
+        private static string GetWaveFromMp3(string filename)
+        {
+            if (!File.Exists(filename))
+            {
+                throw new FileNotFoundException(filename + " not found");
+            }
+            string waveFilenameFromMp = GetWaveFilenameFromMp3(filename);
+            if (!File.Exists(waveFilenameFromMp))
+            {
+                new FileInfo(waveFilenameFromMp).Directory.Create();
+                try
+                {
+                    using (Mp3FileReader mp3FileReader = new Mp3FileReader(filename))
+                    {
+                        WaveFileWriter.CreateWaveFile(waveFilenameFromMp, mp3FileReader);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    QuickLogger.Error($"Failed to load {Path.GetFileName(filename)} : {ex.Message}");
+                    return null;
+                }
+                return waveFilenameFromMp;
+            }
+            return waveFilenameFromMp;
+        }
+
+        private static string GetWaveFilenameFromMp3(string filename)
+        {
+            if (!File.Exists(filename))
+            {
+                throw new FileNotFoundException(filename + " not found");
+            }
+            string str = CreateMD5(File.ReadAllText(filename));
+            return Path.Combine(TempPath, str + ".wav");
+        }
+
+        private static string CreateMD5(string input)
+        {
+            string result;
+            using (MD5 md = MD5.Create())
+            {
+                byte[] bytes = Encoding.Default.GetBytes(input);
+                byte[] array = md.ComputeHash(bytes);
+                StringBuilder stringBuilder = new StringBuilder();
+                for (int i = 0; i < array.Length; i++)
+                {
+                    stringBuilder.Append(array[i].ToString("X2"));
+                }
+                result = stringBuilder.ToString();
+            }
+            return result;
+        }
+
+        private static string TempPath
+        {
+            get
+            {
+                return tempPath = (tempPath ?? Path.Combine(Path.GetTempPath(), "FCStudios\\Subnautica\\Mods\\JukeBox\\"));
+            }
+        }
+
+        private static string tempPath;
 
         private static UnityWebRequest GetAudioFromFile(string audioToLoad)
         {

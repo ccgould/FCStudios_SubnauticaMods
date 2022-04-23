@@ -93,7 +93,7 @@ namespace FCS_EnergySolutions.Mods.AlterraGen.Buildables
                 PowerRelay solarPowerRelay = CraftData.GetPrefabForTechType(TechType.SolarPanel).GetComponent<PowerRelay>();
 
                 var ps = prefab.AddComponent<PowerSource>();
-                ps.maxPower = 500f;
+                ps.maxPower = 1000f; //500f Old Value
 
                 var pFX = prefab.AddComponent<PowerFX>();
                 pFX.vfxPrefab = solarPowerRelay.powerFX.vfxPrefab;
