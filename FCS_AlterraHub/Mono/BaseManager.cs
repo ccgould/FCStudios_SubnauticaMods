@@ -678,8 +678,54 @@ namespace FCS_AlterraHub.Mono
                     }
                 }
             }
-            
-            if (storageFilter == StorageType.OtherStorage || storageFilter == StorageType.All)
+
+            if (storageFilter == StorageType.SeaBreeze || storageFilter == StorageType.All)
+            {
+                foreach (FcsDevice device in BaseFcsStorage)
+                {
+                    if(!device.TabID.Equals("SB")) continue;
+
+                    var storage = device?.GetStorage()?.ItemsContainer;
+
+                    if (storage == null || !storage.Contains(techType)) continue;
+
+                    QuickLogger.Debug("Took Item from Seabreeze", true);
+                    return device.GetStorage().RemoveItemFromContainer(techType);
+                }
+            }
+
+            if (storageFilter == StorageType.Replicator || storageFilter == StorageType.All)
+            {
+                foreach (FcsDevice device in BaseFcsStorage)
+                {
+                    if (!device.TabID.Equals("RM")) continue;
+
+                    var storage = device?.GetStorage()?.ItemsContainer;
+
+                    if (storage == null || !storage.Contains(techType)) continue;
+
+                    QuickLogger.Debug("Took Item from Replicator", true);
+                    return device.GetStorage().RemoveItemFromContainer(techType);
+                }
+            }
+
+            if (storageFilter == StorageType.Harvester || storageFilter == StorageType.All)
+            {
+                foreach (FcsDevice device in BaseFcsStorage)
+                {
+                    if (!device.TabID.Equals("HH")) continue;
+
+                    var storage = device?.GetStorage()?.ItemsContainer;
+
+                    if (storage == null || !storage.Contains(techType)) continue;
+
+                    QuickLogger.Debug("Took Item from Harvester", true);
+                    return device.GetStorage().RemoveItemFromContainer(techType);
+                }
+            }
+
+
+            if (storageFilter == StorageType.RemoteStorage || storageFilter == StorageType.All)
             {
                 foreach (FcsDevice device in BaseFcsStorage)
                 {
@@ -731,6 +777,16 @@ namespace FCS_AlterraHub.Mono
                         }
                     }
                     return _item;
+                case StorageType.SeaBreeze:
+                    foreach (KeyValuePair<TechType, TrackedResource> resource in TrackedResources)
+                    {
+                        foreach (FcsDevice device in resource.Value.OtherStorage)
+                        {
+                            if(!device.TabID.Equals("SB")) continue;
+                            CalculateItems(_item, resource, device);
+                        }
+                    }
+                    return _item;
                 case StorageType.StorageLockers:
                     foreach (KeyValuePair<TechType, TrackedResource> resource in TrackedResources)
                     {
@@ -747,11 +803,32 @@ namespace FCS_AlterraHub.Mono
                         }
                     }
                     return _item;
-                case StorageType.OtherStorage:
+                case StorageType.RemoteStorage:
                     foreach (KeyValuePair<TechType, TrackedResource> resource in TrackedResources)
                     {
                         foreach (FcsDevice device in resource.Value.OtherStorage)
                         {
+                            if (!device.TabID.Equals("AS")) continue;
+                            CalculateItems(_item, resource, device);
+                        }
+                    }
+                    return _item;
+                case StorageType.Harvester:
+                    foreach (KeyValuePair<TechType, TrackedResource> resource in TrackedResources)
+                    {
+                        foreach (FcsDevice device in resource.Value.OtherStorage)
+                        {
+                            if (!device.TabID.Equals("HH")) continue;
+                            CalculateItems(_item, resource, device);
+                        }
+                    }
+                    return _item;
+                case StorageType.Replicator:
+                    foreach (KeyValuePair<TechType, TrackedResource> resource in TrackedResources)
+                    {
+                        foreach (FcsDevice device in resource.Value.OtherStorage)
+                        {
+                            if (!device.TabID.Equals("RM")) continue;
                             CalculateItems(_item, resource, device);
                         }
                     }
@@ -780,52 +857,38 @@ namespace FCS_AlterraHub.Mono
 
         public void AddItemsToTracker(FcsDevice device,TechType item, int amountToAdd = 1)
         {
-            QuickLogger.Debug($"AddItemsToTracker:  {item.AsString()} || {amountToAdd} || TabID: {device?.TabID}");
-
-            if (!string.IsNullOrWhiteSpace(device?.TabID) && (device.TabID.Equals("AS") || device.TabID.Equals("HH")))
+            if (!string.IsNullOrWhiteSpace(device?.TabID) && !device.TabID.Equals("DSV"))
             {
-                QuickLogger.Debug($"Item is AS or HH");
                 if (TrackedResources.ContainsKey(item))
                 {
-                    QuickLogger.Debug($"1");
-                    TrackedResources[item].Amount = TrackedResources[item].Amount + amountToAdd;
-                    QuickLogger.Debug($"2");
+                    TrackedResources[item].Amount += amountToAdd;
                     TrackedResources[item].OtherStorage.Add(device);
-                    QuickLogger.Debug($"3");
                 }
                 else
                 {
-                    QuickLogger.Debug($"4");
                     TrackedResources.Add(item, new TrackedResource()
                     {
                         TechType = item,
                         Amount = amountToAdd,
                         OtherStorage = new HashSet<FcsDevice>() { device }
                     });
-                    QuickLogger.Debug($"5");
                 }
             }
             else
             {
-                QuickLogger.Debug($"Item is  NOT AS or HH");
                 if (TrackedResources.ContainsKey(item))
                 {
-                    QuickLogger.Debug($"1");
-                    TrackedResources[item].Amount = TrackedResources[item].Amount + amountToAdd;
-                    QuickLogger.Debug($"2");
+                    TrackedResources[item].Amount += amountToAdd;
                     TrackedResources[item].Servers.Add(device);
-                    QuickLogger.Debug($"3");
                 }
                 else
                 {
-                    QuickLogger.Debug($"4");
                     TrackedResources.Add(item, new TrackedResource()
                     {
                         TechType = item,
                         Amount = amountToAdd,
                         Servers = new HashSet<FcsDevice>() { device }
                     });
-                    QuickLogger.Debug($"5");
                 }
             }
 

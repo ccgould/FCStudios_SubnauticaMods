@@ -296,9 +296,9 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Model
             };
         }
 
-        public bool GetIsConnected(string id)
+        public bool GetIsConnected(string baseId)
         {
-            return _connections.ContainsKey(id);
+            return _connections.ContainsKey(baseId);
         }
 
         public bool HasPylon()

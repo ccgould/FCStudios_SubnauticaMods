@@ -8,7 +8,9 @@ using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model.Utilities;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
+using FCS_HomeSolutions.Mods.Replicator.Buildables;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Models;
+using FCS_ProductionSolutions.Mods.HydroponicHarvester.Buildable;
 using FCS_ProductionSolutions.Structs;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
@@ -32,15 +34,7 @@ namespace FCS_ProductionSolutions.Configuration
         internal static string ModPackID => "FCSProductionSolutions";
         internal static string SaveDataFilename => $"FCSProductionSolutionsSaveData.json";
         internal const string ModBundleName = "fcsproductionsolutionsbundle";
-
-        internal const string HydroponicHarvesterModTabID = "HH";
-        internal const string HydroponicHarvesterModFriendlyName = "Hydroponic Harvester";
-        internal const string HydroponicHarvesterModName = "HydroponicHarvester";
-        public const string HydroponicHarvesterModDescription = "3 chambers for growing DNA Samples scanned by the Matter Analyzer. Suitable for interior and exterior use.";
-        internal static string HydroponicHarvesterKitClassID => $"{HydroponicHarvesterModName}_Kit";
-        internal static string HydroponicHarvesterModClassName => HydroponicHarvesterModName;
-        internal static string HydroponicHarvesterModPrefabName => HydroponicHarvesterModName;
-
+        
         internal const string MatterAnalyzerTabID = "MA";
         internal const string MatterAnalyzerFriendlyName = "Matter Analyzer";
         internal const string MatterAnalyzerModName = "MatterAnalyzer";
@@ -48,14 +42,6 @@ namespace FCS_ProductionSolutions.Configuration
         internal static string MatterAnalyzerKitClassID => $"{MatterAnalyzerModName}_Kit";
         internal static string MatterAnalyzerClassName => MatterAnalyzerModName;
         internal static string MatterAnalyzerPrefabName => MatterAnalyzerModName;
-
-        internal const string ReplicatorTabID = "RM";
-        internal const string ReplicatorFriendlyName = "Replicator";
-        internal const string ReplicatorModName = "Replicator";
-        public const string ReplicatorDescription = "Duplicates non-living material scanned by the Matter Analyzer.";
-        internal static string ReplicatorKitClassID => $"{ReplicatorModName}_Kit";
-        internal static string ReplicatorClassName => ReplicatorModName;
-        internal static string ReplicatorPrefabName => "Replica-Fabricator";
         
         internal const string SandSpawnableClassID = "Sand_DD";
 
@@ -68,20 +54,6 @@ namespace FCS_ProductionSolutions.Configuration
 
             return _sandBagTechType;
         }
-
-
-#if SUBNAUTICA
-        internal static TechData HydroponicHarvesterIngredients => new()
-#elif BELOWZERO
-                internal static RecipeData HydroponicHarvesterIngredients => new RecipeData
-#endif
-        {
-            craftAmount = 1,
-            Ingredients =
-            {
-                new Ingredient(HydroponicHarvesterKitClassID.ToTechType(), 1),
-            }
-        };
 
         public static List<TechType> Craftables { get; set; } = new();
 
@@ -287,8 +259,8 @@ namespace FCS_ProductionSolutions.Configuration
             }
             if(IsHydroponicKnownTech(data.TechType, out var sampleData)) return;
             _hydroponicKnownTech.Add(data);
-            BaseManager.GlobalNotifyByID(HydroponicHarvesterModTabID,"UpdateDNA");
-            BaseManager.GlobalNotifyByID(ReplicatorTabID,"UpdateDNA");
+            BaseManager.GlobalNotifyByID(HydroponicHarvesterPatch.HydroponicHarvesterModTabID,"UpdateDNA");
+            BaseManager.GlobalNotifyByID(ReplicatorBuildable.ReplicatorTabID, "UpdateDNA");
             BaseManager.GlobalNotifyByID(MatterAnalyzerTabID,"UpdateDNA");
         }
 

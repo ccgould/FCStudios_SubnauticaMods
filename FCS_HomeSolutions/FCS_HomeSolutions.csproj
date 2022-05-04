@@ -63,6 +63,7 @@
     <Compile Include="Mods\QuantumTeleporter\Patches\ToolTipFactory_Patch.cs" />
     <Compile Include="Mods\Rug\Buildable\Rug.cs" />
     <Compile Include="Mods\Rug\Mono\RugController.cs" />
+    <Compile Include="Mods\SeaBreeze\Patches\StorageContainerPatches.cs" />
     <Compile Include="Mods\Sink\Buildable\SinkPrefab.cs" />
     <Compile Include="Mods\Sink\Mono\SinkController.cs" />
     <Compile Include="Mods\Sofas\Buildable\NeonBarStool.cs" />

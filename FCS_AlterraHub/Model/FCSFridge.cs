@@ -13,16 +13,13 @@ using UnityEngine;
 
 namespace FCS_AlterraHub.Model
 {
-    public class FCSFridge : MonoBehaviour, IFCSStorage
-    { 
-        private int _itemLimit;
-        public Action<int, int> OnContainerUpdate { get; set; }
-        public Action<FcsDevice, TechType> OnContainerAddItem { get; set; }
-        public Action<FcsDevice, TechType> OnContainerRemoveItem { get; set; }
+    public class FCSFridge : FCSStorage
+    {
+        //Need a way to prevent pulling of rotten items
+
         private bool _decay;
         private FCSGameMode _modMode;
         private FcsDevice _mono;
-        public bool IsFull => NumberOfItems >= _itemLimit;
         public int NumberOfItems => FridgeItems.Count;
         
         private void AttemptDecay()
@@ -36,7 +33,7 @@ namespace FCS_AlterraHub.Model
             }
         }
 
-        public List<EatableEntities> FridgeItems { get; private set; } = new List<EatableEntities>();
+        public List<EatableEntities> FridgeItems { get; } = new();
         
         private EatableEntities FindMatch(TechType techType, EatableType eatableType)
         {
@@ -51,12 +48,50 @@ namespace FCS_AlterraHub.Model
             }
         }
 
-        public void Initialize(FcsDevice mono, int itemLimit)
+        public void Initialize(FcsDevice mono)
         {
             _mono = mono;
-            _itemLimit = itemLimit;
             float time = UnityEngine.Random.Range(0f, 5f);
+            container.onRemoveItem += ContainerOnRemoveItem;
             InvokeRepeating(nameof(AttemptDecay), time, 5f);
+        }
+
+        private void ContainerOnRemoveItem(InventoryItem item)
+        {
+            var techType = item.item.GetTechType();
+            var pickup = item.item;
+            
+            QuickLogger.Debug($"Removing {techType} from SeaBreeze",true);
+            EatableEntities match = FindMatch(techType, EatableType.Any);
+            QuickLogger.Debug($"Match Result If Null {match == null}", true);
+
+            if (match != null)
+            {
+
+                var eatable = pickup.GetComponent<Eatable>();
+
+
+                if (Inventory.main.HasRoomFor(pickup))
+                {
+                    match.UnpauseDecay();
+                    eatable.timeDecayStart = match.TimeDecayStart;
+
+                    if (Inventory.main.Pickup(pickup))
+                    {
+                        FridgeItems.Remove(match);
+                    }
+                    else
+                    {
+                        QuickLogger.Message(LanguageHelpers.GetLanguage("InventoryFull"), true);
+                    }
+                    OnContainerUpdate?.Invoke(NumberOfItems, SlotsAssigned);
+                    OnContainerRemoveItem?.Invoke(_mono, techType);
+                }
+                else
+                {
+                    Destroy(pickup);
+                }
+            }
         }
 
         public bool IsAllowedToAdd(Pickupable pickupable)
@@ -76,7 +111,7 @@ namespace FCS_AlterraHub.Model
             return flag;
         }
 
-        public void AddItem(InventoryItem item,bool fromSave = false, float timeDecayPause = 0)
+        public void CreateEntityAndAddItem(InventoryItem item,bool fromSave = false, float timeDecayPause = 0)
         {
             if (IsFull)
             {
@@ -90,23 +125,16 @@ namespace FCS_AlterraHub.Model
             {
                 eatableEntity.TimeDecayPause = timeDecayPause;
             }
+            else
+            {
+                base.AddItemToContainer(item);
+            }
             FridgeItems.Add(eatableEntity);
-            OnContainerUpdate?.Invoke(NumberOfItems, _itemLimit);
+            OnContainerUpdate?.Invoke(NumberOfItems, SlotsAssigned);
             OnContainerAddItem?.Invoke(_mono,item.item.GetTechType());
-            Destroy(item.item.gameObject);
+            //Destroy(item.item.gameObject);
         }
         
-        public bool IsEmpty()
-        {
-            return NumberOfItems <= 0;
-        }
-
-        public int GetAmount(TechType techType)
-        {
-            QuickLogger.Debug($"Getting amount for: {techType} || Fridge amount: {FridgeItems.Count}");
-            return FridgeItems.Count(x => x.TechType == techType);
-        }
-
         public List<EatableEntities> Save()
         {
             return FridgeItems;
@@ -136,7 +164,7 @@ namespace FCS_AlterraHub.Model
                 pickupable.Pickup(false);
                 var item = new InventoryItem(pickupable);
 #endif
-                AddItem(item,true,eatableEntities.TimeDecayPause);
+                CreateEntityAndAddItem(item,true,eatableEntities.TimeDecayPause);
                 QuickLogger.Debug($"Load Item {item.item.name}|| Decompose: {eatable.decomposes} || DRate: {eatable.kDecayRate}");
             }
         }
@@ -170,15 +198,8 @@ namespace FCS_AlterraHub.Model
             _modMode = modMode;
             RefreshDecayState();
         }
-
-        public int GetContainerFreeSpace => _itemLimit - NumberOfItems;
         
-        public bool CanBeStored(int amount, TechType techType = TechType.None)
-        {
-            return amount < GetContainerFreeSpace;
-        }
-
-        public bool AddItemToContainer(InventoryItem item)
+        public override bool AddItemToContainer(InventoryItem item)
         {
             if (item == null) return false;
 
@@ -189,7 +210,7 @@ namespace FCS_AlterraHub.Model
                     return false;
                 }
 
-                AddItem(item);
+                CreateEntityAndAddItem(item);
             }
             else
             {
@@ -199,8 +220,10 @@ namespace FCS_AlterraHub.Model
             return true;
         }
 
-        public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
+        public override bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
+            //if (!base.IsAllowedToAdd(pickupable, verbose)) return false;
+
             bool flag = false;
 
             if (IsFull)
@@ -229,77 +252,60 @@ namespace FCS_AlterraHub.Model
 
             return flag;
         }
-
-        public bool IsAllowedToRemoveItems()
+        public override  Pickupable RemoveItemFromContainer(TechType techType)
         {
-            return true;
-        }
+            EatableEntities match = FindMatch(techType, EatableType.Any);
 
-        public Pickupable RemoveItemFromContainer(TechType techType)
-        {
-            //TODO Update to the new EXP System
-            //EatableEntities match = FindMatch(techType, EatableType.Any);
-
-            //if (match == null) return null;
+            if (match == null) return null;
 
             //var go = GameObject.Instantiate(CraftData.GetPrefabForTechType(techType));
-            //var eatable = go.GetComponent<Eatable>();
-            //var pickup = go.GetComponent<Pickupable>();
+            var pickup = base.RemoveItemFromContainer(techType);
+            var eatable = pickup.GetComponent<Eatable>();
 
-            //match.UnpauseDecay();
-            //eatable.timeDecayStart = match.TimeDecayStart;
-            //FridgeItems.Remove(match);
-            //OnContainerUpdate?.Invoke(NumberOfItems, _itemLimit);
 
-            //return pickup;
-            return null;
+            if (!Inventory.main.HasRoomFor(pickup)) return null;
+            match.UnpauseDecay();
+            eatable.timeDecayStart = match.TimeDecayStart;
+
+            FridgeItems.Remove(match);
+            OnContainerUpdate?.Invoke(NumberOfItems, SlotsAssigned);
+            OnContainerRemoveItem?.Invoke(_mono, techType);
+            return pickup;
         }
 
 
 #if SUBNAUTICA_STABLE
         public void RemoveItem(TechType techType, EatableType eatableType)
         {
+            EatableEntities match = FindMatch(techType, eatableType);
 
-            var pickupable = techType.ToPickupable();
-
-            if (pickupable == null)
+            if (match != null)
             {
-                QuickLogger.Error("Failed to convert food item to pickupable");
-                return;
-            }
+              
+                var pickup = base.RemoveItemFromContainer(techType);
+                var eatable = pickup.GetComponent<Eatable>();
 
 
-            if (Inventory.main.HasRoomFor(pickupable))
-            {
-                EatableEntities match = FindMatch(techType, eatableType);
-
-                if (match != null)
+                if (Inventory.main.HasRoomFor(pickup))
                 {
-                    var go = GameObject.Instantiate(CraftData.GetPrefabForTechType(techType));
-                    var eatable = go.GetComponent<Eatable>();
-                    var pickup = go.GetComponent<Pickupable>();
-
                     match.UnpauseDecay();
                     eatable.timeDecayStart = match.TimeDecayStart;
 
                     if (Inventory.main.Pickup(pickup))
                     {
-                        QuickLogger.Debug($"Removed Match Before || Fridge Count {FridgeItems.Count}");
                         FridgeItems.Remove(match);
-                        QuickLogger.Debug($"Removed Match || Fridge Count {FridgeItems.Count}");
                     }
                     else
                     {
                         QuickLogger.Message(LanguageHelpers.GetLanguage("InventoryFull"), true);
                     }
-                    GameObject.Destroy(pickupable);
-                    OnContainerUpdate?.Invoke(NumberOfItems, _itemLimit);
+                    OnContainerUpdate?.Invoke(NumberOfItems, SlotsAssigned);
                     OnContainerRemoveItem?.Invoke(_mono, techType);
                 }
-            }
-            else
-            {
-                Destroy(pickupable);
+                else
+                {
+                    Destroy(pickup);
+                }
             }
         }
 #else
@@ -368,28 +374,10 @@ namespace FCS_AlterraHub.Model
         }
 #endif
 
-
-        public Dictionary<TechType, int> GetItemsWithin()
-        {
-            var lookup = FridgeItems?.Where(x => x != null).ToLookup(x => x.TechType).ToArray();
-            return lookup?.ToDictionary(count => count.Key, count => count.Count());
-        }
-
-        public bool ContainsItem(TechType techType)
-        {
-            return FridgeItems.Any(x => x.TechType == techType);
-        }
-
-        public ItemsContainer ItemsContainer { get; set; }
-        public int StorageCount()
-        {
-            return NumberOfItems;
-        }
-
         public void Clear()
         {
             FridgeItems.Clear();
-            OnContainerUpdate?.Invoke(NumberOfItems, _itemLimit);
+            OnContainerUpdate?.Invoke(NumberOfItems, SlotsAssigned);
         }
     }
 }

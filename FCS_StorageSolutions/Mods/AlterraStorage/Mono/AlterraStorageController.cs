@@ -43,7 +43,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
         private PaginatorController _paginatorController;
         private bool _subscribed;
 
-        public override StorageType StorageType => StorageType.OtherStorage;
+        public override StorageType StorageType => StorageType.RemoteStorage;
 
         #region Unity Methods
 

@@ -32,16 +32,14 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         private Text _totalItemsAmount;
         private BaseManager _currentBase;
         private string _currentSearchString;
-        private StorageType _storageFilter;
+        private StorageType _storageFilter = StorageType.All;
         private GameObject _homeObj;
         private Canvas _canvas;
         private NetworkDialogController _networkBTN;
         private GameObject _powerOffScreen;
         private Text _currentBaseLBL;
         private GameObject _screen;
-        private StringBuilder _sb = new StringBuilder();
-        private int _serverCapacity;
-        private int _alterraStorageCapacity;
+        private StringBuilder _sb = new();
         private PaginatorController _paginatorController;
         private TransceiverPageController _itemTransceiverPage;
         private DeviceTransceiverDialog _deviceTransceiverDialog;
@@ -74,20 +72,47 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             _rackCountAmount.text = AuxPatchers.RackCountFormat(_currentBase?.BaseRacks.Count ?? 0);
             _serverAmount.text = AuxPatchers.ServerCountFormat(_currentBase?.BaseServers.Count ?? 0);
             _currentBaseLBL.text = Player.main.currentSub == _currentBase.Habitat ? AuxPatchers.CurrentBase() : AuxPatchers.RemoteBase();
-            _serverCapacity = _currentBase?.BaseServers.Count * 48 ?? 0;
-            _alterraStorageCapacity = _currentBase?.BaseFcsStorage.Sum(x => x.GetMaxStorage()) ?? 0;
+            
+            var serverTotal = _currentBase.GetTotal(StorageType.Servers);
+            var seaBreezeTotal = _currentBase.GetTotal(StorageType.SeaBreeze);
+            var harvesterTotal = _currentBase.GetTotal(StorageType.Harvester);
+            var replicatorTotal = _currentBase.GetTotal(StorageType.Replicator);
+            var remoteStorageTotal = _currentBase.GetTotal(StorageType.RemoteStorage);
+            var storageLockerTotal = _currentBase.GetTotal(StorageType.StorageLockers);
+
+            var serverCapacity = _currentBase?.BaseServers.Count * 48 ?? 0;
+            var alterraStorageCapacity = _currentBase?.BaseFcsStorage.Sum(x => x.GetMaxStorage()) ?? 0;
+            var seaBreezeCapacity = _currentBase.GetDevicesCount("SB") * 100;
+            var harvesterCapacity = _currentBase.GetDevicesCount("HH") * 150;
+            var replicatorCapacity = _currentBase.GetDevicesCount("RM") * 25;
+
 
             switch (_storageFilter)
             {
                 case StorageType.All:
+                    var total = serverTotal + seaBreezeTotal + harvesterTotal + replicatorTotal + remoteStorageTotal +
+                                storageLockerTotal;
+                    var capacity = serverCapacity + alterraStorageCapacity + seaBreezeCapacity + harvesterCapacity + replicatorCapacity;
+
+                    _totalItemsAmount.text = AuxPatchers.TotalItemsFormat(total, capacity);
+                    break;
                 case StorageType.Servers:
-                    _totalItemsAmount.text = AuxPatchers.TotalItemsFormat(_currentBase.GetTotal(StorageType.Servers), _serverCapacity);
+                    _totalItemsAmount.text = AuxPatchers.TotalItemsFormat(serverTotal, serverCapacity);
                     break;
                 case StorageType.StorageLockers:
-                    _totalItemsAmount.text = AuxPatchers.TotalItemsFormat(_currentBase.GetTotal(_storageFilter), 0);
+                    _totalItemsAmount.text = AuxPatchers.TotalItemsFormat2(storageLockerTotal);
                     break;
-                case StorageType.OtherStorage:
-                    _totalItemsAmount.text = AuxPatchers.TotalItemsFormat(_currentBase.GetTotal(_storageFilter), _alterraStorageCapacity);
+                case StorageType.RemoteStorage:
+                    _totalItemsAmount.text = AuxPatchers.TotalItemsFormat(remoteStorageTotal, alterraStorageCapacity);
+                    break;
+                case StorageType.SeaBreeze:
+                    _totalItemsAmount.text = AuxPatchers.TotalItemsFormat(seaBreezeTotal, seaBreezeCapacity);
+                    break;
+                case StorageType.Harvester:
+                    _totalItemsAmount.text = AuxPatchers.TotalItemsFormat(harvesterTotal, harvesterCapacity);
+                    break;
+                case StorageType.Replicator:
+                    _totalItemsAmount.text = AuxPatchers.TotalItemsFormat(replicatorTotal, replicatorCapacity);
                     break;
             }
 
@@ -298,7 +323,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             _sb.Clear();
             _sb.AppendFormat("\n<size=20><color=#FFA500FF>{0}:</color></size>", "Additional Storage Information");
             _sb.AppendFormat("\n<size=20><color=#FFA500FF>{0}:</color> <color=#DDDEDEFF>{1}</color></size>", "Storage Lockers",$"{_currentBase.GetTotal(StorageType.StorageLockers)} items.");
-            _sb.AppendFormat("\n<size=20><color=#FFA500FF>{0}:</color> <color=#DDDEDEFF>{1}</color></size>", Mod.AlterraStorageFriendlyName,$"{_currentBase.GetTotal(StorageType.OtherStorage)} items.");
+            _sb.AppendFormat("\n<size=20><color=#FFA500FF>{0}:</color> <color=#DDDEDEFF>{1}</color></size>", Mod.AlterraStorageFriendlyName,$"{_currentBase.GetTotal(StorageType.RemoteStorage)} items.");
             return _sb.ToString();
         }
 
@@ -314,7 +339,9 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             {
                 if (_isBeingDestroyed || _mono == null || _currentBase == null) return;
 
-                var grouped = _currentBase.GetItemsWithin(_storageFilter).OrderBy(x => x.Key).ToList();
+                var grouped = _currentBase.GetItemsWithin(_storageFilter)?.OrderBy(x => x.Key).ToList();
+
+                if(grouped == null) return;
 
                 if (!string.IsNullOrEmpty(_currentSearchString?.Trim()))
                 {

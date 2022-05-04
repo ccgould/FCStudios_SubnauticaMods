@@ -935,8 +935,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
                 }
             }
 
-            _batteryPercentage.text = ((data.GetCharge() < 0f) ? Language.main.Get("ChargerSlotEmpty") : $"{percent:P0}"
-                );
+            _batteryPercentage.text = ((data.GetCharge() < 0f) ? Language.main.Get("ChargerSlotEmpty") : $"{percent:P0}");
             _batteryStatus.text = $"{Mathf.RoundToInt(data.GetCharge())}/{data.GetCapacity()}";
 
         }
@@ -947,7 +946,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
             _oilFill.fillAmount = percent;
             Color value = (percent >= 0.5f) ? Color.Lerp(this._colorHalf, this._colorFull, 2f * percent - 1f) : Color.Lerp(this._colorEmpty, this._colorHalf, 2f * percent);
             _oilFill.color = value;
-            _oilPercentage.text = $"{percent / 1 * 100}%";
+            _oilPercentage.text = $"{percent:P0}";
         }
 
         internal void LoadFromSave(DeepDrillerSaveDataEntry save)

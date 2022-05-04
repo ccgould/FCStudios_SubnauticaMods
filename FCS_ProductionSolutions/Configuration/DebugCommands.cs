@@ -5,6 +5,7 @@ using FCS_AlterraHub.Helpers;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Buildable;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Mono;
 using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono;
+using FCS_ProductionSolutions.Mods.HydroponicHarvester.Buildable;
 using FCS_ProductionSolutions.Mods.HydroponicHarvester.Enumerators;
 using FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono;
 using FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono;
@@ -21,7 +22,7 @@ namespace FCS_ProductionSolutions.Configuration
         {
             QuickLogger.Debug($"Executing Command Add Harvester", true);
 
-            var unitName = $"{Mod.HydroponicHarvesterModTabID}{id:D3}";
+            var unitName = $"{HydroponicHarvesterPatch.HydroponicHarvesterModTabID}{id:D3}";
             var hh = GameObject.FindObjectsOfType<HydroponicHarvesterController>();
 
             var techType = techTypeString.ToTechType();
@@ -52,7 +53,7 @@ namespace FCS_ProductionSolutions.Configuration
 
             foreach (HydroponicHarvesterController controller in hh)
             {
-                if (controller.UnitID.Equals($"{Mod.HydroponicHarvesterModTabID}{id:D3}", StringComparison.OrdinalIgnoreCase))
+                if (controller.UnitID.Equals($"{HydroponicHarvesterPatch.HydroponicHarvesterModTabID}{id:D3}", StringComparison.OrdinalIgnoreCase))
                 {
                     controller.GrowBedManager.ClearGrowBed();
                     break;

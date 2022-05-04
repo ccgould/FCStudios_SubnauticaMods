@@ -62,6 +62,8 @@
     <Compile Include="Mods\DeepDriller\Patchers\DeepDrillerHUD.cs" />
     <Compile Include="Mods\DeepDriller\Patchers\DeepDrillerHudPages.cs" />
     <Compile Include="Mods\DeepDriller\Patchers\PowerIndicatorPatch.cs" />
+    <Compile Include="Mods\HydroponicHarvester\Patches\StorageContainerPatches.cs" />
+    <Compile Include="Mods\Replicator\Patches\StorageContainerPatches.cs" />
     <Compile Include="Structs\DNASampleData.cs" />
     <Compile Include="Configuration\Mod.cs" />
     <Compile Include="Configuration\SaveDataEntry.cs" />

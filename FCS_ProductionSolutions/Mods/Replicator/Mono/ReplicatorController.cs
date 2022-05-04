@@ -8,6 +8,7 @@ using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
+using FCS_HomeSolutions.Mods.Replicator.Buildables;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.HydroponicHarvester.Mono;
@@ -38,11 +39,11 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
         private const float PowerUsage = 0.85f;
         public override bool IsOperational => IsConstructed && IsInitialized;
         public override bool IsVisible => true;
-        public override StorageType StorageType => StorageType.OtherStorage;
+        public override StorageType StorageType => StorageType.Replicator;
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.ReplicatorTabID, Mod.ModPackID);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, ReplicatorBuildable.ReplicatorTabID, Mod.ModPackID);
             if (Manager == null)
             {
                 _canvas.SetActive(false);
@@ -83,7 +84,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
                 {
                     QuickLogger.Debug("Loading Replicator save");
                     _replicatorSlot.ChangeTargetItem(_saveData.TargetItem, true);
-                    _replicatorSlot.SetItemCount(_saveData.ItemCount);
+                    //_replicatorSlot.SetItemCount(_saveData.ItemCount);
                     _replicatorSlot.CurrentHarvesterSpeedMode = _saveData.HarvesterSpeed;
                     _replicatorSlot.GenerationProgress = _saveData.Progress;
                     _techTypeIcon.sprite = SpriteManager.Get(_saveData.TargetItem);
@@ -212,7 +213,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
 
             if (_replicatorSlot == null)
             {
-                _replicatorSlot = gameObject.AddComponent<ReplicatorSlot>();
+                _replicatorSlot = gameObject.GetComponent<ReplicatorSlot>();
                 _replicatorSlot.Initialize(this);
             }
 
@@ -383,9 +384,9 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
         {
             if (!Mod.IsSaving())
             {
-                QuickLogger.Info($"Saving {Mod.ReplicatorFriendlyName}");
+                QuickLogger.Info($"Saving {ReplicatorBuildable.ReplicatorFriendlyName}");
                 Mod.Save(serializer);
-                QuickLogger.Info($"Saved {Mod.ReplicatorFriendlyName}");
+                QuickLogger.Info($"Saved {ReplicatorBuildable.ReplicatorFriendlyName}");
             }
         }
 

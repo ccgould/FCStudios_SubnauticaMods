@@ -25,6 +25,7 @@ namespace FCS_StorageSolutions.Configuration
             { $"{ModKey}_RackCountFormat","Racks:{0}"},
             { $"{ModKey}_ServerCountFormat","Servers:{0}"},
             { $"{ModKey}_TotalItemFormat","Total Items:{0}/{1}"},
+            { $"{ModKey}_TotalItemFormat2","Total Items:{0}"},
             { $"{ModKey}_Rename","Rename"},
             { $"{ModKey}_RenameDesc","Rename this base's name."},
             { $"{ModKey}_GlobalNetwork","Global Network"},
@@ -152,6 +153,11 @@ namespace FCS_StorageSolutions.Configuration
         public static string TotalItemsFormat(int itemTotal,int serverTotal)
         {
             return string.Format(GetLanguage($"{ModKey}_TotalItemFormat"), itemTotal,serverTotal);
+        }
+
+        public static string TotalItemsFormat2(int itemTotal)
+        {
+            return string.Format(GetLanguage($"{ModKey}_TotalItemFormat2"), itemTotal);
         }
 
         public static string RenameDesc()

@@ -465,6 +465,11 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
             return OreGenerator?.GetItemsPerDay();
         }
 
+        public int GetOresPerDayCountInt()
+        {
+            return OreGenerator?.GetItemsPerDayInt() ?? 0;
+        }
+
         public string GetPowerUsageAmount()
         {
             return PowerManager?.GetPowerUsage().ToString();

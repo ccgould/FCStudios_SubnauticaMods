@@ -613,10 +613,13 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
 
             if (_baseTelepowerPylonManager.GetCurrentMode() == TelepowerPylonMode.PUSH)
             {
-                foreach (var connection in _baseTelepowerPylonManager.GetConnections())
+                foreach (var manager in BaseTelepowerPylonManager.GetGlobalTelePowerPylonsManagers())
                 {
-                    var distance = WorldHelpers.GetDistance(this, connection.Value.GetRoot());
-                    amount += distance * QPatch.Configuration.TelepowerPylonPowerUsagePerMeter;
+                    if (manager.GetIsConnected(_baseTelepowerPylonManager.GetBaseID()))
+                    {
+                        var distance = WorldHelpers.GetDistance(this, manager.GetRoot());
+                        amount += distance * QPatch.Configuration.TelepowerPylonPowerUsagePerMeter;
+                    }
                 }
             }
             return amount;
@@ -953,11 +956,29 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
 
                 _allowedToInteract = !hand.IsTool();
 
-                var data = new[]
+                string additionalText =  string.Empty;
+                if (_baseTelepowerPylonManager.GetCurrentMode() == TelepowerPylonMode.PUSH)
                 {
-                    $"Unit ID: {UnitID} {additionalInformation} \n {message} |",
-                    AlterraHub.PowerPerMinute(CalculatePowerUsage() * 60)
-                };
+                    additionalText = AlterraHub.PowerPerMinute(CalculatePowerUsage() * 60);
+                }
+
+                string[] data;
+                if (string.IsNullOrWhiteSpace(additionalText))
+                {
+                    data = new[]
+                    {
+                        $"Unit ID: {UnitID} {additionalInformation} \n {message}",
+                    };
+                }
+                else
+                {
+                    data = new[]
+                    {
+                        $"Unit ID: {UnitID} {additionalInformation} \n {message} |",
+                        additionalText
+                    };
+                }
+
                 data.HandHoverPDAHelperEx(GetTechType(), Manager == null ? HandReticle.IconType.HandDeny : HandReticle.IconType.Info);
             }
         }

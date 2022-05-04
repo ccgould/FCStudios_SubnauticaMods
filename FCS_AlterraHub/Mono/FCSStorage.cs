@@ -10,7 +10,7 @@ namespace FCS_AlterraHub.Mono
     public class FCSStorage : StorageContainer, IFCSStorage
     {
         private byte[] _storageRootBytes;
-        public int SlotsAssigned { get; set; }
+        public int SlotsAssigned;
         public Action<int, int> OnContainerUpdate { get; set; }
         public Action<FcsDevice, TechType> OnContainerAddItem { get; set; }
         public Action<FcsDevice, TechType> OnContainerRemoveItem { get; set; }
@@ -18,6 +18,7 @@ namespace FCS_AlterraHub.Mono
         public bool IsFull => GetCount() >= SlotsAssigned;
         public List<TechType> InvalidTechTypes = new List<TechType>();
         private bool _isSubscribed;
+        private FcsDevice _fcsDevice;
 
         public ItemsContainer ItemsContainer
         {
@@ -43,8 +44,15 @@ namespace FCS_AlterraHub.Mono
             if (container == null || _isSubscribed) return;
             container.isAllowedToAdd += IsAllowedToAdd;
             container.isAllowedToRemove += IsAllowedToRemoveItems;
+            container.onRemoveItem += OnRemoveItem;
             _isSubscribed = true;
         }
+
+        private void OnRemoveItem(InventoryItem item)
+        {
+            QuickLogger.Debug("FCSStorage Container Item Removed",true);
+        }
+
 
         public Action OnContainerClosed { get; set; }
 
@@ -79,7 +87,7 @@ namespace FCS_AlterraHub.Mono
             return lookup?.ToDictionary(count => count.Key, count => ItemsContainer.GetCount(count.Key));
         }
 
-        public bool AddItemToContainer(InventoryItem item)
+        public virtual bool AddItemToContainer(InventoryItem item)
         {
             container.UnsafeAdd(item);
           return true;
@@ -93,6 +101,7 @@ namespace FCS_AlterraHub.Mono
         /// <param name="storageRoot"></param>
         public void Initialize(string classID)
         {
+            _fcsDevice = gameObject.GetComponentInChildren<FcsDevice>();
             prefabRoot = transform.gameObject;
             var tempStorageRoot = transform.Find("StorageRoot")?.gameObject;
 
@@ -160,7 +169,7 @@ namespace FCS_AlterraHub.Mono
            return ItemsContainer.RemoveItem(techType);
         }
 
-        public bool ContainsItem(TechType techType)
+        public virtual  bool ContainsItem(TechType techType)
         {
             return ItemsContainer.Contains(techType);
         }

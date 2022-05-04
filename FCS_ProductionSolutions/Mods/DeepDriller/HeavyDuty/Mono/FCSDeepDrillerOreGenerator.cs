@@ -229,6 +229,11 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
             return _oresPerDay.ToKiloFormat();
         }
 
+        public int GetItemsPerDayInt()
+        {
+            return _oresPerDay;
+        }
+
         internal void ApplyUpgrade(UpgradeFunction upgrade)
         {
             switch (upgrade.UpgradeType)

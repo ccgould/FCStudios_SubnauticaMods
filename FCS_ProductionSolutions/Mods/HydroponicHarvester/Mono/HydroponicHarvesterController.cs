@@ -8,6 +8,7 @@ using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_ProductionSolutions.Configuration;
+using FCS_ProductionSolutions.Mods.HydroponicHarvester.Buildable;
 using FCS_ProductionSolutions.Mods.HydroponicHarvester.Enumerators;
 using FCS_ProductionSolutions.Structs;
 using FCSCommon.Utilities;
@@ -25,7 +26,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
         internal DisplayManager DisplayManager;
         private InterfaceInteraction _interactionHelper;
         private const float powerUsage = 0.85f;
-        public override StorageType StorageType => StorageType.OtherStorage;
+        public override StorageType StorageType => StorageType.Harvester;
         public EffectsManager EffectsManager => _effectsManager;
         public GrowBedManager GrowBedManager { get; set; }
         public override bool IsOperational => IsOperationalCheck();
@@ -36,7 +37,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.HydroponicHarvesterModTabID, Mod.ModPackID);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, HydroponicHarvesterPatch.HydroponicHarvesterModTabID, Mod.ModPackID);
             Manager.AlertNewFcsStoragePlaced(this);
             DisplayManager?.UpdateUI();
         }

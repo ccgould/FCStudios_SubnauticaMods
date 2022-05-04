@@ -43,7 +43,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
             if (button.Equals("ToggleButton_2"))
             {
-                _mono.ChangeStorageFilter(StorageType.OtherStorage);
+                _mono.ChangeStorageFilter(StorageType.RemoteStorage);
                 _label.text = "REMOTE STORAGE UNIT";
             }
 
@@ -51,6 +51,24 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             {
                 _mono.ChangeStorageFilter(StorageType.StorageLockers);
                 _label.text = "STORAGE LOCKERS";
+            }
+
+            if (button.Equals("ToggleButton_4"))
+            {
+                _mono.ChangeStorageFilter(StorageType.SeaBreeze);
+                _label.text = "SEABREEZE";
+            }
+
+            if (button.Equals("ToggleButton_5"))
+            {
+                _mono.ChangeStorageFilter(StorageType.Harvester);
+                _label.text = "HARVESTER";
+            }
+
+            if (button.Equals("ToggleButton_6"))
+            {
+                _mono.ChangeStorageFilter(StorageType.Replicator);
+                _label.text = "REPLICATOR";
             }
         }
 

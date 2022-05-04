@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mods.Global.Spawnables;
 using FCS_AlterraHub.Registration;
@@ -22,11 +24,19 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Buildable
     {
         private TechType kitTechType;
 
-        public HydroponicHarvesterPatch() : base(Mod.HydroponicHarvesterModClassName, Mod.HydroponicHarvesterModFriendlyName, Mod.HydroponicHarvesterModDescription)
+        internal const string HydroponicHarvesterModTabID = "HH";
+        internal const string HydroponicHarvesterModFriendlyName = "Hydroponic Harvester";
+        internal const string HydroponicHarvesterModName = "HydroponicHarvester";
+        public const string HydroponicHarvesterModDescription = "3 chambers for growing DNA Samples scanned by the Matter Analyzer. Suitable for interior and exterior use.";
+        internal static string HydroponicHarvesterKitClassID => $"{HydroponicHarvesterModName}_Kit";
+        internal static string HydroponicHarvesterModClassName => HydroponicHarvesterModName;
+        internal static string HydroponicHarvesterModPrefabName => HydroponicHarvesterModName;
+
+        public HydroponicHarvesterPatch() : base(HydroponicHarvesterModClassName, HydroponicHarvesterModFriendlyName, HydroponicHarvesterModDescription)
         {
             OnStartedPatching += () =>
             {
-                var hydroponicHarvesterKit = new FCSKit(Mod.HydroponicHarvesterKitClassID, Mod.HydroponicHarvesterModFriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
+                var hydroponicHarvesterKit = new FCSKit(HydroponicHarvesterKitClassID, HydroponicHarvesterModFriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 hydroponicHarvesterKit.Patch();
                 kitTechType = hydroponicHarvesterKit.TechType;
             };
@@ -93,10 +103,20 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Buildable
 
             return null;
         }
-        
+
         protected override RecipeData GetBlueprintRecipe()
         {
-            return Mod.HydroponicHarvesterIngredients;
+            QuickLogger.Debug($"Creating recipe...");
+            // Create and associate recipe to the new TechType
+            var customFabRecipe = new RecipeData()
+            {
+                craftAmount = 1,
+                Ingredients = new List<Ingredient>()
+                {
+                    new Ingredient(HydroponicHarvesterKitClassID.ToTechType(), 1)
+                }
+            };
+            return customFabRecipe;
         }
 
         protected override Sprite GetItemSprite()

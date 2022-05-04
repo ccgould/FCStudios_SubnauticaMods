@@ -321,6 +321,7 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Mono
 
         internal void OnContainerUpdate(int numberofItems, int storageLimit)
         {
+
             _itemCounter_LBL.text = $"{numberofItems}/{storageLimit} {SeaBreezeAuxPatcher.Items()}";
             UpdateContainers();
         }

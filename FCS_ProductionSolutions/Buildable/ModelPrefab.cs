@@ -1,8 +1,10 @@
 ﻿using System;
 using FCS_AlterraHub.API;
 using FCS_AlterraHub.Buildables;
+using FCS_HomeSolutions.Mods.Replicator.Buildables;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Buildable;
+using FCS_ProductionSolutions.Mods.HydroponicHarvester.Buildable;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -37,7 +39,7 @@ namespace FCS_ProductionSolutions.Buildable
                 ModBundle = FCSAssetBundlesService.PublicAPI.GetAssetBundleByName(Mod.ModBundleName, Mod.GetModDirectory());
             }
 
-            HydroponicHarvesterPrefab = GetPrefab(Mod.HydroponicHarvesterModPrefabName);
+            HydroponicHarvesterPrefab = GetPrefab(HydroponicHarvesterPatch.HydroponicHarvesterModPrefabName);
             HydroponicScreenItemPrefab = GetPrefab("HarvesterScreenItem");
             HydroponicDNASamplePrefab = GetPrefab("DNASampleEntry");
             MatterAnalyzerPrefab = GetPrefab(Mod.MatterAnalyzerPrefabName);
@@ -49,7 +51,7 @@ namespace FCS_ProductionSolutions.Buildable
             //DeepDrillerProgrammingItemPrefab = GetPrefab("DeepDrillerProgrammingItem");
             DeepDrillerOverrideItemPrefab = GetPrefab("OverrideItem");
             DeepDrillerFunctionOptionItemPrefab = GetPrefab("FunctionOptionItem");
-            ReplicatorPrefab = GetPrefab(Mod.ReplicatorPrefabName);
+            ReplicatorPrefab = GetPrefab(ReplicatorBuildable.ReplicatorPrefabName);
             DSSCrafterCratePrefab = GetPrefab("CrafterCrate");
         }
 

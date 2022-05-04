@@ -5,7 +5,9 @@ using FCS_AlterraHub.API;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mods.Global.Spawnables;
+using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.ModManagers;
@@ -84,6 +86,14 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Buildable
 
                 PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = ClassID;
+
+
+                prefab.SetActive(false);
+                var storageContainer = prefab.AddComponent<FCSFridge>();
+                storageContainer.Initialize(QPatch.Configuration.SeaBreezeStorageLimit, 1, 1, FriendlyName, ClassID);
+                storageContainer.enabled = false;
+                prefab.SetActive(true);
+
 
                 prefab.AddComponent<AnimationManager>();
                 prefab.AddComponent<TechTag>().type = TechType;

@@ -2,6 +2,7 @@
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.Controllers;
@@ -36,13 +37,19 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Mono
         internal AnimationManager AnimationManager { get; private set; }
         internal int PageStateHash { get; private set; }
         internal PrefabIdentifier PrefabId { get; set; }
-        public override bool IsVisible => GetHasBreakerTripped();
+        public override bool IsVisible => !GetHasBreakerTripped();
+        public override StorageType StorageType => StorageType.RemoteStorage;
+        public override bool IsOperational => PowerManager.GetIsPowerAvailable() && IsInitialized && IsConstructed;
+
         private bool GetHasBreakerTripped()
         {
             return PowerManager.GetHasBreakerTripped();
         }
 
-        
+        public override IFCSStorage GetStorage()
+        {
+            return FridgeComponent;
+        }
 
         #endregion
 
@@ -51,6 +58,7 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Mono
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, SeaBreezeBuildable.SeaBreezeTabID, Mod.ModPackID);
+            Manager.AlertNewFcsStoragePlaced(this);
         }
 
         private void OnEnable()
@@ -125,9 +133,9 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Mono
 
             if (FridgeComponent == null)
             {
-                FridgeComponent = gameObject.AddComponent<FCSFridge>();
+                FridgeComponent = gameObject.GetComponent<FCSFridge>();
                 FridgeComponent.OnContainerUpdate += OnFridgeContainerUpdate;
-                FridgeComponent.Initialize(this,QPatch.Configuration.SeaBreezeStorageLimit);
+                FridgeComponent.Initialize(this);
                 FridgeComponent.SetModMode(QPatch.Configuration.SeaBreezeModMode);
             }
 

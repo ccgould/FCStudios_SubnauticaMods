@@ -25,17 +25,27 @@ namespace FCS_HomeSolutions.Mods.Replicator.Buildables
     {
         public override TechGroup GroupForPDA { get; } = TechGroup.Miscellaneous;
         public override TechCategory CategoryForPDA { get; } = TechCategory.Misc;
-        public ReplicatorBuildable() : base(Mod.ReplicatorClassName, Mod.ReplicatorFriendlyName, Mod.ReplicatorDescription)
+
+        internal const string ReplicatorTabID = "RM";
+        internal const string ReplicatorFriendlyName = "Replicator";
+        internal const string ReplicatorModName = "Replicator";
+        public const string ReplicatorDescription = "Duplicates non-living material scanned by the Matter Analyzer.";
+        internal static string ReplicatorKitClassID => $"{ReplicatorModName}_Kit";
+        internal static string ReplicatorClassName => ReplicatorModName;
+        internal static string ReplicatorPrefabName => "Replica-Fabricator";
+
+
+        public ReplicatorBuildable() : base(ReplicatorClassName, ReplicatorFriendlyName, ReplicatorDescription)
         {
 
             OnStartedPatching += () =>
             {
-                var miniFountainKit = new FCSKit(Mod.ReplicatorKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
+                var miniFountainKit = new FCSKit(ReplicatorKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 miniFountainKit.Patch();
             };
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.ReplicatorKitClassID.ToTechType(), 196875, StoreCategory.Production);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, ReplicatorKitClassID.ToTechType(), 196875, StoreCategory.Production);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
             };
         }
@@ -78,6 +88,13 @@ namespace FCS_HomeSolutions.Mods.Replicator.Buildables
                 PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = ClassID;
 
+
+                prefab.SetActive(false);
+                var storageContainer = prefab.AddComponent<ReplicatorSlot>();
+                storageContainer.Initialize(25, 1, 1, FriendlyName, ClassID);
+                storageContainer.enabled = false;
+                prefab.SetActive(true);
+                
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<ReplicatorController>();
 
@@ -104,7 +121,7 @@ namespace FCS_HomeSolutions.Mods.Replicator.Buildables
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(Mod.ReplicatorKitClassID.ToTechType(), 1)
+                    new Ingredient(ReplicatorKitClassID.ToTechType(), 1)
                 }
             };
             return customFabRecipe;

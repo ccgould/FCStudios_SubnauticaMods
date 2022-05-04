@@ -23,7 +23,8 @@ namespace FCS_StorageSolutions.Patches
 
             // TODO Find effective way to check this. (Trying to get the DSS C48 to display items in Wind Surfer Operator)
             var fcsdevice = __instance.gameObject.GetComponentInChildren<FcsDevice>();
-            if (fcsdevice != null && fcsdevice.StorageType == StorageType.OtherStorage) return;
+
+            if (fcsdevice != null && (fcsdevice.StorageType == StorageType.RemoteStorage || fcsdevice.StorageType == StorageType.Replicator)) return;
 
             QuickLogger.Debug($"Awake: FCSDevice: {fcsdevice} || Is Bypassing: {fcsdevice?.BypassFCSDeviceCheck} || {fcsdevice?.StorageType}", true);
 
@@ -65,7 +66,7 @@ namespace FCS_StorageSolutions.Patches
 
             var fcsdevice = __instance.gameObject.GetComponentInChildren<FcsDevice>();
             var storageContainer = __instance.gameObject.GetComponentInChildren<StorageContainer>(true);
-            if(fcsdevice != null && fcsdevice.StorageType == StorageType.OtherStorage) return;
+            if(fcsdevice != null && (fcsdevice.StorageType == StorageType.RemoteStorage || fcsdevice.StorageType == StorageType.Replicator)) return;
 
             QuickLogger.Debug($"OnConstructedChanged: FCSDevice: {fcsdevice} || Is Bypassing: {fcsdevice?.BypassFCSDeviceCheck} || {fcsdevice?.StorageType}", true);
 

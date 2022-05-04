@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace FCS_ProductionSolutions.Mods.Replicator.Mono
 {
-    internal class ReplicatorSlot : MonoBehaviour, IFCSStorage
+    internal class ReplicatorSlot : FCSStorage
     {
         private readonly IList<float> _progress = new List<float>(new[] { -1f, -1f, -1f });
         private ReplicatorController _mono;
@@ -22,9 +22,6 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
         private const float EnergyConsumption = 15000f;
         internal bool PauseUpdates { get; set; }
         internal bool NotAllowToGenerate => _mono == null || !_mono.IsOperational || PauseUpdates || CurrentHarvesterSpeedMode == HarvesterSpeedModes.Off || _targetItem == TechType.None || IsFull;
-        public Action<int, int> OnContainerUpdate { get; set; }
-        public Action<FcsDevice, TechType> OnContainerAddItem { get; set; }
-        public Action<FcsDevice, TechType> OnContainerRemoveItem { get; set; }
         internal float GenerationProgress
         {
             get => _progress[(int)ClonePhases.Generating];
@@ -49,7 +46,6 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
         public void Initialize(ReplicatorController mono)
         {
             _mono = mono;
-            ItemsContainer = new ItemsContainer(4,5,transform,"ReplicatorSlot",null);
             ItemsContainer.onRemoveItem += item =>
             {
                 TryStartingNextClone();
@@ -147,50 +143,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             AddItemToInventory();
             _mono.UpdateUI();
         }
-
-        public int GetContainerFreeSpace { get; }
-        public bool IsFull =>ItemsContainer.count >= MAXCOUNT;
-        public bool CanBeStored(int amount, TechType techType)
-        {
-            return false;
-        }
-
-        public bool AddItemToContainer(InventoryItem item)
-        {
-            return false;
-        }
-
-        public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
-        {
-            return false;
-        }
-
-        public bool IsAllowedToRemoveItems()
-        {
-            return true;
-        }
-
-        public Pickupable RemoveItemFromContainer(TechType techType)
-        {
-            return ItemsContainer.RemoveItem(techType);
-        }
-
-        public Dictionary<TechType, int> GetItemsWithin()
-        {
-            return new(){{ _targetItem ,ItemsContainer.count} };
-        }
         
-        public bool ContainsItem(TechType techType)
-        {
-            return _targetItem == techType && ItemsContainer.count > 0;
-        }
-
-        public ItemsContainer ItemsContainer { get; set; }
-        public int StorageCount()
-        {
-            return ItemsContainer?.count ?? 0;
-        }
-
         internal void SpawnClone()
         {
             AddItem();
@@ -214,10 +167,6 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             }
         }
 
-        public int GetCount()
-        {
-            return ItemsContainer.count;
-        }
 
         public void SetItemCount(int amount)
         {
