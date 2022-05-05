@@ -36,6 +36,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
         private ReplicatorSpeedButton _speedBTN;
         private GameObject _canvas;
         private InterfaceInteraction _interactionHelper;
+        private FCSMessageBox _messageBox;
         private const float PowerUsage = 0.85f;
         public override bool IsOperational => IsConstructed && IsInitialized;
         public override bool IsVisible => true;
@@ -202,8 +203,13 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
                 OnButtonClick, Color.gray, Color.white, 5);
 
             var clearBTNObj = InterfaceHelpers.FindGameObject(gameObject, "RemoveDNABTN");
-            InterfaceHelpers.CreateButton(clearBTNObj, "ClearBtn", InterfaceButtonMode.Background,
-                OnButtonClick, Color.gray, Color.white, 5);
+            
+            var removeDnaBtnLongPressListener = clearBTNObj.AddComponent<FCSMultiClickButton>();
+            removeDnaBtnLongPressListener.TextLineOne = AuxPatchers.HarvesterDeleteSample();
+            removeDnaBtnLongPressListener.TextLineTwo = AuxPatchers.HarvesterDeleteSampleDesc();
+            removeDnaBtnLongPressListener.onLongPress += OnLongPress;
+            removeDnaBtnLongPressListener.onSingleClick += Clear;
+
 
             if (_colorManager == null)
             {
@@ -232,10 +238,26 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
 
             var canvas = gameObject.GetComponentInChildren<Canvas>();
             _interactionHelper = canvas.gameObject.AddComponent<InterfaceInteraction>();
+            _messageBox = GameObjectHelpers.FindGameObject(_canvas, "MessageBox").AddComponent<FCSMessageBox>();
 
             IsInitialized = true;
 
             QuickLogger.Debug($"Initialized");
+        }
+
+        private void OnLongPress()
+        {
+            ShowMessage(AuxPatchers.ClearSlotLongPress(), FCSMessageButton.YESNO, (result =>
+            {
+                if (result != FCSMessageResult.OKYES) return;
+                _replicatorSlot.TryClear(true);
+                Clear();
+            }));
+        }
+
+        internal void ShowMessage(string message, FCSMessageButton button = FCSMessageButton.OK, Action<FCSMessageResult> result = null)
+        {
+            _messageBox.Show(message, button, result);
         }
 
         private void OnButtonClick(string btnName, object additionalData)
@@ -243,14 +265,12 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             switch (btnName)
             {
                 case "ItemBtn":
-                    if (_replicatorSlot.RemoveItem(out TechType techType))
-                    {
-                        PlayerInteractionHelper.GivePlayerItem(techType);
-                    }
 
-                    break;
-                case "ClearBtn":
-                    Clear();
+                    var pickUp = _replicatorSlot.RemoveItem();
+                    if (pickUp != null)
+                    {
+                        PlayerInteractionHelper.GivePlayerItem(pickUp);
+                    }
                     break;
             }
         }

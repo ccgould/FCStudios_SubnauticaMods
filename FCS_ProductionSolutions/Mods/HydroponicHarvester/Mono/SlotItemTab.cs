@@ -1,5 +1,6 @@
 ﻿using System;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
@@ -7,6 +8,7 @@ using FCS_ProductionSolutions.Mods.HydroponicHarvester.Models;
 using FCS_ProductionSolutions.Structs;
 using FCSCommon.Utilities;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
@@ -16,12 +18,14 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
         private uGUI_Icon _icon;
         internal PlantSlot Slot;
         private Text _amount;
+        private DisplayManager _display;
         private bool Initialized => _icon != null;
 
         internal void Initialize(DisplayManager display, Action<string,object> onButtonClicked,int slotIndex)
         {
             if (Initialized) return;
 
+            _display = display;
             BtnName = "SlotButton";
 
             Slot = display._mono.GrowBedManager.GetSlot(slotIndex);
@@ -35,20 +39,19 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
             addDnaBtn.TextLineOne = AuxPatchers.HarvesterAddSample();
             addDnaBtn.TextLineTwo = AuxPatchers.HarvesterAddSampleDesc();
             
-            var removeDnaBtn = GameObjectHelpers.FindGameObject(gameObject.transform.parent.gameObject, "RemoveDNABTN").AddComponent<InterfaceButton>();
-            removeDnaBtn.STARTING_COLOR = Color.gray;
-            removeDnaBtn.HOVER_COLOR = Color.white;
-            removeDnaBtn.OnButtonClick += (s, o) =>
+            var removeBTN = GameObjectHelpers.FindGameObject(gameObject.transform.parent.gameObject, "RemoveDNABTN");
+            var removeDnaBtn = removeBTN.AddComponent<FCSMultiClickButton>();
+            removeDnaBtn.onSingleClick += () =>
             {
-                var result = Slot.TryClear();
-                if (result)
-                {
-                    Clear();
-                    display.UpdateUI();
-                }
+                Slot.TryClear();
             };
+
+            removeDnaBtn.onLongPress += OnLongPress;
             removeDnaBtn.TextLineOne = AuxPatchers.HarvesterDeleteSample();
             removeDnaBtn.TextLineTwo = AuxPatchers.HarvesterDeleteSampleDesc();
+
+            //var removeDnaBtnLongPressListener = removeBTN.AddComponent<ButtonLongPressListener>();
+            //removeDnaBtnLongPressListener.onLongPress +=OnLongPress;
 
             _amount = InterfaceHelpers.FindGameObject(gameObject.transform.parent.gameObject, "Amount").GetComponent<Text>();
             UpdateCount();
@@ -59,6 +62,18 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
 
             Slot.TrackTab(this);
         }
+
+        private void OnLongPress()
+        {
+            _display.ShowMessage(AuxPatchers.ClearSlotLongPress(),FCSMessageButton.YESNO,(result =>
+            {
+                if (result == FCSMessageResult.OKYES)
+                {
+                    Slot.TryClear(true,true,Slot.GetCount());
+                }
+            }));
+        }
+
 
         internal void SetIcon(FCSDNASampleData sampleData)
         {
@@ -85,7 +100,8 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
         {
             _icon.sprite = SpriteManager.Get(TechType.None);
             Tag = null;
-            
+            UpdateCount();
+            _display.UpdateUI();   
         }
 
         public void Load(TechType techType)

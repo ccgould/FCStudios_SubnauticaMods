@@ -30,6 +30,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
         private List<TechType> _loadedDNASamples;
         private List<SlotItemTab> _slots = new();
         private Text _unitID;
+        private FCSMessageBox _messageBox;
 
         internal void Setup(HydroponicHarvesterController mono)
         {
@@ -109,6 +110,8 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
                 _powerUsagePerSecond =InterfaceHelpers.FindGameObject(gameObject, "PowerUsagePerSecond").GetComponent<Text>();
                 _generationTime =InterfaceHelpers.FindGameObject(gameObject, "UnitPerSecond").GetComponent<Text>();
 
+                _messageBox = GameObjectHelpers.FindGameObject(canvas, "MessageBox").AddComponent<FCSMessageBox>();
+
                 LoadKnownSamples();
             }
             catch (Exception e)
@@ -186,6 +189,11 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
         public void SetLightGraphicOff()
         {
             _lightToggleBTN.Select();
+        }
+
+        public void ShowMessage(string message,FCSMessageButton button = FCSMessageButton.OK, Action<FCSMessageResult> result= null)
+        {
+            _messageBox.Show(message,button,result);
         }
     }
 }

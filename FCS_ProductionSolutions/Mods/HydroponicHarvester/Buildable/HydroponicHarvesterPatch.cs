@@ -88,6 +88,12 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Buildable
                 PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = ClassID;
 
+                prefab.SetActive(false);
+                var storageContainer = prefab.AddComponent<GrowBedManager>();
+                storageContainer.Initialize(150, 1, 1, FriendlyName, ClassID);
+                storageContainer.enabled = false;
+                prefab.SetActive(true);
+
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<HydroponicHarvesterController>();
 

@@ -30,11 +30,12 @@ namespace FCS_ProductionSolutions.Buildable
             { $"{ModKey}_HarvesterAddSample","Sample Selector Page"},
             { $"{ModKey}_HarvesterAddSampleDesc","Opens the dialog that allows you to choose a sample for this slot"},
             { $"{ModKey}_HarvesterDeleteSample","Remove Sample"},
-            { $"{ModKey}_HarvesterDeleteSampleDesc","Clears this slot. Slot must be empty to clear."},
+            { $"{ModKey}_HarvesterDeleteSampleDesc","Clears this slot. (Slot must be empty to clear or long press to force clear.)"},
             { $"{ModKey}_AutocrafterItemIsBeingCrafted","Cannot deconstruct because AutoCrafter is currently crafting an item."},
             { $"{ModKey}_AutocrafterItemsOnBelt","Cannot deconstruct because there are items on the belt."},
             { $"{ModKey}_CannotSetStandByHasConnections","Standby cannot be set due to this crafter already having connections to other crafters:{0}"},
             { $"{ModKey}_FilterPageInformation","Filter: {0} | Black List: {1} | Enabled Filters Count : {2}"},
+            { $"{ModKey}_ClearSlotLongPress","Are you sure you would like to clear this slot? (All items will be destroyed)"},
 
         };
 
@@ -176,15 +177,16 @@ namespace FCS_ProductionSolutions.Buildable
         {
             return GetLanguage($"{ModKey}_PleaseClearHarvesterSlot");
         }
-
-        public static string PleaseEmptyHarvesterSlot()
-        {
-            return "";
-        }
-
+        
         public static string FilterPageInformation(bool focusToggleValue, bool blackListToggleValue, int focusCount)
         {
             return string.Format(GetLanguage($"{ModKey}_FilterPageInformation"), focusToggleValue ? "On" : "Off", blackListToggleValue ? "On" : "Off", focusCount);
+        }
+
+        public static string ClearSlotLongPress()
+        {
+            return GetLanguage($"{ModKey}_ClearSlotLongPress");
+
         }
     }
 }

@@ -15,7 +15,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Patches
         {
             //return false to skip execution of the original.
             if (!QPatch.Configuration.IsHydroponicHarvesterEnabled) return true;
-            return !__instance.gameObject.name.StartsWith(HydroponicHarvesterPatch.HydroponicHarvesterModClassName, StringComparison.OrdinalIgnoreCase);
+            return !__instance.gameObject.name.StartsWith(HydroponicHarvesterPatch.HydroponicHarvesterModName, StringComparison.OrdinalIgnoreCase);
         }
 
         [HarmonyPatch("OnHandClick")]
@@ -24,7 +24,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Patches
         {
             //return false to skip execution of the original.
             if (!QPatch.Configuration.IsHydroponicHarvesterEnabled) return true;
-            return !__instance.gameObject.name.StartsWith(HydroponicHarvesterPatch.HydroponicHarvesterModClassName, StringComparison.OrdinalIgnoreCase);
+            return !__instance.gameObject.name.StartsWith(HydroponicHarvesterPatch.HydroponicHarvesterModName, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

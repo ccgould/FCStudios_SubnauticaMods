@@ -69,15 +69,15 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
                     
                     _isInBase = _savedData.IsInBase;
 
-                    QuickLogger.Debug($"=============== Attempting Harvester {UnitID} Cleaning ===============");
-                    //Check if any ghost objects and clean
-                    foreach (Plantable plantable in gameObject.GetComponentsInChildren<Plantable>(true))
-                    {
-                        Destroy(plantable.gameObject);
-                        QuickLogger.Debug($"Destroyed Item {plantable.plantTechType.AsString()}");
+                    //QuickLogger.Debug($"=============== Attempting Harvester {UnitID} Cleaning ===============");
+                    ////Check if any ghost objects and clean
+                    //foreach (Plantable plantable in gameObject.GetComponentsInChildren<Plantable>(true))
+                    //{
+                    //    Destroy(plantable.gameObject);
+                    //    QuickLogger.Debug($"Destroyed Item {plantable.plantTechType.AsString()}");
 
-                    }
-                    QuickLogger.Debug($"=============== Attempting Harvester {UnitID} Cleaning Completed ===============");
+                    //}
+                    //QuickLogger.Debug($"=============== Attempting Harvester {UnitID} Cleaning Completed ===============");
 
                     GrowBedManager.Load(_savedData);
                 }
@@ -90,13 +90,19 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
         {
             base.OnDestroy();
             IPCMessage -= OnIpcMessage;
+            if (GrowBedManager?.ItemsContainer != null)
+            {
+                GrowBedManager.ItemsContainer.onAddItem -= UpdateTerminals;
+                GrowBedManager.ItemsContainer.onRemoveItem -= UpdateTerminals;
+                GrowBedManager.ItemsContainer.onRemoveItem -= GrowBedManager.OnItemPulledFromStorage;
+            }
         }
 
         #endregion
 
         public override float GetPowerUsage()
         {
-            if (GrowBedManager == null || GrowBedManager.IsFull() || !GrowBedManager.HasSeeds()) return 0;
+            if (GrowBedManager == null || GrowBedManager.IsFull || !GrowBedManager.HasSeeds()) return 0;
 
             switch (GrowBedManager.GetCurrentSpeedMode())
             {
@@ -133,10 +139,11 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
             
             if (GrowBedManager == null)
             {
-                GrowBedManager = gameObject.AddComponent<GrowBedManager>();
+                GrowBedManager = gameObject.GetComponent<GrowBedManager>();
                 GrowBedManager.Initialize(this);
                 GrowBedManager.ItemsContainer.onAddItem += UpdateTerminals;
                 GrowBedManager.ItemsContainer.onRemoveItem += UpdateTerminals;
+                GrowBedManager.ItemsContainer.onRemoveItem += GrowBedManager.OnItemPulledFromStorage;
             }
 
             if (_colorManager == null)

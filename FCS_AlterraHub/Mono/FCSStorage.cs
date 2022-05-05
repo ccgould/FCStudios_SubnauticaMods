@@ -24,11 +24,9 @@ namespace FCS_AlterraHub.Mono
         {
             get
             {
-                if (container == null && storageRoot != null)
-                {
-                    CreateContainer();
-                    Subscribe();
-                }
+                if (container != null || storageRoot == null) return container;
+                CreateContainer();
+                Subscribe();
                 return container;
             }
         }

@@ -160,7 +160,8 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
 
     internal enum EffectType    
     {
-        Smoke,
-        Bubbles
+        Smoke =0,
+        Bubbles = 1,
+        None = -1
     }
 }

@@ -93,35 +93,44 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Models
             return EnergyConsumption / creationTime;
         }
         
-        public void Clear()
+        private void Clear()
         {
             if (PlantModel != null)
             {
                 GameObject.Destroy(PlantModel);
             }
 
-            if (_plantable.linkedGrownPlant != null)
+            if (_plantable != null  && _plantable.linkedGrownPlant != null)
             {
                 GameObject.Destroy(_plantable.linkedGrownPlant.gameObject);
             }
 
-            GrowBedManager.HarvesterController.EffectsManager.ChangeEffectState(GrowBedManager.FindEffectType(this),Id,false);
+            _count = 0;
+            GrowBedManager.HarvesterController.EffectsManager.ChangeEffectState(GrowBedManager.FindEffectType(this), Id, false);
             IsOccupied = false;
             _seedTech = TechType.None;
             _returnTechType = TechType.None;
             GrowingPlant = null;
             PlantModel = null;
             _plantable = null;
+            _trackedTab.Clear();
         }
 
-        internal bool TryClear()
+        internal bool TryClear(bool forceClear = false, bool clearContainer = false, int amount = 0)
         {
-            if (_count > 0)
+            if (!forceClear && _count > 0)
             {
-                QuickLogger.Message(AuxPatchers.PleaseEmptyHarvesterSlot(), true);
+                GrowBedManager.HarvesterController.DisplayManager.ShowMessage(AuxPatchers.PleaseClearHarvesterSlot());
                 return false;
             }
+
+            if (clearContainer)
+            {
+                GrowBedManager.DestroyAllOfTechType(_returnTechType, amount);
+            }
+
             Clear();
+
             return true;
         }
         
@@ -236,13 +245,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Models
             _seedTech = currentItemTech;
             _returnTechType = data.PickType;
         }
-
-        public void DeductCount()
-        {
-            _count--;
-            _trackedTab?.UpdateCount();
-        }
-
+        
         public void SetCount(int count)
         {
             _count = count;

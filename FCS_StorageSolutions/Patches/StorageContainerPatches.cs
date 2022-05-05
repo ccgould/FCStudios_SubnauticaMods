@@ -24,7 +24,7 @@ namespace FCS_StorageSolutions.Patches
             // TODO Find effective way to check this. (Trying to get the DSS C48 to display items in Wind Surfer Operator)
             var fcsdevice = __instance.gameObject.GetComponentInChildren<FcsDevice>();
 
-            if (fcsdevice != null && (fcsdevice.StorageType == StorageType.RemoteStorage || fcsdevice.StorageType == StorageType.Replicator)) return;
+            if (fcsdevice != null && IsInvalidStorageType(fcsdevice.StorageType)) return;
 
             QuickLogger.Debug($"Awake: FCSDevice: {fcsdevice} || Is Bypassing: {fcsdevice?.BypassFCSDeviceCheck} || {fcsdevice?.StorageType}", true);
 
@@ -42,6 +42,12 @@ namespace FCS_StorageSolutions.Patches
             }
 
             manager.AlertNewStorageContainerPlaced(__instance);
+        }
+
+        internal static bool IsInvalidStorageType(StorageType storageType)
+        {
+            return storageType == StorageType.RemoteStorage || storageType == StorageType.Replicator ||
+                   storageType == StorageType.Harvester || storageType == StorageType.SeaBreeze;
         }
     }
 
@@ -66,7 +72,7 @@ namespace FCS_StorageSolutions.Patches
 
             var fcsdevice = __instance.gameObject.GetComponentInChildren<FcsDevice>();
             var storageContainer = __instance.gameObject.GetComponentInChildren<StorageContainer>(true);
-            if(fcsdevice != null && (fcsdevice.StorageType == StorageType.RemoteStorage || fcsdevice.StorageType == StorageType.Replicator)) return;
+            if(fcsdevice != null && StorageContainerAwakePatcher.IsInvalidStorageType(fcsdevice.StorageType)) return;
 
             QuickLogger.Debug($"OnConstructedChanged: FCSDevice: {fcsdevice} || Is Bypassing: {fcsdevice?.BypassFCSDeviceCheck} || {fcsdevice?.StorageType}", true);
 

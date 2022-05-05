@@ -108,33 +108,40 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             return EnergyConsumption / creationTime;
         }
 
-        internal bool TryClear()
+        internal bool TryClear(bool force = false)
         {
             QuickLogger.Debug($"Item Count {ItemsContainer.count}.", true);
-            if (ItemsContainer.count > 0) return false;
-            
+
+            if (!force && ItemsContainer.count > 0)
+            {
+                _mono.ShowMessage(AuxPatchers.PleaseClearReplicatorSlot());
+                return false;
+            }
+
+            if (force)
+            {
+                ItemsContainer.Clear();
+            }
+
             ChangeTargetItem(TechType.None,true);
             _mono.UpdateUI();
             return true;
         }
 
-        public bool RemoveItem(out TechType techType)
+        public Pickupable RemoveItem()
         {
-            techType = TechType.None;
-            
-            if (ItemsContainer.count <= 0) return false;
+           if (ItemsContainer.count <= 0) return null;
 
             if (PlayerInteractionHelper.CanPlayerHold(_targetItem))
             {
-                ItemsContainer.RemoveItem(_targetItem);
-                techType = _targetItem;
+                
                 TryStartingNextClone();
                 _mono.UpdateUI();
-                return true;
+                return ItemsContainer.RemoveItem(_targetItem); ;
             }
 
             QuickLogger.ModMessage(AuxPatchers.InventoryFull());
-            return false;
+            return null;
         }
         
         public void AddItem()

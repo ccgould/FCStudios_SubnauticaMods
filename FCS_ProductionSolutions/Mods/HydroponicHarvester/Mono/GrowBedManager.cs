@@ -16,21 +16,10 @@ using UnityEngine;
 
 namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
 {
-    internal class GrowBedManager : MonoBehaviour, IFCSGrowBed, IFCSStorage
+    internal class GrowBedManager : FCSStorage, IFCSGrowBed
     {
         private const float MaxPlantsHeight = 3f;
-        private readonly Dictionary<TechType, int> _trackedItems = new();
-
-        #region Actions
-
-        public Action<int, int> OnContainerUpdate { get; set; }
-        public Action<FcsDevice, TechType> OnContainerAddItem { get; set; }
-        public Action<FcsDevice, TechType> OnContainerRemoveItem { get; set; }
-
-        #endregion
-
         internal PlantSlot[] Slots;
-        public ItemsContainer ItemsContainer { get; set; }
         public GameObject grownPlantsRoot { get; set; }
         internal HydroponicHarvesterController HarvesterController { get; private set; }
 
@@ -42,27 +31,20 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
             {
                 grownPlantsRoot = GameObjectHelpers.FindGameObject(gameObject, "Planters");
             }
-
-            if (ItemsContainer == null)
-            {
-                ItemsContainer = new ItemsContainer(1, 1, gameObject.transform, "HarvesterTempStorage", null);
-            }
         }
 
-        internal void UpdateSlotCounts(InventoryItem item)
+        internal void OnItemPulledFromStorage(InventoryItem inventoryItem)
         {
             QuickLogger.Debug("Update Slots", true);
 
+            TakeItem(inventoryItem.item.GetTechType());
+
             foreach (PlantSlot slot in Slots)
             {
-                if (slot.GetReturnType() == item.item.GetTechType() && slot.GetCount() > 0)
-                {
-                    slot.DeductCount();
-                    break;
-                }
+                slot.GetTab()?.UpdateCount();
             }
         }
-
+        
         public void AddItemToItemsContainer(TechType techType)
         {
             Mod.IsHydroponicKnownTech(techType, out var data);
@@ -113,7 +95,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
             GetSlotByID(slotID).IsOccupied = state;
         }
 
-        internal void RemoveItem(int slotID)
+        internal void ClearSlot(int slotID)
         {
             var slotByID = GetSlotByID(slotID);
 
@@ -123,14 +105,14 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
                 return;
             }
 
-            HarvesterController.EffectsManager.ChangeEffectState(FindEffectType(slotByID), slotByID.Id, false);
-            slotByID.Clear();
+            slotByID.TryClear(true);
             SetSlotOccupiedState(slotID, false);
         }
 
         internal static EffectType FindEffectType(PlantSlot slotByID)
         {
-            QuickLogger.Debug($"PlantSlot: {slotByID.GetPlantable().underwater}", true);
+            if(slotByID == null || slotByID.GetPlantable() == null) return EffectType.None;
+            QuickLogger.Debug($"PlantSlot: {slotByID.GetPlantable()?.underwater}", true);
             return slotByID.GetPlantable().underwater ? EffectType.Bubbles : EffectType.Smoke;
         }
 
@@ -197,8 +179,10 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
         {
             for (int i = 0; i < Slots.Length; i++)
             {
-                RemoveItem(i);
+                ClearSlot(i);
             }
+
+            ItemsContainer.Clear();
         }
 
         public bool HasItems()
@@ -274,14 +258,8 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
                 if (data.TechType == TechType.None) continue;
 
                 slot.GenerationProgress = data.GenerationProgress;
-
                 slot.SetCount(data.Amount);
-
-                for (int j = 0; j < data.Amount; j++)
-                {
-                    AddItemToItemsContainer(data.TechType);
-                }
-
+                
                 slot.GetTab().Load(data.TechType);
 
                 if (slot.GrowingPlant != null)
@@ -334,7 +312,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
                     {
                         Destroy(item.gameObject);
                         PlayerInteractionHelper.GivePlayerItem(techType);
-                        slot.RemoveItem();
+                        //slot.RemoveItem();
                     }
                 }
             }
@@ -344,41 +322,33 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
             }
         }
 
-        public bool IsFull()
+        private void TakeItem(TechType techType)
         {
-            return Slots.All(plantSlot => plantSlot != null && plantSlot.IsFull);
+            var slot = GetSlotByItem(techType);
+            if (slot != null)
+            {
+                slot.RemoveItem();
+            }
+        }
+
+        private PlantSlot GetSlotByItem(TechType techType)
+        {
+            for (int i = 0; i < Slots.Length; i++)
+            {
+                if (Slots[i].GetReturnType() == techType)
+                {
+                    return GetSlot(i);
+                }
+            }
+            return null;
         }
 
         public bool HasSeeds()
         {
             return Slots.Where(plantSlot => plantSlot != null).Any(plantSlot => plantSlot.IsOccupied);
         }
-
-        public int GetContainerFreeSpace { get; }
-
-        bool IFCSStorage.IsFull => IsFull();
-
-        public bool CanBeStored(int amount, TechType techType)
-        {
-            return false;
-        }
-
-        public bool AddItemToContainer(InventoryItem item)
-        {
-            return false;
-        }
-
-        public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
-        {
-            return false;
-        }
-
-        public bool IsAllowedToRemoveItems()
-        {
-            return false;
-        }
-
-        public Pickupable RemoveItemFromContainer(TechType techType)
+        
+        public  override Pickupable RemoveItemFromContainer(TechType techType)
         {
             var pickupable = ItemsContainer.RemoveItem(techType);
 
@@ -407,30 +377,21 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
             return null;
         }
 
-        public Dictionary<TechType, int> GetItemsWithin()
-        {
-            _trackedItems.Clear();
-            foreach (KeyValuePair<TechType, ItemsContainer.ItemGroup> item in ItemsContainer._items)
-            {
-                _trackedItems.Add(item.Key, item.Value.items.Count);
-            }
-
-            return _trackedItems;
-        }
-
-        public bool ContainsItem(TechType techType)
-        {
-            return _trackedItems.ContainsKey(techType);
-        }
-
-        public int StorageCount()
-        {
-            return _trackedItems.Values.Sum();
-        }
-
         public int GetItemCount(TechType techType)
         {
             return ItemsContainer.GetCount(techType);
+        }
+
+        public void DestroyAllOfTechType(TechType techType, int amount)
+        {
+
+            QuickLogger.Debug($"{techType.AsString()} Count: {GetItemCount(techType)}", true);
+
+            for (int i = 0; i < amount; i++)
+            {
+                QuickLogger.Debug($"Destroy Items: {techType}", true);
+                container.DestroyItem(techType);
+            }
         }
     }
 }

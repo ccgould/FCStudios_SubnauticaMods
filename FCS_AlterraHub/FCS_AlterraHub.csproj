@@ -41,6 +41,8 @@
     <Compile Include="Helpers\TechTypeHelpers.cs" />
     <Compile Include="Managers\PortManager.cs" />
     <Compile Include="Model\ColorTemplate.cs" />
+    <Compile Include="Model\GUI\ButtonEvents\ButtonDoubleClickListener.cs" />
+    <Compile Include="Model\GUI\ButtonEvents\ButtonLongPressListener.cs" />
     <Compile Include="Model\GUI\EquipmentConfiguration.cs" />
     <Compile Include="Model\GUI\Initialize_uGUI.cs" />
     <Compile Include="Model\GUI\StorageInventoryButton.cs" />
@@ -173,6 +175,7 @@
     <Compile Include="Mono\CustomToggle.cs" />
     <Compile Include="Mono\DSSVehicleDockingManager.cs" />
     <Compile Include="Mono\DumpContainerSimplified.cs" />
+    <Compile Include="Mono\FCSMultiClickButton.cs" />
     <Compile Include="Mono\FCSButton.cs" />
     <Compile Include="Mods\FCSPDA\Enums\PDAPages.cs" />
     <Compile Include="Mods\FCSPDA\Mono\Dialogs\AlterraHubReturnItemController.cs" />
