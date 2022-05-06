@@ -55,7 +55,7 @@ namespace FCS_ProductionSolutions.Configuration
             {
                 if (controller.UnitID.Equals($"{HydroponicHarvesterPatch.HydroponicHarvesterModTabID}{id:D3}", StringComparison.OrdinalIgnoreCase))
                 {
-                    controller.GrowBedManager.ClearGrowBed();
+                    controller.GrowBedManager.PerformPurge();
                     break;
                 }
             }

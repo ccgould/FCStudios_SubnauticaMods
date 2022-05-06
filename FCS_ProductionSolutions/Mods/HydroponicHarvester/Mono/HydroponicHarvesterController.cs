@@ -310,7 +310,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
         {
             QuickLogger.Debug("Hydroponics Remove From Container",true);
 
-            Destroy(GrowBedManager.RemoveItemFromContainer(techType).gameObject);
+            GrowBedManager.TakeItemFromContainer(techType,GrowBedManager.GetSlotByItem(techType),false);
 #if SUBNAUTICA_STABLE
             return techType.ToPickupable();
 #else

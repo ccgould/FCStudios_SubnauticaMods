@@ -339,7 +339,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             {
                 if (_isBeingDestroyed || _mono == null || _currentBase == null) return;
 
-                var grouped = _currentBase.GetItemsWithin(_storageFilter)?.OrderBy(x => x.Key).ToList();
+                var grouped = _currentBase.GetItemsWithin(_storageFilter)?.Where(x=>x.Value > 0)?.OrderBy(x => x.Key).ToList();
 
                 if(grouped == null) return;
 
@@ -362,6 +362,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
                 for (int i = data.StartPosition; i < data.EndPosition; i++)
                 {
+                    QuickLogger.Debug($"Terminal OnLoad: {grouped.ElementAt(i).Key} | {grouped.ElementAt(i).Value}");
+
                     _inventoryButtons[w++].Set(grouped.ElementAt(i).Key, grouped.ElementAt(i).Value);
                 }
 

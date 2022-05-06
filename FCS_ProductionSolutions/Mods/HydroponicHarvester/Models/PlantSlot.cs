@@ -116,7 +116,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Models
             _trackedTab.Clear();
         }
 
-        internal bool TryClear(bool forceClear = false, bool clearContainer = false, int amount = 0)
+        internal bool TryClear(bool forceClear = false, bool clearContainer = false)
         {
             if (!forceClear && _count > 0)
             {
@@ -126,7 +126,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Models
 
             if (clearContainer)
             {
-                GrowBedManager.DestroyAllOfTechType(_returnTechType, amount);
+                GrowBedManager.ClearSlot(GetTab().Slot.Id);
             }
 
             Clear();
@@ -157,7 +157,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Models
             return true;
         }
 
-        public bool CanRemoveItem() => _count > 0; //GrowBedManager.GetItemCount(_returnTechType) > 0;
+        public bool CanRemoveItem() => _count > 0;
 
         public void AddItem()
         {
@@ -203,7 +203,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Models
 
         public int GetCount()
         {
-            return _count; //GrowBedManager.GetItemCount(_returnTechType);
+            return _count;
         }
 
         public int GetMaxCapacity()
@@ -249,6 +249,11 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Models
         public void SetCount(int count)
         {
             _count = count;
+        }
+
+        public bool HasItems()
+        {
+            return GetCount() > 0;
         }
     }
 }

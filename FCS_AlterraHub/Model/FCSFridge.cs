@@ -20,6 +20,7 @@ namespace FCS_AlterraHub.Model
         private bool _decay;
         private FCSGameMode _modMode;
         private FcsDevice _mono;
+        private EatableType _targetEatableType = EatableType.Any;
         public int NumberOfItems => FridgeItems.Count;
         
         private void AttemptDecay()
@@ -52,48 +53,10 @@ namespace FCS_AlterraHub.Model
         {
             _mono = mono;
             float time = UnityEngine.Random.Range(0f, 5f);
-            container.onRemoveItem += ContainerOnRemoveItem;
+            ItemsContainer.onRemoveItem += ContainerOnRemoveItem;
             InvokeRepeating(nameof(AttemptDecay), time, 5f);
         }
-
-        private void ContainerOnRemoveItem(InventoryItem item)
-        {
-            var techType = item.item.GetTechType();
-            var pickup = item.item;
-            
-            QuickLogger.Debug($"Removing {techType} from SeaBreeze",true);
-            EatableEntities match = FindMatch(techType, EatableType.Any);
-            QuickLogger.Debug($"Match Result If Null {match == null}", true);
-
-            if (match != null)
-            {
-
-                var eatable = pickup.GetComponent<Eatable>();
-
-
-                if (Inventory.main.HasRoomFor(pickup))
-                {
-                    match.UnpauseDecay();
-                    eatable.timeDecayStart = match.TimeDecayStart;
-
-                    if (Inventory.main.Pickup(pickup))
-                    {
-                        FridgeItems.Remove(match);
-                    }
-                    else
-                    {
-                        QuickLogger.Message(LanguageHelpers.GetLanguage("InventoryFull"), true);
-                    }
-                    OnContainerUpdate?.Invoke(NumberOfItems, SlotsAssigned);
-                    OnContainerRemoveItem?.Invoke(_mono, techType);
-                }
-                else
-                {
-                    Destroy(pickup);
-                }
-            }
-        }
-
+        
         public bool IsAllowedToAdd(Pickupable pickupable)
         {
             bool flag = false;
@@ -252,127 +215,69 @@ namespace FCS_AlterraHub.Model
 
             return flag;
         }
+        
         public override  Pickupable RemoveItemFromContainer(TechType techType)
         {
-            EatableEntities match = FindMatch(techType, EatableType.Any);
+
+            QuickLogger.Debug($"RemoveItemFromContainer Called {techType.AsString()}");
+
+            EatableEntities match = FindMatch(techType, _targetEatableType);
 
             if (match == null) return null;
-
-            //var go = GameObject.Instantiate(CraftData.GetPrefabForTechType(techType));
-            var pickup = base.RemoveItemFromContainer(techType);
-            var eatable = pickup.GetComponent<Eatable>();
-
-
-            if (!Inventory.main.HasRoomFor(pickup)) return null;
-            match.UnpauseDecay();
-            eatable.timeDecayStart = match.TimeDecayStart;
-
-            FridgeItems.Remove(match);
-            OnContainerUpdate?.Invoke(NumberOfItems, SlotsAssigned);
-            OnContainerRemoveItem?.Invoke(_mono, techType);
-            return pickup;
+            _targetEatableType = EatableType.Any;
+            return base.RemoveItemFromContainer(techType);
         }
 
-
-#if SUBNAUTICA_STABLE
         public void RemoveItem(TechType techType, EatableType eatableType)
         {
-            EatableEntities match = FindMatch(techType, eatableType);
+            QuickLogger.Debug($"RemoveItem Called {techType.AsString()}");
+
+#if SUBNAUTICA
+            var slotSize = CraftData.GetItemSize(techType);
+#else
+            var slotSize = TechData.GetItemSize(techType);
+#endif
+
+
+
+            if (Inventory.main.HasRoomFor(slotSize.x, slotSize.y))
+            {
+                EatableEntities match = FindMatch(techType, eatableType);
+
+                if (match != null)
+                {
+                    Inventory.main.Pickup(RemoveItemFromContainer(techType));
+                }
+                else
+                {
+                    QuickLogger.Message(LanguageHelpers.GetLanguage("InventoryFull"), true);
+                }
+            }
+            
+        }
+
+        private void ContainerOnRemoveItem(InventoryItem item)
+        {
+            QuickLogger.Debug($"ContainerOnRemoveItem Called {item.item.GetTechName()}");
+            var techType = item.item.GetTechType();
+            var pickup = item.item;
+
+            QuickLogger.Debug($"Removing {techType} from SeaBreeze", true);
+            EatableEntities match = FindMatch(techType, EatableType.Any);
 
             if (match != null)
             {
-              
-                var pickup = base.RemoveItemFromContainer(techType);
+
                 var eatable = pickup.GetComponent<Eatable>();
-
-
-                if (Inventory.main.HasRoomFor(pickup))
-                {
-                    match.UnpauseDecay();
-                    eatable.timeDecayStart = match.TimeDecayStart;
-
-                    if (Inventory.main.Pickup(pickup))
-                    {
-                        FridgeItems.Remove(match);
-                    }
-                    else
-                    {
-                        QuickLogger.Message(LanguageHelpers.GetLanguage("InventoryFull"), true);
-                    }
-                    OnContainerUpdate?.Invoke(NumberOfItems, SlotsAssigned);
-                    OnContainerRemoveItem?.Invoke(_mono, techType);
-                }
-                else
-                {
-                    Destroy(pickup);
-                }
-            }
-        }
-#else
-
-        public void RemoveItem(TechType techType, EatableType eatableType)
-        {
-
-#if SUBNAUTICA_STABLE
-            var pickupable = techType.ToPickupable();
-#else
-            var pickupable = TechTypeHelpers.ConvertToPickupable(techType,(pickupable =>
-            {
-                if (Inventory.main.HasRoomFor(pickupable))
-                {
-                    EatableEntities match = FindMatch(techType, eatableType);
-
-                    if (match != null)
-                    {
-                        StartCoroutine(AttemptToRemoveAsync(techType, match, pickupable));
-                    }
-                }
-                else
-                {
-                    Destroy(pickupable);
-                }
-            }));
-#endif
-        }
-
-        private IEnumerator AttemptToRemoveAsync(TechType techType, EatableEntities match, Pickupable pickupable)
-        {
-            var prefabForTechType = CraftData.GetPrefabForTechTypeAsync(techType, false);
-            yield return prefabForTechType;
-
-            var prefabResult = prefabForTechType.GetResult();
-
-            var go = GameObject.Instantiate(prefabResult);
-            var eatable = go.GetComponent<Eatable>();
-            var pickup = go.GetComponent<Pickupable>();
-
-            match.UnpauseDecay();
-            eatable.timeDecayStart = match.TimeDecayStart;
-
-            TaskResult<bool> pickupResult = new TaskResult<bool>();
-#if SUBNAUTICA
-            yield return Inventory.main.PickupAsync(pickup, pickupResult);
-#else
-            yield return Inventory.main.Pickup(pickup);
-#endif
-
-            if (pickupResult.Get())
-            {
-                QuickLogger.Debug($"Removed Match Before || Fridge Count {FridgeItems.Count}");
+                
+                match.UnpauseDecay();
+                eatable.timeDecayStart = match.TimeDecayStart;
                 FridgeItems.Remove(match);
-                QuickLogger.Debug($"Removed Match || Fridge Count {FridgeItems.Count}");
+                OnContainerUpdate?.Invoke(NumberOfItems, SlotsAssigned);
+                OnContainerRemoveItem?.Invoke(_mono, techType);
             }
-            else
-            {
-                QuickLogger.Message(LanguageHelpers.GetLanguage("InventoryFull"), true);
-            }
-
-            Destroy(pickupable);
-            OnContainerUpdate?.Invoke(NumberOfItems, _itemLimit);
-            OnContainerRemoveItem?.Invoke(_mono, techType);
-            yield break;
         }
-#endif
+
 
         public void Clear()
         {

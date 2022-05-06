@@ -69,11 +69,10 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
             {
                 if (result == FCSMessageResult.OKYES)
                 {
-                    Slot.TryClear(true,true,Slot.GetCount());
+                    Slot.TryClear(true,true);
                 }
             }));
         }
-
 
         internal void SetIcon(FCSDNASampleData sampleData)
         {

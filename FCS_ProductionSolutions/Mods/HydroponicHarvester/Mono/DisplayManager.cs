@@ -52,7 +52,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
             {
                 if (Tag == null) return;
                 var data = (SlotData)Tag;
-                _mono?.GrowBedManager.TakeItem(data.TechType,data.SlotId);
+                _mono?.GrowBedManager.TakeItemFromContainer(data.TechType,_mono.GrowBedManager.GetSlot(data.SlotId));
             }
         }
 

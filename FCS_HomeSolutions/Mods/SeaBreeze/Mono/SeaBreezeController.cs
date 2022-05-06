@@ -38,7 +38,7 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Mono
         internal int PageStateHash { get; private set; }
         internal PrefabIdentifier PrefabId { get; set; }
         public override bool IsVisible => !GetHasBreakerTripped();
-        public override StorageType StorageType => StorageType.RemoteStorage;
+        public override StorageType StorageType => StorageType.SeaBreeze;
         public override bool IsOperational => PowerManager.GetIsPowerAvailable() && IsInitialized && IsConstructed;
 
         private bool GetHasBreakerTripped()
@@ -238,6 +238,7 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Mono
         private void OnFridgeContainerUpdate(int arg1, int arg2)
         {
             DisplayManager.OnContainerUpdate(arg1, arg2);
+            BaseManager.GlobalNotifyByID("DTC", "ItemUpdateDisplay");
         }
 
         private void OnLabelChangedMethod(string arg1, NameController arg2)
