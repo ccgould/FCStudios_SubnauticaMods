@@ -71,9 +71,16 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
 
         private bool TryCraft()
         {
+            
             QuickLogger.Debug("Trycraft", true);
 
-            if (_operation != null && IsCraftRecipeFulfilledAdvanced(_operation.TechType) &&
+            if (_operation != null && _operation.IsComplete)
+            {
+                return false;
+            }
+
+
+            if ( IsCraftRecipeFulfilledAdvanced(_operation.TechType) &&
                 CheckIfLinkedItemsAllowed())
             {
                 QuickLogger.Debug("Crafting", true);
@@ -138,59 +145,9 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
             _operation = null;
             _consumable?.Clear();
             _crafted?.Clear();
-            //_manager?.Crafter?.CraftMachine?.OnComplete?.Invoke(craftingOperation);
             AutocrafterHUD.Main.OnComplete(craftingOperation);
         }
-
-        //private void CraftItem(TechType techType, bool isComplete)
-        //{
-        //    bool result = false;
-        //    QuickLogger.Debug($"Crafting item: {Language.main.Get(techType)}",true);
-        //    Dictionary<TechType, int> dictionary = new Dictionary<TechType, int>();
-        //    Dictionary<TechType, int> crafted = new Dictionary<TechType, int>();
-        //    if (!_IsCraftRecipeFulfilledAdvanced(techType, techType, dictionary, crafted))
-        //    {
-        //        return; 
-        //    }
-
-        //    ConsumeIngredients(dictionary);
-
-        //    if (isComplete)
-        //    {
-        //        QuickLogger.Debug("Attempting to add item", true);
-        //        for (int i = 0; i < _operation.ReturnAmount; i++)
-        //        {
-        //            if (_manager.Crafter.Manager.IsAllowedToAdd(techType, 1, true))
-        //            {
-        //                QuickLogger.Debug("Item was allowed trying to add network", true);
-        //                result = AttemptToAddToNetwork(_operation.FixCustomTechType());
-        //                QuickLogger.Debug($"Result : {result}", true);
-        //            }
-        //            else
-        //            {
-        //                QuickLogger.Debug("Item not allowed adding to storage", true);
-        //                result = _manager.Crafter.AddItemToStorage(_operation.FixCustomTechType());
-        //            }
-        //        }
-
-        //        if(result)
-        //            _operation.AppendCompletion();
-
-        //    }
-        //    else
-        //    {
-        //        _manager.Crafter.Storage.container.UnsafeAdd(techType.ToInventoryItem());
-        //        result = true;
-        //    }
-
-        //    if (result)
-        //    {
-        //        //CoroutineHost.StartCoroutine(SpawnItems());
-        //        _manager.Crafter.CrafterBelt.SpawnBeltItem(_operation.FixCustomTechType());
-        //        _manager.Crafter.CraftMachine.OnItemCrafted?.Invoke();
-        //    }
-        //}
-
+        
         private void CraftItem(TechType techType)
         {
             if (techType == TechType.None) return;
@@ -308,7 +265,6 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
 #endif
         private bool AttemptToAddToNetwork(TechType techType)
         {
-            QuickLogger.Debug("1");
 #if SUBNAUTICA_STABLE
             var inventoryItem = techType.ToInventoryItem();
 #else
@@ -316,13 +272,10 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
             CouroutineManager.WaitCoroutine(techType.ToInventoryItem(itemTask));
             var inventoryItem = itemTask.Get();
 #endif
-            QuickLogger.Debug("2");
 
             QuickLogger.Debug($"InventoryItemLegacy returned: {Language.main.Get(inventoryItem.item.GetTechType())}");
-            QuickLogger.Debug("3");
 
             var result = BaseManager.AddItemToNetwork(_manager.Crafter.Manager, inventoryItem, true);
-            QuickLogger.Debug("4");
 
             if (!result)
             {
@@ -399,7 +352,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
 
                     if (amountRemainder < ingredientAmount)
                     {
-                        if (!CheckIfInvalidEquipmentType(ingredientTechType)) return false;
+                        //if (!CheckIfInvalidEquipmentType(ingredientTechType)) return false;
 
                         QuickLogger.Debug(
                             $"PT1 | Adding Consumable: {Language.main.Get(ingredientTechType)} | Amount: {amountRemainder}");
@@ -508,7 +461,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
 
                         if (amountRemainder < ingredientAmount)
                         {
-                            if (!CheckIfInvalidEquipmentType(ingredientTechType)) return false;
+                            //if (!CheckIfInvalidEquipmentType(ingredientTechType)) return false;
 
                             QuickLogger.Debug(
                                 $"PT1 | Adding Consumable: {Language.main.Get(ingredientTechType)} | Amount: {amountRemainder}");
