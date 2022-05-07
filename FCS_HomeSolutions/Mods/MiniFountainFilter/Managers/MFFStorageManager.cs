@@ -150,7 +150,7 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Managers
         private void SpawnBottle()
         {
 #if SUBNAUTICA_STABLE
-            var newInventoryItem = TechType.BigFilteredWater.ToInventoryItem();
+            var newInventoryItem = TechType.BigFilteredWater.ToInventoryItemLegacy();
             _container.UnsafeAdd(newInventoryItem);
 #else
             CoroutineHost.StartCoroutine(TechType.BigFilteredWater.AddTechTypeToContainerUnSafe(_container));

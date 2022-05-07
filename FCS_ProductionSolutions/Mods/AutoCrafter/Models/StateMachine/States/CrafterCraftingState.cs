@@ -235,7 +235,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
                         for (int i = 0; i < Mathf.Abs(keyValuePair2.Value); i++)
                         {
 #if SUBNAUTICA_STABLE
-                            _manager.Crafter.Manager.AddItemToContainer(keyValuePair2.Key.ToInventoryItem());
+                            _manager.Crafter.Manager.AddItemToContainer(keyValuePair2.Key.ToInventoryItemLegacy());
 #else
                             CoroutineHost.StartCoroutine(AttemptToAddToContainerAsync(keyValuePair2.Key));
 #endif
@@ -266,8 +266,8 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
         private bool AttemptToAddToNetwork(TechType techType)
         {
 #if SUBNAUTICA_STABLE
-            var inventoryItem = techType.ToInventoryItem();
-#else
+            var inventoryItem = techType.ToInventoryItemLegacy(); 
+#else 
             var itemTask = new TaskResult<InventoryItem>();
             CouroutineManager.WaitCoroutine(techType.ToInventoryItem(itemTask));
             var inventoryItem = itemTask.Get();

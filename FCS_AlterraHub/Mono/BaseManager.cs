@@ -173,7 +173,7 @@ namespace FCS_AlterraHub.Mono
                         if (operation.Device.CanBeStored(1, item) && operation.Device.GetStorage() != null && operation.Device.GetStorage()?.StorageCount() < operation.MaxAmount)
                         {
 #if SUBNAUTICA_STABLE
-                            var result = TakeItem(item).Pickup(false).GetTechType().ToInventoryItem();
+                            var result = TakeItem(item).Pickup(false).GetTechType().ToInventoryItemLegacy();
                             operation.Device.AddItemToContainer(result);
                             #else
                             CoroutineHost.StartCoroutine(AddItemToDevice(operation.Device, item));

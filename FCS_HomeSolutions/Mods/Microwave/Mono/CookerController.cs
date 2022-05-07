@@ -116,7 +116,7 @@ namespace FCS_HomeSolutions.Mods.Microwave.Mono
                     _pendingItem.TechType != TechType.None)
                 {
 #if SUBNAUTICA_STABLE
-                    _storageContainer.container.UnsafeAdd(_pendingItem.ReturnItem.ToInventoryItem());
+                    _storageContainer.container.UnsafeAdd(_pendingItem.ReturnItem.ToInventoryItemLegacy());
 #else
                         StartCoroutine(_pendingItem.ReturnItem.AddTechTypeToContainerUnSafe(_storageContainer.container));
 #endif

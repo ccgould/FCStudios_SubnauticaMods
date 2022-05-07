@@ -147,7 +147,7 @@ namespace FCS_HomeSolutions.Mods.Stove.Mono
             else
             {
 #if SUBNAUTICA_STABLE
-                _mono.StorageSystem.container.UnsafeAdd(item.CookedTechType.ToInventoryItem());
+                _mono.StorageSystem.container.UnsafeAdd(item.CookedTechType.ToInventoryItemLegacy());
 #else
                 StartCoroutine(item.CookedTechType.AddTechTypeToContainerUnSafe(_mono.StorageSystem.container));
 #endif

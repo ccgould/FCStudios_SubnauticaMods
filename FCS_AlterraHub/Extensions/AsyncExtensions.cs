@@ -31,40 +31,7 @@ namespace FCS_AlterraHub.Extensions
 
             return null;
         }
-
-        public static InventoryItem ToInventoryItem(this TechType techType)
-        {
-
-            InventoryItem item = null;
-            if (PrefabDatabase.TryGetPrefabFilename(CraftData.GetClassIdForTechType(techType), out string filepath))
-            {
-                GameObject prefab = Resources.Load<GameObject>(filepath);
-
-                if (prefab != null)
-                {
-                    var go = GameObject.Instantiate(prefab);
-                    var pickupable = go.EnsureComponent<Pickupable>();
-                    PickupReplacement(pickupable);
-                    item = new InventoryItem(pickupable);
-                }
-                else
-                {
-                    var go = GameObject.Instantiate(GameObject.CreatePrimitive(PrimitiveType.Cube));
-                    go.EnsureComponent<PrefabIdentifier>();
-                    var pickupable = go.EnsureComponent<Pickupable>();
-                    PickupReplacement(pickupable);
-                    item = new InventoryItem(pickupable);
-                }
-            }
-
-            if (item == null)
-            {
-                item = techType.ToInventoryItemLegacy();
-            }
-
-        return item;
-        }
-
+        
         public static InventoryItem ToInventoryItemLegacy(this TechType techType)
         {
             GameObject prefabForTechType = CraftData.GetPrefabForTechType(techType, false);

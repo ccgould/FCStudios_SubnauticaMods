@@ -230,7 +230,7 @@ namespace FCS_HomeSolutions.Mods.Stove.Mono
                 if (device.CanBeStored(1, techType))
                 {
 #if SUBNAUTICA_STABLE
-                    device.AddItemToContainer(techType.ToInventoryItem());
+                    device.AddItemToContainer(techType.ToInventoryItemLegacy());
                     yield break;
 #else
                     var itemTask = new TaskResult<InventoryItem>();
