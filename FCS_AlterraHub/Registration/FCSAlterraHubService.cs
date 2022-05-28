@@ -187,7 +187,7 @@ namespace FCS_AlterraHub.Registration
                 }
                 else
                 {
-                    QuickLogger.Error($"Failed to Setup the Base Manager for device {device.UnitID} with prefab id {device.GetPrefabID()} - Subroot returned null");
+                    QuickLogger.DebugError($"Failed to Setup the Base Manager for device {device.UnitID} with prefab id {device.GetPrefabID()} - Subroot returned null");
                     return;
                 }
             }

@@ -471,7 +471,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
         public string GetStatus()
         {
-            return "N/A";
+            return !HasDepot() ? "Depot Not Built At Base" : "Ready";
         }
 
         public string GetBaseID()

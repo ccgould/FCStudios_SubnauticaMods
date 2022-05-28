@@ -6,6 +6,7 @@ using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
+using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Buildable;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Helpers;
@@ -37,6 +38,9 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
         private HashSet<string> _linkedChildDevices = new();
         private HashSet<string> _parentCrafters = new();
         private bool _isStandBy;
+        private bool _isLimitedOperation;
+        private bool _isInfiniteOperation = true;
+        private bool _isRecursiveOperation;
 
         public CraftMachine CraftMachine { get; private set; }
 
@@ -101,6 +105,10 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
                 _colorManager.LoadTemplate(_saveData.ColorTemplate);
 
                 _isStandBy = _saveData.IsStandBy;
+                _isLimitedOperation = _saveData.IsLimitedOperation;
+                _isInfiniteOperation = _saveData.IsInfiniteOperation;
+                _isRecursiveOperation = _saveData.IsRecursiveOperation;
+
 
                 if (_saveData.StoredItems != null)
                 {
@@ -112,7 +120,9 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
                     StateMachine.LoadFromSave(_saveData.StateData);
                 }
 
-                if(_saveData.ConnectedDevices != null) _linkedChildDevices = new HashSet<string>(_saveData.ConnectedDevices);
+                CraftMachine.SetLimitAmount(_saveData.LimitAmount);
+
+                if (_saveData.ConnectedDevices != null) _linkedChildDevices = new HashSet<string>(_saveData.ConnectedDevices);
                 if(_saveData.ParentDevices != null) _parentCrafters = new HashSet<string>(_saveData.ParentDevices);
                 QuickLogger.Debug($"------------------------------------------");
 
@@ -213,7 +223,11 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
                 : null;
             _saveData.ConnectedDevices = _linkedChildDevices.ToList();
             _saveData.ParentDevices = _parentCrafters.ToList();
-            _saveData.IsStandBy = _isStandBy; 
+            _saveData.IsStandBy = _isStandBy;
+            _saveData.LimitAmount = CraftMachine.GetLimitAmount();
+            _saveData.IsLimitedOperation = GetIsLimitedOperation();
+            _saveData.IsInfiniteOperation = GetIsInfiniteOperation();
+            _saveData.IsRecursiveOperation = GetIsRecursive();
             saveDataList.AutoCrafterDataEntries.Add(_saveData);
         }
 
@@ -383,12 +397,18 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
             foreach (string deviceUnitID in _linkedChildDevices)
             {
                 var device = FCSAlterraHubService.PublicAPI.FindDevice(deviceUnitID);
+
+
                 if (device.Value != null)
                 {
                     var crafter = (AutoCrafterController) device.Value;
 
                     if (!crafter.CraftMachine.IsCrafting())
                     {
+                        crafter.SetIsRecursive(GetIsRecursive());
+                        crafter.SetIsInfiniteOperation(GetIsInfiniteOperation());
+                        crafter.SetIsLimitedOperation(GetIsLimitedOperation());
+                        crafter.CraftMachine.SetLimitAmount(CraftMachine.GetLimitAmount());
                         crafter.CraftMachine.StartCrafting(operation);
                     }
                 }
@@ -403,12 +423,15 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
 
 
             var message = hand.IsTool()
-                ? $"Please clear hand to use {AutoCrafterPatch.AutoCrafterFriendlyName}."
-                : $"Press {KeyCode.F} to interact with {AutoCrafterPatch.AutoCrafterFriendlyName}.";
+                ? AlterraHub.PleaseClearHands()
+                : AlterraHub.PressToInteractWith(KeyCode.F, AutoCrafterPatch.AutoCrafterFriendlyName);
+
+            var isCraftAmountSelected = _isStandBy || (!_isInfiniteOperation && !_isRecursiveOperation);
 
             var data = new[]
             {
                 message,
+                AuxPatchers.AutocrafterHoverInformation(_isStandBy,_isRecursiveOperation,_isLimitedOperation,new Vector2int(CraftMachine.GetOperation()?.AmountCompleted ?? 0,CraftMachine?.GetOperation()?.Amount ?? 0)),
                 $"UnitID: {UnitID}"
             };
             
@@ -438,6 +461,41 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
         public IEnumerable<string> GetParentCrafters()
         {
             return _parentCrafters;
+        }        
+        
+        public IEnumerable<string> GetLinkedCrafters()
+        {
+            return _linkedChildDevices;
+        }
+
+        public void SetIsLimitedOperation(bool value)
+        {
+            _isLimitedOperation = value;
+        }
+
+        public bool GetIsLimitedOperation()
+        {
+            return _isLimitedOperation;
+        }
+
+        public void SetIsInfiniteOperation(bool value)
+        {
+            _isInfiniteOperation = value;
+        }
+
+        public bool GetIsInfiniteOperation()
+        {
+            return _isInfiniteOperation;
+        }
+
+        public bool GetIsRecursive()
+        {
+            return _isRecursiveOperation;
+        }
+
+        public  void SetIsRecursive(bool value)
+        {
+             _isRecursiveOperation = value;
         }
     }
 

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using FCS_AlterraHub.Model.Converters;
 using SMLHelper.V2.Handlers;
 
@@ -8,6 +10,8 @@ namespace FCS_ProductionSolutions.Buildable
     internal static class AuxPatchers
     {
         private const string ModKey = "APS";
+        private static StringBuilder _sb = new StringBuilder();
+
 
         private static readonly Dictionary<string, string> LanguageDictionary = new Dictionary<string, string>
         {
@@ -36,6 +40,9 @@ namespace FCS_ProductionSolutions.Buildable
             { $"{ModKey}_CannotSetStandByHasConnections","Standby cannot be set due to this crafter already having connections to other crafters:{0}"},
             { $"{ModKey}_FilterPageInformation","Filter: {0} | Black List: {1} | Enabled Filters Count : {2}"},
             { $"{ModKey}_ClearSlotLongPress","Are you sure you would like to clear this slot? (All items will be destroyed)"},
+            { $"{ModKey}_AutocrafterStandbyTxt","Assist Mode Enabled. \n\nParent Crafter: {0}"},
+            { $"{ModKey}_AutocrafterHoverInformation","Assist Mode Enabled: {0} | Continuous Mode: {1} | Is Limited {2} | {3}"},
+            { $"{ModKey}_CraftAmount","Craft Amount: {0} | {1}"},
 
         };
 
@@ -49,17 +56,18 @@ namespace FCS_ProductionSolutions.Buildable
 
         private static string GetLanguage(string key)
         {
-            return LanguageDictionary.ContainsKey(key) ? Language.main.Get(key) : "N/A";
+            var value = $"{ModKey}_{key}";
+            return LanguageDictionary.ContainsKey(value) ? Language.main.Get(value) : "N/A";
         }
 
         internal static string Stop()
         {
-            return GetLanguage( $"{ModKey}_Stop");
+            return GetLanguage( "Stop");
         }
         
         internal static string Scan()
         {
-            return GetLanguage($"{ModKey}_Scan");
+            return GetLanguage("Scan");
         }
 
         public static string InventoryFull()
@@ -69,103 +77,103 @@ namespace FCS_ProductionSolutions.Buildable
 
         internal static string HarvesterBackButtonDesc()
         {
-            return GetLanguage($"{ModKey}_HHBackButtonDesc");
+            return GetLanguage("HHBackButtonDesc");
         }
 
         internal static string HarvesterBackButton()
         {
-            return GetLanguage($"{ModKey}_HHBackButton");
+            return GetLanguage("HHBackButton");
         }
 
         public static string PressKeyToOperate(string buttonName,string modName)
         {
-            return String.Format(GetLanguage($"{ModKey}_PressKeyToOperate"),buttonName,modName);
+            return String.Format(GetLanguage("PressKeyToOperate"),buttonName,modName);
         }
 
         public static string HarvesterToggleLight()
         {
 
              
-            return GetLanguage($"{ModKey}_ToggleLight");
+            return GetLanguage("ToggleLight");
         }
 
         public static string HarvesterToggleLightDesc()
         {
-            return GetLanguage($"{ModKey}_ToggleLightDesc");
+            return GetLanguage("ToggleLightDesc");
         }
 
         public static string PowerUsagePerSecondFormat(float amount)
         {
-            return string.Format(GetLanguage($"{ModKey}_PowerUsagePerSecondFormat"),amount);
+            return string.Format(GetLanguage("PowerUsagePerSecondFormat"),amount);
         }
         public static string GenerationTimeFormat(float amount)
         {
-            return string.Format(GetLanguage($"{ModKey}_GenerationTimeFormat"), TimeConverters.SecondsToHMS(amount));
+            return string.Format(GetLanguage("GenerationTimeFormat"), TimeConverters.SecondsToHMS(amount));
         }
 
         public static string GenerationTimeMinutesOnlyFormat(float amount)
         {
-            return string.Format(GetLanguage($"{ModKey}_GenerationTimeFormat"), TimeConverters.SecondsToMS(amount));
+            return string.Format(GetLanguage("GenerationTimeFormat"), TimeConverters.SecondsToMS(amount));
         }
 
         public static string MatterAnalyzerHasItems()
         {
-            return GetLanguage($"{ModKey}_MatterAnalyzerHasItems");
+            return GetLanguage("MatterAnalyzerHasItems");
         }
 
         public static string PleaseClearReplicatorSlot()
         {
-            return GetLanguage($"{ModKey}_PleaseClearReplicatorSlot");
+            return GetLanguage("PleaseClearReplicatorSlot");
         }
 
         public static string NotBuildOnBase()
         {
-            return GetLanguage($"{ModKey}_NotBuildOnBase");
+            return GetLanguage("NotBuildOnBase");
         }
 
         public static string HarvesterSpeedToggle()
         {
-            return GetLanguage($"{ModKey}_HarvesterSpeedToggle");
+            return GetLanguage("HarvesterSpeedToggle");
         }
 
         public static string HarvesterSpeedToggleDesc()
         {
-            return GetLanguage($"{ModKey}_HarvesterSpeedToggleDesc");
+            return GetLanguage("HarvesterSpeedToggleDesc");
         }
 
         public static string HarvesterAddSample()
         {
-            return GetLanguage($"{ModKey}_HarvesterAddSample");
+            return GetLanguage("HarvesterAddSample");
         }
 
         public static string HarvesterAddSampleDesc()
         {
-            return GetLanguage($"{ModKey}_HarvesterAddSampleDesc");
+            return GetLanguage("HarvesterAddSampleDesc");
         }
 
         public static string HarvesterDeleteSample()
         {
-            return GetLanguage($"{ModKey}_HarvesterDeleteSample");
+            return GetLanguage("HarvesterDeleteSample");
         }
 
         public static string HarvesterDeleteSampleDesc()
         {
-            return GetLanguage($"{ModKey}_HarvesterDeleteSampleDesc");
+            return GetLanguage("HarvesterDeleteSampleDesc");
         }
 
         public static string AutocrafterItemIsBeingCrafted()
         {
-            return GetLanguage($"{ModKey}_AutocrafterItemIsBeingCrafted");
+            return GetLanguage("AutocrafterItemIsBeingCrafted");
         }
 
         public static string AutocrafterItemsOnBelt()
         {
-            return GetLanguage($"{ModKey}_AutocrafterItemsOnBelt");
+            return GetLanguage("AutocrafterItemsOnBelt");
         }
 
         public static string CannotSetStandByHasConnections(string otherCrafterId)
         {
-            return string.Format(GetLanguage($"{ModKey}_CannotSetStandByHasConnections"),otherCrafterId);
+            return string.Format(GetLanguage("CannotSetStandByHasConnections"),otherCrafterId);
         }
 
         public static string ClickToEdit()
@@ -175,18 +183,41 @@ namespace FCS_ProductionSolutions.Buildable
 
         public static string PleaseClearHarvesterSlot()
         {
-            return GetLanguage($"{ModKey}_PleaseClearHarvesterSlot");
+            return GetLanguage("PleaseClearHarvesterSlot");
         }
         
         public static string FilterPageInformation(bool focusToggleValue, bool blackListToggleValue, int focusCount)
         {
-            return string.Format(GetLanguage($"{ModKey}_FilterPageInformation"), focusToggleValue ? "On" : "Off", blackListToggleValue ? "On" : "Off", focusCount);
+            return string.Format(GetLanguage("FilterPageInformation"), focusToggleValue ? "On" : "Off", blackListToggleValue ? "On" : "Off", focusCount);
         }
 
         public static string ClearSlotLongPress()
         {
-            return GetLanguage($"{ModKey}_ClearSlotLongPress");
+            return GetLanguage("ClearSlotLongPress");
 
+        }
+
+        public static string StandbyTxt(string[] name)
+        {
+
+            _sb.Clear();
+            for (int i = 0; i < name.Length; i++)
+            {
+                _sb.Append(name[i]);
+
+                if (i != name.Length - 1)
+                {
+                    _sb.Append(",");
+                }
+            }
+
+            return string.Format(GetLanguage("AutocrafterStandbyTxt"),_sb);
+        }
+
+        public static string AutocrafterHoverInformation(bool isStandBy, bool isRecursiveOperation, bool isLimitedOperation, Vector2int amount)
+        {
+
+            return string.Format(GetLanguage("AutocrafterHoverInformation"), isStandBy,isRecursiveOperation,isLimitedOperation, string.Format(GetLanguage("CraftAmount"), amount.x, amount.y));
         }
     }
 }

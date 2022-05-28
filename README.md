@@ -1,51 +1,32 @@
-
-
-
-
-﻿
 <p align="center">
   <img width="100" height="100" src="https://i.imgur.com/DHjcUQS.png">
 </p>
 
+
 # Field Creators Studios Subnautica Mods!
 
 **Hello There!**
-Thanks you for visiting our git repo for our mods information in this readme should update you on whats avaliable in the current version of this repo. If you have any question or need support for our mods please visit the [Subnautica Modding Discord](https://discordapp.com/invite/UpWuWwq) or [FCStudios Discord](https://discordapp.com/invite/szc7m5M) visit our [Facebook](https://www.facebook.com/FCSTools/), [Artstation](https://www.artstation.com/fieldcreatorsstudios) and view our [Trello](https://trello.com/b/Rqit6I94/fcs-subnatica-mods) to see what we are currently doing.
+Thanks you for visiting our git repo for our mods information in this readme should update you on whats avaliable in the current version of this repo. If you have any question or need support for our mods please visit the [Subnautica Modding Discord](https://discordapp.com/invite/UpWuWwq) or [FCStudios Discord](https://discordapp.com/invite/szc7m5M) visit our [Facebook](https://www.facebook.com/FCSTools/), [Artstation](https://www.artstation.com/fieldcreatorsstudios) to see what we are currently doing.
 
 
 # Mods
 
-Here is a Chart of all the mods and the place to download on NexusMods.
+Here is a Chart of all the mods and the place to download on our website.
 
-| Mod |Description  | Download
-|--|--|--|
-|  Power Storage| FCS Power Storage is a mod that allows you to have a power storage bank in your base. This mod will pull or trickle power to and from your base while running. | [#212](https://www.nexusmods.com/subnautica/mods/212)
-| CyclopsNuclearReactor |The nuclear reactor the Cyclops always deserved! Power up your Cyclops today in whole new ways! Enhance with upgrades to maximize energy output.   <ul><li>A collaberation between FCStudios and [PrimeSonic](https://www.nexusmods.com/subnautica/users/1733280)| [#241](https://www.nexusmods.com/subnautica/mods/241)
-| Alterra Shipping|This mod allows you to ship items from one base to another by selecting another shipping unit at another base.| [#247](https://www.nexusmods.com/subnautica/mods/247)
-|AI Marine Turbine|An all new mod from Field Creators Studios that allows you to generate power from using water current in Subnautica.|[#249](https://www.nexusmods.com/subnautica/mods/249)
-|AM Mini MedBay|Alterra technologies new Mini MedBay heals you within 3 seconds of pressing the heal button. Also, we generate 4 free med packs for your convenience.|[#261](https://www.nexusmods.com/subnautica/mods/261)
-|AI Powercell Socket|A subnautica mod that allows you to power your base using powercells.|[#264](https://www.nexusmods.com/subnautica/mods/264)
-|FCS Tech fabricator|The tech fabricator is a fabricator that allows you to build Kits and other necessary items for the FCS Mods.|[#313](https://www.nexusmods.com/subnautica/mods/313)
-|Alterra Storage Solutions Ex-Storage Depot|A mod that allows you to store items outside in a large storage unit.|[#320](https://www.nexusmods.com/subnautica/mods/320)
-|Alterra Industrial Deep Driller|A mod the allows you to drill for resources in different biomes.|[#319](https://www.nexusmods.com/subnautica/mods/319)
-|Alterra Refrigeration Solutions SeaBreeze|A refrigeration mod that freezes food and prevents decay while in the fridge.|[#318](https://www.nexusmods.com/subnautica/mods/318)
-|Alterra Electrical Mini Fountain Filter|This mod is a smaller version of the water filtration machine that builds on the wall and allows you to drink water directly from it.|[#335](https://www.nexusmods.com/subnautica/mods/335)
-|Alterra Electrical Sea Cooker|This mod is a smaller version of the water filtration machine that builds on the wall and allows you to drink water directly from it.|[#336](https://www.nexusmods.com/subnautica/mods/336)
-|Save Vehicle Light State|Saves the light state of the Seamoth and the prawn suit.|[#367](https://www.nexusmods.com/subnautica/mods/367)
-|Fire Extinguisher Holder|A Fire Extinguisher Holder which allows you to hold fire extinguisher in your habitat.|[#322](https://www.nexusmods.com/subnautica/mods/322)
-|Drop All On Death|This mod has one purpose and that is to empty your inventor and module slots on player death.|[#363](https://www.nexusmods.com/subnautica/mods/363)
-|Alterra Electrical Quantum Teleporter|Quantum Teleporter is a mod that allows you to teleport from one point to another inside a base (local) or from one base to another (global).|[#371](https://www.nexusmods.com/subnautica/mods/371)
-|Gaspod Collector |This mod collects gaspods that are in the range of it. All pods are stored within the gaspod collector and can be taken by using either the Take gaspod button to take one gaspod or the bulk button to fill the player's inventory with gaspods. |[#430](https://www.nexusmods.com/subnautica/mods/430)
-|OxStation |This adds extra habitat functionality to Subnautica by removing oxygen from bases until oxstation is build |[\[#386\]](https://www.nexusmods.com/subnautica/mods/386)
-|OxStation Vehicle Module |This adds extra functionality to Subnautica by removing oxygen from seamoth or prawn suit until the module is inserted in the module slot. |[#464](https://www.nexusmods.com/subnautica/mods/464)
-|OxStation Cyclops Module |This adds extra functionality to Subnautica by removing oxygen from cyclops until the module is inserted in the module slot. |[#465](https://www.nexusmods.com/subnautica/mods/465)
-|Hydroponic Harvester |This mod adds a new buildable to the game that allows you to clone plantable plants and corals from instead and outside your base wither its a water plant or land plant. |[#466](https://www.nexusmods.com/subnautica/mods/466)
+| Mod                         | Description                                                  | Download                                                     |
+| --------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Alterra Hub (***Required**) | Required by all FCStudios Mods for Subnautica/Below Zero     | [Link](http://fcstudioshub.com/subnautica/alterrahub-4/)     |
+| Energy Solutions            | Catalog brings contains machines for the Production, Storage, and Transmission of Energy. Energy from the environment (turbines, solar, bio reactors) or use Alterra’s concentrated Bio Fuel, store it for the base with **PowerStorage** or in batteries and power-cells with the **Universal Charger**, and send it where it’s needed by creating a global distribution web with the **Alterra Telepower Pylon** your claim on a bit of ocean with the **Alterra Wind Surfer** and built up to 15 open air platforms or floating turbines that can send energy to any receiving Telepower Pylon. | [Link](fcstudioshub.com/subnautica/subnauticafcspda/)        |
+| Life Support Solutions      | This Catalog brings you devices to keep you alive in hostile environments, supplying Oxygen, Water, Medical Attention, and other tools to help you manage any crisis. | [Link](http://fcstudioshub.com/subnautica/life-support-solutions/) |
+| Production Solutions        | This Catalog brings you the very best in automated production. Deep scan it with the **Matter Anaylzer**. Then grow it with the **Hydroponic Harvester** or 3D-Print it with the **Replicator**. This Catalog brings you devices to keep you alive in hostile environments, supplying Oxygen, Water, Medical Attention, and other tools to help you manage any crisis. Dig it up with a **Deep Driller** (***Light Duty\*** and ***Heavy Duty\*** models available).This Catalog brings you devices to keep you alive in hostile environments, supplying Oxygen, Water, Medical Attention, and other tools to help you manage any crisis. Once you have what you need, put it all together in the **AutoCrafter**. | [Link](http://fcstudioshub.com/subnautica/production-solutions/) |
+| Storage Solutions           | This Catalog brings you the Storage Solutions family of interconnected devices and the backbone connectivity to devices in the **Production Catalog** and **Energy Catalog.** With Alterra Storage Solutions you can create Local and Global **Data Storage Networks** that simplify storing, finding, and retrieving items at your base, or a base across the world. Use a **Remote Storage Unit** to store things outside or to ease congestion at a **Deep Driller** Site.  Plug in a **Transceiver** to use your **C48 Panel** to set up automated movement of items between devices. Add in an **Antenna** to connect bases to one another or to any Cyclops with servers installed. | [Link](http://fcstudioshub.com/subnautica/storage-solutions/) |
+| Home Solutions              | This Catalog brings you all the little things — and big things — to make your base a safe and productive Home. Pay special attention to the **Alterra Paint Tool** for adding some style to your base. Play your own videos on the **Alterra Televisions** and add your own graphics to the **Curtains,** **Hologram Posters**, and **Rugs**. Quickly move yourself from base to base with the **Quantum Teleporter** or take your vehicle with you to a **Vehicle Platform**. Create an unique lighting experience with **Neon Shelves and Tables** or various **LED Lights**. Combine with **Shelves, Sofas, and Cabinets** to make your base more cozy. You won’t need to answer Nature’s Call outside anymore with the **Alterra Toilet**. Be sure to use the **Alterrs Sink** to wash your hands or just hop in the **Alterra Shower** — be sure to turn the water off when you’re done. Enjoy celebrity branded snacks and drinks from [Z1 Gaming](https://www.youtube.com/c/Z1Gaming), [MonikaCinnyRoll](https://www.twitch.tv/monikacinnyroll), and [MrSpicyGaming](https://www.youtube.com/c/MrSpicyGaming) at the **Peeper Lounge**. | [Link](http://fcstudioshub.com/subnautica/home-solutions/)   |
+
 
 # Mods in Collaboration/Not Included in repo
 
 
-|Mod|Description  | Download
-|--|--|--|
-| CyclopsNuclearReactor  | The nuclear reactor the Cyclops always deserved! Power up your Cyclops today in whole new ways! Enhance with upgrades to maximize energy output.   <ul><li>A collaberation between FCStudios and [PrimeSonic](https://www.nexusmods.com/subnautica/users/1733280) | [#241](https://www.nexusmods.com/subnautica/mods/241) |
-| IonCubeGenerator|Make your own ion cubes right at home!<ul><li>A collaberation between FCStudios and [PrimeSonic](https://www.nexusmods.com/subnautica/users/1733280) |[#242](https://www.nexusmods.com/subnautica/mods/242)
-
+| Mod                   | Description                                                  | Download                                              |
+| --------------------- | ------------------------------------------------------------ | ----------------------------------------------------- |
+| CyclopsNuclearReactor | The nuclear reactor the Cyclops always deserved! Power up your Cyclops today in whole new ways! Enhance with upgrades to maximize energy output.   <ul><li>A collaberation between FCStudios and [PrimeSonic](https://www.nexusmods.com/subnautica/users/1733280) | [#241](https://www.nexusmods.com/subnautica/mods/241) |
+| IonCubeGenerator      | Make your own ion cubes right at home!<ul><li>A collaberation between FCStudios and [PrimeSonic](https://www.nexusmods.com/subnautica/users/1733280) | [#242](https://www.nexusmods.com/subnautica/mods/242) |

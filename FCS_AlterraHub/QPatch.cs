@@ -41,7 +41,6 @@ namespace FCS_AlterraHub
         [QModPatch]
         public static void Patch()
         {
-
             FCSAlterraHubService.PublicAPI.RegisterModPack(Mod.ModPackID, Mod.AssetBundleName, Assembly.GetExecutingAssembly());
             FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(Mod.ModPackID);
 

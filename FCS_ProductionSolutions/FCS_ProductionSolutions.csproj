@@ -106,7 +106,6 @@
     <Compile Include="Mods\DeepDriller\HeavyDuty\Patchers\Builder_CheckAsSubModule_Patch.cs" />
     <Compile Include="Mods\DeepDriller\HeavyDuty\Patchers\FCSConnectableAwake_Patcher.cs" />
     <Compile Include="Mods\DeepDriller\HeavyDuty\Patchers\LootDistributionData_Patchers.cs" />
-    <Compile Include="Mods\DeepDriller\HeavyDuty\Patchers\uGUI_DepthCompassPatchers.cs" />
     <Compile Include="Mods\DeepDriller\HeavyDuty\Structs\UpgradeSave.cs" />
     <Compile Include="Mods\HydroponicHarvester\Buildable\HydroponicHarvesterPatch.cs" />
     <Compile Include="Mods\HydroponicHarvester\Mono\DisplayManager.cs" />

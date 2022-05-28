@@ -62,23 +62,35 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Patchers
 
                 var grouped = Hud.GetItemsWithin();
 
+                QuickLogger.Debug("==================================================");
+                foreach (KeyValuePair<TechType, int> pair in grouped)
+                {
+                    QuickLogger.Debug(pair.Key.AsString());
+                }
+                QuickLogger.Debug("==================================================");
                 if (data.EndPosition > grouped.Count)
                 {
                     data.EndPosition = grouped.Count;
                 }
 
+                foreach (uGUI_FCSDisplayItem displayItem in _trackedItems)
+                {
+                    displayItem.Hide();
+                    displayItem.UnSubscribeAll();
+                }
+
                 for (int i = data.StartPosition; i < data.EndPosition; i++)
                 {
-                    if (CheckIfButtonIsActive(grouped.ElementAt(i).Key))
-                    {
-                        continue;
-                    }
+                    //if (CheckIfButtonIsActive(grouped.ElementAt(i).Key))
+                    //{
+                    //    continue;
+                    //}
 
                     GameObject buttonPrefab = data.Pool.SpawnFromPool(InventoryPoolTag, data.ItemsGrid);
                     buttonPrefab.transform.SetParent(data.ItemsGrid.transform, false);
                     var itemBTN = buttonPrefab.EnsureComponent<uGUI_FCSDisplayItem>();
                     itemBTN.Initialize(grouped.ElementAt(i).Key,false,true);
-                    itemBTN.UpdateAmount(1);
+                    itemBTN.UpdateAmount(grouped.ElementAt(i).Value);
                     itemBTN.Subscribe((() =>
                     {
                         var techType = itemBTN.GetTechType();
@@ -89,6 +101,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Patchers
                             itemBTN.Hide();
                         }
                     }));
+   
 
                     _trackedItems.Add(itemBTN);
                 }
@@ -125,6 +138,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Patchers
                     else
                     {
                         button.UpdateAmount(count);
+                        button.Show();
                     }
 
                     return true;
@@ -133,7 +147,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Patchers
 
             return false;
         }
-        
+
         public override void Show()
         {
             base.Show();

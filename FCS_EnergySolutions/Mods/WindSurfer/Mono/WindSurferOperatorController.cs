@@ -357,6 +357,13 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
 
         public IEnumerator AddPlatform(HolographSlot slot, Vector2Int position, IOut<bool> result)
         {
+            if (_connectedTurbines.Count == BuildingCapacity)
+            {
+                _messageBox.Show(AuxPatchers.WindSurferMaxReached(),FCSMessageButton.OK,null);
+                result.Set(false);
+                yield break;
+            }
+
             if (!CheckForKit())
             {
                 var kit = PlatFormKitMode == PlatformKitModes.TurbinePlatform

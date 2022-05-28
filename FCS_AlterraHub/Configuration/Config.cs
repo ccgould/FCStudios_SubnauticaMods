@@ -29,15 +29,15 @@ namespace FCS_AlterraHub.Configuration
         public UnityAction<int> onGameModeChanged;
 
         [Keybind("Open/Close FCS PDA"), OnChange(nameof(PDAKeyCodeChangedEvent))]
-        public KeyCode FCSPDAKeyCode { get; set; } = KeyCode.F2;
+        public KeyCode FCSPDAKeyCode  = KeyCode.F2;
 
         [Keybind("FCS PDA Information Button"), OnChange(nameof(PDAKeyCodeChangedEvent))]
-        public KeyCode PDAInfoKeyCode { get; set; } = KeyCode.I;
+        public KeyCode PDAInfoKeyCode  = KeyCode.I;
 
         public List<FCSStoreEntry> AdditionalStoreItems = new();
 
         [Slider("Ore Payout Difficulty", 0.1f, 1.9f, DefaultValue = 1, Step = 0.1f, Format = "{0}", Tooltip = "The higher the value the more payout per ore.")]
-        public float OrePayoutMultiplier { get; set; } = 1f;
+        public float OrePayoutMultiplier  = 1f;
 
         [Toggle("Play Sound Effects"), OnChange(nameof(PlaySoundToggleEvent))]
         public bool PlaySFX = true;
@@ -51,7 +51,7 @@ namespace FCS_AlterraHub.Configuration
         internal Action<bool> OnPlaySoundToggleEvent { get; set; }
 
         [Toggle("[Alterra Transport Drone] Enable Drone Audio", Order = 1, Tooltip = "Enables/Disables the sound effects on the drone.")]
-        public bool AlterraTransportDroneFxAllowed { get; set; } = true;
+        public bool AlterraTransportDroneFxAllowed = true;
 
         //[Slider("[Alterra Transport Drone] Master Volume", 0.0f, 1.0f, DefaultValue = 1.0f, Step = 0.01f,
         //    Format = "{0:P0}", Order = 1, Tooltip = "This control affects all drones.")]
@@ -63,6 +63,9 @@ namespace FCS_AlterraHub.Configuration
 
         [Toggle("Hide All F.C.S On-Screen Messages", Tooltip = "Prevents all FCS messages that can appear on-screen from showing. (Warning: Even important functional messages from mods will not show.)")]
         public bool HideAllFCSOnScreenMessages = false;
+
+        [Slider("Credit Message Delay", 0f, 600f, DefaultValue = 0, Step = 30.0f, Format = "{0}", Tooltip = "Delays credit messages by the selected amount in seconds.")]
+        public float CreditMessageDelay  = 0f;
 
 
         private void PDAKeyCodeChangedEvent(KeybindChangedEventArgs e)

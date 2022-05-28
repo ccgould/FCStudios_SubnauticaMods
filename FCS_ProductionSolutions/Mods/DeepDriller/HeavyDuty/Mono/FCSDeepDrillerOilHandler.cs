@@ -28,22 +28,19 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         private void Update()
         {
             if (_mono == null || _mono.IsBreakSet()) return;
-            if (QPatch.Configuration.DDHardCoreMode)
+            _elapsed += DayNightCycle.main.deltaTime;
+
+            if (_elapsed >= 1f)
             {
-                _elapsed += DayNightCycle.main.deltaTime;
-
-                if (_elapsed >= 1f)
+                if (_oil > 0 && _mono.IsOperational)
                 {
-                    if (_oil > 0 && _mono.IsOperational)
-                    {
-                        var lusePerDay = KDayInSeconds + 16 * (_mono.GetOresPerDayCountInt() - QPatch.Configuration.DDDefaultOrePerDay);
-                        var lusePerSecond = lusePerDay / 1200;
-                        _oil -= lusePerSecond;
-                    }
-
-                    _elapsed %= 1f;
-                    _mono.OnOilLevelChange?.Invoke(GetOilPercent());
+                    var lusePerDay = KDayInSeconds + 16 * (_mono.GetOresPerDayCountInt() - QPatch.Configuration.DDDefaultOrePerDay);
+                    var lusePerSecond = lusePerDay / 1200;
+                    _oil -= lusePerSecond;
                 }
+
+                _elapsed %= 1f;
+                _mono.OnOilLevelChange?.Invoke(GetOilPercent());
             }
         }
 
@@ -71,7 +68,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 
         internal float GetOilPercent()
         {
-            return QPatch.Configuration.DDHardCoreMode ?  _oil / _setOilTime : 1f;
+            return _oil / _setOilTime;
         }
 
         public bool CanBeStored(int amount, TechType techType)
@@ -162,7 +159,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 
         internal bool HasOil()
         {
-            return !QPatch.Configuration.DDHardCoreMode || _oil > 0;
+            return _oil > 0;
         }
     }
 }

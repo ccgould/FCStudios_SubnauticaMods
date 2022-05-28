@@ -19,10 +19,11 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
         private Queue<TechType> _beltItems = new();
         private CraftingOperation _operation;
         private float _timeLeft;
+        private int _limitAmount;
 
         private void DistributeLoad(CraftingOperation operation)
         {
-            if (_operation.Amount > 1 || _operation.IsRecursive)
+            if (_operation.Amount > 1 || Crafter.GetIsRecursive())
             {
                 Crafter.DistributeLoad(operation);
             }
@@ -127,6 +128,16 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
 
                 ShowItemOnBelt();
             }
+        }
+
+        public void SetLimitAmount(int amountInt)
+        {
+            _limitAmount = amountInt;
+        }
+
+        public int GetLimitAmount()
+        {
+            return _limitAmount;
         }
     }
 }

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Mono;
+using FCS_AlterraHub.Registration;
+using FCS_ProductionSolutions.Mods.AutoCrafter.Mono;
 using SMLHelper.V2.Handlers;
 #if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
@@ -15,23 +17,38 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models
     public class CraftingOperation
     {
         public int Amount { get; set; }
-        public bool IsRecursive { get; set; }
-        public bool IsBeingCrafted { get; set; }
-        public bool IsOperational { get; set; }
-        public HashSet<string> Devices { get; set; } = new HashSet<string>();
-        public List<TechType> LinkedItems { get; set; } = new List<TechType>();
-        [JsonIgnore] public HashSet<FcsDevice> MountedBy { get; set; } = new HashSet<FcsDevice>();
+        public HashSet<string> Devices { get; set; } = new();
+        public List<TechType> LinkedItems { get; set; } = new();
+        [JsonIgnore] public HashSet<FcsDevice> MountedBy { get; set; } = new();
         public int AmountCompleted { get; set; }
         public TechType TechType { get; set; }
         public bool IsComplete => GetIsComplete();
-        public int ReturnAmount { get; }
+        public int ReturnAmount { get; set; }
         public int LinkedItemCount { get; }
-        public Action<CraftingOperation> OnOperationDeleted { get; set; }
         public string ParentMachineUnitID { get; set; }
+        internal AutoCrafterController Crafter => GetMachine();
+        private AutoCrafterController _device;
+
+
+        private AutoCrafterController GetMachine()
+        {
+            if (_device == null)
+            {
+                var fcsDevice = FCSAlterraHubService.PublicAPI.FindDevice(ParentMachineUnitID).Value;
+                
+                if (fcsDevice != null)
+                {
+                    _device = (AutoCrafterController)fcsDevice;
+                }
+            }
+            
+            return _device;
+
+        }
 
         private bool GetIsComplete()
         {
-            if (IsRecursive) return false;
+            if (Crafter?.GetIsRecursive() ?? false) return false;
             return AmountCompleted >= Amount;
         }
 
@@ -39,7 +56,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models
         {
         }
 
-        public CraftingOperation(string unitID, TechType techType, int amount, bool isRecursive)
+        public CraftingOperation(string unitID, TechType techType, int amount)
         {
             ParentMachineUnitID = unitID;
             TechType = techType;
@@ -54,40 +71,17 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models
 
             LinkedItemCount = linkedItems?.Count ?? 0;
             ReturnAmount = returnAmount == 0 ? 1 : returnAmount;
-            IsRecursive = isRecursive;
         }
 
 
         private void AddDevice(string unitID)
         {
             Devices.Add(unitID);
-            if (!IsRecursive)
-            {
-            }
         }
 
         private void RemoveDevice(string unitID)
         {
             Devices.Remove(unitID);
-        }
-
-        public bool IsSame(CraftingOperation operation)
-        {
-            return operation.IsRecursive == IsRecursive &&
-                   operation.Amount == Amount &&
-                   //operation.AssignedUnit.Equals(AssignedUnit, StringComparison.OrdinalIgnoreCase) &&
-                   operation.TechType == TechType;
-        }
-
-        public bool CanCraft()
-        {
-            if (IsRecursive && IsBeingCrafted) return false;
-            return AmountCompleted < Amount && Devices.Count < Amount;
-        }
-
-        public void NotifyIfComplete()
-        {
-            AmountCompleted++;
         }
 
         private readonly Dictionary<TechType, TechType> _techTypeFixes = new()
@@ -99,7 +93,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models
         {
             {"FCSGlass".ToTechType()}
         };
-
+        
         public TechType FixCustomTechType()
         {
             return _techTypeFixes.ContainsKey(TechType) ? _techTypeFixes[TechType] : TechType;

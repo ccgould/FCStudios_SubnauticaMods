@@ -30,7 +30,7 @@ namespace FCS_AlterraHub.Model.GUI
                 _button = gameObject.GetComponent<Button>();
             }
 
-            _icon = GameObjectHelpers.FindGameObject(gameObject, "Icon").AddComponent<uGUI_Icon>();
+            _icon = GameObjectHelpers.FindGameObject(gameObject, "Icon").EnsureComponent<uGUI_Icon>();
             _itemCount = GameObjectHelpers.FindGameObject(gameObject, "ItemCountLbl")?.GetComponent<Text>();
             Set(techType);
         }
@@ -142,6 +142,12 @@ namespace FCS_AlterraHub.Model.GUI
         public bool IsChecked()
         {
             return _toggle?.isOn ?? false;
+        }
+
+        public void UnSubscribeAll()
+        {
+            _button?.onClick?.RemoveAllListeners();
+            _toggle?.onValueChanged?.RemoveAllListeners();
         }
     }
 }

@@ -49,6 +49,8 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         public override bool IsVisible => IsConstructed && IsInitialized;
         public override int MaxItemAllowForTransfer { get; } = 6;
 
+        private List<TechType> Resources => BiomeManager.Resources;
+
         public override TechType[] AllowedTransferItems { get; } =
         {
             TechType.Lubricant

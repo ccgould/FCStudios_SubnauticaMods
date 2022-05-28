@@ -82,7 +82,7 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
                 _movingToBackground.SetActive(false);
                 _currentlyAtBackground.SetActive(true);
                 _noPowerBackground.SetActive(false);
-                _statusMessage.text = AuxPatchers.CurrentlyAt();
+                _statusMessage.text = AuxPatchers.FloorLevel();
                 _floorName.text = _controller.GetCurrentFloorData().FloorName.TruncateWEllipsis(15);
             }
 

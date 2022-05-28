@@ -27,16 +27,9 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 
         private void Update()
         {
-            if (QPatch.Configuration.DDHardCoreMode)
-            {
-                _liveMixin.invincible = false;
-                UpdateHealthSystem();
-                UpdateHealthMultiplier();
-            }
-            else
-            {
-                _liveMixin.invincible = true;
-            }
+            _liveMixin.invincible = false;
+            UpdateHealthSystem();
+            UpdateHealthMultiplier();
         }
 
         private void UpdateHealthMultiplier()
@@ -50,8 +43,6 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         internal bool IsDamagedFlag()
         {
             if (_liveMixin == null) return true;
-
-            if (!QPatch.Configuration.DDHardCoreMode) return false;
 
             return _liveMixin.health <= 0;
         }
@@ -126,7 +117,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         {
             try
             {
-                if (!QPatch.Configuration.DDHardCoreMode && GetHealth() <= 0f)
+                if (GetHealth() <= 0f)
                 {
                     OnRepaired?.Invoke();
                     _prevHealth = 100;

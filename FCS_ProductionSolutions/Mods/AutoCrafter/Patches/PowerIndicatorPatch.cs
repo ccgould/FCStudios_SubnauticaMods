@@ -73,7 +73,6 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Patches
         private CraftingOperation _operation;
         private string _currentSearchString;
         private ToggleGroup _toggleGroup;
-        private Toggle _isStandbyToggle;
         private InputField _amountInput;
         private GameObject _fcsToggleItemPrefab;
         private GameObject _autoCrafterGrid;
@@ -87,6 +86,17 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Patches
         private Button _cancelBtn;
         private Button _searchBTN;
         private GameObject _missingItemsGrid;
+        private InputField _limitInput;
+        private GameObject _continuousLimitSection;
+        private Toggle _isInfiniteCraft;
+        private Toggle _isLimitedToggle;
+        private Toggle _isCraftAmountToggle;
+        private GameObject _autoCrafterPanels;
+        private GameObject _standByPanel;
+        private GameObject _mainPanel;
+        private GameObject _requiredItemsPanel;
+        private GameObject _missingItemsPanel;
+        private Text _standByTxt;
 
         public override void Update()
         {
@@ -96,8 +106,6 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Patches
             {
                 Hide();
             }
-
-            UpdateScreen();
         }
 
         public override void Awake()
@@ -120,37 +128,52 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Patches
             _fcsToggleItemPrefab = ModelPrefab.GetPrefabFromGlobal("FCSToggle");
             _toggleGroup = gameObject.GetComponentInChildren<ToggleGroup>();
             _amountInput = GameObjectHelpers.FindGameObject(gameObject, "AmountInputField").GetComponent<InputField>();
-            _craftingAmount = GameObjectHelpers.FindGameObject(gameObject, "CraftingAmount").GetComponent<Text>();
-            UpdateAmountLabel(true);
-            _isStandbyToggle = GameObjectHelpers.FindGameObject(gameObject, "IsStandByToggle").GetComponent<Toggle>();
-
-            _isStandbyToggle.onValueChanged.AddListener((value =>
+            _limitInput = GameObjectHelpers.FindGameObject(gameObject, "LimitInputField").GetComponent<InputField>();
+            _limitInput.onEndEdit.AddListener((amount =>
             {
-                _sender.SetIsStandBy(value);
-
-                if (value)
+                if (int.TryParse(amount, out int amountInt))
                 {
-                    ChangeAutoCrafterToggleStates(true);
-                    UpdateCrafterItemsStates(false);
-                }
-                else
-                {
-                    ChangeAutoCrafterToggleStates(false);
-                    UpdateCrafterItemsStates(true);
+                    _sender.CraftMachine.SetLimitAmount(amountInt);
                 }
             }));
 
+            _craftingAmount = GameObjectHelpers.FindGameObject(gameObject, "CraftingAmount").GetComponent<Text>();
+            _standByTxt = GameObjectHelpers.FindGameObject(gameObject, "StandBy_Txt").GetComponent<Text>();
+            UpdateAmountLabel(true);
+            
+            _continuousLimitSection = GameObjectHelpers.FindGameObject(gameObject, "ContinuousLimitSection");
             _isRecursiveToggle = GameObjectHelpers.FindGameObject(gameObject, "IsRecursiveToggle").GetComponent<Toggle>();
             _isRecursiveToggle.onValueChanged.AddListener((value =>
             {
+                _continuousLimitSection.gameObject.SetActive(value);
+                _isInfiniteCraft.gameObject.SetActive(value);
+
                 _isRecursive = value;
-                if (_operation != null)
-                {
-                    _operation.IsRecursive = value;
-                }
+
+               _sender.SetIsRecursive(value);
 
                 UpdateAmountLabel();
             }));
+            
+            _isLimitedToggle = GameObjectHelpers.FindGameObject(gameObject, "IsLimitedToggle").GetComponent<Toggle>();
+            _isLimitedToggle.onValueChanged.AddListener((value =>
+            {
+                _sender.SetIsLimitedOperation(value);
+            }));
+
+            _isCraftAmountToggle = GameObjectHelpers.FindGameObject(gameObject, "CraftAmountToggle").GetComponent<Toggle>();
+
+            _isInfiniteCraft = GameObjectHelpers.FindGameObject(gameObject, "IsInfiniteCraft").GetComponent<Toggle>();
+            _isInfiniteCraft.onValueChanged.AddListener((value =>
+            {
+                _sender.SetIsInfiniteOperation(value);
+            }));
+
+            _autoCrafterPanels = GameObjectHelpers.FindGameObject(gameObject, "AutoCrafterPanels");
+            _standByPanel = GameObjectHelpers.FindGameObject(gameObject, "StandByPanel");
+            _mainPanel = GameObjectHelpers.FindGameObject(gameObject, "MainPanel");
+            _requiredItemsPanel = GameObjectHelpers.FindGameObject(gameObject, "RequiredItemsPanel");
+            _missingItemsPanel = GameObjectHelpers.FindGameObject(gameObject, "MissingItemsPanel");
 
             #region Search
 
@@ -179,12 +202,25 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Patches
             {
                 if (_sender != null)
                 {
-                    _sender.CraftMachine.StartCrafting(new CraftingOperation(_sender.UnitID,_currentTechType, Int32.Parse(_amountInput.text), _isRecursive));
+                    _sender.CraftMachine.StartCrafting(new CraftingOperation(_sender.UnitID,_currentTechType, Int32.Parse(_amountInput.text)));
                     _craftBTN.interactable = !_sender.CraftMachine.IsCrafting();
                     _operation = _sender.CraftMachine.GetOperation();
                     GenerateNeededItemsList();
                     UpdateAmountLabel();
                 }
+            }));
+
+
+            var openBTN = GameObjectHelpers.FindGameObject(gameObject, "OpenBTN").GetComponent<Button>();
+            openBTN.onClick.AddListener((() =>
+            {
+                _autoCrafterPanels.SetActive(true);
+            }));
+
+            var autoCrafterCloseBTN = GameObjectHelpers.FindGameObject(gameObject, "AutoCrafterCloseBTN").GetComponent<Button>();
+            autoCrafterCloseBTN.onClick.AddListener((() =>
+            {
+                _autoCrafterPanels.SetActive(false);
             }));
 
             var closeBTN = GameObjectHelpers.FindGameObject(gameObject, "CloseBTN").GetComponent<Button>();
@@ -207,20 +243,51 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Patches
                     ClearNeedItemsList();
                     ClearMissingItemsList();
                     UpdateAmountLabel();
+                    ResetInteractions();
                 }
             }));
+
+            InvokeRepeating(nameof(UpdateAutoCrafterToggleInteraction),1,1);
         }
 
-        private void ChangeAutoCrafterToggleStates(bool value)
+        private void ChangeAutoCrafterToggleStates()
         {
             foreach (var item in _currentAutocrafterToggles)
             {
                 var toggle = item.Value;
-                toggle.interactable = value;
 
                 if (!toggle.interactable && toggle.isOn)
                 {
                     toggle.isOn = false;
+                }
+            }
+        }
+
+        private void UpdateAutoCrafterToggleInteraction()
+        {
+            foreach (var item in _currentAutocrafterToggles)
+            {
+                var toggle = item.Value;
+                
+                if(_sender?.CraftMachine == null) return;
+
+                if (_sender.CraftMachine.IsCrafting())
+                {
+                    toggle.interactable = false;
+                }
+                else if (_sender.GetLinkedCrafters().Contains(item.Key))
+                {
+                    toggle.interactable = true;
+                }
+                else
+                {
+                    var fcsdevice = _sender.Manager.FindDeviceById(item.Key);
+
+                    if (fcsdevice != null)
+                    {
+                        var autoCrafter = (AutoCrafterController)fcsdevice;
+                        toggle.interactable = !autoCrafter.GetIsStandBy() && !autoCrafter.CraftMachine.IsCrafting();
+                    }
                 }
             }
         }
@@ -257,7 +324,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Patches
 
         private void UpdateInteractableStates()
         {
-            if (_sender == null || _amountInput == null || _craftBTN == null || _cancelBtn == null || _isRecursiveToggle == null || _isStandbyToggle == null) return;
+            if (_sender == null || _amountInput == null || _craftBTN == null || _cancelBtn == null || _isRecursiveToggle == null) return;
             
             //Amount Input
             if (_isRecursive || _sender.CraftMachine.IsCrafting() || _sender.GetIsStandBy())
@@ -294,15 +361,24 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Patches
             if (_sender.GetIsStandBy())
             {
                 _isRecursiveToggle.interactable = false;
+                _limitInput.interactable = false;
+                _isLimitedToggle.interactable = false;
+                _isInfiniteCraft.interactable = false;
+                _isCraftAmountToggle.interactable = false;
                 _isRecursiveToggle.SetIsOnWithoutNotify(false);
             }
             else
             {
                 _isRecursiveToggle.interactable = true;
+                _limitInput.interactable = true;
+                _isLimitedToggle.interactable = true;
+                _isInfiniteCraft.interactable = true;
+                _isCraftAmountToggle.interactable = true;
             }
 
             UpdateCrafterItemsStates(!_sender.GetIsStandBy());
-            _isStandbyToggle.interactable = !_sender.CraftMachine.IsCrafting();
+            _isRecursiveToggle.interactable = !_sender.CraftMachine.IsCrafting();
+            _isCraftAmountToggle.interactable = !_sender.CraftMachine.IsCrafting();
         }
 
         private void ResetInteractions()
@@ -310,15 +386,10 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Patches
             _amountInput.interactable = true;
             _cancelBtn.interactable = true;
             _craftBTN.interactable = true;
-            _isStandbyToggle.interactable = true;
             _isRecursiveToggle.interactable = true;
+            _isCraftAmountToggle.interactable = true;
         }
 
-        private void UpdateScreen()
-        {
-            if (_sender == null || !_isOpen || _isStandbyToggle == null) return;
-        }
-        
         private void OnLoadDisplay()
         {
             try
@@ -504,8 +575,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Patches
                 toggleText.text = device.UnitID;
                 item.transform.SetParent(_autoCrafterGrid.transform, false);
                 var toggle = item.gameObject.GetComponent<Toggle>();
-                    toggle.GetComponent<Toggle>().interactable = false;
-                    toggle.onValueChanged.AddListener((value =>
+                toggle.onValueChanged.AddListener((value =>
                     {
                         var deviceName = toggle.GetComponentInChildren<Text>()?.text;
                         var device = FCSAlterraHubService.PublicAPI.FindDevice(deviceName);
@@ -515,11 +585,14 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Patches
 
                             if (value)
                             {
-                                crafter.AddLinkedDevice(_sender);
+                                _sender.AddLinkedDevice(crafter);
+                                crafter.SetIsStandBy(true);
                             }
                             else
                             {
-                                crafter.RemoveLinkedDevice(_sender);
+                                _sender.RemoveLinkedDevice(crafter);
+                                crafter.SetIsStandBy(false);
+                                crafter.CraftMachine?.CancelOperation();
                             }
                         }
                         else
@@ -549,16 +622,6 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Patches
                 {
                     child.Hide();
                 }
-
-
-                #region Disabled because it caused Double Items when searching
-
-                //foreach (TechType techType in grouped)
-                //{
-                //    _currentItems.FirstOrDefault(x=>x.GetTechType() == techType)?.Show();
-                //}
-
-                #endregion
             }
             else
             {
@@ -619,6 +682,9 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Patches
         {
             try
             {
+
+                _autoCrafterPanels.SetActive(false);
+                
                 ResetInteractions();
 
                 if (Time.timeSinceLevelLoad < 1f)
@@ -635,11 +701,36 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Patches
                 GetCraftables();
                 
                 _sender = sender;
-                
-                _isStandbyToggle.SetIsOnWithoutNotify(_sender.GetIsStandBy());
+
+                if (_sender.GetIsStandBy())
+                {
+                    _standByPanel.SetActive(true);
+                    _mainPanel.SetActive(false);
+                    _requiredItemsPanel.SetActive(false);
+                    _missingItemsPanel.SetActive(false);
+                    _standByTxt.text = AuxPatchers.StandbyTxt(_sender.GetParentCrafters().ToArray());
+                }
+                else
+                {
+                    _standByPanel.SetActive(false);
+                    _mainPanel.SetActive(true);
+                    _requiredItemsPanel.SetActive(true);
+                    _missingItemsPanel.SetActive(true);
+                }
+
+
                 _operation = _sender.CraftMachine.GetOperation();
-                _isRecursive = _operation?.IsRecursive ?? false;
-                _isRecursiveToggle.SetIsOnWithoutNotify(_isRecursive);
+                _isRecursive = _sender.GetIsRecursive();
+
+                _isRecursiveToggle.Set(_isRecursive);
+                _continuousLimitSection.gameObject.SetActive(_isRecursive);
+                _isInfiniteCraft.gameObject.SetActive(_isRecursive);
+
+
+                _isLimitedToggle.SetIsOnWithoutNotify(_sender.GetIsLimitedOperation());
+                _isInfiniteCraft.SetIsOnWithoutNotify(_sender.GetIsInfiniteOperation());
+
+                
                 _currentTechType = _operation?.TechType ?? TechType.None;
             
                 OnLoadDisplay();
@@ -648,19 +739,19 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Patches
                 
                 UpdateAmountLabel();
                 
+                _limitInput.SetTextWithoutNotify(_sender.CraftMachine.GetLimitAmount().ToString());
                 _amountInput.text = _operation?.Amount.ToString() ?? "1";
                 _sender.CraftMachine.OnItemCrafted += GeneratePendingItemsList;
                 _sender.CraftMachine.OnNeededItemFound += GenerateNeededItemsList;
-                //_sender.CraftMachine.OnComplete += OnComplete;
                 _sender.CraftMachine.OnItemCrafted += OnItemCrafted;
-                _isOpen = true;
+                UpdateIsInUse(true);
 
             }
             catch (Exception e)
             {
-                QuickLogger.Debug(e.Message);
-                QuickLogger.Debug(e.StackTrace);
-                _isOpen = false;
+                QuickLogger.Error(e.Message);
+                QuickLogger.Error(e.StackTrace);
+                UpdateIsInUse(false);
                 Hide();
             }
         }
@@ -674,39 +765,39 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Patches
         {
             if (_craftingAmount == null) return;
 
-            if (_operation != null && _operation.IsRecursive)
+            if (_sender != null)
             {
-                _craftingAmount.text = "\u221E";
-                return;
+                if (_sender.GetIsRecursive())
+                {
+                    _craftingAmount.text = "\u221E";
+                    return;
+                }
             }
             
             _craftingAmount.text = reset ? "Operation: 0/0" : $"Operation: {_operation?.AmountCompleted ?? 0}/{_operation?.Amount ?? 0}";
         }
 
-        internal void OnComplete(CraftingOperation obj)
+        internal void OnComplete()
         {
-            //if (_sender?.CraftMachine == null) return;
             _operation = null;
             UpdateAmountLabel(true);
             ClearNeedItemsList();
             ClearMissingItemsList();
             ResetInteractions();
+
         }
 
         private void CheckChildCrafters()
         {
             if(_sender == null) return;
+            
+            ChangeAutoCrafterToggleStates();
 
-            if (_sender.GetIsStandBy())
+            foreach (var connectedCrafter in _sender.GetLinkedCrafters())
             {
-                ChangeAutoCrafterToggleStates(true);
-
-                foreach (var connectedCrafter in _sender?.GetParentCrafters())
+                if (_currentAutocrafterToggles.ContainsKey(connectedCrafter))
                 {
-                    if (_currentAutocrafterToggles.ContainsKey(connectedCrafter))
-                    {
-                        _currentAutocrafterToggles[connectedCrafter].SetIsOnWithoutNotify(true);
-                    }
+                    _currentAutocrafterToggles[connectedCrafter].SetIsOnWithoutNotify(true);
                 }
             }
         }
@@ -735,8 +826,6 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Patches
         {
             foreach (CraftNode craftNode in innerNodes)
             {
-                //QuickLogger.Debug($"Craftable: {craftNode.id} | {craftNode.string0} | {craftNode.string1} | {craftNode.techType0}");
-
                 if (string.IsNullOrWhiteSpace(craftNode.id)) continue;
                 if (craftNode.id.Equals("CookedFood") || craftNode.id.Equals("CuredFood")) return;
                 if (craftNode.techType0 != TechType.None)
@@ -764,7 +853,6 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Patches
                 _sender.CraftMachine.OnItemCrafted -= GeneratePendingItemsList;
                 _sender.CraftMachine.OnNeededItemFound -= GenerateNeededItemsList;
                 _sender.CraftMachine.OnItemCrafted -= OnItemCrafted;
-                //_sender.CraftMachine.OnComplete -= OnComplete;
                 _sender = null;
                 _operation = null;
             }
@@ -776,7 +864,12 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Patches
             gameObject.SetActive(false);
             Clear();
             gameObject.SetActive(false);
-            _isOpen = false;
+            UpdateIsInUse(false);
+        }
+
+        private void UpdateIsInUse(bool isInUse)
+        {
+            _isOpen = isInUse;
         }
 
         public bool OnButtonDown(GameInput.Button button)

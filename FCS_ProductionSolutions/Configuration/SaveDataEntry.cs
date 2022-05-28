@@ -133,6 +133,10 @@ namespace FCS_ProductionSolutions.Configuration
         [JsonProperty] internal CrafterCraftingState StateData { get; set; }
         [JsonProperty] internal List<string> ParentDevices { get; set; }
         [JsonProperty] internal bool IsStandBy { get; set; }
+        [JsonProperty] internal int LimitAmount { get; set; }
+        [JsonProperty] internal bool IsLimitedOperation { get; set; }
+        [JsonProperty] internal bool IsInfiniteOperation { get; set; } = true;
+        [JsonProperty] internal bool IsRecursiveOperation { get; set; }
     }
 
     [Serializable]

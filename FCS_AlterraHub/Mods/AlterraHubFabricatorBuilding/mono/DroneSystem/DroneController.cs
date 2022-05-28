@@ -123,9 +123,9 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
         private IEnumerator ShipOrderAsync(AlterraDronePortController destinationPort)
         {
+            this.destinationPort = destinationPort;
             yield return new WaitForSeconds(5f);
             QuickLogger.Debug("Trying to ship");
-            this.destinationPort = destinationPort;
             destinationPort.SetInboundDrone(this);
             Depart();
             yield break;
@@ -255,22 +255,38 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
                 {
                     QuickLogger.Debug("Destination Port not null", true);
 
-                    BaseManager.FindManager(data.DestinationBaseID, result =>
+                    if (!AlterraFabricatorStationController.Main.IsStationBaseID(data.DestinationBaseID))
                     {
-                        destinationPort = result.GetPortManager().GetOpenPort();
-                        QuickLogger.Debug($"Found Destination: {destinationPort?.GetPrefabID()}", true);
+                        BaseManager.FindManager(data.DestinationBaseID, result =>
+                        {
+                            destinationPort = result.GetPortManager().GetOpenPort();
+                            QuickLogger.Debug($"Found Destination: {destinationPort?.GetPrefabID()}", true);
 
-                    });
+                            var state = StateFactory.GetState(data.State);
+                            QuickLogger.Debug($"Setting State: {state.Name}", true);
 
-                    destinationPort?.SetInboundDrone(this);
+                            if (state.GetType() == typeof(IdleState) && destinationPort != null && !AlterraFabricatorStationController.Main.IsStationPort(destinationPort))
+                            {
+                                ShipOrder(destinationPort);
+                            }
+                            else
+                            {
+                                StateMachine.SwitchToNewState(state.GetType());
+                            }
+
+                        });
+                    }
+                    else
+                    {
+                        StateMachine.SwitchToNewState(typeof(IdleState));
+                    }
+
+
+                    //destinationPort?.SetInboundDrone(this);
                 }
 
                 _trans.position = data.Position.ToVector3();
                 _trans.rotation = data.Rotation.Vec4ToQuaternion();
-
-                var state = StateFactory.GetState(data.State);
-                QuickLogger.Debug($"Setting State: {state.Name}", true);
-                StateMachine.SwitchToNewState(state.GetType());
             }
             _dataLoaded = true;
         }

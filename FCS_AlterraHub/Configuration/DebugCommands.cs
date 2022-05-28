@@ -149,6 +149,7 @@ namespace FCS_AlterraHub.Configuration
         public static string ResetTransportDrones()
         {
             AlterraFabricatorStationController.Main.ResetDrones();
+            AlterraFabricatorStationController.Main.ClearShipmentData();
 
             return $"Drones reset!";
         }        
@@ -159,14 +160,6 @@ namespace FCS_AlterraHub.Configuration
             DayNightCycle.main.SetDayNightTime(0.86f);
 
             return $"Time Set to Evening";
-        }
-
-        [ConsoleCommand("FixDrillSpawns")]
-        public static string FixDrillSpawns()
-        {
-            AlterraFabricatorStationController.Main.ResetDrones();
-
-            return $"Drones reset!";
         }
     }
 }

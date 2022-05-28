@@ -57,8 +57,8 @@ namespace FCS_ProductionSolutions.Configuration
 
         [Toggle("[Deep Driller] Is Mod Enabled", Order = 1,Tooltip = "Enables/Disables Deep Driller MK3 from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsDeepDrillerEnabled = true;
-        [Toggle("[Deep Driller] Is HardCore Mode", Order = 1)]
-        public bool DDHardCoreMode  = true;
+        //[Toggle("[Deep Driller] Is HardCore Mode", Order = 1)]
+        //public bool DDHardCoreMode  = true;
         [Toggle("[Deep Driller Play Fx", Order = 1, Tooltip ="Enables/Disables Deep Driller MK3 sound effects")]
         public bool DDMK3FxAllowed = true;
         [Slider("[Deep Driller] Master Volume", 0.0f, 1.0f, DefaultValue = 0.1f, Step = 0.01f, Format = "{0:P0}", Order = 1, Tooltip = "This control affects all drills.")]

@@ -50,6 +50,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Spawnables
                 applier.anchorSky = Skies.Auto;
 
                 prefab.AddComponent<DroneController>();
+                var immuseToProp = prefab.EnsureComponent<ImmuneToPropulsioncannon>();
+                immuseToProp.immuneToRepulsionCannon = true;
 
                 //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
@@ -65,7 +67,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Spawnables
 
         protected override Sprite GetItemSprite()
         {
-            return ImageUtils.LoadSpriteFromFile(Path.Combine(AssetsFolder, $"{ClassID}.png"));
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(AssetsFolder, $"TransportDronePing.png"));
         }
     }
 }

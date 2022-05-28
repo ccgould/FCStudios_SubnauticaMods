@@ -120,6 +120,15 @@
 
         private static string FormatToSimpleVersion(FileVersionInfo version) => $"{version.FileMajorPart}.{version.FileMinorPart}.{version.FileBuildPart}.{version.FilePrivatePart}";
 
+        public static void CreditMessage(string msg)
+        {
+            if (!QPatch.Configuration.ShowCreditMessages) return;
+            Initialize();
+            string name = Assembly.GetCallingAssembly().GetName().Name;
+            _logger.LogMessage($"[{name}] {msg}");
+            ErrorMessage.AddMessage($"[{name}] {msg}");
+        }        
+        
         public static void ModMessage(string msg)
         {
             if (QPatch.Configuration.HideAllFCSOnScreenMessages) return;

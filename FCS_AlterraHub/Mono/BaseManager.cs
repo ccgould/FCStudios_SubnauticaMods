@@ -9,6 +9,7 @@ using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Managers;
 using FCS_AlterraHub.Model;
+using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem;
 using FCS_AlterraHub.Mono.Controllers;
 using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
@@ -86,7 +87,7 @@ namespace FCS_AlterraHub.Mono
         public readonly HashSet<FcsDevice> BaseFcsStorage = new();
         public readonly HashSet<FcsDevice> BaseAntennas = new();
         public readonly HashSet<FcsDevice> BaseTerminals = new();
-        private static PortManager _portManager;
+        private PortManager _portManager;
         public SubRoot Habitat { get; set; }
         public static Action<BaseManager> OnManagerCreated { get; set; }
         public bool IsVisible => GetIsVisible();
@@ -296,7 +297,7 @@ namespace FCS_AlterraHub.Mono
             QuickLogger.Debug($"Creating new manager", true);
             var manager = new BaseManager(habitat);
             QuickLogger.Debug($"Created new base manager with ID {manager.BaseID}", true);
-            _portManager = habitat.gameObject.EnsureComponent<PortManager>();
+            manager._portManager = habitat.gameObject.EnsureComponent<PortManager>();
             Managers.Add(manager);
             QuickLogger.Debug($"Manager Count = {Managers.Count}", true);
             OnManagerCreated?.Invoke(manager);
@@ -1665,6 +1666,20 @@ namespace FCS_AlterraHub.Mono
         public List<string> GetConnectedDevices(string telepowerPylonTabId)
         {
             return (from device in _registeredDevices where device.Key == telepowerPylonTabId select device.Value.UnitID).ToList();
+        }
+
+        internal static AlterraDronePortController FindPort(string portPrefabId)
+        {
+            foreach (BaseManager baseManager in Managers)
+            {
+                var port = baseManager.GetPortManager().FindPort(portPrefabId);
+                if (port != null)
+                {
+                    return port;
+                }
+            }
+
+            return null;
         }
     }
 

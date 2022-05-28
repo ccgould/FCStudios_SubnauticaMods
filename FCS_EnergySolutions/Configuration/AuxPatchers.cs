@@ -26,6 +26,7 @@ namespace FCS_EnergySolutions.Configuration
             { $"{ModKey}_RemoveAllTelepowerConnectionsPull","Please remove all connections to this pylon before switching to pull mode."},
             { $"{ModKey}_MaximumConnectionsReached","The maximum amount of connections have been reached. Please use an upgrade to get more slots."},
             { $"{ModKey}_SelectAMode","Select a Mode or Connect to another Pylon."},
+            { $"{ModKey}_WindSurferMaxReached","Maximum platform allowance reached. No more platforms can be added."},
         };
 
         internal static void AdditionalPatching()
@@ -121,6 +122,11 @@ namespace FCS_EnergySolutions.Configuration
         public static string SelectAMode()
         {
             return GetLanguage("SelectAMode");
+        }
+
+        public static string WindSurferMaxReached()
+        {
+            return GetLanguage("WindSurferMaxReached");
         }
     }
 }

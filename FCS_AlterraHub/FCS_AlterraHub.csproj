@@ -252,6 +252,7 @@
     <Compile Include="Systems\AccountDetails.cs" />
     <Compile Include="Systems\CardSystem.cs" />
     <Compile Include="Systems\MessageBoxHandler.cs" />
+    <Compile Include="Systems\CreditNotificationSystem.cs" />
     <Compile Include="Systems\StoreInventorySystem.cs" />
     <Compile Include="Systems\VoiceNotificationSystem.cs" />
   </ItemGroup>

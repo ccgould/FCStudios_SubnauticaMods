@@ -101,6 +101,14 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Spawnables
                 var lwe = prefab.AddComponent<LargeWorldEntity>();
                 lwe.cellLevel = LargeWorldEntity.CellLevel.Near;
 
+                //var coi = prefab.EnsureComponent<ChildObjectIdentifier>();
+
+                //prefab.gameObject.SetActive(false);
+                //var energyMixin = prefab.EnsureComponent<EnergyMixin>();
+                //energyMixin.storageRoot = coi;
+                //energyMixin.allowBatteryReplacement = false;
+                //prefab.gameObject.SetActive(true);
+                
                 prefab.AddComponent<QuantumPowerBankController>();
 
                 MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, prefab, Color.red);

@@ -69,7 +69,7 @@ namespace FCS_HomeSolutions.Configuration
             { $"{ModKey}_CannotDeleteLevelFormat","Cannot delete level: {0}"},
             { $"{ModKey}_DeleteLevelConfirmation","Are you sure you would like to delete level ({0})"},
             { $"{ModKey}_MovingTo","MOVING TO"},
-            { $"{ModKey}_CurrentlyAt","CURRENTLY AT"},
+            { $"{ModKey}_FloorLevel","FLOOR LEVEL"},
             { $"{ModKey}_QuantumPowerBankFull","Quantum Power Bank is already full"},
         };
 
@@ -381,9 +381,9 @@ namespace FCS_HomeSolutions.Configuration
             return GetLanguage($"{ModKey}_MovingTo");
         }
 
-        public static string CurrentlyAt()
+        public static string FloorLevel()
         {
-            return GetLanguage($"{ModKey}_CurrentlyAt");
+            return GetLanguage($"{ModKey}_FloorLevel");
         }
 
         public static string QuantumPowerBankFull()

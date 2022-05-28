@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -26,6 +27,7 @@ namespace FCS_AlterraHub.Systems
         public Action onBalanceUpdated;
         private bool _hasBeenSaved;
         private bool _accountLoaded;
+
         public TechType CardTechType { get; set; }
         
         /// <summary>
@@ -92,9 +94,13 @@ namespace FCS_AlterraHub.Systems
             try
             {
                 _accountDetails.Balance += amount;
-                if (QPatch.Configuration.ShowCreditMessages)
+                if (QPatch.Configuration.CreditMessageDelay == 0f)
                 {
-                    QuickLogger.ModMessage($"Added {amount} to account new balance is {_accountDetails.Balance}");
+                    QuickLogger.CreditMessage(AlterraHub.CreditMessage(amount));
+                }
+                else
+                {
+                    CreditNotificationSystem.main.AddCredit(amount);
                 }
                 onBalanceUpdated?.Invoke();
             }
@@ -347,7 +353,7 @@ namespace FCS_AlterraHub.Systems
             _accountDetails.AlterraDebitPayed += amountToTake;
             RemoveFinances(amountToTake);
 
-            if(QPatch.Configuration.ShowCreditMessages) QuickLogger.ModMessage($"Deducted {amount} from the account new balance is {_accountDetails.Balance}");
+            QuickLogger.CreditMessage($"Deducted {amount} from the account new balance is {_accountDetails.Balance}");
             return true;
         }
 

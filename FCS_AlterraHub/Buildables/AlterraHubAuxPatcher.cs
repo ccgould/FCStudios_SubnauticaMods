@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Handlers;
 using UnityEngine;
@@ -85,7 +86,9 @@ namespace FCS_AlterraHub.Buildables
             { $"{ModKey}_OrderBeingShipped", "Your order is now being shipped to base" },
             { $"{ModKey}_OrderHasBeenShipped", "Your order has been shipped to base" },
             { $"{ModKey}_NoPowerEmergencyMode", "NO POWER SYSTEM IN EMERGENCY MODE" },
-            { $"{ModKey}_BaseIDFormat", "Base ID: {0}" }
+            { $"{ModKey}_BaseIDFormat", "Base ID: {0}" },
+            { $"{ModKey}_CreditMessage", "Added {0} to account new balance is {1}" },
+            { $"{ModKey}_PressToInteractWith", "Press {0} to interact with {1}" }
         };
 
         internal static void AdditionalPatching()
@@ -458,6 +461,8 @@ namespace FCS_AlterraHub.Buildables
             return GetLanguage("PleaseClearHands");
         }
 
+
+
         public static string DebitHasBeenPaid()
         {
             return GetLanguage("DebitHasBeenPaid");
@@ -496,6 +501,16 @@ namespace FCS_AlterraHub.Buildables
         public static string BaseIDFormat(string baseId)
         {
             return string.Format(GetLanguage("BaseIDFormat"), baseId);
+        }
+
+        public static string CreditMessage(decimal amount)
+        {
+            return string.Format(GetLanguage("CreditMessage"), amount, CardSystem.main.GetAccountBalance());
+        }
+
+        public static string PressToInteractWith(KeyCode keyCode, string unitName)
+        {
+            return string.Format(GetLanguage("PressToInteractWith"), keyCode, unitName);
         }
     }
 }

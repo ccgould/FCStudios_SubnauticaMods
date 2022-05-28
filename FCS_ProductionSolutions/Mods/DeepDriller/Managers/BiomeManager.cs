@@ -49,6 +49,8 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
             TechType.DrillableKyanite
         };
 
+        public static Dictionary<TechType, List<TechType>> AdditionalSpecialResources = new();
+
         private static List<TechType> _allOres = new();
 
         private static void FindMatchingBiome(string biome, out string biomeType)
@@ -251,6 +253,11 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
 
         private static void GetResourceForSpecial(TechType techType, List<TechType> items)
         {
+            if (AdditionalSpecialResources.ContainsKey(techType))
+            {
+                items.AddRange(AdditionalSpecialResources[techType]);
+            }
+
             switch (techType)
             {
                 case TechType.LimestoneChunk:

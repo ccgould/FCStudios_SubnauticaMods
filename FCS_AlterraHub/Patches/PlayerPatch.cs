@@ -41,6 +41,7 @@ namespace FCS_AlterraHub.Patches
         {
             
             __instance.gameObject.EnsureComponent<VoiceNotificationSystem>();
+            __instance.gameObject.EnsureComponent<CreditNotificationSystem>();
             var f = uSkyManager.main.SunLight.transform;
             if (f != null)
             {

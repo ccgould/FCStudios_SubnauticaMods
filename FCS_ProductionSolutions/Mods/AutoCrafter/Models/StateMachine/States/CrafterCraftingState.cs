@@ -74,7 +74,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
             
             QuickLogger.Debug("Trycraft", true);
 
-            if (_operation != null && _operation.IsComplete)
+            if (_operation != null && (_operation.IsComplete || IsLimitedCheck()))
             {
                 return false;
             }
@@ -109,13 +109,22 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
 
                 if (!_operation.IsComplete) return false;
 
-                CompleteOperation(_operation);
+                CompleteOperation();
 
                 return true;
             }
 
             QuickLogger.Debug("try craft failed", true);
             return false;
+        }
+
+        private bool IsLimitedCheck()
+        {
+            if (!_manager.Crafter.GetIsRecursive()) return false;
+            return _manager.Crafter.CraftMachine.GetLimitAmount() > 0 &&
+                   _manager.Crafter.GetIsLimitedOperation() && 
+                   _manager.Crafter.Manager.GetItemCount(_operation.FixCustomTechType()) >=
+                   _manager.Crafter.CraftMachine.GetLimitAmount();
         }
 
         private bool CheckIfLinkedItemsAllowed()
@@ -139,13 +148,16 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
             }
         }
 
-        private void CompleteOperation(CraftingOperation craftingOperation)
+        private void CompleteOperation()
         {
-            QuickLogger.Debug("Operation Complete.", true);
+            QuickLogger.Debug($"{_manager.Crafter.UnitID} Operation Complete.", true);
+
             _operation = null;
             _consumable?.Clear();
             _crafted?.Clear();
-            AutocrafterHUD.Main.OnComplete(craftingOperation);
+            AutocrafterHUD.Main.OnComplete();
+            _manager.Crafter.CraftMachine.CancelOperation();
+            _manager.Crafter.CancelLinkedCraftersOperations();
         }
         
         private void CraftItem(TechType techType)

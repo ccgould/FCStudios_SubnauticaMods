@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem;
 using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Interfaces;
+using FCSCommon.Utilities;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Managers
@@ -45,6 +47,22 @@ namespace FCS_AlterraHub.Managers
         public IDroneDestination FindPort(int dockedPortId)
         {
             return (from port in _dronePorts where port.Value.GetPortID() == dockedPortId select port.Value).FirstOrDefault();
+        }
+
+        public AlterraDronePortController FindPort(string prefabId)
+        {
+            QuickLogger.Debug($"Port Count:{_dronePorts.Count} | Port ID: {prefabId}");
+            foreach (KeyValuePair<string, IDroneDestination> port in _dronePorts)
+            {
+                QuickLogger.Debug($"Checking: {port.Key}");
+                if (port.Key.Equals(prefabId.Trim(),StringComparison.OrdinalIgnoreCase))
+                {
+                    QuickLogger.Debug("Target Port Found", true);
+                    return (AlterraDronePortController)port.Value;
+                }
+            }
+
+            return null;
         }
 
         public AlterraDronePortController GetOpenPort()
