@@ -9,8 +9,5 @@
     "SMLHelper": "2.6.1"
   },
   "Enable": true,
-  "AssemblyName": "DataStorageSolutions.dll",
-  "VersionChecker": {
-    "LatestVersionURL": "https://https://github.com/ccgould/FCStudios_SubnauticaMods/raw/master/DataStorageSolutions/mod.json"
-  }
+  "AssemblyName": "DataStorageSolutions.dll"
 }
