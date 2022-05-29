@@ -493,7 +493,9 @@ namespace DataStorageSolutions.Configuration
         [JsonProperty] internal bool PullFromDockedVehicles { get; set; } = true;
         [JsonProperty] internal float CheckVehiclesInterval { get; set; } = 2.0f;
         [JsonProperty] internal int ExtractMultiplier { get; set; }
+
         [JsonProperty] internal float ExtractInterval = 0.25f;
+        [JsonProperty] internal bool AllowFood { get; set; }
 
         private HashSet<Filter> _dockingBlackList = new HashSet<Filter>();
 

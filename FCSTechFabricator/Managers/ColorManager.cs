@@ -99,9 +99,7 @@ namespace FCSTechFabricator.Managers
             {
                 itemButton.OnInterfaceButton = _onInterfaceButton;
             }
-
-            if(!_colorItemsTracker.Contains(itemButton))
-                _colorItemsTracker.Add(itemButton);
+            _colorItemsTracker.Add(itemButton);
         }
 
         private void ClearColorPage()

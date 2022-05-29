@@ -28,7 +28,6 @@ namespace FCSTechFabricator
             Texture2D coloredTexture = FcAssetBundlesService.PublicAPI.GetAssetBundleByName(AssetBundleName).LoadAsset<Texture2D>(Mod.ModName);
             SkinnedMeshRenderer skinnedMeshRenderer = prefab.GetComponentInChildren<SkinnedMeshRenderer>();
             skinnedMeshRenderer.material.mainTexture = coloredTexture;
-            prefab.AddComponent<FCSTechFabGameLoadUtil>();
 
             return prefab;
         }

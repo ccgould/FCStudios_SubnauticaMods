@@ -3,9 +3,7 @@ using FCSTechFabricator.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
-using System.Security.Policy;
 using FCSCommon.Utilities;
-using FCSTechFabricator.Configuration;
 using FCSTechFabricator.Enums;
 using SMLHelper.V2.Crafting;
 using UnityEngine;
@@ -19,53 +17,24 @@ namespace FCSTechFabricator.Components
         private FCSController _mono;
         private IFCSStorage _storage;
         private TechType _techtype;
-        private FCSPowerManager _powerManager;
-        private bool _canBeVisible;
-        private bool _isBase { get; set; }
-        public string UnitID { get; set; }
-        public bool IsVisible { get; set; } = false;
-        //TODO Save Is Visible
+        private IFCSPowerManager _powerManager;
 
-        public void Initialize(FCSController mono, IFCSStorage storage, FCSPowerManager powerManager,bool canBeVisible = false)
+        [Obsolete("Please use Initialize(FCSController mono, IFCSStorage storage, IFCSPowerManager powerManager) to allow power usage data to be accessible")]
+        public void Initialize(FCSController mono, IFCSStorage storage)
+        {
+            _mono = mono;
+            _storage = storage;
+        }
+        
+        public void Initialize(FCSController mono, IFCSStorage storage, IFCSPowerManager powerManager)
         {
             _mono = mono;
             _storage = storage;
             _powerManager = powerManager;
-            _canBeVisible = canBeVisible;
         }
-
-        public void InitializeBase(FCSController mono, IFCSStorage storage, FCSPowerManager powerManager,
-            PrefabIdentifier prefabIdentifier)
-        {
-            _mono = mono;
-            _storage = storage;
-            _powerManager = powerManager;
-            _prefabId = prefabIdentifier;
-            _isBase = true;
-        }
-
-        public bool IsBase()
-        {
-            return _isBase;
-        }
-
-        /// <summary>
-        /// Only us this if this Connectable is a base
-        /// </summary>
-        public void SetTechType(TechType techType)
-        {
-            if (_isBase)
-            {
-                _techtype = techType;
-            }
-        }
-
+        
         public TechType GetTechType()
         {
-            if (_isBase)
-            {
-                return _techtype;
-            }
             if (_techtype == TechType.None)
             {
                 var techTag = GetComponentInParent<TechTag>() ?? GetComponentInChildren<TechTag>();
@@ -82,12 +51,7 @@ namespace FCSTechFabricator.Components
         {
             return _prefabId?.Id;
         }
-
-        public void SetPrefabID(PrefabIdentifier prefabid)
-        {
-            _prefabId = prefabid;
-        }
-
+        
         public float GetDevicePowerCharge()
         {
             return _powerManager?.GetDevicePowerCharge() ?? 0f;
@@ -108,7 +72,7 @@ namespace FCSTechFabricator.Components
             _powerManager?.SetPowerState(state);
         }
 
-        public FCSPowerManager GetPowerManager()
+        public IFCSPowerManager GetPowerManager()
         {
             return _powerManager;
         }
@@ -198,31 +162,5 @@ namespace FCSTechFabricator.Components
         {
            return _storage.ContainsItem(techType);
         }
-
-        public virtual int GetItemCount(TechType techType)
-        {  var items = _storage.GetItemsWithin();
-            return items.ContainsKey(techType) ? items[techType] : 0;
-        }
-
-        public virtual bool IsConstructed()
-        {
-            return _mono.IsConstructed;
-        }
-
-        public virtual bool IsOperational()
-        {
-            return _powerManager?.GetPowerState() == FCSPowerStates.Powered && IsConstructed();
-        }
-
-        public FCSController GetController()
-        {
-            return _mono;
-        }
-
-        public bool CanBeVisible()
-        {
-            return _canBeVisible;
-        }
-
     }
 }
