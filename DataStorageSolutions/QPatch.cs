@@ -103,7 +103,6 @@ namespace DataStorageSolutions
                 harmony.PatchAll(Assembly.GetExecutingAssembly());
 
                 PatchEasyCraft(harmony);
-                PatchToolTipFactory(harmony);
 
                 IsDockedVehicleStorageAccessInstalled = QModServices.Main.ModPresent("DockedVehicleStorageAccess");
                 
@@ -178,51 +177,6 @@ namespace DataStorageSolutions
             {
                 QuickLogger.Debug("EasyCraft  not installed");
             }
-        }
-
-        private static void PatchToolTipFactory(Harmony harmony)
-        {
-            var toolTipFactoryType = Type.GetType("TooltipFactory, Assembly-CSharp");
-           
-            if (toolTipFactoryType != null)
-            {
-                QuickLogger.Debug("Got TooltipFactory Type");
-
-                var inventoryItemViewMethodInfo = toolTipFactoryType.GetMethod("InventoryItem");
-
-                if (inventoryItemViewMethodInfo != null)
-                {
-                    QuickLogger.Info("Got Inventory Item View Method Info");
-                    var postfix = typeof(TooltipFactory_Patch).GetMethod("GetToolTip");
-                    harmony.Patch(inventoryItemViewMethodInfo, null, new HarmonyMethod(postfix));
-                }
-            }
-
-
-            //if (easyCraftClosestItemContainersType != null)
-            //{
-            //    QuickLogger.Debug("Got EasyCraft Type");
-            //    var destroyItemMethodInfo = easyCraftClosestItemContainersType.GetMethod("DestroyItem");
-            //    var getPickupCountMethodInfo = easyCraftClosestItemContainersType.GetMethod("GetPickupCount");
-
-            //    if (destroyItemMethodInfo != null)
-            //    {
-            //        QuickLogger.Debug("Got EasyCraft DestroyItem Method");
-            //        var postfix = typeof(EasyCraft_Patch).GetMethod("DestroyItem");
-            //        harmony.Patch(destroyItemMethodInfo, null, new HarmonyMethod(postfix));
-            //    }
-
-            //    if (getPickupCountMethodInfo != null)
-            //    {
-            //        QuickLogger.Debug("Got EasyCraft GetPickupCount Method");
-            //        var postfix = typeof(EasyCraft_Patch).GetMethod("GetPickupCount");
-            //        harmony.Patch(getPickupCountMethodInfo, null, new HarmonyMethod(postfix));
-            //    }
-            //}
-            //else
-            //{
-            //    QuickLogger.Error("Failed to get EasyCraft Type");
-            //}
         }
     }
 }

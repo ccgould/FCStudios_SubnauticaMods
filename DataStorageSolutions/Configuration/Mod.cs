@@ -494,7 +494,6 @@ namespace DataStorageSolutions.Configuration
         [JsonProperty] internal float CheckVehiclesInterval { get; set; } = 2.0f;
         [JsonProperty] internal int ExtractMultiplier { get; set; }
         [JsonProperty] internal float ExtractInterval = 0.25f;
-        [JsonProperty] internal bool ShowServerCustomToolTip { get; set; } = true;
 
         private HashSet<Filter> _dockingBlackList = new HashSet<Filter>();
 
@@ -508,8 +507,6 @@ namespace DataStorageSolutions.Configuration
                 Mod.SaveModConfiguration();
             }
         }
-
-
     }
 
     internal class ConfigFile
@@ -521,30 +518,34 @@ namespace DataStorageSolutions.Configuration
     {
         //private ModModes _modMode;
         private const string ExtractMultiplierID = "DSSEMulti";
-        private const string ShowCustomServerToolTip = "DSSShowSeverCustomToolTip";
+        //private const string AllowFoodToggle = "DSSAllowFood";
 
 
         public Options() : base("Data Storage Solutions Settings")
         {
             ChoiceChanged += Options_ChoiceChanged;
-            ToggleChanged += Options_ToggleChanged;
+            //ToggleChanged += Options_ToggleChanged;
         }
 
-        private void Options_ToggleChanged(object sender, ToggleChangedEventArgs e)
-        {
-            if (e.Id == ShowCustomServerToolTip)
-            {
-                QPatch.Configuration.Config.ShowServerCustomToolTip = e.Value;
-            }
+        //private void Options_ToggleChanged(object sender, ToggleChangedEventArgs e)
+        //{
+        //    switch (e.Id)
+        //    {
+        //        case ExtractMultiplierID:
+        //            QPatch.Configuration.Config.AllowFood = e.Value;
+        //            break;
+        //    }
 
-            Mod.SaveModConfiguration();
-        }
+        //    Mod.SaveModConfiguration();
+        //}
 
         private void Options_ChoiceChanged(object sender, ChoiceChangedEventArgs e)
         {
-            if (e.Id == ExtractMultiplierID)
+            switch (e.Id)
             {
-                QPatch.Configuration.Config.ExtractMultiplier = e.Index;
+                case ExtractMultiplierID:
+                    QPatch.Configuration.Config.ExtractMultiplier = e.Index;
+                    break;
             }
 
             Mod.SaveModConfiguration();
@@ -560,7 +561,7 @@ namespace DataStorageSolutions.Configuration
                 "x20"
             }, QPatch.Configuration.Config.ExtractMultiplier);
 
-            AddToggleOption(ShowCustomServerToolTip, "Show Server Custom ToolTip", QPatch.Configuration.Config.ShowServerCustomToolTip);
+            //AddToggleOption(AllowFoodToggle, "Allow Food", QPatch.Configuration.Config.AllowFood);
         }
     }
 }
