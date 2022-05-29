@@ -8,9 +8,6 @@
   "VersionDependencies": {
     "SMLHelper": "2.13.3"
   },
-  "NexusId": {
-    "Subnautica": "0"
-  },
   "QModSAM": {
     "DeprecatedMods": [
       "FCSTechFabricator"
