@@ -1,0 +1,21 @@
+{
+  "Id": "FCSLifeSupportSolutions",
+  "DisplayName": "FCS Life Support Solutions",
+  "Author": "Field Creators Studios",
+  "Version": "1.0.1.12",
+  "Game": "Subnautica",
+  "AssemblyName": "FCS_LifeSupportSolutions.dll",
+  "VersionDependencies": {
+    "FCSAlterraHub": "1.0.1.53"
+  },
+  "NexusId": {
+    "Subnautica": "0"
+  },
+  "QModSAM": {
+    "DeprecatedMods": [
+      "AMMiniMedBay",
+      "OxStation"
+    ]
+  },
+  "Enable": true
+}

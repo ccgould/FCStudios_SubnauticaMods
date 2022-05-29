@@ -1,0 +1,26 @@
+{
+  "Id": "FCSHomeSolutions",
+  "DisplayName": "FCS Home Solutions",
+  "Author": "Field Creators Studios",
+  "Description": "Home Soltions is a mod that adds furniture and some functional items to subnuatica.",
+  "IconName": "PackIcon.png",
+  "Version": "1.0.1.19",
+  "Game": "Subnautica",
+  "VersionDependencies": {
+    "FCSAlterraHub": "1.0.1.53"
+  },
+  "NexusId": {
+    "Subnautica": "0"
+  },
+  "QModSAM": {
+    "DeprecatedMods": [
+      "ARSSeaBreeze",
+      "FireExtinguisherHolder",
+      "MiniFountainFilter",
+      "SeaCooker",
+      "QuantumTeleporter"
+    ]
+  },
+  "AssemblyName": "FCS_HomeSolutions.dll",
+  "Enable": true
+}
