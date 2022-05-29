@@ -71,9 +71,16 @@ namespace DataStorageSolutions.Mono
                     {
                         SubRoot = GetComponentInParent<SubRoot>();
                         FindBaseById(SubRoot.gameObject.gameObject?.GetComponentInChildren<PrefabIdentifier>()?.Id);
+                        
                     }
 
                     QuickLogger.Info($"BaseManager on Load {Manager} || {Manager.GetHasBreakerTripped()}");
+
+
+                    if (Manager.GetHasBreakerTripped())
+                    {
+                        //Manager.OnBreakerToggled?.Invoke(Manager.GetHasBreakerTripped());
+                    }
                 }
 
                 UpdateScreen();
