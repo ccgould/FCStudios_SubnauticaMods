@@ -1,0 +1,20 @@
+{
+  "Id": "FCSAlterraHub",
+  "DisplayName": "FCS Alterra Hub",
+  "Author": "Field Creators Studios",
+  "Version": "1.0.1.53",
+  "Game": "Subnautica",
+  "AssemblyName": "FCS_AlterraHub.dll",
+  "VersionDependencies": {
+    "SMLHelper": "2.13.3"
+  },
+  "NexusId": {
+    "Subnautica": "0"
+  },
+  "QModSAM": {
+    "DeprecatedMods": [
+      "FCSTechFabricator"
+    ]
+  },
+  "Enable": true
+}
