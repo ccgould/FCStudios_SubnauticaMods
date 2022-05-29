@@ -8,15 +8,15 @@
   "VersionDependencies": {
     "FCSAlterraHub": "1.0.1.53"
   },
-  "NexusId": {
-    "Subnautica": "0"
-  },
   "QModSAM": {
     "DeprecatedMods": [
       "FCSAlterraShipping",
       "ExStorageDepot",
       "FCSDataStorageSolutions"
     ]
+  },
+  "VersionChecker": {
+    "LatestVersionURL": "https://github.com/ccgould/FCStudios_SubnauticaMods/raw/master/VersionChecker/FCS_StorageSolutions/mod.json"
   },
   "Enable": true
 }

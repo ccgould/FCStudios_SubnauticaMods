@@ -9,9 +9,6 @@
   "VersionDependencies": {
     "FCSAlterraHub": "1.0.1.53"
   },
-  "NexusId": {
-    "Subnautica": "0"
-  },
   "QModSAM": {
     "DeprecatedMods": [
       "ARSSeaBreeze",
@@ -20,6 +17,9 @@
       "SeaCooker",
       "QuantumTeleporter"
     ]
+  },
+    "VersionChecker": {
+    "LatestVersionURL": "https://github.com/ccgould/FCStudios_SubnauticaMods/raw/master/VersionChecker/FCS_HomeSolutions/mod.json"
   },
   "AssemblyName": "FCS_HomeSolutions.dll",
   "Enable": true

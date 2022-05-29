@@ -8,14 +8,14 @@
   "VersionDependencies": {
     "FCSAlterraHub": "1.0.1.53"
   },
-  "NexusId": {
-    "Subnautica": "0"
-  },
   "QModSAM": {
     "DeprecatedMods": [
       "AMMiniMedBay",
       "OxStation"
     ]
+  },
+  "VersionChecker": {
+    "LatestVersionURL": "https://github.com/ccgould/FCStudios_SubnauticaMods/raw/master/VersionChecker/FCS_LifeSupportSolutions/mod.json"
   },
   "Enable": true
 }
