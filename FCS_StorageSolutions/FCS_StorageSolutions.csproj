@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <Import Project="$(SolutionDir)\GamePaths.targets" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{4B160A7F-C541-4071-9DFE-D3E813B959B3}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>FCS_StorageSolutions</RootNamespace>
+    <AssemblyName>FCS_StorageSolutions</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <Game>$(Configuration.split(_)[0])</Game>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'BZ_Exp|AnyCPU' ">
+    <OutputPath>bin\BZ_Exp\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'BZ_Stable|AnyCPU' ">
+    <OutputPath>bin\BZ_Stable\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SN_Exp|AnyCPU' ">
+    <OutputPath>bin\SN_Exp\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SN_Stable|AnyCPU' ">
+    <OutputPath>bin\SN_Stable\</OutputPath>
+  </PropertyGroup>
+  <Import Project="$(SolutionDir)\Configurations.targets" />
+  <Import Project="$(SolutionDir)\References.targets" />
+  <ItemGroup>
+    <Compile Include="Helpers\TransferHelpers.cs" />
+    <Compile Include="Mods\AlterraStorage\Buildable\AlterraStoragePatch.cs" />
+    <Compile Include="Configuration\ModelPrefab.cs" />
+    <Compile Include="Mods\AlterraStorage\Mono\AlterraStorageController.cs" />
+    <Compile Include="Configuration\AuxPatchers.cs" />
+    <Compile Include="Configuration\Config.cs" />
+    <Compile Include="Configuration\DebugCommands.cs" />
+    <Compile Include="Configuration\Mod.cs" />
+    <Compile Include="Configuration\SaveDataEntry.cs" />
+    <Compile Include="Mods\AlterraStorage\Mono\InventoryButton.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Buildable\DSSAntennaPatch.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Rack\AddFilterController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Rack\FilterDisplayItem.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Rack\FilterItems.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Rack\RackConfigurationPageController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Spawnable\DSSTransceiver.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Buildable\DSSTerminalPatch.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Buildable\DSSItemDisplayPatch.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Buildable\DSSFloorServerRackPatch.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Buildable\DSSWallServerRackPatch.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Spawnable\DSSServerSpawnable.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Antenna\DSSAntennaController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\ItemDisplay\DSSItemDisplayController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\ItemDisplay\NetworkDumpStorage.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Rack\DSSRackBase.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Rack\DSSSlotController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Rack\DSSFloorServerRackController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Rack\DSSWallServerRackController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Server\DSSServerController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\BaseListController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\BulkMultipliers.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\TerminalConfigurationPageController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\CraftingPageController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\DeviceItem.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\DeviceTransceiverDialog.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\DSSInventoryItem.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\DSSListItemController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\DssListItemIcon.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\DSSTerminalController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\DSSTerminalDisplayManager.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\Enumerators\TerminalPages.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\FilterItemButton.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\MoonPoolDialog.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\FilterSettingDialog.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\MoonPoolPageController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\MultiplierController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\NetworkDialogController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\TransceiverPageController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\VehicleButton.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\VehicleItemButton.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Transceiver\DSSTransceiverController.cs" />
+    <Compile Include="Patches\StorageHelperPatches.cs" />
+    <Compile Include="Patches\StorageContainerPatches.cs" />
+    <Compile Include="Patches\ToolTipFactory_Patch.cs" />
+    <Compile Include="Patches\VehicleDockingBayPatcher.cs" />
+    <Compile Include="QPatch.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\FCS_AlterraHub\FCS_AlterraHub.csproj">
+      <Project>{1a17b4ba-aae5-41c2-924a-ce05dc74efe8}</Project>
+      <Name>FCS_AlterraHub</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\BuildEvents.targets" />
+</Project>

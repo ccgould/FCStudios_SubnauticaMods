@@ -1,5 +1,5 @@
 ﻿using FCSDemo.Mono;
-using Harmony;
+using HarmonyLib;
 using UnityEngine;
 
 namespace FCStudioDebugger.Debug.Patches

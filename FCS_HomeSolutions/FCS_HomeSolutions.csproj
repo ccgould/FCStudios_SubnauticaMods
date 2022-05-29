@@ -1,0 +1,201 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <Import Project="$(SolutionDir)\GamePaths.targets" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7317FEE1-C0B2-443E-AB9D-3F656B6C766A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>FCS_HomeSolutions</RootNamespace>
+    <AssemblyName>FCS_HomeSolutions</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <Game>$(Configuration.split(_)[0])</Game>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'BZ_Exp|AnyCPU' ">
+    <OutputPath>bin\BZ_Exp\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'BZ_Stable|AnyCPU' ">
+    <OutputPath>bin\BZ_Stable\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SN_Exp|AnyCPU' ">
+    <OutputPath>bin\SN_Exp\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SN_Stable|AnyCPU' ">
+    <OutputPath>bin\SN_Stable\</OutputPath>
+  </PropertyGroup>
+  <Import Project="$(SolutionDir)\Configurations.targets" />
+  <Import Project="$(SolutionDir)\References.targets" />
+  <ItemGroup>
+    <Compile Include="Buildables\DecorationController.cs" />
+    <Compile Include="Buildables\DecorationEntryPatch.cs" />
+    <Compile Include="Buildables\ModelPrefab.cs" />
+    <Compile Include="Enums\CookingMode.cs" />
+    <Compile Include="Mods\BunkBed\Buildable\CrewBunkBedPatcher.cs" />
+    <Compile Include="Mods\CrewLocker\Buildable\CrewLockerPatch.cs" />
+    <Compile Include="Mods\Curtains\Patches\OSubmarinHelper.cs" />
+    <Compile Include="Mods\DisplayBoard\Buildable\DisplayBoardPatcher.cs" />
+    <Compile Include="Mods\DisplayBoard\Mono\DisplayBoardController.cs" />
+    <Compile Include="Mods\DisplayBoard\Mono\DisplayScreenController.cs" />
+    <Compile Include="Mods\JukeBox\Buildable\JukeBoxSubWooferPatcher.cs" />
+    <Compile Include="Mods\LedLights\Buildable\RingLEDLight.cs" />
+    <Compile Include="Mods\LedLights\Buildable\FloodLEDLight.cs" />
+    <Compile Include="Mods\Microwave\Buildable\CookerPatch.cs" />
+    <Compile Include="Mods\Microwave\Mono\CookerController.cs" />
+    <Compile Include="Mods\NeonPlanter\Buildable\NeonPlanterPatch.cs" />
+    <Compile Include="Mods\PaintTool\Mono\ColorPickerTemplateItemController.cs" />
+    <Compile Include="Mods\PaintTool\Mono\HSVControl.cs" />
+    <Compile Include="Mods\PaintTool\Mono\uGUI_PaintToolColorPicker.cs" />
+    <Compile Include="Mods\PaintTool\Mono\uGUI_PaintToolColorPickerEditor.cs" />
+    <Compile Include="Mods\PartitionWalls\Patches\OSubmarinHelper.cs" />
+    <Compile Include="Mods\QuantumTeleporter\Mono\QuantumTeleporterVehiclePadController.cs" />
+    <Compile Include="Mods\QuantumTeleporter\Interface\IQuantumTeleporter.cs" />
+    <Compile Include="Mods\QuantumTeleporter\Interface\IQTPower.cs" />
+    <Compile Include="Mods\QuantumTeleporter\Mono\QTVehiclePadPowerManager.cs" />
+    <Compile Include="Mods\QuantumTeleporter\Buildable\QuantumTeleporterVehiclePadPatcher.cs" />
+    <Compile Include="Mods\QuantumTeleporter\Enumerators\TeleportItemType.cs" />
+    <Compile Include="Mods\QuantumTeleporter\Mono\QuantumPowerBankChargerController.cs" />
+    <Compile Include="Mods\QuantumTeleporter\Buildable\QuantumPowerBankChargerPatcher.cs" />
+    <Compile Include="Mods\QuantumTeleporter\Patches\ToolTipFactory_Patch.cs" />
+    <Compile Include="Mods\Rug\Buildable\Rug.cs" />
+    <Compile Include="Mods\Rug\Mono\RugController.cs" />
+    <Compile Include="Mods\SeaBreeze\Patches\StorageContainerPatches.cs" />
+    <Compile Include="Mods\Sink\Buildable\SinkPrefab.cs" />
+    <Compile Include="Mods\Sink\Mono\SinkController.cs" />
+    <Compile Include="Mods\Sofas\Buildable\NeonBarStool.cs" />
+    <Compile Include="Mods\Stairs\Buildable\StairsPatcher.cs" />
+    <Compile Include="Mods\Stairs\Mono\StairsController.cs" />
+    <Compile Include="Mods\Stove\Buildable\StovePatcher.cs" />
+    <Compile Include="Mods\Stove\Mono\StoveController.cs" />
+    <Compile Include="Mods\Elevator\Buildable\ElevatorPatcher.cs" />
+    <Compile Include="Mods\Elevator\Mono\ElevatorFloorData.cs" />
+    <Compile Include="Mods\Elevator\Mono\FCSElevatorController.cs" />
+    <Compile Include="Mods\Elevator\Mono\PlatformPoleController.cs" />
+    <Compile Include="Mods\Elevator\Mono\PlatformTrigger.cs" />
+    <Compile Include="Mods\Elevator\Mono\ScreenController.cs" />
+    <Compile Include="Mods\HologramPoster\Buildable\HologramPosterPatcher.cs" />
+    <Compile Include="Mods\HologramPoster\Mono\HologramPosterController.cs" />
+    <Compile Include="Mods\JukeBox\Mono\BaseJukeBox.cs" />
+    <Compile Include="Mods\JukeBox\Spectrum\AudioSpectrum.cs" />
+    <Compile Include="Mods\JukeBox\Buildable\JukeBoxSpeakerPatcher.cs" />
+    <Compile Include="Mods\JukeBox\Buildable\JukeBoxPatcher.cs" />
+    <Compile Include="Mods\JukeBox\Mono\JukeBox.cs" />
+    <Compile Include="Mods\JukeBox\Mono\JukeBoxSpeakerController.cs" />
+    <Compile Include="Mods\JukeBox\Mono\JukeBoxController.cs" />
+    <Compile Include="Mods\JukeBox\Spectrum\AudioSyncColor.cs" />
+    <Compile Include="Mods\JukeBox\Spectrum\AudioSyncer.cs" />
+    <Compile Include="Mods\LedLights\Buildable\LongLEDLight.cs" />
+    <Compile Include="Mods\LedLights\Buildable\ShortLEDLight.cs" />
+    <Compile Include="Mods\LedLights\Buildable\WallLEDLight.cs" />
+    <Compile Include="Mods\PeeperLoungeBar\Mono\PeeperLoungeBarController.cs" />
+    <Compile Include="Buildables\Settings.cs" />
+    <Compile Include="Buildables\SignEntryPatch.cs" />
+    <Compile Include="Mods\PeeperLoungeBar\Buildable\PeeperLoungeBarPatch.cs" />
+    <Compile Include="Configuration\AuxPatchers.cs" />
+    <Compile Include="Configuration\Config.cs" />
+    <Compile Include="Configuration\DebugCommands.cs" />
+    <Compile Include="Configuration\Mod.cs" />
+    <Compile Include="Configuration\SaveData.cs" />
+    <Compile Include="Mods\Curtains\Buildable\CurtainPatch.cs" />
+    <Compile Include="Mods\Curtains\Mono\CurtainController.cs" />
+    <Compile Include="Mods\MiniFountainFilter\Buildables\MiniFountainFilterAuxPatcher.cs" />
+    <Compile Include="Mods\MiniFountainFilter\Buildables\MiniFountainFilterPatcher.cs" />
+    <Compile Include="ModManagers\AnimationManager.cs" />
+    <Compile Include="Mods\MiniFountainFilter\Managers\MFFDisplayManager.cs" />
+    <Compile Include="Mods\MiniFountainFilter\Managers\MFFStorageManager.cs" />
+    <Compile Include="Mods\MiniFountainFilter\Managers\PlayerManager.cs" />
+    <Compile Include="Mods\MiniFountainFilter\Managers\TankManager.cs" />
+    <Compile Include="Mods\MiniFountainFilter\Mono\MiniFountainFilterController.cs" />
+    <Compile Include="Mods\AlienChef\Mono\AlienChefController.cs" />
+    <Compile Include="Mods\Stove\Mono\Cooker.cs" />
+    <Compile Include="Mods\Shower\Buildable\ShowerPrefab.cs" />
+    <Compile Include="Mods\Shower\Mono\ShowerBaseController.cs" />
+    <Compile Include="Mods\Shower\Mono\DoorController.cs" />
+    <Compile Include="Mods\Shower\Mono\LightController.cs" />
+    <Compile Include="Mods\Shower\Mono\ShowerController.cs" />
+    <Compile Include="Mods\Cabinets\Buildable\Cabinet2.cs" />
+    <Compile Include="Mods\Cabinets\Buildable\Cabinet3.cs" />
+    <Compile Include="Mods\Cabinets\Buildable\Cabinet1.cs" />
+    <Compile Include="Mods\Cabinets\Mono\CabinetController.cs" />
+    <Compile Include="Mods\FireExtinguisherRefueler\Buildable\FireExtinguisherRefuelerPatcher.cs" />
+    <Compile Include="Mods\FireExtinguisherRefueler\Mono\FireExtinguisherRefuelerController.cs" />
+    <Compile Include="Mods\LedLights\Buildable\LedLightPatch.cs" />
+    <Compile Include="Mods\LedLights\Mono\LedLightController.cs" />
+    <Compile Include="Mods\Sofas\Buildable\SofaBase.cs" />
+    <Compile Include="Mods\Sofas\Buildable\Sofa3.cs" />
+    <Compile Include="Mods\Sofas\Buildable\Sofa2.cs" />
+    <Compile Include="Mods\Sofas\Buildable\Sofa1.cs" />
+    <Compile Include="Mods\Stove\Struct\CookingItem.cs" />
+    <Compile Include="Mods\Toilet\Buildable\ToiletPatch.cs" />
+    <Compile Include="Mods\TVStand\Buildable\TVStandPatch.cs" />
+    <Compile Include="Mods\TV\Buildable\TVPatch.cs" />
+    <Compile Include="Mods\TV\Mono\HomeSectionController.cs" />
+    <Compile Include="Mods\TV\Mono\TVController.cs" />
+    <Compile Include="Mods\TV\Mono\VideoSectionController.cs" />
+    <Compile Include="Mods\NeonPlanter\Mono\NeonPlanterController.cs" />
+    <Compile Include="Mods\PaintTool\Mono\PaintToolController.cs" />
+    <Compile Include="Mods\PartitionWalls\Patches\BaseDecontructable_Patches.cs" />
+    <Compile Include="Patches\Builder_Patches.cs" />
+    <Compile Include="Patches\OSubmarinHelper.cs" />
+    <Compile Include="Patches\Player_Patches.cs" />
+    <Compile Include="Patches\PowerIndicatorPatch.cs" />
+    <Compile Include="Patches\ReleaseEventPrefix_Patch.cs" />
+    <Compile Include="Patches\StorageContainerPatches.cs" />
+    <Compile Include="Patches\SubRoot_Patches.cs" />
+    <Compile Include="QPatch.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Mods\QuantumTeleporter\Buildable\QuantumTeleporterPatcher.cs" />
+    <Compile Include="Mods\QuantumTeleporter\Enumerators\QTTeleportTypes.cs" />
+    <Compile Include="Mods\QuantumTeleporter\Mono\QTDisplayManager.cs" />
+    <Compile Include="Mods\QuantumTeleporter\Mono\QTPowerManager.cs" />
+    <Compile Include="Mods\QuantumTeleporter\Mono\QuantumTeleporterController.cs" />
+    <Compile Include="Mods\QuantumTeleporter\Mono\TeleportManager.cs" />
+    <Compile Include="Mods\SeaBreeze\Buildable\SeaBreezeAuxPatcher.cs" />
+    <Compile Include="Mods\SeaBreeze\Buildable\SeaBreezePatcher.cs" />
+    <Compile Include="Mods\SeaBreeze\Display\InterfaceButton.cs" />
+    <Compile Include="Mods\SeaBreeze\Display\ItemButton.cs" />
+    <Compile Include="Mods\SeaBreeze\Display\OnScreenButton.cs" />
+    <Compile Include="Mods\SeaBreeze\Display\PaginatorButton.cs" />
+    <Compile Include="Mods\SeaBreeze\Enumerators\SeaBreezePages.cs" />
+    <Compile Include="Mods\SeaBreeze\Mono\SeaBreezeDisplay.cs" />
+    <Compile Include="Mods\SeaBreeze\Mono\SeaBreezePowerManager.cs" />
+    <Compile Include="Mods\SeaBreeze\Mono\SeaBreezeController.cs" />
+    <Compile Include="Mods\QuantumTeleporter\Spawnables\QuantumPowerBankSpawnable.cs" />
+    <Compile Include="Structs\SoundEntry.cs" />
+    <Compile Include="Spawnables\FoodSpawnable.cs" />
+    <Compile Include="Mods\PaintTool\Spawnable\PaintCanSpawnable.cs" />
+    <Compile Include="Mods\PaintTool\Spawnable\PaintToolSpawnable.cs" />
+    <Compile Include="Mods\TrashReceptacle\Buildable\TrashReceptaclePatch.cs" />
+    <Compile Include="Mods\TrashReceptacle\Mono\TrashReceptacleController.cs" />
+    <Compile Include="Mods\TrashReceptacle\Mono\TrashStorage.cs" />
+    <Compile Include="Mods\TrashRecycler\Buildable\TrashRecyclerPatch.cs" />
+    <Compile Include="Mods\TrashRecycler\Mono\Recycler.cs" />
+    <Compile Include="Mods\TrashRecycler\Mono\TrashCollectorItem.cs" />
+    <Compile Include="Mods\TrashRecycler\Mono\TrashRecyclerController.cs" />
+    <Compile Include="Mods\TrashRecycler\Model\Waste.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FCS_AlterraHub\FCS_AlterraHub.csproj">
+      <Project>{1a17b4ba-aae5-41c2-924a-ce05dc74efe8}</Project>
+      <Name>FCS_AlterraHub</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Enumerators\" />
+    <Folder Include="Mods\AlienChef\Buildable\" />
+    <Folder Include="Mods\Sofas\Mono\" />
+    <Folder Include="Mono\BaseOperator\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="NAudio">
+      <HintPath>$(SolutionDir)\Libs\$(Configuration)\NAudio.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\BuildEvents.targets" />
+</Project>

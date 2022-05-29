@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <Import Project="$(SolutionDir)\GamePaths.targets" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{088706F7-949A-426F-A265-6CD0454B61A6}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>FCS_CyclopsUpgradeConsole</RootNamespace>
+    <AssemblyName>FCS_CyclopsUpgradeConsole</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'BZ_Exp|AnyCPU' ">
+    <OutputPath>bin\BZ_Exp\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'BZ_Stable|AnyCPU' ">
+    <OutputPath>bin\BZ_Stable\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SN_Exp|AnyCPU' ">
+    <OutputPath>bin\SN_Exp\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SN_Stable|AnyCPU' ">
+    <OutputPath>bin\SN_Stable\</OutputPath>
+  </PropertyGroup>
+  <Import Project="$(SolutionDir)\Configurations.targets" />
+  <Import Project="$(SolutionDir)\References.targets" />
+  <ItemGroup>
+    <Compile Include="Buildables\CUCAuxPatcher.cs" />
+    <Compile Include="Buildables\CUCModelPrefab.cs" />
+    <Compile Include="Buildables\CUCBuildable.cs" />
+    <Compile Include="Configuration\Config.cs" />
+    <Compile Include="Configuration\Mod.cs" />
+    <Compile Include="Helpers\Helpers.cs" />
+    <Compile Include="Mono\CUCController.cs" />
+    <Compile Include="Mono\CUCDisplayManager.cs" />
+    <Compile Include="QPatch.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Struct\UpgradeTrans.cs" />
+    <Compile Include="Utilities\Utils.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="MoreCyclopsUpgrades">
+      <HintPath>$(GameDir)\QMods\MoreCyclopsUpgrades\MoreCyclopsUpgrades.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FCS_AlterraHub\FCS_AlterraHub.csproj">
+      <Project>{1a17b4ba-aae5-41c2-924a-ce05dc74efe8}</Project>
+      <Name>FCS_AlterraHub</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\BuildEvents.targets" />
+</Project>

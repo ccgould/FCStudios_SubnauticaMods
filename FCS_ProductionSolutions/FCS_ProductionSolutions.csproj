@@ -1,0 +1,147 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <Import Project="$(SolutionDir)\GamePaths.targets" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{2B878BAA-1C0B-4623-A599-506A58C0DE32}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>FCS_ProductionSolutions</RootNamespace>
+    <AssemblyName>FCS_ProductionSolutions</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'BZ_Exp|AnyCPU' ">
+    <OutputPath>bin\BZ_Exp\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'BZ_Stable|AnyCPU' ">
+    <OutputPath>bin\BZ_Stable\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SN_Exp|AnyCPU' ">
+    <OutputPath>bin\SN_Exp\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SN_Stable|AnyCPU' ">
+    <OutputPath>bin\SN_Stable\</OutputPath>
+  </PropertyGroup>
+  <Import Project="$(SolutionDir)\Configurations.targets" />
+  <Import Project="$(SolutionDir)\References.targets" />
+  <ItemGroup>
+    <Compile Include="Buildable\AuxPatchers.cs" />
+    <Compile Include="Buildable\ModelPrefab.cs" />
+    <Compile Include="Configuration\Config.cs" />
+    <Compile Include="Configuration\DebugCommands.cs" />
+    <Compile Include="Mods\AutoCrafter\Helpers\CompatiblityMethods.cs" />
+    <Compile Include="Mods\AutoCrafter\Helpers\CrafterLogicHelper.cs" />
+    <Compile Include="Mods\AutoCrafter\Models\CrafterHelpers.cs" />
+    <Compile Include="Mods\AutoCrafter\Models\CraftingOperation.cs" />
+    <Compile Include="Mods\AutoCrafter\Models\StateMachine\CrafterBaseState.cs" />
+    <Compile Include="Mods\AutoCrafter\Models\StateMachine\CrafterStateManager.cs" />
+    <Compile Include="Mods\AutoCrafter\Models\StateMachine\States\CrafterCraftingState.cs" />
+    <Compile Include="Mods\AutoCrafter\Models\StateMachine\States\CrafterIdleState.cs" />
+    <Compile Include="Mods\AutoCrafter\Mono\AutoCrafterController.cs" />
+    <Compile Include="Mods\AutoCrafter\Mono\AutoCrafterCrateController.cs" />
+    <Compile Include="Mods\AutoCrafter\Mono\CrafterBeltController.cs" />
+    <Compile Include="Mods\AutoCrafter\Mono\CraftMachine.cs" />
+    <Compile Include="Mods\AutoCrafter\Patches\PowerIndicatorPatch.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Patchers\OSubmarinHelper.cs" />
+    <Compile Include="Mods\DeepDriller\Interfaces\IDeepDrillerController.cs" />
+    <Compile Include="Mods\DeepDriller\Interfaces\IPowerManager.cs" />
+    <Compile Include="Mods\DeepDriller\LightDuty\Buildable\DeepDrillerLightDutyPatcher.cs" />
+    <Compile Include="Mods\DeepDriller\LightDuty\Mono\DeepDrillerLightDutyController.cs" />
+    <Compile Include="Mods\DeepDriller\LightDuty\Mono\DeepDrillerLightDutyPowerManager.cs" />
+    <Compile Include="Mods\DeepDriller\Managers\DrillSystem.cs" />
+    <Compile Include="Mods\DeepDriller\Patchers\DeepDrillerGUIFilterPage.cs" />
+    <Compile Include="Mods\DeepDriller\Patchers\DeepDrillerGUIInventoryPage.cs" />
+    <Compile Include="Mods\DeepDriller\Patchers\DeepDrillerGUIOilPage.cs" />
+    <Compile Include="Mods\DeepDriller\Patchers\DeepDrillerGUIPage.cs" />
+    <Compile Include="Mods\DeepDriller\Patchers\DeepDrillerGUISettingsPage.cs" />
+    <Compile Include="Mods\DeepDriller\Patchers\DeepDrillerGUISignalPage.cs" />
+    <Compile Include="Mods\DeepDriller\Patchers\DeepDrillerHUD.cs" />
+    <Compile Include="Mods\DeepDriller\Patchers\DeepDrillerHudPages.cs" />
+    <Compile Include="Mods\DeepDriller\Patchers\PowerIndicatorPatch.cs" />
+    <Compile Include="Mods\HydroponicHarvester\Patches\StorageContainerPatches.cs" />
+    <Compile Include="Mods\Replicator\Patches\StorageContainerPatches.cs" />
+    <Compile Include="Structs\DNASampleData.cs" />
+    <Compile Include="Configuration\Mod.cs" />
+    <Compile Include="Configuration\SaveDataEntry.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Buildable\FCSDeepDrillerAuxPatcher.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Buildable\FCSDeepDrillerPatcher.cs" />
+    <Compile Include="Mods\DeepDriller\Configuration\DeepDrillerPowerData.cs" />
+    <Compile Include="Mods\DeepDriller\Craftable\FCSGlassCraftable.cs" />
+    <Compile Include="Mods\DeepDriller\Helpers\Helpers.cs" />
+    <Compile Include="Mods\DeepDriller\Managers\BiomeManager.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Managers\LaserManager.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Models\LaserScript.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Models\Pillar.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Models\State.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Models\Upgrades\AutoShutDownAtUpgrade.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Models\Upgrades\ConnectToBaseUpgrade.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Models\Upgrades\AutoStartUpAtUpgrade.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Models\Upgrades\MaxOreCountUpgrade.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Models\Upgrades\MinOreCountUpgrade.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Models\Upgrades\OresPerDayUpgrade.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Models\Upgrades\SilkTouchUpgrade.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Models\Upgrades\UpgradeClass.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Mono\DrillInventoryButton.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Mono\FCSDeepDrillerAnimationHandler.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Mono\FCSDeepDrillerContainer.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Mono\FCSDeepDrillerController.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Mono\FCSDeepDrillerDisplay.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Mono\FCSDeepDrillerHealthHandler.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Mono\FCSDeepDrillerLavaPitHandler.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Mono\FCSDeepDrillerOilHandler.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Mono\FCSDeepDrillerOreGenerator.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Mono\FCSDeepDrillerPowerHandler.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Mono\FCSDeepDrillerSolarController.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Mono\FCSDeepDrillerTransferManager.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Mono\FCSDeepDrillerUpgradeManager.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Enumerators\FCSDeepDrillerPages.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Mono\FCSDeepDrillerThermalController.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Structs\FilterBtnData.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Mono\NotificationSystem.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Ores\SandOrePatcher.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Patchers\Builder_CheckAsSubModule_Patch.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Patchers\FCSConnectableAwake_Patcher.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Patchers\LootDistributionData_Patchers.cs" />
+    <Compile Include="Mods\DeepDriller\HeavyDuty\Structs\UpgradeSave.cs" />
+    <Compile Include="Mods\HydroponicHarvester\Buildable\HydroponicHarvesterPatch.cs" />
+    <Compile Include="Mods\HydroponicHarvester\Mono\DisplayManager.cs" />
+    <Compile Include="Mods\HydroponicHarvester\Mono\HarvesterSpeedButton.cs" />
+    <Compile Include="Mods\HydroponicHarvester\Mono\SlotData.cs" />
+    <Compile Include="Mods\HydroponicHarvester\Mono\SlotItemTab.cs" />
+    <Compile Include="Mods\HydroponicHarvester\Mono\SlotsData.cs" />
+    <Compile Include="Mods\MatterAnalyzer\Buildable\MatterAnalyzerPatch.cs" />
+    <Compile Include="Mods\HydroponicHarvester\Enumerators\ClonePhases.cs" />
+    <Compile Include="Mods\HydroponicHarvester\Enumerators\HarvesterSpeedModes.cs" />
+    <Compile Include="Mods\HydroponicHarvester\Models\PlantSlot.cs" />
+    <Compile Include="Mods\HydroponicHarvester\Mono\GrowBedManager.cs" />
+    <Compile Include="Mods\HydroponicHarvester\Mono\HydroponicHarvesterController.cs" />
+    <Compile Include="Mods\HydroponicHarvester\Mono\EffectsManager.cs" />
+    <Compile Include="Mods\MatterAnalyzer\Mono\AudioManager.cs" />
+    <Compile Include="Mods\MatterAnalyzer\Mono\MatterAnalyzerController.cs" />
+    <Compile Include="Mods\MatterAnalyzer\Mono\MatterAnalyzerStorage.cs" />
+    <Compile Include="Mods\MatterAnalyzer\Mono\MessagePop.cs" />
+    <Compile Include="Mods\AutoCrafter\Buildable\AutoCrafterPatch.cs" />
+    <Compile Include="Mods\Replicator\Buildable\ReplicatorPatcher.cs" />
+    <Compile Include="Mods\Replicator\Mono\ReplicatorSpeedButton.cs" />
+    <Compile Include="Mods\Replicator\Mono\ReplicatorSlot.cs" />
+    <Compile Include="Mods\Replicator\Mono\ReplicatorController.cs" />
+    <Compile Include="QPatch.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FCS_AlterraHub\FCS_AlterraHub.csproj">
+      <Project>{1a17b4ba-aae5-41c2-924a-ce05dc74efe8}</Project>
+      <Name>FCS_AlterraHub</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Patches\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\BuildEvents.targets" />
+</Project>

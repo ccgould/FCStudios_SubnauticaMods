@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using FCSTechFabricator.Objects;
+using FCS_AlterraHub.Model;
+#if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
+#else
+using Newtonsoft.Json;
+#endif
 
-namespace Model
+namespace FCSDemo.Model
 {
     [Serializable]
     internal class SaveDataEntry
     {
         [JsonProperty] internal string ID { get; set; }
-        [JsonProperty] internal ColorVec4 BodyColor { get; set; }
+        [JsonProperty] internal ColorTemplateSave ColorTemplate { get; set; }
     }
 
     [Serializable]

@@ -2,17 +2,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using FCSCommon.Objects;
+using FCS_AlterraHub.Model.Utilities;
+using FCS_AlterraHub.Objects;
 using FCSCommon.Utilities;
-using FCSTechFabricator.Objects;
-using Model;
-using Mono;
-using Oculus.Newtonsoft.Json;
+using FCSDemo.Model;
+using FCSDemo.Mono;
 using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Json;
 using SMLHelper.V2.Utility;
 using UnityEngine;
+#if SUBNAUTICA
+using RecipeData = SMLHelper.V2.Crafting.TechData;
+#endif
 
 namespace FCSDemo.Configuration
 {
@@ -26,12 +27,11 @@ namespace FCSDemo.Configuration
 # endregion
 
         #region Internal Properties
-        internal static string ModName => QPatch.Configuration.Config.ModName;
+        internal static string ModName => QPatch.Configuration.ModName;
         internal const string BundleName = "fcsdemo";
         internal const string FriendlyName = "FCS Demo";
         internal const string Description = "A demo mod for FCStudios";
         internal const string ClassID = "FcsDemo";
-        internal static string PrefabName => QPatch.Configuration.Config.PrefabName;
         internal static string AssetFolder => Path.Combine(ModName, "Assets");
 
         internal const string FCSDemoKitClassID = "FCSDemo_Kit";
@@ -39,9 +39,9 @@ namespace FCSDemo.Configuration
         internal static string SaveDataFilename => $"{ClassID}SaveData.json";
         internal static string MODFOLDERLOCATION => GetModPath();
 
-#if SUBNAUTICA
+#if SUBNAUTICA_STABLE
         internal static TechData FCSDemoIngredients => new TechData
-#elif BELOWZERO
+#else
                 internal static RecipeData FCSDemoIngredients => new RecipeData
 #endif
         {
@@ -62,8 +62,6 @@ namespace FCSDemo.Configuration
 
         internal static void Save()
         {
-
-
             if (!IsSaving())
             {
                 _saveObject = new GameObject().AddComponent<ModSaver>();
@@ -131,18 +129,6 @@ namespace FCSDemo.Configuration
             });
         }
 
-        internal static string ConfigurationFile()
-        {
-            QuickLogger.Info($"GetQmodsPath: {GetQModsPath()}");
-            QuickLogger.Info($"ModName: {ModName}");
-            QuickLogger.Info($"ModFolderLocation: {MODFOLDERLOCATION}");
-            return Path.Combine(MODFOLDERLOCATION, ConfigFileName);
-        }
-
-        internal static bool IsConfigAvailable()
-        {
-            return File.Exists(ConfigurationFile());
-        }
         #endregion
 
         #region Private Methods
@@ -163,8 +149,6 @@ namespace FCSDemo.Configuration
 
         private static string GetModPath()
         {
-            QuickLogger.Info($"GetQmodsPath: {GetQModsPath()}");
-            QuickLogger.Info($"ModName: {ModName}");
             return Path.Combine(GetQModsPath(), ModName);
         }
         private static string GetQModsPath()
@@ -173,63 +157,30 @@ namespace FCSDemo.Configuration
         }
 
         #endregion
-
-        private static void CreateModConfiguration()
-        {
-            var config = new ConfigFile { Config = new Config() };
-
-            var saveDataJson = JsonConvert.SerializeObject(config, Formatting.Indented);
-
-            File.WriteAllText(Path.Combine(MODFOLDERLOCATION, ConfigFileName), saveDataJson);
-        }
-
-        private static ConfigFile LoadConfigurationData()
-        {
-            // == Load Configuration == //
-            string configJson = File.ReadAllText(ConfigurationFile().Trim());
-
-            JsonSerializerSettings settings = new JsonSerializerSettings();
-            settings.MissingMemberHandling = MissingMemberHandling.Ignore;
-
-            // == LoadData == //
-            return JsonConvert.DeserializeObject<ConfigFile>(configJson, settings);
-        }
-
-        internal static ConfigFile LoadConfiguration()
-        {
-            if (!IsConfigAvailable())
-            {
-                CreateModConfiguration();
-            }
-
-            return LoadConfigurationData();
-        }
     }
 
-    internal class Config
+    internal class Config : ConfigFile
     {
-        [JsonProperty] internal float PowerUsage { get; set; } = 0.1f;
-        [JsonProperty] internal float PlaceMaxDistance { get; set; } = 5f;
-        [JsonProperty] internal float PlaceMinDistance { get; set; } = 1.2f;
-        [JsonProperty] internal float PlaceDefaultDistance { get; set; } = 2f;
-        [JsonProperty] internal bool AllowedOutside { get; set; } = false;
-        [JsonProperty] internal bool AllowedInBase { get; set; } = true;
-        [JsonProperty] internal bool AllowedOnGround { get; set; } = true;
-        [JsonProperty] internal bool AllowedOnWall { get; set; } = false;
-        [JsonProperty] internal bool RotationEnabled { get; set; } = true;
-        [JsonProperty] internal bool AllowedOnCeiling { get; set; } = false;
-        [JsonProperty] internal bool AllowedInSub { get; set; } = false;
-        [JsonProperty] internal bool AllowedOnConstructables { get; set; } = false;
-        [JsonProperty] internal bool UseCustomBoundingBox { get; set; } = false;
-        [JsonProperty] internal Vec3 BoundingCenter { get; set; } = new Vec3(0f, 0, 0f);
-        [JsonProperty] internal Vec3 BoundingSize { get; set; } = new Vec3(0, 0, 0);
-        [JsonProperty] internal string ModName { get; set; } = "FCSDemo";
-        [JsonProperty] internal string PrefabName { get; set; } = "DemoModel";
-        public ColorVec4 BodyColor { get; set; } = new ColorVec4(1,1,1,1);
-    }
-
-    internal class ConfigFile
-    {
-        [JsonProperty] internal Config Config { get; set; } = new Config();
+        public bool AddPlants { get; set; } = false;
+        public bool HasAquarium { get; set; } = false;
+        public float PowerUsage { get; set; } = 0.1f;
+        public float PlaceMaxDistance { get; set; } = 5f;
+        public float PlaceMinDistance { get; set; } = 1.2f;
+        public float PlaceDefaultDistance { get; set; } = 2f;
+        public bool AllowedOutside { get; set; } = false;
+        public bool AllowedInBase { get; set; } = true;
+        public bool AllowedOnGround { get; set; } = true;
+        public bool AllowedOnWall { get; set; } = false;
+        public bool RotationEnabled { get; set; } = true;
+        public bool AllowedOnCeiling { get; set; } = false;
+        public bool AllowedInSub { get; set; } = false;
+        public bool AllowedOnConstructables { get; set; } = false;
+        public bool UseCustomBoundingBox { get; set; } = false;
+        public Vec3 BoundingCenter { get; set; } = new Vec3(0f, 0, 0f);
+        public Vec3 BoundingSize { get; set; } = new Vec3(0, 0, 0);
+        public string ModName { get; set; } = "FCSDemo";
+        public IEnumerable<ModEntry> Prefabs { get; set; }
+        public bool ControlEmissionStrength { get; set; } = false;
+        public float EmissionStrength { get; set; } = 5f;
     }
 }
