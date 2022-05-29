@@ -13,5 +13,8 @@
       "FCSTechFabricator"
     ]
   },
+  "VersionChecker": {
+    "LatestVersionURL": "https://github.com/ccgould/FCStudios_SubnauticaMods/raw/master/VersionChecker/FCS_AlterraHub/mod.json"
+  },
   "Enable": true
 }

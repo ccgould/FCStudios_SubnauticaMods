@@ -2,14 +2,11 @@
   "Id": "FCSEnergySolutions",
   "DisplayName": "FCS Energy Solutions",
   "Author": "Field Creators Studios",
-  "Version": "1.0.1.100",
+  "Version": "1.0.1.108",
   "Game": "Subnautica",
   "AssemblyName": "FCS_EnergySolutions.dll",
   "VersionDependencies": {
-    "FCSAlterraHub": "1.0.1.26"
-  },
-  "NexusId": {
-    "Subnautica": "0"
+    "FCSAlterraHub": "1.0.1.53"
   },
   "QModSAM": {
     "DeprecatedMods": [
@@ -18,6 +15,9 @@
       "FCSAIPowerCellSocket",
       "FCSPowerStorage"
     ]
+  },
+    "VersionChecker": {
+    "LatestVersionURL": "https://github.com/ccgould/FCStudios_SubnauticaMods/raw/master/VersionChecker/FCS_EnergySolutions/mod.json"
   },
   "Enable": true
 }

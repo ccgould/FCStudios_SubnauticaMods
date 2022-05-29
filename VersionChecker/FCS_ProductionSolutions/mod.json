@@ -8,15 +8,15 @@
   "VersionDependencies": {
     "FCSAlterraHub": "1.0.1.53"
   },
-  "NexusId": {
-    "Subnautica": "0"
-  },
   "QModSAM": {
     "DeprecatedMods": [
       "FCSDeepDriller",
       "GasPodCollector",
       "HydroponicHarvesters"
     ]
+  },
+    "VersionChecker": {
+    "LatestVersionURL": "https://github.com/ccgould/FCStudios_SubnauticaMods/raw/master/VersionChecker/FCS_ProductionSolutions/mod.json"
   },
   "Enable": true
 }
