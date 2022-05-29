@@ -25,7 +25,6 @@ namespace DataStorageSolutions.Configuration
         private static ModSaver _saveObject;
         private static SaveData _saveData;
         private const string ConfigFileName = "config.json";
-        private static TechType _seaBreezeTechType;
 
         #endregion
 
@@ -76,15 +75,10 @@ namespace DataStorageSolutions.Configuration
         internal const string ServerPrefabName = "Server";
 
         internal static Action<bool> OnAntennaBuilt;
+        private static TechType _seaBreezeTechType;
+
         internal static Dictionary<string, ServerData> Servers { get; set; } = new Dictionary<string, ServerData>();
-        internal static List<string> TrackedServers { get; set; } = new List<string>();
-
-        internal static Action OnBaseUpdate { get; set; }
-        internal static Action<DSSRackController> OnContainerUpdate { get; set; }
-        internal static List<TechType> AllTechTypes = new List<TechType>();
-        internal static LootDistributionData LootDistributionData { get; set; }
-
-        internal static event Action<SaveData> OnDataLoaded;
+        public static List<string> TrackedServers { get; set; } = new List<string>();
         #endregion
 
         #region Ingredients
@@ -117,8 +111,7 @@ namespace DataStorageSolutions.Configuration
                 new Ingredient(TechType.Glass, 1),
                 new Ingredient(TechType.Titanium, 1),
                 new Ingredient(TechType.WiringKit, 1),
-                new Ingredient(TechType.Silicone, 1),
-                new Ingredient(TechType.Aerogel, 1),
+                new Ingredient(TechType.Silicone, 1)
             }
         };
 
@@ -147,8 +140,9 @@ namespace DataStorageSolutions.Configuration
             craftAmount = 1,
             Ingredients =
             {
+                new Ingredient(TechType.Glass, 1),
                 new Ingredient(TechType.AdvancedWiringKit, 1),
-                new Ingredient(TechType.TitaniumIngot, 1),
+                new Ingredient(TechType.TitaniumIngot, 2),
                 new Ingredient(TechType.MapRoomUpgradeScanRange, 1)
             }
         };
@@ -162,7 +156,9 @@ namespace DataStorageSolutions.Configuration
             craftAmount = 1,
             Ingredients =
             {
-                new Ingredient(TechType.AdvancedWiringKit, 1),
+                new Ingredient(TechType.WiringKit, 1),
+                new Ingredient(TechType.ComputerChip, 1),
+                new Ingredient(TechType.Aerogel, 1),
                 new Ingredient(TechType.Titanium, 1)
             }
         };
@@ -178,39 +174,15 @@ namespace DataStorageSolutions.Configuration
             {
                 new Ingredient(TechType.Glass, 1),
                 new Ingredient(TechType.AdvancedWiringKit, 1),
+                new Ingredient(TechType.Aerogel, 1),
                 new Ingredient(TechType.Titanium, 1)
             }
         };
 
-#if SUBNAUTICA
-        internal static TechData DSSOperatorIngredients => new TechData
-#elif BELOWZERO
-                internal static RecipeData DSSOperatorIngredients => new RecipeData
-#endif
-        {
-            craftAmount = 1,
-            Ingredients =
-            {
-                new Ingredient(TechType.Glass, 1),
-                new Ingredient(TechType.AdvancedWiringKit, 1),
-                new Ingredient(TechType.Titanium, 3)
-            }
-        };
+        internal static Action OnBaseUpdate { get; set; }
+        internal static Action<DSSRackController> OnContainerUpdate { get; set; }
 
-#if SUBNAUTICA
-        internal static TechData ItemDisplayIngredients => new TechData
-#elif BELOWZERO
-                internal static RecipeData ItemDisplayIngredients => new RecipeData
-#endif
-        {
-            craftAmount = 1,
-            Ingredients =
-            {
-                new Ingredient(TechType.Glass, 1),
-                new Ingredient(TechType.WiringKit, 1),
-                new Ingredient(TechType.Titanium, 1)
-            }
-        };
+        internal static event Action<SaveData> OnDataLoaded;
         #endregion
 
         #region Internal Methods
