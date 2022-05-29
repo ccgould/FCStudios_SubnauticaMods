@@ -155,11 +155,11 @@ namespace DataStorageSolutions.Mono
 
         public override void PowerOffDisplay()
         {
-            if (_mono.RackPowerManager.GetPowerState() == FCSPowerStates.Unpowered)
+            if (_mono.PowerManager.GetPowerState() == FCSPowerStates.Unpowered)
             {
                 GoToPage(RackPages.Blackout);
             }
-            else if (_mono.RackPowerManager.GetPowerState() == FCSPowerStates.Tripped)
+            else if (_mono.PowerManager.GetPowerState() == FCSPowerStates.Tripped)
             {
                 GoToPage(RackPages.Tripped);
             }

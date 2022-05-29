@@ -75,14 +75,8 @@ namespace DataStorageSolutions.Mono
         internal void UpdatePowerState()
         {
             var habitat = _mono?.SubRoot;
-            
+
             if (habitat == null || habitat.powerRelay == null || _powerState == FCSPowerStates.Tripped) return;
-            
-            if (_mono.Manager.GetHasBreakerTripped())
-            {
-                SetPowerStates(FCSPowerStates.Tripped);
-                return;
-            }
 
             if (habitat.powerRelay.GetPowerStatus() == PowerSystem.Status.Offline)
             {
