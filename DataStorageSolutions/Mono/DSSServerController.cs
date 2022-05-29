@@ -21,7 +21,6 @@ namespace DataStorageSolutions.Mono
         private bool _fromSave;
         private SaveDataEntry _savedData;
         private ServerData _data;
-        private List<string> TrackedItems => Mod.TrackedServers;
 
         [JsonIgnore] public override BaseManager Manager { get; set; }
         [JsonIgnore] internal int StorageLimit => QPatch.Configuration.Config.ServerStorageLimit;
@@ -53,7 +52,6 @@ namespace DataStorageSolutions.Mono
 
         private void Awake()
         {
-            QuickLogger.Info("In Awake");
             if (_runStartUpOnEnable)
             {
                 if (!IsInitialized)
@@ -82,7 +80,6 @@ namespace DataStorageSolutions.Mono
             {
                 _data = Mod.Servers[id];
             }
-            
         }
 
         private TechType GetTechType()
@@ -210,24 +207,9 @@ namespace DataStorageSolutions.Mono
         {
             if (FCSFilteredStorage == null)
             {
-                QuickLogger.Info("Adding Filtered Storage");
-
                 FCSFilteredStorage = gameObject.GetComponent<FCSFilteredStorage>();
-
-
-                if (_data != null)
-                {
-                    QuickLogger.Info($"Server from Data: {_data?.Server}");
-                    FCSFilteredStorage.Initialize(_data?.ServerFilters ?? new List<Filter>(), UpdateScreen);
-                    FCSFilteredStorage.Items = _data?.Server ?? new HashSet<ObjectData>();
-                }
-                else if (_savedData != null)
-                {
-                    QuickLogger.Info($"Server from Save Data: {_savedData?.ServerData}");
-                    FCSFilteredStorage.Initialize(_savedData?.Filters ?? new List<Filter>(), UpdateScreen);
-                    FCSFilteredStorage.Items = _savedData?.ServerData ?? new HashSet<ObjectData>();
-                }
-                
+                FCSFilteredStorage.Initialize(_data?.ServerFilters ?? new List<Filter>(),UpdateScreen);
+                FCSFilteredStorage.Items = _data?.Server ?? new HashSet<ObjectData>();
                 FCSFilteredStorage.OnFiltersUpdate += OnFiltersUpdate;
                 FCSFilteredStorage.OnItemsUpdate += OnItemsUpdate;
             }
