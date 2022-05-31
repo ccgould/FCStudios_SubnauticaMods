@@ -12,13 +12,14 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
 {
     internal  class JukeBoxSpeakerController : FcsDevice, IFCSSave<SaveData>
     {
-        private AudioSource _audio;
+        protected AudioSource _audio;
         private bool _runStartUpOnEnable;
         private AudioLowPassFilter _lowPassFilter;
         private BaseJukeBox _baseJukeBox;
         private JukeBoxDataEntry _savedData;
         private bool _isFromSave;
         private Constructable _constructable;
+
 
         private void OnEnable()
         {
@@ -74,8 +75,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
             {
                 _audio.Play();
             }
-
-            _audio.volume = _baseJukeBox.Volume;
+            //_audio.volume = _baseJukeBox.Volume;
         }
 
         private void Resume()
@@ -159,7 +159,8 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol, AlterraHub.BaseLightsEmissiveController);
+
             }
 
             _constructable = gameObject.GetComponentInChildren<Constructable>();
@@ -168,8 +169,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
 
 
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseLightsEmissiveController, gameObject, Color.cyan);
-
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseLightsEmissiveController, gameObject, Color.cyan); 
             IsInitialized = true;
         }
 
