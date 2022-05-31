@@ -44,7 +44,6 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
             MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, gameObject, 4f);
 
             //TODO Manager seems to be always null remove in future if not needed
-
             Manager?.NotifyByID(TelepowerPylonBuildable.TelepowerPylonTabID, "PylonBuilt");
         }
 
