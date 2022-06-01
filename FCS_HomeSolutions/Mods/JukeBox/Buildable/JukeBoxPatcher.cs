@@ -25,7 +25,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Buildable
         private readonly GameObject _prefab;
         internal const string JukeBoxClassID = "FCSJukebox";
         internal const string JukeBoxFriendly = "Jukebox";
-        internal const string JukeBoxDescription = "N/A";
+        internal const string JukeBoxDescription = "Wall-mounted Alterra Jukebox. Plays your favorite music to help you develop a relaxed attitude toward danger.";
         internal const string JukeBoxPrefabName = "Jukebox";
         internal const string JukeBoxKitClassID = "Jukebox_Kit";
         internal const string JukeBoxTabID = "JB";
