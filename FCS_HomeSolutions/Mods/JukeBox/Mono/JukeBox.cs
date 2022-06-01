@@ -72,6 +72,8 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
                         Playlist.Add(new TrackData {Index=Playlist.Count,  Path = fileInfo.Name, AudioClip = DownloadHandlerAudioClip.GetContent(request) });
                     }
                 }
+
+
             }
 
             callBack?.Invoke();
@@ -185,6 +187,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
         {
             return Playlist.FirstOrDefault();
         }
+
     }
 
     internal struct TrackData

@@ -25,7 +25,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Buildable
         private readonly GameObject _prefab;
         internal const string JukeBoxSpeakerClassID = "FCSJukeboxSpeaker";
         internal const string JukeBoxSpeakerFriendly = "Jukebox Speaker";
-        internal const string JukeBoxSpeakerDescription = "N/A";
+        internal const string JukeBoxSpeakerDescription = "Wall-mounted satellite speaker for the Alterra Jukebox so you can take your relaxed attitude toward danger anywhere inside your base.";
         internal const string JukeBoxSpeakerPrefabName = "JukeBoxSpeaker";
         internal const string JukeBoxSpeakerKitClassID = "JukeboxSpeaker_Kit";
         internal const string JukeBoxSpeakerTabID = "JBS";

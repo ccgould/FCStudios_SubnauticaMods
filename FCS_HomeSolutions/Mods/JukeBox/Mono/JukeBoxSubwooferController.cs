@@ -1,15 +1,17 @@
-﻿using FCS_AlterraHub.Buildables;
-using FCS_AlterraHub.Helpers;
-using FCS_AlterraHub.Model;
-using FCS_AlterraHub.Mono;
-using FCS_HomeSolutions.Configuration;
-using FCSCommon.Utilities;
+﻿using FCS_AlterraHub.Helpers;
 using UnityEngine;
 
 namespace FCS_HomeSolutions.Mods.JukeBox.Mono
 {
     internal class JukeBoxSubwooferController : JukeBoxSpeakerController,IHandTarget
     {
+        public override void Awake()
+        {
+            BypassAudioVolumeSync = true;
+            GetVolumeFromSave = true;
+            base.Awake();
+        }
+
         public void OnHandClick(GUIHand hand)
         {
             _audio.mute = !_audio.mute;
@@ -20,14 +22,14 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
             if (!IsInitialized || !IsConstructed) return;
 
             base.OnHandHover(hand);
-
+            var muteState = _audio.mute ? "Unmute" : "Mute";
             var data = new[]
             {
-                $"Volume Level: {_audio.volume * 100f}",
-                $"Is Muted: {_audio.mute}"
+                $"Volume Level: {Mathf.RoundToInt(_audio.volume * 100f)}%",
+                $"Click to: {muteState}"
             };
 
-            data.HandHoverPDAHelperEx(GetTechType());
+            data.HandHoverPDAHelperEx(GetTechType(),HandReticle.IconType.Hand);
             if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
             {
                 if (Input.GetKeyDown(KeyCode.UpArrow))
