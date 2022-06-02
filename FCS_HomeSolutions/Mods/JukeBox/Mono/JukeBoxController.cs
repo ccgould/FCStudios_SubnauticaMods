@@ -37,6 +37,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
         private GameObject _mainScreen;
         private GameObject _boot;
         private GameObject _musicListContent;
+        private bool _isPairing;
 
         public override bool IsOperational => IsConstructed && IsInitialized;
         public bool IsJukeBox => true;
@@ -84,6 +85,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
 
         private void Resume()
         {
+            if (_audio.clip == null) return;
             _audio.UnPause();
         }
 
@@ -163,14 +165,15 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
 
         private void PlayUpdate()
         {
-            if (_baseJukeBox?.GetState() != JukeBoxState.Play) return;
+            if (_baseJukeBox?.GetState() != JukeBoxState.Play || _isPairing) return;
 
             if (!_audio.isPlaying)
             {
+                QuickLogger.Debug($"Time Samples: {_baseJukeBox.TimeSamples}",true);
                 Play(_baseJukeBox.CurrentTrack);
+                _audio.timeSamples = _baseJukeBox.TimeSamples;
             }
-            _audio.timeSamples = _baseJukeBox.TimeSamples;
-        }
+        }   
 
         private void LowPassFilterCheck()
         {
@@ -297,6 +300,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
             }));
 
             _trackSlider = GameObjectHelpers.FindGameObject(gameObject, "Timeline").GetComponent<Slider>();
+
             _trackSlider.onValueChanged.AddListener((amount =>
             {
                 if (_audio.clip == null)
@@ -351,6 +355,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
 
         private IEnumerator PairJukeBox()
         {
+            _isPairing = true;
             Play(ModelPrefab.PoweringOnClip);
             GotoPage(JukeboxPages.PoweringOn);
             yield return new WaitForSeconds(5);
@@ -359,9 +364,8 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
             yield return new WaitForSeconds(5);
             Play(ModelPrefab.PairedClip);
             GotoPage(JukeboxPages.Home);
-            yield return new WaitForSeconds(2);
-            GotoPage(JukeboxPages.Home);
-
+            _isPairing = false;
+            yield break;
         }
 
         private void GotoPage(JukeboxPages page)
@@ -418,9 +422,9 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
 
         public void Play(TrackData trackData)
         {
-            if (!IsOperational) return;
+            if (!IsOperational || _isPairing) return;
             _audio.clip = trackData.AudioClip;
-            _trackSlider.value = 0;
+            _trackSlider.SetValueWithoutNotify(0);
             _audio.Play();
             RefreshUI(trackData);
         }
