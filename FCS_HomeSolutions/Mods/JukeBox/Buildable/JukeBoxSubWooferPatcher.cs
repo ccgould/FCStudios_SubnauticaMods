@@ -26,7 +26,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Buildable
         private readonly GameObject _prefab;
         internal const string JukeBoxSpeakerClassID = "FCSJukeBoxSubWoofer";
         internal const string JukeBoxSpeakerFriendly = "Jukebox Sub Woofer";
-        internal const string JukeBoxSpeakerDescription = "N/A";
+        internal const string JukeBoxSpeakerDescription = "Floor-mounted satellite Subwoofer for the Alterra Jukebox so your relaxed attitude toward danger can vibrate the air in your lungs anywhere inside your base.";
         internal const string JukeBoxSpeakerPrefabName = "JukeBoxSubWoofer";
         internal const string JukeBoxSpeakerKitClassID = "JukeBoxSubWoofer_Kit";
         internal const string JukeBoxSpeakerTabID = "JBSW";
@@ -90,7 +90,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Buildable
                 prefabID.ClassId = ClassID;
 
                 prefab.AddComponent<TechTag>().type = TechType;
-                prefab.AddComponent<JukeBoxSpeakerController>();
+                prefab.AddComponent<JukeBoxSubwooferController>();
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
                 return prefab;
             }

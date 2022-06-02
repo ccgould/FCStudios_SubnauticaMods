@@ -1,4 +1,5 @@
-﻿using FCS_HomeSolutions.Mods.JukeBox.Mono;
+﻿using FCS_AlterraHub.Mono;
+using FCS_HomeSolutions.Mods.JukeBox.Mono;
 using HarmonyLib;
 using UnityEngine;
 
@@ -14,7 +15,12 @@ namespace FCS_HomeSolutions.Patches
             if (__instance.gameObject.activeSelf && __instance.gameObject.transform.position != Vector3.zero)
             {
                 if (QPatch.Configuration.IsJukeBoxEnabled)
-                    __instance.gameObject.EnsureComponent<BaseJukeBox>();
+                {
+                    var baseJukeBox = __instance.gameObject.EnsureComponent<BaseJukeBox>();
+                    baseJukeBox.BaseManager = BaseManager.FindManager(__instance);
+
+                }
+
             }
         }
     }
