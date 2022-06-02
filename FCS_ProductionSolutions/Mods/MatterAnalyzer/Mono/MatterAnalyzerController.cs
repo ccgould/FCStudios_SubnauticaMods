@@ -10,11 +10,11 @@ using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
-using FCS_ProductionSolutions.Structs;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
+using DNASampleData = FCS_ProductionSolutions.Structs.DNASampleData;
 
 
 namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono

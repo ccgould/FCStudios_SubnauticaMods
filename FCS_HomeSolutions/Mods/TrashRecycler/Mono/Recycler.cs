@@ -91,6 +91,7 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Mono
             Destroy(item.item.gameObject);
             OnStartingRecycle?.Invoke();
             OnContainerUpdated?.Invoke();
+#endif
         }
 
         public Action OnStartingRecycle { get; set; }

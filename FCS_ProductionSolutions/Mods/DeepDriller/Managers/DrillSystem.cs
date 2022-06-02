@@ -66,7 +66,11 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
         
         private void UpdateDrillShaftState()
         {
+            QuickLogger.Debug("UpdateDrillShaftState",true);
+
             if (!IsConstructed || !IsInitialized) return;
+
+            QuickLogger.Debug("UpdateDrillShaftState 1",true);
 
             if (GetIsDrilling())
             {
@@ -262,8 +266,16 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
 
         internal void SetPingName(string beaconName)
         {
-            _ping.SetLabel(beaconName);
-            PingManager.NotifyRename(_ping);
+            try
+            {
+                _ping.SetLabel(beaconName);
+                PingManager.NotifyRename(_ping);
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error(e.Message);
+                QuickLogger.Error(e.StackTrace);
+            }
         }
 
         internal void EmptyDrill()

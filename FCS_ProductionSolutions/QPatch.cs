@@ -3,10 +3,10 @@ using System.IO;
 using System.Reflection;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Registration;
-using FCS_HomeSolutions.Mods.Replicator.Buildables;
+//using FCS_HomeSolutions.Mods.Replicator.Buildables;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
-using FCS_ProductionSolutions.Mods.AutoCrafter.Buildable;
+//using FCS_ProductionSolutions.Mods.AutoCrafter.Buildable;
 using FCS_ProductionSolutions.Mods.DeepDriller.Craftable;
 using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Buildable;
 using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Ores;
@@ -43,20 +43,20 @@ namespace FCS_ProductionSolutions
 
             if (Configuration.IsHydroponicHarvesterEnabled)
             {
-                var hydroHarvester = new HydroponicHarvesterPatch();
-                hydroHarvester.Patch();
+                //var hydroHarvester = new HydroponicHarvesterPatch();
+                //hydroHarvester.Patch();
             }
 
             if (Configuration.IsReplicatorEnabled)
             {
-                var replicator = new ReplicatorBuildable();
-                replicator.Patch();
+                //var replicator = new ReplicatorBuildable();
+                //replicator.Patch();
             }
             
             if (Configuration.IsReplicatorEnabled || Configuration.IsHydroponicHarvesterEnabled)
             {
-                var matterAnalyzer = new MatterAnalyzerPatch();
-                matterAnalyzer.Patch();
+                //var matterAnalyzer = new MatterAnalyzerPatch();
+                //matterAnalyzer.Patch();
             }
 
             if (Configuration.IsDeepDrillerEnabled)
@@ -114,8 +114,8 @@ namespace FCS_ProductionSolutions
 
             if (Configuration.IsAutocrafterEnabled)
             {
-                var dssAutoCrafter = new AutoCrafterPatch();
-                dssAutoCrafter.Patch();
+                //var dssAutoCrafter = new AutoCrafterPatch();
+                //dssAutoCrafter.Patch();
             }
 
             //Register debug commands

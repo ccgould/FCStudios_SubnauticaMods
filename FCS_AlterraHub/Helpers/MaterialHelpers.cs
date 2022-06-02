@@ -640,7 +640,9 @@ namespace FCS_AlterraHub.Helpers
                     if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
                     {
                         material.shader = shader;
+#if SUBNAUTICA
                         material.EnableKeyword("MARMO_ALPHA_CLIP");
+#endif
                     }
                 }
             }
@@ -653,10 +655,12 @@ namespace FCS_AlterraHub.Helpers
             if (mat != null)
             {
                 mat.shader = shader;
+#if SUBNAUTICA
                 mat.EnableKeyword("MARMO_ALPHA_CLIP");
+#endif
             }
 
-            return mat;
+                return mat;
         }
 
         [Obsolete("This method will be removed in upcoming update please use MaterialHelpers.ChangeMaterialColor instead.")]

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
@@ -54,6 +55,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Buildable
             };
         }
 
+#if SUBNAUTICA_STABLE
         public override GameObject GetGameObject()
         {
             GameObject prefab = null;
@@ -111,6 +113,66 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Buildable
 
             return prefab;
         }
+#else
+        public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
+        {
+            GameObject prefab = null;
+
+            try
+            {
+                prefab = GameObject.Instantiate<GameObject>(ModelPrefab.DeepDrillerPrefab);
+
+                //========== Allows the building animation and material colors ==========// 
+                SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
+                skyApplier.renderers = prefab.GetComponentsInChildren<Renderer>();
+                skyApplier.anchorSky = Skies.Auto;
+
+                //========== Allows the building animation and material colors ==========// 
+
+                // Add constructible
+                var constructable = prefab.EnsureComponent<Constructable>();
+                constructable.allowedOnWall = false;
+                constructable.allowedOnGround = true;
+                constructable.allowedInSub = false;
+                constructable.allowedInBase = false;
+                constructable.allowedOnCeiling = false;
+                constructable.allowedOutside = true;
+                constructable.model = prefab.FindChild("DrillModel");
+                constructable.techType = TechType;
+                constructable.rotationEnabled = true;
+                constructable.forceUpright = true;
+                constructable.placeDefaultDistance = 10f;
+                constructable.placeMaxDistance = 10f;
+
+                // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
+                var lwe = prefab.AddComponent<LargeWorldEntity>();
+                lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
+
+                //var center = new Vector3(-2.384186e-07f, 2.500637f, -0.007555246f);
+                //var size = new Vector3(5.605133f, 8.229565f, 5.689059f);
+
+                var center = new Vector3(-0.0168829f, 3.009828f, 0.03002357f);
+                var size = new Vector3(4.291656f, 5.013103f, 4.075207f);
+
+                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
+
+                prefab.AddComponent<PrefabIdentifier>().ClassId = this.ClassID;
+                prefab.AddComponent<TechTag>().type = TechTypeID;
+                prefab.AddComponent<FCSDeepDrillerController>();
+
+                //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
+                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
+
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error(e.Message);
+            }
+
+            gameObject.Set(prefab);
+            yield break;
+        }
+#endif
 
         protected override RecipeData GetBlueprintRecipe()
         {

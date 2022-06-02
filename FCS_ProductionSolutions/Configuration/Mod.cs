@@ -16,6 +16,7 @@ using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 using UnityEngine;
+using DNASampleData = FCS_ProductionSolutions.Structs.DNASampleData;
 
 namespace FCS_ProductionSolutions.Configuration
 {
@@ -98,7 +99,7 @@ namespace FCS_ProductionSolutions.Configuration
             ModUtils.LoadSaveData<SaveData>(SaveDataFilename, GetSaveFileDirectory(), (data) =>
             {
                 _saveData = data;
-                CraftingOperations = _saveData.CraftingOperations;
+                //CraftingOperations = _saveData.CraftingOperations;
                 _hydroponicKnownTech = _saveData.HydroponicHarvesterKnownTech;
                 QuickLogger.Info("Save Data Loaded");
                 OnDataLoaded?.Invoke(_saveData);
@@ -328,22 +329,22 @@ namespace FCS_ProductionSolutions.Configuration
             _isPurging = false;
         }
 
-        public static void RemoveCraftingOperation(string unitID)
-        {
-            CraftingOperations.Remove(unitID);
-        }
+        //public static void RemoveCraftingOperation(string unitID)
+        //{
+        //    CraftingOperations.Remove(unitID);
+        //}
 
-        public static bool AddCraftingOperation(CraftingOperation operation)
-        {
-            if(CraftingOperations.ContainsKey(operation.ParentMachineUnitID)) return false;
-            CraftingOperations.Add(operation.ParentMachineUnitID, operation);
-            return true;
-        }
+        //public static bool AddCraftingOperation(CraftingOperation operation)
+        //{
+        //    if(CraftingOperations.ContainsKey(operation.ParentMachineUnitID)) return false;
+        //    CraftingOperations.Add(operation.ParentMachineUnitID, operation);
+        //    return true;
+        //}
 
-        public static CraftingOperation FindCraftingOperation(string unitID)
-        {
-            return !CraftingOperations.ContainsKey(unitID) ? null : CraftingOperations[unitID];
-        }
+        //public static CraftingOperation FindCraftingOperation(string unitID)
+        //{
+        //    return !CraftingOperations.ContainsKey(unitID) ? null : CraftingOperations[unitID];
+        //}
 
         private static Dictionary<string, CraftingOperation> CraftingOperations = new();
         private static bool _isPurging;
