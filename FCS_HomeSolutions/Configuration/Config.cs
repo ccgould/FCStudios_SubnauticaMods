@@ -172,64 +172,64 @@ namespace FCS_HomeSolutions.Configuration
         public bool IsNeonPlanterEnabled = true;
 
         #endregion
-
-        #region Fire Extinguisher Refueler
+#if SUBNAUTICA
+#region Fire Extinguisher Refueler
 
         [Toggle("[Fire Extinguisher Refueler] Is Mod Enabled",Order = 10,Tooltip="Enables/Disables Fire Extinguisher Refueler from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsFireExtinguisherRefuelerEnabled = true;
 
-        #endregion
-
-        #region Trash Receptacle
+#endregion
+#endif
+#region Trash Receptacle
 
         [Toggle("[Trash Receptacle] Is Mod Enabled", Order = 11, Tooltip ="Enables/Disables Trash Receptacle from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsTrashReceptacleEnabled = true;
 
-        #endregion                
+#endregion
         
-        #region Trash Recycler
+#region Trash Recycler
 
         [Toggle("[Trash Recycler] Is Mod Enabled", Order = 12, Tooltip ="Enables/Disables Trash Recycler from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsTrashRecyclerEnabled = true;
 
-        #endregion        
+#endregion
         
-        #region Curtain
+#region Curtain
 
         [Toggle("[Curtain] Is Mod Enabled", Order = 13, Tooltip ="Enables/Disables Curtain from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsCurtainEnabled = true;
 
-        #endregion
+#endregion
         
-        #region Shower
+#region Shower
 
         [Toggle("[Shower] Is Mod Enabled", Order = 14, Tooltip ="Enables/Disables Mini Bathroom from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsShowerEnabled = true;
 
-        #endregion
+#endregion
 
-        #region Wall Signs
+#region Wall Signs
 
         [Toggle("[Wall Signs] Is Mod Enabled", Order = 15, Tooltip ="Enables/Disables Wall Signs from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsWallSignsEnabled = true;
 
-        #endregion
+#endregion
 
-        #region Cabinets
+#region Cabinets
 
         [Toggle("[Cabinets] Is Mod Enabled", Order = 15, Tooltip ="Enables/Disables Cabinets from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsCabinetsEnabled = true;
 
-        #endregion        
+#endregion
         
-        #region Shelves and Tables
+#region Shelves and Tables
 
         [Toggle("[Shelves and Tables] Is Mod Enabled", Order = 15, Tooltip ="Enables/Disables Shelves and Tables from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsShelvesAndTablesEnabled = true;
 
-        #endregion
+#endregion
 
-        #region LED Lights
+#region LED Lights
 
         [Toggle("[LED Lights] Is Mod Enabled", Order = 16, Tooltip ="Enables/Disables LED Lights and Tables from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsLEDLightsEnabled = true;
@@ -241,7 +241,7 @@ namespace FCS_HomeSolutions.Configuration
         [Keybind("[LED Lights] Increase Light Intensity", Order = 16, Tooltip ="Enables/Disables the night sensor which turns the light off during the day and on in the night")]
         public KeyCode LEDLightNightSensorToggleKeyCode = KeyCode.K;
 
-        #endregion
+#endregion
 
 
         [Toggle("[Hatch Stairway] Is Mod Enabled", Order = 17, Tooltip = "Enables/Disables Hatch Stairway from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
@@ -256,12 +256,12 @@ namespace FCS_HomeSolutions.Configuration
         internal bool IsWallPartitionsEnabled { get; set; } = false;
 
 
-        #region JukeBox
+#region JukeBox
         [Toggle("[Juke Box] Is Mod Enabled", Order = 19, Tooltip = "Enables/Disables Juke Box from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
 
         public bool IsJukeBoxEnabled = true;
 
-        #endregion
+#endregion
 
         private void EnableDebugsToggleEvent(ToggleChangedEventArgs e)
         {

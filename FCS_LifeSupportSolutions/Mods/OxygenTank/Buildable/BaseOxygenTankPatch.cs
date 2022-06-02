@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.IO;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Enumerators;
@@ -54,6 +55,7 @@ namespace FCS_LifeSupportSolutions.Mods.BaseOxygenTank.Buildable
             };
         }
 
+#if SUBNAUTICA_STABLE
         public override GameObject GetGameObject()
         {
             try
@@ -107,7 +109,63 @@ namespace FCS_LifeSupportSolutions.Mods.BaseOxygenTank.Buildable
             }
 
             return null;
+        }   
+#else
+        public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
+        {
+            try
+            {
+                var prefab = GameObject.Instantiate(ModelPrefab.BaseOxygenTankPrefab);
+
+                var center = new Vector3(-2.488494e-05f, 0.6907129f, 0.02741182f);
+                var size = new Vector3(1.997957f, 1.303595f, 1.819634f);
+
+                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
+
+                var model = prefab.FindChild("model");
+
+                //========== Allows the building animation and material colors ==========// 
+                Shader shader = Shader.Find("MarmosetUBER");
+                Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
+                SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
+                skyApplier.renderers = renderers;
+                skyApplier.anchorSky = Skies.Auto;
+                //========== Allows the building animation and material colors ==========// 
+
+
+                var lw = prefab.AddComponent<LargeWorldEntity>();
+                lw.cellLevel = LargeWorldEntity.CellLevel.Global;
+
+                // Add constructible
+                var constructable = prefab.AddComponent<Constructable>();
+                constructable.allowedOutside = true;
+                constructable.allowedInBase = false;
+                constructable.allowedOnGround = true;
+                constructable.allowedOnWall = false;
+                constructable.rotationEnabled = true;
+                constructable.allowedOnCeiling = false;
+                constructable.allowedInSub = false;
+                constructable.allowedOnConstructables = false;
+                constructable.model = model;
+                constructable.techType = TechType;
+
+                PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
+                prefabID.ClassId = ClassID;
+                prefab.AddComponent<TechTag>().type = TechType;
+                prefab.AddComponent<BaseOxygenTankController>();
+                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, prefab, Color.cyan);
+
+                gameObject.Set(prefab);
+                yield break;
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error(e.Message);
+            }
+            gameObject.Set(null);
+            yield break;
         }
+#endif
 
         protected override RecipeData GetBlueprintRecipe()
         {

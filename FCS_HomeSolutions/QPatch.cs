@@ -119,13 +119,15 @@ namespace FCS_HomeSolutions
                 var paintCan = new PaintCanSpawnable();
                 paintCan.Patch();
             }
-
+#if SUBNAUTICA
             if (Configuration.IsFireExtinguisherRefuelerEnabled)
             {
                 //Fire Extinguisher Refueler
                 var fireExtinguisherRefueler = new FireExtinguisherRefuelerBuildable();
                 fireExtinguisherRefueler.Patch();
             }
+#endif
+
 
             if (Configuration.IsTrashReceptacleEnabled)
             {

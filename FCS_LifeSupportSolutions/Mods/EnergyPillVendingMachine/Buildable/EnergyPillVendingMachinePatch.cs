@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
@@ -40,6 +41,7 @@ namespace FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.Buildable
             };
         }
 
+#if SUBNAUTICA_STABLE
         public override GameObject GetGameObject()
         {
             try
@@ -91,6 +93,60 @@ namespace FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.Buildable
 
             return null;
         }
+#else
+        public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
+        {
+            try
+            {
+                var prefab = GameObject.Instantiate(ModelPrefab.EnergyPillVendingMachinePrefab);
+
+                var center = new Vector3(-0.0310173f, -0.04652709f, 0.2817473f);
+                var size = new Vector3(1.062035f, 1.429083f, 0.3227724f);
+
+                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
+
+                var model = prefab.FindChild("model");
+
+                //========== Allows the building animation and material colors ==========// 
+                Shader shader = Shader.Find("MarmosetUBER");
+                Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
+                SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
+                skyApplier.renderers = renderers;
+                skyApplier.anchorSky = Skies.Auto;
+                //========== Allows the building animation and material colors ==========// 
+
+                // Add constructible
+                var constructable = prefab.AddComponent<Constructable>();
+                constructable.allowedOutside = false;
+                constructable.allowedInBase = true;
+                constructable.allowedOnGround = false;
+                constructable.allowedOnWall = true;
+                constructable.rotationEnabled = false;
+                constructable.allowedOnCeiling = false;
+                constructable.allowedInSub = true;
+                constructable.allowedOnConstructables = false;
+                constructable.model = model;
+                constructable.techType = TechType;
+
+                PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
+                prefabID.ClassId = ClassID;
+                prefab.AddComponent<TechTag>().type = TechType;
+                prefab.AddComponent<EnergyPillVendingMachineController>();
+
+                //Apply the glass shader here because of autosort lockers for some reason doesn't like it.
+                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
+                gameObject.Set(prefab);
+                yield break;
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error(e.Message);
+            }
+
+            gameObject.Set(null);
+            yield break;
+        }
+#endif
 
         protected override RecipeData GetBlueprintRecipe()
         {

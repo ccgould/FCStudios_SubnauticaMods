@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
@@ -50,11 +51,13 @@ namespace FCS_HomeSolutions.Mods.Replicator.Buildables
             };
         }
 
+#if SUBNAUTICA_STABLE
         public override GameObject GetGameObject()
         {
+            GameObject prefab = null;
             try
             {
-                var prefab = GameObject.Instantiate(ModelPrefab.ReplicatorPrefab);
+                prefab = GameObject.Instantiate(ModelPrefab.ReplicatorPrefab);
 
                 prefab.name = this.PrefabFileName;
                 
@@ -100,15 +103,74 @@ namespace FCS_HomeSolutions.Mods.Replicator.Buildables
 
                 //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
-
-                return prefab;
             }
             catch (Exception e)
             {
                 QuickLogger.Error(e.Message);
-                return null;
             }
+            return prefab;
         }
+#else
+        public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
+        {
+            GameObject prefab = null;
+            try
+            {
+                prefab = GameObject.Instantiate(ModelPrefab.ReplicatorPrefab);
+
+                prefab.name = this.PrefabFileName;
+
+                var center = new Vector3(0f, 1.219271f, 0f);
+                var size = new Vector3(0.7963083f, 2.037489f, 0.8331643f);
+
+                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
+
+                var model = prefab.FindChild("model");
+
+                SkyApplier skyApplier = prefab.AddComponent<SkyApplier>();
+                skyApplier.renderers = model.GetComponentsInChildren<MeshRenderer>();
+                skyApplier.anchorSky = Skies.Auto;
+
+                //========== Allows the building animation and material colors ==========// 
+
+                QuickLogger.Debug("Adding Constructible");
+
+                // Add constructible
+                var constructable = prefab.AddComponent<Constructable>();
+                constructable.allowedOnWall = false;
+                constructable.allowedOnGround = true;
+                constructable.allowedInSub = true;
+                constructable.allowedInBase = true;
+                constructable.allowedOnCeiling = false;
+                constructable.allowedOutside = true;
+                constructable.rotationEnabled = true;
+                constructable.model = model;
+                constructable.techType = TechType;
+
+                PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
+                prefabID.ClassId = ClassID;
+
+
+                prefab.SetActive(false);
+                var storageContainer = prefab.AddComponent<ReplicatorSlot>();
+                storageContainer.Initialize(25, 1, 1, FriendlyName, ClassID);
+                storageContainer.enabled = false;
+                prefab.SetActive(true);
+
+                prefab.AddComponent<TechTag>().type = TechType;
+                prefab.AddComponent<ReplicatorController>();
+
+                //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
+                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error(e.Message);
+            }
+            gameObject.Set(prefab);
+            yield break;
+        }
+#endif
 
         public override string AssetsFolder { get; } = Mod.GetAssetPath();
 

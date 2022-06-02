@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
@@ -38,11 +39,13 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
             };
         }
 
+#if SUBNAUTICA_STABLE
         public override GameObject GetGameObject()
         {
+            GameObject prefab = null;
             try
             {
-                var prefab = GameObject.Instantiate(ModelPrefab.DSSTerminalPrefab);
+                prefab = GameObject.Instantiate(ModelPrefab.DSSTerminalPrefab);
 
                 var center = new Vector3(0f, 0f, 0.08101498f);
                 var size = new Vector3(1.887982f, 1.202661f, 0.06203462f);
@@ -81,15 +84,69 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
 
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<DSSTerminalController>();
-                return prefab;
             }
             catch (Exception e)
             {
                 QuickLogger.Error(e.Message);
             }
 
-            return null;
+            return prefab;
         }
+#else
+        public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
+        {
+            GameObject prefab = null;
+            try
+            {
+                prefab = GameObject.Instantiate(ModelPrefab.DSSTerminalPrefab);
+
+                var center = new Vector3(0f, 0f, 0.08101498f);
+                var size = new Vector3(1.887982f, 1.202661f, 0.06203462f);
+
+                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
+
+                var model = prefab.FindChild("model");
+
+                //========== Allows the building animation and material colors ==========// 
+                Shader shader = Shader.Find("MarmosetUBER");
+                Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
+                SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
+                skyApplier.renderers = renderers;
+                skyApplier.anchorSky = Skies.Auto;
+                //========== Allows the building animation and material colors ==========// 
+
+                // Add constructible
+                var constructable = prefab.AddComponent<Constructable>();
+
+                constructable.allowedOutside = false;
+                constructable.allowedInBase = true;
+                constructable.allowedOnGround = false;
+                constructable.allowedOnWall = true;
+                constructable.rotationEnabled = false;
+                constructable.allowedOnCeiling = false;
+                constructable.allowedInSub = true;
+                constructable.allowedOnConstructables = false;
+                constructable.model = model;
+                constructable.techType = TechType;
+
+                PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
+                prefabID.ClassId = ClassID;
+
+                var lw = prefab.AddComponent<LargeWorldEntity>();
+                lw.cellLevel = LargeWorldEntity.CellLevel.Global;
+
+                prefab.AddComponent<TechTag>().type = TechType;
+                prefab.AddComponent<DSSTerminalController>();
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error(e.Message);
+            }
+
+            gameObject.Set(prefab);
+            yield break;
+        }
+#endif
 
         protected override RecipeData GetBlueprintRecipe()
         {

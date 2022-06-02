@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
@@ -39,6 +40,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
             };
         }
 
+#if SUBNAUTICA_STABLE
         public override GameObject GetGameObject()
         {
             try
@@ -93,6 +95,63 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
 
             return null;
         }
+#else
+        public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
+        {
+            GameObject prefab = null;
+            try
+            {
+                prefab = GameObject.Instantiate(ModelPrefab.DSSAntennaPrefab);
+
+                var center = new Vector3(0f, 2.308932f, -0.06670582f);
+                var size = new Vector3(2.882609f, 4.29576f, 2.970935f);
+
+
+                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
+
+                var model = prefab.FindChild("model");
+
+                //========== Allows the building animation and material colors ==========// 
+                Shader shader = Shader.Find("MarmosetUBER");
+                Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
+                SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
+                skyApplier.renderers = renderers;
+                skyApplier.anchorSky = Skies.Auto;
+                //========== Allows the building animation and material colors ==========// 
+
+                // Add constructible
+                var constructable = prefab.AddComponent<Constructable>();
+
+                constructable.allowedOutside = true;
+                constructable.allowedInBase = false;
+                constructable.allowedOnGround = true;
+                constructable.allowedOnWall = false;
+                constructable.rotationEnabled = true;
+                constructable.allowedOnCeiling = false;
+                constructable.allowedInSub = false;
+                constructable.allowedOnConstructables = false;
+                constructable.model = model;
+                constructable.techType = TechType;
+                constructable.forceUpright = true;
+
+                PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
+                prefabID.ClassId = ClassID;
+
+                var lw = prefab.AddComponent<LargeWorldEntity>();
+                lw.cellLevel = LargeWorldEntity.CellLevel.Global;
+
+                prefab.AddComponent<TechTag>().type = TechType;
+                prefab.AddComponent<DSSAntennaController>();
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error(e.Message);
+            }
+
+            gameObject.Set(prefab);
+            yield break;
+        }
+#endif
 
         protected override RecipeData GetBlueprintRecipe()
         {

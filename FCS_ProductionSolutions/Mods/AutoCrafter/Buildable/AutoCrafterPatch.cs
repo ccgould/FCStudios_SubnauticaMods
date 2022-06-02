@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
@@ -51,6 +52,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Buildable
             };
         }
 
+#if SUBNAUTICA_STABLE
         public override GameObject GetGameObject()
         {
             try
@@ -112,6 +114,71 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Buildable
 
             return null;
         }
+#else
+        public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
+        {
+            try
+            {
+                var prefab = GameObject.Instantiate(_prefab);
+
+                var center = new Vector3(0f, 1.33581f, 0.1292717f);
+                var size = new Vector3(1.87915f, 2.327191f, 1.775631f);
+
+
+                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
+
+                var model = prefab.FindChild("model");
+
+                //========== Allows the building animation and material colors ==========// 
+                Shader shader = Shader.Find("MarmosetUBER");
+                Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
+                SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
+                skyApplier.renderers = renderers;
+                skyApplier.anchorSky = Skies.Auto;
+                //========== Allows the building animation and material colors ==========// 
+
+                // Add constructible
+                var constructable = prefab.AddComponent<Constructable>();
+
+                constructable.allowedOutside = false;
+                constructable.allowedInBase = true;
+                constructable.allowedOnGround = true;
+                constructable.allowedOnWall = false;
+                constructable.rotationEnabled = true;
+                constructable.allowedOnCeiling = false;
+                constructable.allowedInSub = true;
+                constructable.allowedOnConstructables = false;
+                constructable.model = model;
+                constructable.techType = TechType;
+
+                PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
+                prefabID.ClassId = ClassID;
+
+                var lw = prefab.AddComponent<LargeWorldEntity>();
+                lw.cellLevel = LargeWorldEntity.CellLevel.Global;
+
+                prefab.AddComponent<TechTag>().type = TechType;
+                var craftMachine = prefab.AddComponent<CraftMachine>();
+                var controller = prefab.AddComponent<AutoCrafterController>();
+                craftMachine.Crafter = controller;
+                controller.Storage = UWEHelpers.CreateStorageContainer(prefab, null, ClassID, string.Empty, 4, 8);
+
+                //Apply the glass shader here because of autosort lockers for some reason doesn't like it.
+                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
+                MaterialHelpers.ApplyShaderToMaterial(prefab, "_ConveyorBelt");
+
+                gameObject.Set(prefab);
+                yield break;
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error(e.Message);
+            }
+
+            gameObject.Set(null);
+            yield break;
+        }
+#endif
 
         protected override RecipeData GetBlueprintRecipe()
         {

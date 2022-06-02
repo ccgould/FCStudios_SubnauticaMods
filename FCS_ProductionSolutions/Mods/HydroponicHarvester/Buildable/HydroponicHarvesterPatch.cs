@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
@@ -50,11 +51,14 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Buildable
         public override TechCategory CategoryForPDA => TechCategory.Misc;
         public override string AssetsFolder => Mod.GetAssetPath();
 
+#if SUBNAUTICA_STABLE
         public override GameObject GetGameObject()
         {
+            GameObject prefab = null;
+            
             try
             {
-                var prefab = GameObject.Instantiate(ModelPrefab.HydroponicHarvesterPrefab);
+                prefab = GameObject.Instantiate(ModelPrefab.HydroponicHarvesterPrefab);
 
                 var size = new Vector3(1.353966f, 2.503282f, 1.006555f);
                 var center = new Vector3(0.006554961f, 1.394679f, 0.003277525f);
@@ -99,16 +103,76 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Buildable
 
                 //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
-                return prefab;
-
             }
             catch (Exception e)
             {
                 QuickLogger.Error(e.Message);
             }
 
-            return null;
+            return prefab;
         }
+#else
+        public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
+        {
+            GameObject prefab = null;
+
+            try
+            {
+                prefab = GameObject.Instantiate(ModelPrefab.HydroponicHarvesterPrefab);
+
+                var size = new Vector3(1.353966f, 2.503282f, 1.006555f);
+                var center = new Vector3(0.006554961f, 1.394679f, 0.003277525f);
+
+                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
+
+                var model = prefab.FindChild("model");
+
+                //========== Allows the building animation and material colors ==========// 
+                Shader shader = Shader.Find("MarmosetUBER");
+                Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
+                SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
+                skyApplier.renderers = renderers;
+                skyApplier.anchorSky = Skies.Auto;
+                //========== Allows the building animation and material colors ==========// 
+
+                // Add constructible
+                var constructable = prefab.AddComponent<Constructable>();
+
+                constructable.allowedOutside = true;
+                constructable.allowedInBase = true;
+                constructable.allowedOnGround = true;
+                constructable.allowedOnWall = false;
+                constructable.rotationEnabled = true;
+                constructable.allowedOnCeiling = false;
+                constructable.allowedInSub = true;
+                constructable.allowedOnConstructables = true;
+                constructable.model = model;
+                constructable.techType = TechType;
+
+                PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
+                prefabID.ClassId = ClassID;
+
+                prefab.SetActive(false);
+                var storageContainer = prefab.AddComponent<GrowBedManager>();
+                storageContainer.Initialize(150, 1, 1, FriendlyName, ClassID);
+                storageContainer.enabled = false;
+                prefab.SetActive(true);
+
+                prefab.AddComponent<TechTag>().type = TechType;
+                prefab.AddComponent<HydroponicHarvesterController>();
+
+                //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
+                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error(e.Message);
+            }
+
+            gameObject.Set(prefab);
+            yield break;
+        }
+#endif
 
         protected override RecipeData GetBlueprintRecipe()
         {

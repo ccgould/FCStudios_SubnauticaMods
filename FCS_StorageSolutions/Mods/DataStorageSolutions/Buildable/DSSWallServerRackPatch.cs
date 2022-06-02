@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
@@ -41,11 +42,13 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
             };
         }
 
+#if SUBNAUTICA_STABLE
         public override GameObject GetGameObject()
         {
+            GameObject prefab = null;
             try
             {
-                var prefab = GameObject.Instantiate(ModelPrefab.DSSWallServerRackPrefab);
+                prefab = GameObject.Instantiate(ModelPrefab.DSSWallServerRackPrefab);
 
                 var size = new Vector3(0.427167f, 0.7129324f, 0.3643499f);
                 var center = new Vector3(0f, 0f, 0.2369909f);
@@ -91,16 +94,77 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
 
                 //Apply the glass shader here because of autosort lockers for some reason doesn't like it.
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
-                return prefab;
             }
             catch (Exception e)
             {
                 QuickLogger.Error(e.Message);
             }
 
-            return null;
+            return prefab;
         }
-        
+#else
+        public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
+        {
+            GameObject prefab = null;
+            try
+            {
+                prefab = GameObject.Instantiate(ModelPrefab.DSSWallServerRackPrefab);
+
+                var size = new Vector3(0.427167f, 0.7129324f, 0.3643499f);
+                var center = new Vector3(0f, 0f, 0.2369909f);
+
+                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
+
+                var model = prefab.FindChild("model");
+
+                //========== Allows the building animation and material colors ==========// 
+                Shader shader = Shader.Find("MarmosetUBER");
+                Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
+                SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
+                skyApplier.renderers = renderers;
+                skyApplier.anchorSky = Skies.Auto;
+                //========== Allows the building animation and material colors ==========// 
+
+                // Add constructible
+                var constructable = prefab.AddComponent<Constructable>();
+
+                constructable.allowedOutside = false;
+                constructable.allowedInBase = true;
+                constructable.allowedOnGround = false;
+                constructable.allowedOnWall = true;
+                constructable.rotationEnabled = false;
+                constructable.allowedOnCeiling = false;
+                constructable.allowedInSub = true;
+                constructable.allowedOnConstructables = false;
+                constructable.model = model;
+                constructable.techType = TechType;
+
+                PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
+                prefabID.ClassId = ClassID;
+
+                var lw = prefab.AddComponent<LargeWorldEntity>();
+                lw.cellLevel = LargeWorldEntity.CellLevel.Global;
+                prefab.AddComponent<TechTag>().type = TechType;
+                prefab.AddComponent<DSSWallServerRackController>();
+
+                prefab.SetActive(false);
+                var storage = prefab.AddComponent<FCSStorage>();
+                storage.Initialize(Mod.DSSWallServerRackClassName);
+                prefab.SetActive(true);
+
+                //Apply the glass shader here because of autosort lockers for some reason doesn't like it.
+                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error(e.Message);
+            }
+
+            gameObject.Set(prefab);
+            yield break;
+        }
+#endif
+
         protected override RecipeData GetBlueprintRecipe()
         {
             return Mod.DSSWallServerRackIngredients;
