@@ -25,31 +25,31 @@ namespace FCS_ProductionSolutions.Configuration
             var unitName = $"{HydroponicHarvesterPatch.HydroponicHarvesterModTabID}{id:D3}";
             var hh = GameObject.FindObjectsOfType<HydroponicHarvesterController>();
 
-            var techType = techTypeString.ToTechType();
+            //var techType = techTypeString.ToTechType();
 
-            if (techType != TechType.None)
-            {
-                foreach (HydroponicHarvesterController controller in hh)
-                {
-                    if (controller.UnitID.Equals(unitName, StringComparison.OrdinalIgnoreCase))
-                    {
-                        QuickLogger.Debug($"Adding Dummy to harvester", true);
-                        controller.GrowBedManager.AddSample(techType, amount);
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                QuickLogger.Error($"Invalid TechType: {techTypeString}",true);
-            }
+            //if (techType != TechType.None)
+            //{
+            //    foreach (HydroponicHarvesterController controller in hh)
+            //    {
+            //        if (controller.UnitID.Equals(unitName, StringComparison.OrdinalIgnoreCase))
+            //        {
+            //            QuickLogger.Debug($"Adding Dummy to harvester", true);
+            //            controller.GrowBedManager.AddSample(techType, amount);
+            //            break;
+            //        }
+            //    }
+            //}
+            //else
+            //{
+            //    QuickLogger.Error($"Invalid TechType: {techTypeString}",true);
+            //}
             return $"Parameters: {id} {techTypeString} {amount}";
         }
 
         [ConsoleCommand("clearharvester")]
         public static string ClearHarvesterCommand(int id)
         {
-            var hh = GameObject.FindObjectsOfType<HydroponicHarvesterController>();
+            //var hh = GameObject.FindObjectsOfType<HydroponicHarvesterController>();
 
             foreach (HydroponicHarvesterController controller in hh)
             {
@@ -67,25 +67,25 @@ namespace FCS_ProductionSolutions.Configuration
         [ConsoleCommand("harvesterMode")]
         public static string HarvesterModeCommand(int id, string mode)
         {
-            var hh = GameObject.FindObjectsOfType<HydroponicHarvesterController>();
+            //var hh = GameObject.FindObjectsOfType<HydroponicHarvesterController>();
 
-            foreach (HydroponicHarvesterController controller in hh)
-            {
-                QuickLogger.Debug($"Current ID: {controller.UnitID} || Match: HH{id:D3}");
-                if (controller.UnitID.Equals($"HH{id:D3}", StringComparison.OrdinalIgnoreCase))
-                {
+            //foreach (HydroponicHarvesterController controller in hh)
+            //{
+            //    QuickLogger.Debug($"Current ID: {controller.UnitID} || Match: HH{id:D3}");
+            //    if (controller.UnitID.Equals($"HH{id:D3}", StringComparison.OrdinalIgnoreCase))
+            //    {
 
-                    if (Enum.TryParse(mode, true, out HarvesterSpeedModes result))
-                    {
-                        controller.GrowBedManager.SetSpeedMode(result);
-                    }
-                    else
-                    {
-                        QuickLogger.Error($"Invalid harvester speed mode valid are: Min,Low,High,Max,", true);
-                    }
-                    break;
-                }
-            }
+            //        if (Enum.TryParse(mode, true, out HarvesterSpeedModes result))
+            //        {
+            //            controller.GrowBedManager.SetSpeedMode(result);
+            //        }
+            //        else
+            //        {
+            //            QuickLogger.Error($"Invalid harvester speed mode valid are: Min,Low,High,Max,", true);
+            //        }
+            //        break;
+            //    }
+            //}
 
             return $"Parameters: {mode}";
         }
@@ -125,8 +125,8 @@ namespace FCS_ProductionSolutions.Configuration
                     }
                 }
 
-                return $"{Language.main.Get(techType)} is not scannable by the Matter Analyzer.";
-            }
+            //    return $"{Language.main.Get(techType)} is not scannable by the Matter Analyzer.";
+            //}
             return $"Could not parse {techTypeAsString} as TechType";
         }
 
@@ -166,19 +166,19 @@ namespace FCS_ProductionSolutions.Configuration
         {
             QuickLogger.Debug($"Executing Command Add Harvester", true);
 
-            var unitName1 = $"{AutoCrafterPatch.AutoCrafterTabID}{parentCrafter:D3}";
-            var unitName2 = $"{AutoCrafterPatch.AutoCrafterTabID}{childCrafter:D3}";
+            //var unitName1 = $"{AutoCrafterPatch.AutoCrafterTabID}{parentCrafter:D3}";
+            //var unitName2 = $"{AutoCrafterPatch.AutoCrafterTabID}{childCrafter:D3}";
 
-            var crafters = GameObject.FindObjectsOfType<AutoCrafterController>();
+            //var crafters = GameObject.FindObjectsOfType<AutoCrafterController>();
             
-            foreach (AutoCrafterController controller in crafters)
-            {
-                if (controller.UnitID.Equals(unitName1, StringComparison.OrdinalIgnoreCase))
-                {
-                    controller.AddLinkedDevice(crafters.FirstOrDefault(x=>x.UnitID == unitName2));
-                    break;
-                }
-            }
+            //foreach (AutoCrafterController controller in crafters)
+            //{
+            //    if (controller.UnitID.Equals(unitName1, StringComparison.OrdinalIgnoreCase))
+            //    {
+            //        controller.AddLinkedDevice(crafters.FirstOrDefault(x=>x.UnitID == unitName2));
+            //        break;
+            //    }
+            //}
             return $"Parameters: {parentCrafter} {childCrafter}";
         }
 
@@ -187,19 +187,19 @@ namespace FCS_ProductionSolutions.Configuration
         {
             QuickLogger.Debug($"Executing Command Add Harvester", true);
 
-            var unitName1 = $"{AutoCrafterPatch.AutoCrafterTabID}{parentCrafter:D3}";
-            var unitName2 = $"{AutoCrafterPatch.AutoCrafterTabID}{childCrafter:D3}";
+            //var unitName1 = $"{AutoCrafterPatch.AutoCrafterTabID}{parentCrafter:D3}";
+            //var unitName2 = $"{AutoCrafterPatch.AutoCrafterTabID}{childCrafter:D3}";
 
-            var crafters = GameObject.FindObjectsOfType<AutoCrafterController>();
+            //var crafters = GameObject.FindObjectsOfType<AutoCrafterController>();
 
-            foreach (AutoCrafterController controller in crafters)
-            {
-                if (controller.UnitID.Equals(unitName1, StringComparison.OrdinalIgnoreCase))
-                {
-                    controller.RemoveLinkedDevice(crafters.FirstOrDefault(x => x.UnitID == unitName2));
-                    break;
-                }
-            }
+            //foreach (AutoCrafterController controller in crafters)
+            //{
+            //    if (controller.UnitID.Equals(unitName1, StringComparison.OrdinalIgnoreCase))
+            //    {
+            //        controller.RemoveLinkedDevice(crafters.FirstOrDefault(x => x.UnitID == unitName2));
+            //        break;
+            //    }
+            //}
             return $"Parameters: {parentCrafter} {childCrafter}";
         }
 

@@ -41,6 +41,7 @@ namespace FCS_AlterraHub.Extensions
             var pickupable = gameObject.GetComponent<Pickupable>();
             return new InventoryItem(pickupable.Pickup(false));
         }
+#else
 
 #else
 
