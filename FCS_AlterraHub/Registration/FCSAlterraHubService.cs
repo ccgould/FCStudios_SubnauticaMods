@@ -178,12 +178,12 @@ namespace FCS_AlterraHub.Registration
             }
 
 
-            if (string.IsNullOrEmpty(device.BaseId))
+            if (string.IsNullOrWhiteSpace(device.BaseId))
             {
                 var subRoot = device.gameObject.GetComponentInParent<SubRoot>();
                 if (subRoot != null)
                 {
-                    device.BaseId = subRoot.gameObject.GetComponent<PrefabIdentifier>().Id;
+                    device.BaseId = subRoot.gameObject.GetComponent<PrefabIdentifier>().Id ?? subRoot.gameObject.GetComponentInChildren<PrefabIdentifier>().id;
                 }
                 else
                 {
@@ -193,6 +193,7 @@ namespace FCS_AlterraHub.Registration
             }
 
             var manager = BaseManager.FindManager(device.BaseId);
+
             if (manager != null)
             {
                 device.Manager = manager;

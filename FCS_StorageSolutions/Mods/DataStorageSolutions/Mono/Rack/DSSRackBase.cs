@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Buildables;
@@ -52,13 +53,28 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
         private void Start()
         {
+        }
+
+        private void AwaitManagerSetup()
+        {
+            QuickLogger.Debug("AwaitManagerSetup", true);
+
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DSSTabID, Mod.ModPackID);
+
+            if (Manager == null) return;
             Manager.OnPowerStateChanged += OnPowerStateChanged;
             Manager.OnBreakerStateChanged += OnBreakerStateChanged;
+
             UpdateStorageCount();
             UpdateScreenState();
             Mod.CleanDummyServers();
-            _canvas.FindChild("Home").FindChild("UnitID").GetComponentInChildren<Text>().text = $"UNIT ID: {UnitID}";
+            if (_canvas != null)
+            {
+                _canvas.FindChild("Home").FindChild("UnitID").GetComponentInChildren<Text>().text = $"UNIT ID: {UnitID}";
+            }
+
+            QuickLogger.Debug("Rack Setup Complete", true);
+            CancelInvoke(nameof(AwaitManagerSetup));
         }
 
         private void OnBreakerStateChanged(bool value)
@@ -73,6 +89,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
         private void UpdateScreenState()
         {
+            if (Manager == null || _canvas == null) return;
+
             if (Manager.GetBreakerState() || Manager.GetPowerState() == PowerSystem.Status.Offline)
             {
                 TurnOffDevice();
@@ -203,6 +221,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             _messageBox = GameObjectHelpers.FindGameObject(_canvas, "MessageBox").AddComponent<FCSMessageBox>();
             InvokeRepeating(nameof(RegisterServers), 1f, 1f);
             InvokeRepeating(nameof(UpdateScreenState), 1, 1);
+            InvokeRepeating(nameof(AwaitManagerSetup),1, 1);
             IsInitialized = true;
         }
 
@@ -302,8 +321,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
         public void UpdateStorageCount()
         {
-            QuickLogger.Debug("UpdateStorageCount",true);
-            if (Slots == null) return;
+            if (Slots == null || _storageAmount == null || _percentageBar == null) return;
             var storageTotal = 0;
             var storageAmount = 0;
             foreach (KeyValuePair<string, DSSSlotController> controller in Slots)

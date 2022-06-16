@@ -158,8 +158,19 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Buildable
                 storageContainer.enabled = false;
                 prefab.SetActive(true);
 
+                if(!Player.main.IsInBase())
+                {
+                    // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
+                    var lwe = prefab.AddComponent<LargeWorldEntity>();
+                    lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
+                }
+
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<HydroponicHarvesterController>();
+
+#if BELOWZERO_STABLE
+                prefab.AddComponent<HighlightingSystem.HighlightingBlocker>();
+#endif
 
                 //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);

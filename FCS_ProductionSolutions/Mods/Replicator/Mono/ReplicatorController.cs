@@ -45,9 +45,10 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, ReplicatorBuildable.ReplicatorTabID, Mod.ModPackID);
+            
             if (Manager == null)
             {
-                _canvas.SetActive(false);
+                _canvas?.SetActive(false);
             }
             else
             {

@@ -212,7 +212,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
             _savedData = Mod.GetDSSServerSaveData(GetPrefabID());
         }
 
-        public void OnHandHover(GUIHand hand)
+        public override void OnHandHover(GUIHand hand)
         {
             HandReticle main = HandReticle.main;
 

@@ -80,9 +80,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
                 PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = ClassID;
 
-                var lw = prefab.AddComponent<LargeWorldEntity>();
-                lw.cellLevel = LargeWorldEntity.CellLevel.Global;
-
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<DSSItemDisplayController>();
             }
@@ -133,10 +130,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
 
                 PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = ClassID;
-
-                var lw = prefab.AddComponent<LargeWorldEntity>();
-                lw.cellLevel = LargeWorldEntity.CellLevel.Global;
-
+                
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<DSSItemDisplayController>();
             }

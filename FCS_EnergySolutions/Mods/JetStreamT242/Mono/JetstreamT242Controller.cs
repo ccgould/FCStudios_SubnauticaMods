@@ -27,7 +27,10 @@ namespace FCS_EnergySolutions.Mods.JetStreamT242.Mono
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.JetStreamT242TabID, Mod.ModPackID);
-            _unitID.text = $"UnitID: {UnitID}";
+            if (_unitID != null)
+            {
+                _unitID.text = $"UnitID: {UnitID}";
+            }
         }
 
         private void OnEnable()

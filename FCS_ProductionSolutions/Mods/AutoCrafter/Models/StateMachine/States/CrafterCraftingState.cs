@@ -192,7 +192,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
                 OnItemComplete();
             }
         }
-#endif
+
 
         private bool Craft(TechType techType)
         {
@@ -307,7 +307,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
 
         #region EasyCraft Code
 
-#if SUBNAUTICA_STABLE
+
         public bool IsCraftRecipeFulfilledAdvanced(TechType techType)
         {
             if (Inventory.main == null)
@@ -329,7 +329,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
             _crafted = new Dictionary<TechType, int>();
             return _IsCraftRecipeFulfilledAdvanced(techType, techType, _consumable, _crafted, 0);
         }
-#endif
+
 
         private bool _IsCraftRecipeFulfilledAdvanced(TechType parent, TechType techType,
             Dictionary<TechType, int> consumable, Dictionary<TechType, int> crafted, int depth = 0)
@@ -436,7 +436,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
 
             return false;
         }
-#endif
+
 
         private bool _IsCraftRecipeFulfilledAdvanced1(TechType parent, TechType techType,
             Dictionary<TechType, int> consumable, Dictionary<TechType, int> crafted, int depth = 0,
@@ -597,7 +597,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
 
             return true;
         }
-#endif
+
 
         #endregion
 

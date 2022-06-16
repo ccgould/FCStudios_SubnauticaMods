@@ -10,11 +10,12 @@ using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
+using FCS_ProductionSolutions.Structs;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
-using DNASampleData = FCS_ProductionSolutions.Structs.DNASampleData;
+using DNASampleData = FCS_ProductionSolutions.Structs.FCSDNASampleData;
 
 
 namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono
@@ -309,6 +310,8 @@ namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono
             try
             {
                 var grouped = Mod.GetHydroponicKnownTech();
+
+                if(grouped == null) return;
 
                 if (data.EndPosition > grouped.Count)
                 {

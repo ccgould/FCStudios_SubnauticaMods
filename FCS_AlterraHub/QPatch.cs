@@ -63,11 +63,11 @@ namespace FCS_AlterraHub
             //Load Prefabs
             AlterraHub.GetPrefabs();
             
-            //Patch all spawnables
-            PatchSpawnables();
-
             //Patch all the buildables
             PatchBuildables();
+
+            //Patch all spawnables
+            PatchSpawnables();
 
             //Patch all Additional Store Items
             PatchAdditionalStoreItems();
@@ -150,8 +150,17 @@ namespace FCS_AlterraHub
         private static void PatchSpawnables()
         {
             //Data Box
-            var databox = new FCSDataBoxSpawnable();
-            databox.Patch();
+            var databoxOreConsumer = new FCSDataBoxSpawnable(Mod.OreConsumerTechType,"OreConsumer");
+            databoxOreConsumer.Patch();
+            Mod.DataboxOreConsumer = databoxOreConsumer.TechType;
+
+            var databoxDronePad = new FCSDataBoxSpawnable(Mod.DronePortPadHubNewTechType,"DronePortPadHub");
+            databoxDronePad.Patch();
+            Mod.DataboxDronePad = databoxDronePad.TechType;
+
+            var databoxAlterraHubDepot = new FCSDataBoxSpawnable(Mod.AlterraHubDepotTechType, "AlterraHubDepot");
+            databoxAlterraHubDepot.Patch();
+            Mod.DataboxAlterraHubDepot = databoxAlterraHubDepot.TechType;
 
             //Patch Debit Card
             var debitCardSpawnable = new DebitCardSpawnable();

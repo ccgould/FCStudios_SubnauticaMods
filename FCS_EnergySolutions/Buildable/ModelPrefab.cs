@@ -6,6 +6,7 @@ using FCS_EnergySolutions.Configuration;
 using FCS_EnergySolutions.Mods.WindSurfer.Mono;
 using FCSCommon.Utilities;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace FCS_EnergySolutions.Buildable
 {
@@ -31,6 +32,7 @@ namespace FCS_EnergySolutions.Buildable
         public static GameObject PylonUpgradeDataBoxPrefab { get; set; }
         public static GameObject HoloGramPrefab { get; set; }
         public static GameObject UniversalChargerPrefab { get; set; }
+        public static GameObject SolarCluster { get; set; }
 
         internal static void Initialize()
         {
@@ -51,6 +53,7 @@ namespace FCS_EnergySolutions.Buildable
             FrequencyItemPrefab = GetPrefab("FrequencyItem");
             PowerStoragePrefab = GetPrefab(Mod.PowerStoragePrefabName,true);
             UniversalChargerPrefab = GetPrefab(Mod.UniversalChargerPrefabName, true);
+            SolarCluster = GetPrefab(Mod.AlterraSolarClusterModPrefabName, true);
         }
 
 

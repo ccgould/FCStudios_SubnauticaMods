@@ -192,13 +192,27 @@ namespace FCS_AlterraHub.Mods.PatreonStatue.Mono
         
         private void GetPatreonData()
         {
+            if(LoadingScreen == null || CreditScreen == null) return;
+            QuickLogger.Debug("1");
             if(PatreonCollector.GetIsRunning()) return;
+            QuickLogger.Debug("2");
+
             LoadingScreen.SetActive(false);
+            QuickLogger.Debug("3");
+
             CreditScreen.SetActive(true);
+            QuickLogger.Debug("4");
+
             _value = 1f;
             scrollCredits = true;
+            QuickLogger.Debug("5");
+
             _totalPatreons = PatreonCollector.GetTotalPatrons();
+            QuickLogger.Debug("6");
+
             CancelInvoke(nameof(GetPatreonData));
+            QuickLogger.Debug("1");
+
         }
 
         private void Update()

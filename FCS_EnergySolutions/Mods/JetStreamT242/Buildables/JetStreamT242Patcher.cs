@@ -167,7 +167,8 @@ namespace FCS_EnergySolutions.Mods.JetStreamT242.Buildables
             var taskResult = CraftData.GetPrefabForTechTypeAsync(TechType.SolarPanel);
             yield return taskResult;
 
-            PowerRelay solarPowerRelay = taskResult.GetResult().GetComponent<PowerRelay>();
+            var solarPanel = taskResult.GetResult();
+            PowerRelay solarPowerRelay = solarPanel.GetComponent<PowerRelay>();
 
             var ps = prefab.AddComponent<PowerSource>();
             ps.maxPower = 500f;
@@ -180,11 +181,11 @@ namespace FCS_EnergySolutions.Mods.JetStreamT242.Buildables
             pr.powerFX = pFX;
             pr.maxOutboundDistance = 15;
             pr.internalPowerSource = ps;
+            pr.powerSystemPreviewPrefab = solarPowerRelay.powerSystemPreviewPrefab;
 
             prefab.AddComponent<TechTag>().type = TechType;
             prefab.AddComponent<JetStreamT242Controller>();
 
-            Resources.UnloadAsset(solarPowerRelay);
             gameObject.Set(prefab);
             yield break;
         }

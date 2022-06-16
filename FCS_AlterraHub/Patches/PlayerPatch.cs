@@ -58,14 +58,6 @@ namespace FCS_AlterraHub.Patches
 
             CoroutineHost.StartCoroutine(CreateFcsPda(__instance));
             PatreonCollector.GetData();
-            //var shouldPlay = (bool)_shouldPlayIntro.GetValue(__instance.GetPDA());
-
-
-
-            //Mod.OnGamePlaySettingsLoaded += settings =>
-            //{
-            //    CoroutineHost.StartCoroutine(Mod.SpawnAlterraFabStation(settings));
-            //};
             Mod.LoadGamePlaySettings();
         }
         
@@ -123,7 +115,10 @@ namespace FCS_AlterraHub.Patches
         [HarmonyPostfix]
         private static void GetPDA_Postfix(Player __instance)
         {
-            if(FCSPDA != null) MoveFcsPdaIntoPosition(FCSPDA.gameObject);
+            if (FCSPDA != null)
+            {
+                MoveFcsPdaIntoPosition(FCSPDA.gameObject);
+            }
         }
 
         [HarmonyPatch(typeof(Player), nameof(Player.OnProtoSerialize))]
@@ -149,7 +144,7 @@ namespace FCS_AlterraHub.Patches
 #if SUBNAUTICA
             yield return new WaitUntil(() => player.pdaSpawn.spawnedObj != null);
 #else
-            yield return new WaitUntil(() => player.pda.prefabScreen != null);
+            yield return new WaitUntil(() => player.pda != null);
 #endif
 
             QuickLogger.Debug("Creating FCS PDA");
@@ -157,7 +152,7 @@ namespace FCS_AlterraHub.Patches
 #if SUBNAUTICA
             defPDA = player.pdaSpawn.spawnedObj;
 #else
-            defPDA = player.pda.prefabScreen;
+            defPDA = player.pda.gameObject;
 #endif
 
             var pda = GameObject.Instantiate(AlterraHub.FcsPDAPrefab, default, default, true);

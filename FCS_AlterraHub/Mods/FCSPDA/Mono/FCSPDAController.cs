@@ -62,7 +62,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         internal bool IsOpen { get; private set; }
         public Action OnClose { get; set; }
         public Channel AudioTrack { get; set; }
-        public bool isFocused => this.ui != null && this.ui.focused;
+        public bool isFocused => ui != null && ui.focused;
         public uGUI_InputGroup ui
         {
             get
@@ -410,7 +410,9 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             MainCameraControl.main.SaveLockedVRViewModelAngle();
             IsOpen = true;
             gameObject.SetActive(true);
+#if SUBNAUTICA_STABLE
             sequence.Set(0.5f, true, Activated);
+#endif
             UWE.Utils.lockCursor = false;
             HandReticle.main?.RequestCrosshairHide();
 
@@ -475,8 +477,13 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
                 MessageBoxHandler.main.Show(AlterraHub.ErrorHasOccurred("0x0001"), FCSMessageButton.OK);
                 return;
             }
-            
-            _404?.SetActive(!AlterraFabricatorStationController.Main.DetermineIfUnlocked());
+
+#if SUBNAUTICA_STABLE
+                      _404?.SetActive(!AlterraFabricatorStationController.Main.DetermineIfUnlocked());
+#else
+            _404?.SetActive(false);
+#endif
+
         }
 
         private void PlayAppropriateVoiceMessage()
@@ -526,25 +533,29 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             }
 
             _accountPageHandler.Close();
+            
+            //#if SUBNAUTICA_STABLE
+            //            MainGameController.Instance.PerformGarbageAndAssetCollection();
+            //#else
+            //            MainGameController.Instance.PerformIncrementalGarbageCollection();
+            //#endif
 
-
-#if SUBNAUTICA_STABLE
-            MainGameController.Instance.PerformGarbageAndAssetCollection();
-#else
-            MainGameController.Instance.PerformIncrementalGarbageCollection();
-#endif
             HandReticle.main?.UnrequestCrosshairHide();
             Inventory.main.SetViewModelVis(true);
-            sequence.Set(0.5f, false, Deactivated);
-            
+
+#if SUBNAUTICA_STABLE
+                  sequence.Set(0.5f, false, Deactivated);      
+#endif
+
             SafeAnimator.SetBool(Player.main.armsController.animator, "using_pda", false);
             ui.Deselect(null);
             UwePostProcessingManager.ClosePDA();
 #if SUBNAUTICA
-            _pda.ui.soundQueue.PlayImmediately(_pda.ui.soundClose);
+                        _pda.ui.soundQueue.PlayImmediately(_pda.ui.soundClose);
 #else
 #endif
             UwePostProcessingManager.ToggleDof(_depthState);
+            gameObject.SetActive(false);
             QuickLogger.Debug("FCS PDA Is Closed", true);
         }
 
@@ -1104,10 +1115,22 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
 
         public bool TryDelete(Shipment shipment)
         {
-            if (shipment.OrderNumber.Equals(_shipment.OrderNumber))
+            QuickLogger.Debug("1");
+            if (shipment?.OrderNumber == null || _shipment?.OrderNumber == null) return false;
+            QuickLogger.Debug("2");
+
+
+            if (shipment.OrderNumber.Equals(_shipment?.OrderNumber))
             {
-                Destroy(gameObject);
-                return true;
+                QuickLogger.Debug("3");
+
+                if (gameObject != null)
+                {
+                    Destroy(gameObject);
+                }
+            QuickLogger.Debug("4");
+
+            return true; 
             }
 
             return false;

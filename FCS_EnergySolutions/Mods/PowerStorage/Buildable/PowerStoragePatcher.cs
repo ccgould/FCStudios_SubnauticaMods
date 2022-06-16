@@ -172,6 +172,7 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Buildable
                 pr.powerFX = pFX;
                 pr.maxOutboundDistance = 20;
                 pr.internalPowerSource = ps;
+                pr.powerSystemPreviewPrefab = solarPowerRelay.powerSystemPreviewPrefab;
 
                 prefab.AddComponent<PowerStorageController>();
 

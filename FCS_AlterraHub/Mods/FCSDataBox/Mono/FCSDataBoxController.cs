@@ -6,9 +6,6 @@ namespace FCS_AlterraHub.Mods.FCSDataBox.Mono
     internal class FCSDataBoxController : MonoBehaviour
     {
         private BlueprintHandTarget _bluePrintDataBox;
-        private string _id;
-        private bool _isInitalized;
-        private bool _fromSave;
         private TechType UnlockTechType { get; set; }
 
         private void Start()
@@ -24,7 +21,9 @@ namespace FCS_AlterraHub.Mods.FCSDataBox.Mono
             if (KnownTech.Contains(UnlockTechType))
             {
                 _bluePrintDataBox.used = true;
+#if SUBNAUTICA_STABLE
                 _bluePrintDataBox.Start();
+#endif
                 CancelInvoke(nameof(CheckIfUnlocked));
             }
         }

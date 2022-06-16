@@ -43,8 +43,6 @@ namespace FCS_AlterraHub.Extensions
         }
 #else
 
-#else
-
         public static IEnumerator AddTechTypeToContainerUnSafe(this TechType techType, ItemsContainer container)
         {
             if (techType != TechType.None)

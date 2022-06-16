@@ -41,6 +41,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
 
         private void UpdateScreenState()
         {
+            if (_canvas == null || Manager == null) return;
+
             if (Manager.GetBreakerState() || Manager.GetPowerState() == PowerSystem.Status.Offline)
             {
                 if (_canvas.activeSelf)
@@ -60,9 +62,13 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DSSTabID, Mod.ModPackID);
-            Manager.OnPowerStateChanged += OnPowerStateChanged;
-            Manager.OnBreakerStateChanged += OnBreakerStateChanged;
-            UpdateScreenState();
+            if (Manager != null)
+            {
+                Manager.OnPowerStateChanged += OnPowerStateChanged;
+                Manager.OnBreakerStateChanged += OnBreakerStateChanged;
+                UpdateScreenState();
+            }
+
         }
 
         public override void OnDestroy()

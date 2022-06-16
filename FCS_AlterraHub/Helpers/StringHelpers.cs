@@ -47,7 +47,7 @@ namespace FCS_AlterraHub.Helpers
 #if SUBNAUTICA
             main.SetInteractTextRaw(Sb.ToString(), AlterraHub.ViewInPDA());
 #else
-            main.SetTextRaw(HandReticle.TextType.Hand , $"{Sb}/n {AlterraHub.ViewInPDA()}");
+            main.SetText(HandReticle.TextType.Hand , $"{Sb}\n {AlterraHub.ViewInPDA()}",false);
 #endif
 
         }
@@ -71,7 +71,7 @@ namespace FCS_AlterraHub.Helpers
 #if SUBNAUTICA
             main.SetInteractTextRaw(Sb.ToString(), text);
 #else
-            main.SetTextRaw(HandReticle.TextType.Count, $"{Sb}/n {text}");
+            main.SetText(HandReticle.TextType.Hand, $"{Sb}\n {text}",false);
 #endif
 
 
@@ -100,7 +100,7 @@ namespace FCS_AlterraHub.Helpers
 #if SUBNAUTICA
             main.SetInteractTextRaw(Sb.ToString(), text);
 #else
-            main.SetTextRaw(HandReticle.TextType.Count, $"{Sb}/n {text}");
+            main.SetText(HandReticle.TextType.Hand, $"{Sb}\n {text}", false);
 #endif
 
 

@@ -329,11 +329,15 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
         public IEnumerator SpawnDrone(Action<DroneController> callback)
         {
+            QuickLogger.Debug("Trying to create drone");
             var task = CraftData.GetPrefabForTechTypeAsync(Mod.AlterraTransportDroneTechType, false);
             yield return task;
 
             var prefab = task.GetResult();
-            _assignedDrone = prefab.GetComponent<DroneController>();
+            GameObject gameObject = Instantiate(prefab,_spawnPoint.transform.position, _spawnPoint.transform.rotation);
+            _assignedDrone = gameObject.GetComponent<DroneController>();
+            QuickLogger.Debug("Drone Created");
+            LargeWorldEntity.Register(gameObject);
             callback?.Invoke(_assignedDrone);
         }
 

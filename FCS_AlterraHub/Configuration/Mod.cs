@@ -235,9 +235,10 @@ namespace FCS_AlterraHub.Configuration
             try
             {
                 QuickLogger.Debug("Saving Gameplay Settings",true);
+#if SUBNAUTICA_STABLE
+                      AlterraFabricatorStationController.Main.Save();          
+#endif
 
-                AlterraFabricatorStationController.Main.Save();
-                
                 ModUtils.Save(_gamePlaySettings, "settings.json", GetSaveFileDirectory(), OnSaveComplete);
 
                 if (File.Exists(Path.Combine(GetSaveFileDirectory(), "settings.json")))
@@ -319,6 +320,7 @@ namespace FCS_AlterraHub.Configuration
                     }
                 }
 
+#if SUBNAUTICA_STABLE
                 if (AlterraFabricatorStationController.Main != null)
                 {
                     foreach (AlterraTransportDroneEntry entry in AlterraFabricatorStationController.Main.SaveDrones())
@@ -327,6 +329,7 @@ namespace FCS_AlterraHub.Configuration
                             newSaveData.AlterraTransportDroneEntries.Add(entry);
                     }
                 }
+#endif
 
                 QuickLogger.Debug("Attempting to save bases",true);
                 newSaveData.BaseSaves = BaseManager.Save().ToList();
@@ -448,6 +451,10 @@ namespace FCS_AlterraHub.Configuration
         public static TechType DronePortPadHubNewTechType { get; set; }
         public static TechType AlterraTransportDroneTechType { get; set; }
         public static PingType AlterraTransportDronePingType { get; set; }
+        public static TechType DataboxOreConsumer { get; set; }
+        public static TechType DataboxDronePad { get; set; }
+        public static TechType DataboxAlterraHubDepot { get; set; }
+
         public static void DeepCopySave(AccountDetails accountDetails)
         {
             _tempAccountDetails = new AccountDetails(accountDetails);

@@ -250,12 +250,12 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
 
         public override void TurnOffDevice()
         {
-            _canvas.SetActive(false);
+            _canvas?.SetActive(false);
         }
 
         public override void TurnOnDevice()
         {
-            _canvas.SetActive(true);
+            _canvas?.SetActive(true);
         }
 
         public override void OnHandHover(GUIHand hand)

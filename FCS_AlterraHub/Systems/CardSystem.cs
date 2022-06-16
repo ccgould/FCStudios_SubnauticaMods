@@ -126,6 +126,7 @@ namespace FCS_AlterraHub.Systems
         {
             if (HasEnough(amount))
             {
+                if (GameModeUtils.RequiresPower()) return true;
                 _accountDetails.Balance -= amount;
                 onBalanceUpdated?.Invoke();
                 return true;
@@ -204,6 +205,8 @@ namespace FCS_AlterraHub.Systems
         /// <returns></returns>
         public bool HasEnough(decimal cost)
         {
+            if (GameModeUtils.RequiresPower()) return true;
+
             return _accountDetails.Balance >= cost;
         }
 

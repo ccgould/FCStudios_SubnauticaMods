@@ -157,7 +157,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
             {
                 CrafterLogic.NotifyCraftEnd(gameObject, techType);
                 Pickupable component = gameObject.GetComponent<Pickupable>();
-                if (component != null && !target.AddItemToContainer(component.inventoryItem))
+                if (component != null && !target.AddItemToContainer(new InventoryItem(component)))
                 {
                     ErrorMessage.AddError(Language.main.Get("InventoryFull"));
                 }

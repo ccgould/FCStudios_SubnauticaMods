@@ -1,4 +1,5 @@
-﻿using FCS_AlterraHub.Buildables;
+﻿using System.Collections;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
@@ -25,20 +26,36 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             return 0.01f;
         }
 
-        private void Start()
+        private IEnumerator AwaitManagerSetup()
         {
+            QuickLogger.Debug("AwaitManagerSetup",true);
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DSSTerminalTabID, Mod.ModPackID);
-            _display.Setup(this);
-            Manager.OnPowerStateChanged += OnPowerStateChanged;
-            Manager.OnBreakerStateChanged += OnBreakerStateChanged;
-            if (Manager.GetBreakerState())
+
+            while (Manager == null)
             {
-                _display?.HibernateDisplay();
+                QuickLogger.Debug("Manager is Null", true);
+                yield return null;
+            }
+
+            if (Manager != null)
+            {
+                Manager.OnPowerStateChanged += OnPowerStateChanged;
+                Manager.OnBreakerStateChanged += OnBreakerStateChanged;
+                if (Manager.GetBreakerState())
+                {
+                    _display?.HibernateDisplay();
+                }
+
+                _display?.Setup(this);
+                QuickLogger.Debug("Setup Complete", true);
             }
 
             UpdateScreenState();
             _display?.Refresh();
+
+            yield break;
         }
+
 
         public override void OnDestroy()
         {
@@ -69,14 +86,14 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
         private void UpdateScreenState()
         {
-            if (Manager == null) return;
+            if (Manager == null || _display == null) return;
 
             if (Manager.GetPowerState() == PowerSystem.Status.Offline)
             {
-                _display?.TurnOffDisplay();
+                _display.TurnOffDisplay();
                 return;
             }
-            _display?.TurnOnDisplay();
+            _display.TurnOnDisplay();
         }
 
         private void OnEnable()
@@ -144,6 +161,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
 
             InvokeRepeating(nameof(UpdateScreenState), 1, 1);
+            StartCoroutine(AwaitManagerSetup());
             IsInitialized = true;
 
             QuickLogger.Debug($"Initialized");

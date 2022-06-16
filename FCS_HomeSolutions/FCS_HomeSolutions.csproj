@@ -111,7 +111,6 @@
     <Compile Include="Mods\MiniFountainFilter\Managers\PlayerManager.cs" />
     <Compile Include="Mods\MiniFountainFilter\Managers\TankManager.cs" />
     <Compile Include="Mods\MiniFountainFilter\Mono\MiniFountainFilterController.cs" />
-    <Compile Include="Mods\AlienChef\Mono\AlienChefController.cs" />
     <Compile Include="Mods\Stove\Mono\Cooker.cs" />
     <Compile Include="Mods\Shower\Buildable\ShowerPrefab.cs" />
     <Compile Include="Mods\Shower\Mono\ShowerBaseController.cs" />
@@ -188,7 +187,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Enumerators\" />
-    <Folder Include="Mods\AlienChef\Buildable\" />
     <Folder Include="Mods\Sofas\Mono\" />
     <Folder Include="Mono\BaseOperator\" />
   </ItemGroup>

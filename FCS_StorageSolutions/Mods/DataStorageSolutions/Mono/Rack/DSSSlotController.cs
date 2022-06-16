@@ -312,6 +312,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
                 return;
             }
 
+            if (_controller.Manager == null)
+            {
+                QuickLogger.Error("Manager Is Null");
+            }
+
 
             if (_mountedServer != null)
             {

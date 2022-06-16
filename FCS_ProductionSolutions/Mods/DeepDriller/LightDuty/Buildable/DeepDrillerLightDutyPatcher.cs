@@ -114,114 +114,58 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.LightDuty.Buildable
 #else
         public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
         {
-            GameObject prefab = null;
+            var prefab = GameObject.Instantiate<GameObject>(_prefab);
 
-            try
-            {
-                prefab = GameObject.Instantiate<GameObject>(_prefab);
+            //========== Allows the building animation and material colors ==========// 
+            SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
+            skyApplier.renderers = prefab.GetComponentsInChildren<Renderer>();
+            skyApplier.anchorSky = Skies.Auto;
 
-                //========== Allows the building animation and material colors ==========// 
-                SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
-                skyApplier.renderers = prefab.GetComponentsInChildren<Renderer>();
-                skyApplier.anchorSky = Skies.Auto;
+            //========== Allows the building animation and material colors ==========// 
 
-                //========== Allows the building animation and material colors ==========// 
+            // Add constructible
+            var constructable = prefab.EnsureComponent<Constructable>();
+            constructable.allowedOnWall = false;
+            constructable.allowedOnGround = true;
+            constructable.allowedInSub = false;
+            constructable.allowedInBase = false;
+            constructable.allowedOnCeiling = false;
+            constructable.allowedOutside = true;
+            constructable.model = prefab.FindChild("model");
+            constructable.techType = TechType;
+            constructable.rotationEnabled = true;
+            constructable.forceUpright = true;
+            constructable.placeDefaultDistance = 10f;
+            constructable.placeMaxDistance = 10f;
 
-                // Add constructible
-                var constructable = prefab.EnsureComponent<Constructable>();
-                constructable.allowedOnWall = false;
-                constructable.allowedOnGround = true;
-                constructable.allowedInSub = false;
-                constructable.allowedInBase = false;
-                constructable.allowedOnCeiling = false;
-                constructable.allowedOutside = true;
-                constructable.model = prefab.FindChild("model");
-                constructable.techType = TechType;
-                constructable.rotationEnabled = true;
-                constructable.forceUpright = true;
-                constructable.placeDefaultDistance = 10f;
-                constructable.placeMaxDistance = 10f;
+            // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
+            var lwe = prefab.AddComponent<LargeWorldEntity>();
+            lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
 
-                // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
-                var lwe = prefab.AddComponent<LargeWorldEntity>();
-                lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
+            var center = new Vector3(0f, 1.880612f, 0f);
+            var size = new Vector3(1.729009f, 3.01031f, 1.815033f);
 
-                var center = new Vector3(0f, 1.880612f, 0f);
-                var size = new Vector3(1.729009f, 3.01031f, 1.815033f);
+            GameObjectHelpers.AddConstructableBounds(prefab, size, center);
 
-                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
+            prefab.AddComponent<PrefabIdentifier>().ClassId = this.ClassID;
+            prefab.AddComponent<TechTag>().type = TechType;
 
-                prefab.AddComponent<PrefabIdentifier>().ClassId = this.ClassID;
-                prefab.AddComponent<TechTag>().type = TechType;
-                prefab.AddComponent<DeepDrillerLightDutyController>();
+            var taskResult = CraftData.GetPrefabForTechTypeAsync(TechType.SolarPanel);
+            yield return taskResult;
+            var solarpanel = taskResult.GetResult();
+            PowerRelay solarPowerRelay = solarpanel.GetComponent<PowerRelay>();
 
-                //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
-                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID/*,1f,2,.2f*/);
+            var pr = prefab.AddComponent<PowerRelay>();
+            pr.powerSystemPreviewPrefab = solarPowerRelay.powerSystemPreviewPrefab;
 
-            }
-            catch (Exception e)
-            {
-                QuickLogger.Error(e.Message);
-            }
+            prefab.AddComponent<DeepDrillerLightDutyController>();
 
-            gameObject.Set(prefab);
-            yield break;
-        }
+#if BELOWZERO_STABLE
+            prefab.AddComponent<HighlightingSystem.HighlightingBlocker>();
 #endif
 
-#else
-        public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
-        {
-            GameObject prefab = null;
-            
-            try
-            {
-                prefab = GameObject.Instantiate<GameObject>(_prefab);
-
-                //========== Allows the building animation and material colors ==========// 
-                SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
-                skyApplier.renderers = prefab.GetComponentsInChildren<Renderer>();
-                skyApplier.anchorSky = Skies.Auto;
-
-                //========== Allows the building animation and material colors ==========// 
-
-                // Add constructible
-                var constructable = prefab.EnsureComponent<Constructable>();
-                constructable.allowedOnWall = false;
-                constructable.allowedOnGround = true;
-                constructable.allowedInSub = false;
-                constructable.allowedInBase = false;
-                constructable.allowedOnCeiling = false;
-                constructable.allowedOutside = true;
-                constructable.model = prefab.FindChild("model");
-                constructable.techType = TechType;
-                constructable.rotationEnabled = true;
-                constructable.forceUpright = true;
-                constructable.placeDefaultDistance = 10f;
-                constructable.placeMaxDistance = 10f;
-
-                // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
-                var lwe = prefab.AddComponent<LargeWorldEntity>();
-                lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
-
-                var center = new Vector3(0f, 1.880612f, 0f);
-                var size = new Vector3(1.729009f, 3.01031f, 1.815033f);
-
-                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
-
-                prefab.AddComponent<PrefabIdentifier>().ClassId = this.ClassID;
-                prefab.AddComponent<TechTag>().type = TechType;
-                prefab.AddComponent<DeepDrillerLightDutyController>();
-
-                //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
-                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID/*,1f,2,.2f*/);
-
-            }
-            catch (Exception e)
-            {
-                QuickLogger.Error(e.Message);
-            }
-
+            //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
+            MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID/*,1f,2,.2f*/);
 
             gameObject.Set(prefab);
             yield break;

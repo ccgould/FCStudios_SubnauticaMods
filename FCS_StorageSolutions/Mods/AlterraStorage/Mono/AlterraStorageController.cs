@@ -50,7 +50,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.AlterraStorageTabID, Mod.ModPackID);
-            Manager.AlertNewFcsStoragePlaced(this);
+            Manager?.AlertNewFcsStoragePlaced(this);
             UpdateStorageCount();
         }
 
@@ -195,7 +195,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
             {
                 return;
             }
-            if (_storageContainer.container == null)
+            if (_storageContainer?.container == null)
             {
                 QuickLogger.Debug("AlterraStorager.Subscribe(): container null; will retry next frame");
                 return;

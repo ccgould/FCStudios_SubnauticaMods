@@ -27,12 +27,10 @@ namespace FCS_EnergySolutions.AlterraSolarCluster.Buildables
         public override TechCategory CategoryForPDA => TechCategory.ExteriorModule;
         private string _assetFolder => Mod.GetAssetFolder();
         public override string AssetsFolder => _assetFolder;
-        private GameObject _prefab;
 
         public AlterraSolarClusterBuildable() : base(Mod.AlterraSolarClusterModClassName, Mod.AlterraSolarClusterModFriendlyName, Mod.AlterraSolarClusterModDescription)
         {
-            _prefab = ModelPrefab.GetPrefab(Mod.AlterraSolarClusterModPrefabName,true);
-
+   
             OnStartedPatching += () =>
             {
                 var AlterraSolarClusterKit = new FCSKit(Mod.AlterraSolarClusterKitClassID, Mod.AlterraSolarClusterModFriendlyName,
@@ -51,7 +49,7 @@ namespace FCS_EnergySolutions.AlterraSolarCluster.Buildables
         {
             try
             {
-                var prefab = GameObject.Instantiate(_prefab);
+                var prefab = GameObject.Instantiate(ModelPrefab.SolarCluster);
 
                 //Scale the object
                 prefab.transform.localScale += new Vector3(0.24f, 0.24f, 0.24f);
@@ -129,8 +127,9 @@ namespace FCS_EnergySolutions.AlterraSolarCluster.Buildables
 #else
         public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
         {
-                var prefab = GameObject.Instantiate(_prefab);
-
+                QuickLogger.Debug("Getting Solar Cluster Model",true);
+                var prefab = GameObject.Instantiate(ModelPrefab.SolarCluster);
+                QuickLogger.Debug("1", true);
                 //Scale the object
                 prefab.transform.localScale += new Vector3(0.24f, 0.24f, 0.24f);
 
@@ -173,12 +172,13 @@ namespace FCS_EnergySolutions.AlterraSolarCluster.Buildables
                 PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = ClassID;
 
-                var taskResult = CraftData.GetPrefabForTechTypeAsync(TechType.SolarPanel);
-                yield return taskResult;
+                var task = new TaskResult<GameObject>();
+                yield return CraftData.GetPrefabForTechTypeAsync(TechType.SolarPanel, false, task);
+           
 
-                PowerRelay solarPowerRelay = taskResult.GetResult().GetComponent<PowerRelay>();
+                PowerRelay solarPowerRelay = task.Get().GetComponent<PowerRelay>();
 
-            var ps = prefab.AddComponent<PowerSource>();
+                var ps = prefab.AddComponent<PowerSource>();
                 ps.maxPower = 2975f;
 
                 var pFX = prefab.AddComponent<PowerFX>();
@@ -189,15 +189,15 @@ namespace FCS_EnergySolutions.AlterraSolarCluster.Buildables
                 pr.powerFX = pFX;
                 pr.maxOutboundDistance = 15;
                 pr.internalPowerSource = ps;
+                pr.powerSystemPreviewPrefab = solarPowerRelay.powerSystemPreviewPrefab;
 
-                prefab.AddComponent<TechTag>().type = TechType;
+            prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<AlterraSolarClusterController>();
-
-
-                Resources.UnloadAsset(solarPowerRelay);
 
                 //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
+
+
                 gameObject.Set(prefab);
                 yield break;
         }

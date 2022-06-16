@@ -5,6 +5,7 @@ using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mods.FCSDataBox.Mono;
 using FCSCommon.Utilities;
+using Story;
 using UnityEngine;
 using UWE;
 
@@ -12,8 +13,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Spawnable
 {
     internal class FCSDataBoxSpawnable : SMLHelper.V2.Assets.Spawnable
     {
-        public FCSDataBoxSpawnable() : base("FCSDataBox", "FCS Data Box", "")
+        private readonly TechType _techType;
+
+        public FCSDataBoxSpawnable(TechType techType,string varient) : base($"FCSDataBox_{varient}", "FCS Data Box", "")
         {
+            _techType = techType;
             OnFinishedPatching += () =>
             {
                 Mod.FCSDataBoxTechType = TechType;
@@ -49,7 +53,16 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Spawnable
 
                 prefab.AddComponent<GenericHandTarget>();
                 
-                prefab.AddComponent<BlueprintHandTarget>();
+                var blueprint = prefab.AddComponent<BlueprintHandTarget>();
+                blueprint.animator = prefab.GetComponent<Animator>();
+                blueprint.animParam = "databox_take";
+                blueprint.viewAnimParam = "databox_lookat";
+                blueprint.useSound = QPatch.BoxOpenSoundAsset;
+                blueprint.disableGameObject = GameObjectHelpers.FindGameObject(prefab, "BLUEPRINT_DATA_DISC");
+                blueprint.inspectPrefab = AlterraHub.BluePrintDataDiscPrefab;
+                blueprint.onUseGoal = new StoryGoal(string.Empty, Story.GoalType.PDA, 0);
+                blueprint.unlockTechType = _techType;
+
 
                 prefab.AddComponent<FCSDataBoxController>();
                 

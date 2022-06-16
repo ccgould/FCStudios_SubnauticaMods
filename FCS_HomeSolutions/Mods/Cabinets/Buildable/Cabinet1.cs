@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
@@ -49,11 +50,13 @@ namespace FCS_HomeSolutions.Mods.Cabinets.Buildable
             };
         }
 
+#if SUBNAUTICA_STABLE
         public override GameObject GetGameObject()
         {
+            GameObject prefab = null;
             try
             {
-                var prefab = GameObject.Instantiate(_prefab);
+                prefab = GameObject.Instantiate(_prefab);
 
                 prefab.name = this.PrefabFileName;
 
@@ -92,15 +95,68 @@ namespace FCS_HomeSolutions.Mods.Cabinets.Buildable
                 
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<CabinetController>();
-
-                return prefab;
             }
             catch (Exception e)
             {
                 QuickLogger.Error(e.Message);
-                return null;
             }
+                return prefab;
         }
+#else
+        public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
+        {
+            GameObject prefab = null;
+            try
+            {
+                prefab = GameObject.Instantiate(_prefab);
+
+                prefab.name = this.PrefabFileName;
+
+                var center = new Vector3(-0.1788177f, 0.5337045f, 0f);
+                var size = new Vector3(2.776398f, 0.757907f, 0.631052f);
+
+                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
+
+                var model = prefab.FindChild("model");
+
+                SkyApplier skyApplier = prefab.AddComponent<SkyApplier>();
+                skyApplier.renderers = model.GetComponentsInChildren<MeshRenderer>();
+                skyApplier.anchorSky = Skies.Auto;
+
+                //========== Allows the building animation and material colors ==========// 
+
+                QuickLogger.Debug("Adding Constructible");
+
+                // Add constructible
+                var constructable = prefab.AddComponent<Constructable>();
+                constructable.allowedOnWall = false;
+                constructable.allowedOnGround = true;
+                constructable.allowedInSub = true;
+                constructable.allowedInBase = true;
+                constructable.allowedOnCeiling = false;
+                constructable.allowedOutside = false;
+                constructable.allowedOnConstructables = true;
+                constructable.rotationEnabled = true;
+                constructable.model = model;
+                constructable.techType = TechType;
+
+                PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
+                prefabID.ClassId = ClassID;
+
+                UWEHelpers.CreateStorageContainer(prefab, prefab.FindChild("StorageRoot"), ClassID, "Storage", 3, 6);
+
+                prefab.AddComponent<TechTag>().type = TechType;
+                prefab.AddComponent<CabinetController>();
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error(e.Message);
+            }
+
+            gameObject.Set(prefab);
+            yield break;
+        }
+#endif
 
         public override string AssetsFolder { get; } = Mod.GetAssetPath();
 

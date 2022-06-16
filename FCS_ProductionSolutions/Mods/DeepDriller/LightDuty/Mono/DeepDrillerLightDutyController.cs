@@ -27,8 +27,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.LightDuty.Mono
             if (PowerManagerLD == null)
             {
                 PowerManagerLD = gameObject.AddComponent<DeepDrillerLightDutyPowerManager>();
-                var powerRelay = gameObject.AddComponent<PowerRelay>();
-                PowerManagerLD.SetPowerRelay(powerRelay);
+                PowerManagerLD.SetPowerRelay(gameObject.GetComponent<PowerRelay>());
                 PowerManager = PowerManagerLD;
                 PowerManagerLD.Initialize(this);
             }

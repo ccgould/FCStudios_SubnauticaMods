@@ -64,8 +64,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 
         internal override void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, FCSDeepDrillerBuildable.DeepDrillerMk3TabID,
-                Mod.ModPackID);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, FCSDeepDrillerBuildable.DeepDrillerMk3TabID, Mod.ModPackID);
             DisplayHandler?.UpdateUnitID();
             base.Start();
         }
@@ -187,20 +186,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
                 piston.SetState(isRunning);
             }
         }
-
-        private void OreGeneratorOnAddCreated(TechType type)
-        {
-            //if (TransferManager.IsAllowedToExport())
-            //{
-            //    var result = TransferManager.TransferToExStorage(type);
-            //    if (result)
-            //    {
-            //        return;
-            //    }
-            //}
-            DeepDrillerContainer.AddItemToContainer(type);
-        }
-
+        
         internal override void ConnectDisplay()
         {
             if (DisplayHandler != null) return;
@@ -209,7 +195,6 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
             DisplayHandler.Setup(this);
             DisplayHandler.RefreshStorageAmount();
             DisplayHandler.UpdateListItemsState(_saveData?.FocusOres ?? new HashSet<TechType>());
-            DisplayHandler?.UpdateUnitID();
             DisplayHandler?.UpdatePingToggleState(_ping?.visible ?? false);
             if (_saveData != null)
             {
@@ -288,8 +273,8 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
             {
                 DeepDrillerPowerManager = gameObject.AddComponent<FCSDeepDrillerPowerHandler>();
                 DeepDrillerPowerManager.Initialize(this);
-                var powerRelay = gameObject.AddComponent<PowerRelay>();
-                DeepDrillerPowerManager.SetPowerRelay(powerRelay);
+
+                DeepDrillerPowerManager.SetPowerRelay(gameObject.GetComponent<PowerRelay>());
                 PowerManager = DeepDrillerPowerManager;
             }
 
@@ -328,7 +313,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 
             QuickLogger.Debug($"Initializing Completed");
         }
-
+        
         private void UpdatePistonState()
         {
             if (!IsConstructed || !IsInitialized) return;

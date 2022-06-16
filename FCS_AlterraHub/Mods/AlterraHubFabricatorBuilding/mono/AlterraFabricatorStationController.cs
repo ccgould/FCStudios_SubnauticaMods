@@ -101,7 +101,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 
         private IEnumerator Start()
         {
-#if SUBNAUTICA
+
             CreatePorts();
 
             _generator = GameObjectHelpers.FindGameObject(gameObject, "Anim_Generator")
@@ -185,41 +185,42 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             var bp3Pos = GameObjectHelpers.FindGameObject(gameObject, "_BlueprintBoxPnt3_");
 
 #if SUBNAUTICA_STABLE
-            var dataBox1 = SpawnHelper.SpawnTechType(Mod.FCSDataBoxTechType, bp1Pos.transform.position, bp1Pos.transform.rotation, true);
+            var dataBox1 = SpawnHelper.SpawnTechType(Mod.DataboxAlterraHubDepot, bp1Pos.transform.position, bp1Pos.transform.rotation, true);
 #else
             var task1 = new TaskResult<GameObject>();
-            yield return SpawnHelper.SpawnTechTypeAsync(Mod.FCSDataBoxTechType, bp1Pos.transform.position,
+            yield return SpawnHelper.SpawnTechTypeAsync(Mod.DataboxAlterraHubDepot, bp1Pos.transform.position,
                 bp1Pos.transform.rotation,
                 true, task1);
             var dataBox1 = task1.Get();
 #endif
 
             var dataBox1C = dataBox1.GetComponent<BlueprintHandTarget>();
-            CreateBluePrintHandTarget(dataBox1C, dataBox1, Mod.AlterraHubDepotTechType);
+            CreateBluePrintHandTarget(dataBox1C, dataBox1);
 
 #if SUBNAUTICA_STABLE
-            var dataBox2 = SpawnHelper.SpawnTechType(Mod.FCSDataBoxTechType, bp2Pos.transform.position,
+            var dataBox2 = SpawnHelper.SpawnTechType(Mod.DataboxOreConsumer, bp2Pos.transform.position,
                 bp2Pos.transform.rotation, true);
 #else
             var task2 = new TaskResult<GameObject>();
-            yield return SpawnHelper.SpawnTechTypeAsync(Mod.FCSDataBoxTechType, bp2Pos.transform.position,
+            yield return SpawnHelper.SpawnTechTypeAsync(Mod.DataboxOreConsumer, bp2Pos.transform.position,
                 bp2Pos.transform.rotation, true, task2);
             var dataBox2 = task1.Get();
 #endif
             var dataBox2C = dataBox2.GetComponent<BlueprintHandTarget>();
-            CreateBluePrintHandTarget(dataBox2C, dataBox2, Mod.OreConsumerTechType);
+            CreateBluePrintHandTarget(dataBox2C, dataBox2);
 
 #if SUBNAUTICA_STABLE
             var dataBox3 = SpawnHelper.SpawnTechType(Mod.FCSDataBoxTechType, bp3Pos.transform.position,
                 bp3Pos.transform.rotation, true);
 #else
             var task3 = new TaskResult<GameObject>();
-            yield return SpawnHelper.SpawnTechTypeAsync(Mod.FCSDataBoxTechType, bp3Pos.transform.position,
+            yield return SpawnHelper.SpawnTechTypeAsync(Mod.DataboxDronePad, bp3Pos.transform.position,
                 bp3Pos.transform.rotation, true, task3);
             var dataBox3 = task1.Get();
 #endif
+
             var dataBox3C = dataBox3.GetComponent<BlueprintHandTarget>();
-            CreateBluePrintHandTarget(dataBox3C, dataBox3, Mod.DronePortPadHubNewTechType);
+            CreateBluePrintHandTarget(dataBox3C, dataBox3);
 
             _securityGateController = GameObjectHelpers.FindGameObject(gameObject, "AlterraHubFabStationSecurityGate")
                 .AddComponent<SecurityGateController>();
@@ -232,7 +233,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             OnGamePlaySettingsLoaded(Mod.GamePlaySettings);
 
             InvokeRepeating(nameof(CheckIfSecurityDoorCanUnlock), 1f, 1f);
-#endif
             yield break;
         }
 
@@ -269,23 +269,15 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             return _securityBoxTrigger;
         }
 
-        private static void CreateBluePrintHandTarget(BlueprintHandTarget dataBox, GameObject go,
-            TechType unlockTechType)
+        private static void CreateBluePrintHandTarget(BlueprintHandTarget dataBox, GameObject go)
         {
-            dataBox.animator = go.GetComponent<Animator>();
-            dataBox.animParam = "databox_take";
-            dataBox.viewAnimParam = "databox_lookat";
-            dataBox.unlockTechType = unlockTechType;
-            dataBox.useSound = QPatch.BoxOpenSoundAsset;
-            dataBox.disableGameObject = GameObjectHelpers.FindGameObject(go, "BLUEPRINT_DATA_DISC");
-            dataBox.inspectPrefab = AlterraHub.BluePrintDataDiscPrefab;
-            dataBox.onUseGoal = new StoryGoal(string.Empty, Story.GoalType.PDA, 0);
-            dataBox.unlockTechType = unlockTechType;
-
+            //dataBox.unlockTechType = unlockTechType;
             var genericHandTarget = go.GetComponent<GenericHandTarget>();
             genericHandTarget.onHandHover.AddListener(_ => dataBox.HoverBlueprint());
             genericHandTarget.onHandClick.AddListener(_ => dataBox.UnlockBlueprint());
+#if SUBNAUTICA_STABLE
             dataBox.Start();
+#endif 
         }
 
         private void FindScreens()
@@ -568,6 +560,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         {
             if (!_gamePlaySettingsLoaded)
             {
+                QuickLogger.DebugError("Game Play Settings Not loaded");
                 return;
             }
 
@@ -583,6 +576,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             {
                 if (!Mod.GamePlaySettings.TransDroneSpawned)
                 {
+                    QuickLogger.Debug("Attempting to spawn drone");
                     if (MAXDRONECOUNT > _ports.Count)
                     {
                         MAXDRONECOUNT = _ports.Count;
@@ -595,11 +589,13 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                         _drones.Add(drone);
                         drone.LoadData();
 #else
-                        _ports.ElementAt(i).Value.SpawnDrone(drone =>
+
+                        StartCoroutine(_ports.ElementAt(i).Value.SpawnDrone(drone =>
                         {
                             _drones.Add(drone);
                             drone.LoadData();
-                        });
+                        }));
+
 #endif
                     }
                 }
@@ -614,6 +610,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 
         internal void ResetDrones()
         {
+            QuickLogger.Debug("Reset Drones");
             var drones = GameObject.FindObjectsOfType<DroneController>();
 
             foreach (DroneController controller in drones)
@@ -776,7 +773,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 
         public float GetOrderCompletionPercentage(string orderNumber)
         {
-            if (string.IsNullOrWhiteSpace(_currentOrder.OrderNumber)) return 0f;
+            if (string.IsNullOrWhiteSpace(_currentOrder?.OrderNumber)) return 0f;
             return _currentOrder.OrderNumber.Equals(orderNumber) ? _drones.ElementAt(0).GetCompletionPercentage() : 0f;
         }
 

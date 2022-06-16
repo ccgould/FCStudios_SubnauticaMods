@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Registration;
@@ -718,18 +719,49 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
 
         private TreeNode FindNodeByTechType(CraftNode tree, TechType techType)
         {
-            foreach (var encyclopediaEntry in FCSAlterraHubService.InternalAPI.EncyclopediaEntries)
+            try
             {
-                foreach (KeyValuePair<string, List<EncyclopediaEntryData>> dataKeyValuePair in encyclopediaEntry)
+                //QuickLogger.Debug($"FindNodeByTechType: Tree {tree == null} || Last Tree: {Tree == null}|| Entries {FCSAlterraHubService.InternalAPI?.EncyclopediaEntries == null} ");
+                if (FCSAlterraHubService.InternalAPI?.EncyclopediaEntries == null)
                 {
-                    foreach (EncyclopediaEntryData data in dataKeyValuePair.Value)
+                    return null;
+                }
+                foreach (var encyclopediaEntry in FCSAlterraHubService.InternalAPI.EncyclopediaEntries)
+                {
+                    if (encyclopediaEntry == null)
                     {
-                        if (data.IsSame(techType))
+                        //QuickLogger.Error("encyclopediaEntry is null");
+                        continue;
+                    }
+
+                    foreach (KeyValuePair<string, List<EncyclopediaEntryData>> dataKeyValuePair in encyclopediaEntry)
+                    {
+                        if (dataKeyValuePair.Value == null)
                         {
-                            return Tree.FindNodeById(dataKeyValuePair.Key);
+                            //QuickLogger.Error("dataKeyValuePair is null");
+                            continue;
+                        }
+
+                        foreach (EncyclopediaEntryData data in dataKeyValuePair.Value)
+                        {
+                            if (data == null)
+                            {
+                                //QuickLogger.Error("Encyclopedia Data Entry is null");
+                                continue;
+                            }
+                            if (data.IsSame(techType))
+                            {
+                                return Tree?.FindNodeById(dataKeyValuePair.Key);
+                            }
                         }
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error(e.Message);
+                QuickLogger.Error(e.StackTrace);
+                QuickLogger.Error(e.InnerException);
             }
 
             return null;

@@ -428,6 +428,8 @@ namespace FCS_AlterraHub.Helpers
 
         public static PingInstance CreateBeacon(GameObject gameObject, PingType pingType, string label, bool isEnable = true)
         {
+            gameObject.SetActive(false);
+
             var pingInstance = gameObject.EnsureComponent<PingInstance>();
 
             if (pingInstance != null)
@@ -438,7 +440,7 @@ namespace FCS_AlterraHub.Helpers
                 pingInstance.SetLabel(label);
                 pingInstance.enabled = isEnable;
             }
-
+            gameObject.SetActive(true);
             return pingInstance;
         }
 

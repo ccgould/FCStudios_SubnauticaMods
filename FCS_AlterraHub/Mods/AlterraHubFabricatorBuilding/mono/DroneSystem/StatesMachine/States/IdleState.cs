@@ -31,6 +31,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Stat
 
             if (_drone.GetCurrentPort() == null)
             {
+#if SUBNAUTICA_STABLE
                 var devices = FCSAlterraHubService.PublicAPI.GetRegisteredDevicesOfId(Mod.DronePortPadHubNewTabID);
                 if (devices != null)
                 {
@@ -42,6 +43,9 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Stat
                     var platform = WorldHelpers.FindNearestObject(processList, transform);
                     _drone.SetDeparturePort(platform.GetComponent<AlterraDronePortController>());
                 }
+#else
+                _drone.SetDeparturePort(AlterraFabricatorStationController.Main.GetOpenPort());
+#endif
             }
 
             if (!AlterraFabricatorStationController.Main.IsStationPort(_drone.GetCurrentPort()))

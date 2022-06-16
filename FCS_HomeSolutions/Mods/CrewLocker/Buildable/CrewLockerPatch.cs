@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.API;
@@ -48,11 +49,13 @@ namespace FCS_HomeSolutions.Mods.CrewLocker.Buildable
             };
         }
 
+#if SUBNAUTICA_STABLE
         public override GameObject GetGameObject()
         {
+            GameObject prefab = null;
             try
             {
-                var prefab = GameObject.Instantiate(FCSAssetBundlesService.PublicAPI.GetPrefabByName(CrewLockerPrefabName, FCSAssetBundlesService.PublicAPI.GlobalBundleName));
+                prefab = GameObject.Instantiate(FCSAssetBundlesService.PublicAPI.GetPrefabByName(CrewLockerPrefabName, FCSAssetBundlesService.PublicAPI.GlobalBundleName));
                 
                 prefab.name = this.PrefabFileName;
 
@@ -96,15 +99,76 @@ namespace FCS_HomeSolutions.Mods.CrewLocker.Buildable
                 //Apply the glass shader here because of autosort lockers for some reason doesn't like it.
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
                 MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, prefab, Color.cyan);
-
-                return prefab;
             }
             catch (Exception e)
             {
                 QuickLogger.Error(e.Message);
-                return null;
             }
+
+            return prefab;
         }
+#else
+        public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
+        {
+            GameObject prefab = null;
+            try
+            {
+                prefab = GameObject.Instantiate(FCSAssetBundlesService.PublicAPI.GetPrefabByName(CrewLockerPrefabName, FCSAssetBundlesService.PublicAPI.GlobalBundleName));
+
+                prefab.name = this.PrefabFileName;
+
+                var center = new Vector3(0f, 1.392986f, 0.07044983f);
+                var size = new Vector3(0.7382165f, 2.641892f, 0.8591003f);
+
+                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
+
+                var model = prefab.FindChild("model");
+
+                SkyApplier skyApplier = prefab.AddComponent<SkyApplier>();
+                skyApplier.renderers = model.GetComponentsInChildren<MeshRenderer>();
+                skyApplier.anchorSky = Skies.Auto;
+
+                //========== Allows the building animation and material colors ==========// 
+
+                QuickLogger.Debug("Adding Constructible");
+
+                // Add constructible
+                var constructable = prefab.AddComponent<Constructable>();
+                constructable.allowedOnWall = false;
+                constructable.allowedOnGround = true;
+                constructable.allowedInSub = true;
+                constructable.allowedInBase = true;
+                constructable.allowedOnCeiling = false;
+                constructable.allowedOutside = false;
+                constructable.allowedOnConstructables = true;
+                constructable.rotationEnabled = true;
+                constructable.model = model;
+                constructable.techType = TechType;
+
+                PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
+                prefabID.ClassId = ClassID;
+
+                UWEHelpers.CreateStorageContainer(prefab, prefab.FindChild("StorageRoot"), ClassID, "Storage", 6, 8);
+
+                prefab.AddComponent<TechTag>().type = TechType;
+                prefab.AddComponent<CabinetController>();
+
+
+                //Apply the glass shader here because of autosort lockers for some reason doesn't like it.
+                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
+                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, prefab, Color.cyan);
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error(e.Message);
+            }
+
+            gameObject.Set(prefab);
+            yield break;
+        }
+#endif
+
+
 
         public override string AssetsFolder { get; } = Mod.GetAssetPath();
 

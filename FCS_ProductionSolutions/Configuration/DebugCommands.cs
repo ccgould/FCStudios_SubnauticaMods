@@ -49,7 +49,7 @@ namespace FCS_ProductionSolutions.Configuration
         [ConsoleCommand("clearharvester")]
         public static string ClearHarvesterCommand(int id)
         {
-            //var hh = GameObject.FindObjectsOfType<HydroponicHarvesterController>();
+            var hh = GameObject.FindObjectsOfType<HydroponicHarvesterController>();
 
             foreach (HydroponicHarvesterController controller in hh)
             {
@@ -124,9 +124,8 @@ namespace FCS_ProductionSolutions.Configuration
                         return $"{Language.main.Get(techType)} was unlocked.";
                     }
                 }
-
             //    return $"{Language.main.Get(techType)} is not scannable by the Matter Analyzer.";
-            //}
+            }
             return $"Could not parse {techTypeAsString} as TechType";
         }
 

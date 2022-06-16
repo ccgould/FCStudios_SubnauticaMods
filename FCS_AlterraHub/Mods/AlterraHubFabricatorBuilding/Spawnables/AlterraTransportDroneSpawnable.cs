@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.IO;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
@@ -24,6 +25,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Spawnables
             OnFinishedPatching += () => { Mod.AlterraTransportDroneTechType = TechType; };
         }
 
+#if SUBNAUTICA_STABLE
         public override GameObject GetGameObject()
         {
             try
@@ -64,6 +66,41 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Spawnables
                 return null;
             }
         }
+#else
+        public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
+        {
+            var prefab = GameObject.Instantiate(AlterraHub.AlterraHubTransportDronePrefab);
+
+            prefab.AddComponent<PrefabIdentifier>().ClassId = ClassID;
+            prefab.AddComponent<TechTag>().type = TechType;
+
+            var pickUp = prefab.AddComponent<Pickupable>();
+            pickUp.isPickupable = false;
+
+            var lw = prefab.AddComponent<LargeWorldEntity>();
+            lw.cellLevel = LargeWorldEntity.CellLevel.Global;
+
+            //Renderer
+            var renderer = prefab.GetComponentInChildren<Renderer>();
+
+            // Update sky applier
+            var applier = prefab.GetComponent<SkyApplier>();
+            if (applier == null)
+                applier = prefab.AddComponent<SkyApplier>();
+            applier.renderers = new Renderer[] { renderer };
+            applier.anchorSky = Skies.Auto;
+
+            prefab.AddComponent<DroneController>();
+            var immuseToProp = prefab.EnsureComponent<ImmuneToPropulsioncannon>();
+            immuseToProp.immuneToRepulsionCannon = true;
+
+            //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
+            MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
+
+            gameObject.Set(prefab);
+            yield break;
+        }
+#endif
 
         protected override Sprite GetItemSprite()
         {

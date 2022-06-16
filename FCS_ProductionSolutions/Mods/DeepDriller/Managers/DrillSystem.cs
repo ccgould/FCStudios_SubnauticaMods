@@ -30,6 +30,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
         internal bool IsBeingDeleted { get; set; }
         internal FCSPowerManager PowerManager { get; private protected set; }
         protected StringBuilder _sb =  new();
+
         public override bool IsOperational => PowerManager.HasEnoughPowerToOperate() &&
                                               PowerManager.GetPowerState() == FCSPowerStates.Powered &&
                                               OilHandler.HasOil() && !DeepDrillerContainer.IsFull && !_isBreakSet;
@@ -186,6 +187,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
 
         internal virtual void Start()
         {
+            LargeWorldEntity.Register(gameObject);
             InvokeRepeating(nameof(UpdateDrillShaftState), .5f, .5f);
             UpdateEmission();
             if (_saveData == null)
@@ -241,7 +243,6 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
                     OilHandler, 4, 4);
             }
 
-
             _ping = WorldHelpers.CreateBeacon(gameObject, QPatch.DeepDrillerPingType, "");
 
             IsInitialized = true;
@@ -268,8 +269,10 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
         {
             try
             {
-                _ping.SetLabel(beaconName);
+                _ping?.SetLabel(beaconName);
+#if SUBNAUTICA_STABLE
                 PingManager.NotifyRename(_ping);
+#endif
             }
             catch (Exception e)
             {
@@ -305,13 +308,14 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
 
         internal void ToggleVisibility(bool value = false)
         {
-            _ping.SetVisible(value);
+            _ping?.SetVisible(value);
             PingManager.NotifyVisible(_ping);
         }
 
         internal void ToggleBeacon()
         {
-            _ping.enabled = !_ping.enabled;
+            if(_ping != null)
+                _ping.enabled = !_ping.enabled;
         }
 
         public override bool IsUnderWater()
@@ -333,7 +337,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
             return _colorManager.ChangeColor(template);
         }
 
-        #region IProtoEventListener
+#region IProtoEventListener
 
         public abstract void Save(SaveData saveDataList, ProtobufSerializer serializer = null);
 
@@ -351,9 +355,9 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
             _isFromSave = true;
         }
 
-        #endregion
+#endregion
 
-        #region IConstructable
+#region IConstructable
         public override bool CanDeconstruct(out string reason)
         {
             reason = string.Empty;
@@ -396,7 +400,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
                 }
             }
         }
-        #endregion
+#endregion
 
         public override void OnHandHover(GUIHand hand)
         {

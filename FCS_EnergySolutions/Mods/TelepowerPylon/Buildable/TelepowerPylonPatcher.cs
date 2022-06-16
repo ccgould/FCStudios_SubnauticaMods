@@ -119,7 +119,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Buildable
                 prefab.AddComponent<TelepowerPylonController>();
 
 
-                Resources.UnloadAsset(solarPowerRelay);
+                //Resources.UnloadAsset(solarPowerRelay);
 
                 //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
@@ -189,13 +189,11 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Buildable
             var pr = prefab.AddComponent<PowerRelay>();
             pr.powerFX = pFX;
             pr.maxOutboundDistance = 15;
+            pr.powerSystemPreviewPrefab = solarPowerRelay.powerSystemPreviewPrefab;
 
             prefab.AddComponent<TechTag>().type = TechType;
             prefab.AddComponent<TelepowerPylonController>();
-
-
-            Resources.UnloadAsset(solarPowerRelay);
-
+            
             //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
             MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
             gameObject.Set(prefab);
