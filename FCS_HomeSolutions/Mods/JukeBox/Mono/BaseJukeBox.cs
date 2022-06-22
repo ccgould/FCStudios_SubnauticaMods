@@ -81,6 +81,10 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
             return Player.main.IsSwimming() || Player.main.IsUnderwaterForSwimming();
         }
         
+        internal bool HasJukeBox()
+        {
+            return GetFirstJukeBox != null;
+        }
 
         private bool CheckIfPaused()
         {
@@ -98,6 +102,11 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
             }
             
             return gamePaused;
+        }
+
+        internal bool IsPairing()
+        {
+            return GetFirstJukeBox().IsPairing();
         }
 
         private IJukeBoxDevice GetFirstJukeBox()
@@ -282,5 +291,6 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
         float GetPowerUsage();
         void ForceTimeChange(float amount,AudioClip clip);
         float GetSliderValue();
+        bool IsPairing();
     }
 }

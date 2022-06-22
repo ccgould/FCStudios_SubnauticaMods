@@ -91,6 +91,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
 
         public void OnTrackChanged(TrackData trackData, bool isPlaying)
         {
+            if (_isPairing) return;
             QuickLogger.Debug($"OnTrackChanged {trackData.AudioClip.name} : {trackData.AudioClip.length}", true);
             
             RefreshUI(trackData);
@@ -363,6 +364,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
             GotoPage(JukeboxPages.Pairing);
             yield return new WaitForSeconds(5);
             Play(ModelPrefab.PairedClip);
+            yield return new WaitForSeconds(5);
             GotoPage(JukeboxPages.Home);
             _isPairing = false;
             yield break;
@@ -575,6 +577,11 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
                 t %= num;
             }
             return Mathf.Clamp01(Mathf.Min(b > 0f ? (t - a) / b : 0f, d > 0f ? (num - t) / d : 0f));
+        }
+
+        public bool IsPairing()
+        {
+            return _isPairing;
         }
     }
 

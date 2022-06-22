@@ -6,6 +6,7 @@ using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Mods.JukeBox.Buildable;
 using FCSCommon.Utilities;
+using System;
 using UnityEngine;
 
 namespace FCS_HomeSolutions.Mods.JukeBox.Mono
@@ -21,7 +22,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
         private Constructable _constructable;
         protected bool BypassAudioVolumeSync;
         protected bool GetVolumeFromSave;
-
+        protected bool _mutedByHand;
 
         private void OnEnable()
         {
@@ -46,6 +47,8 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
                         _audio.volume = _savedData.Volume;
                         _audio.mute = _savedData.IsMuted;
                     }
+
+                    _mutedByHand = _savedData.IsMutedByHand;
                 }
 
                 _runStartUpOnEnable = false;
@@ -147,9 +150,36 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
 
         private void Update()
         {
-            if (_audio == null) return;
+            if (_audio == null || _baseJukeBox == null) return;
+
+
+            CheckIfMuting();
+
             UpdateTimeSample();
+
             LowPassFilterCheck();
+        }
+
+        internal virtual void CheckIfMuting()
+        {
+            if (!_baseJukeBox.HasJukeBox() || _baseJukeBox.IsPairing())
+            {
+                Mute();
+            }
+            else
+            {
+                UnMute();
+            }
+        }
+
+        internal void Mute()
+        {
+            _audio.mute = true;
+        }
+
+        internal void UnMute()
+        {
+            _audio.mute = false;
         }
 
         private void UpdateTimeSample()
@@ -255,6 +285,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
             _savedData.ColorTemplate = _colorManager.SaveTemplate();
             _savedData.Volume = _audio.volume;
             _savedData.IsMuted = _audio.mute;
+            _savedData.IsMutedByHand = _mutedByHand;
             QuickLogger.Debug($"Saving ID {_savedData.Id}");
             newSaveData.JukeBoxDataEntries.Add(_savedData);
         }
