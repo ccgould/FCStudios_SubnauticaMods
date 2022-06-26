@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Linq;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
@@ -12,6 +13,7 @@ using FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Commands;
 using UnityEngine;
+using UWE;
 
 namespace FCS_ProductionSolutions.Configuration
 {
@@ -209,6 +211,35 @@ namespace FCS_ProductionSolutions.Configuration
             PlayerInteractionHelper.GivePlayerItem(TechType.Silver,2);
             PlayerInteractionHelper.GivePlayerItem(TechType.JeweledDiskPiece,2);
             PlayerInteractionHelper.GivePlayerItem(TechType.Gold,3);
+        }
+
+        [ConsoleCommand("ClearTechTypeInRange")]
+        public static string ClearTechTypeInRange(string objectName, int range)
+        {
+            CoroutineHost.StartCoroutine(StartBomb(objectName,range));
+
+            return $"Parameters: {objectName} {range}";
+        }
+
+        private static IEnumerator StartBomb(string name,int range)
+        {
+            var Colliders = Physics.OverlapSphere(Player.main.transform.position, range);
+   
+            foreach (var hit in Colliders)
+            {
+                if (!hit)
+                    continue;
+
+                if (hit?.transform?.parent == null) continue;
+
+                if (hit.transform.parent.name.StartsWith(name,StringComparison.OrdinalIgnoreCase))
+                {
+                    QuickLogger.Info($"Deleting Found Entity {name}",true);
+                    GameObject.Destroy(hit.transform.parent.gameObject);
+                }
+
+            }
+            yield break;
         }
 
         //[ConsoleCommand("testMe")]

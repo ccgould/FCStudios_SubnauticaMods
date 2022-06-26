@@ -124,6 +124,8 @@ namespace FCS_AlterraHub.Systems
         /// <returns>Boolean on success</returns>
         public bool RemoveFinances(decimal amount)
         {
+            if (!GameModeUtils.RequiresPower()) return true;
+
             if (HasEnough(amount))
             {
                 if (GameModeUtils.RequiresPower()) return true;
@@ -143,6 +145,7 @@ namespace FCS_AlterraHub.Systems
         /// <returns></returns>
         public decimal GetAccountBalance()
         {
+            if (!GameModeUtils.RequiresPower()) return 99999999999999;
             return _accountDetails?.Balance ?? 0;
         }
         
@@ -205,8 +208,7 @@ namespace FCS_AlterraHub.Systems
         /// <returns></returns>
         public bool HasEnough(decimal cost)
         {
-            if (GameModeUtils.RequiresPower()) return true;
-
+            if (!GameModeUtils.RequiresPower()) return true;
             return _accountDetails.Balance >= cost;
         }
 
@@ -396,6 +398,7 @@ namespace FCS_AlterraHub.Systems
 
         public decimal AlterraBalance()
         {
+
             return AlterraDebit + _accountDetails.AlterraDebitPayed;
         }
 
