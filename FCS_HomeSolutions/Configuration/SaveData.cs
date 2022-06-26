@@ -229,6 +229,7 @@ namespace FCS_HomeSolutions.Configuration
         public ColorTemplateSave ColorTemplate { get; set; }
         [JsonProperty] internal float Volume { get; set; }
         [JsonProperty] internal bool IsMuted { get; set; }
+        [JsonProperty] internal bool IsMutedByHand { get; set; }
     }
 
     [Serializable]

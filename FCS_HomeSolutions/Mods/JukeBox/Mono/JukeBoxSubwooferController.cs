@@ -5,6 +5,8 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
 {
     internal class JukeBoxSubwooferController : JukeBoxSpeakerController,IHandTarget
     {
+
+
         public override void Awake()
         {
             BypassAudioVolumeSync = true;
@@ -12,9 +14,23 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
             base.Awake();
         }
 
+        internal override void CheckIfMuting()
+        {
+            if (_mutedByHand) return;
+            base.CheckIfMuting();
+        }
+
         public void OnHandClick(GUIHand hand)
         {
-            _audio.mute = !_audio.mute;
+            if (_audio.mute)
+            {
+                UnMute();
+            }
+            else
+            {
+                Mute();
+            }
+            _mutedByHand = _audio.mute;
         }
 
         public override void OnHandHover(GUIHand hand)

@@ -256,7 +256,7 @@ namespace FCS_HomeSolutions.Configuration
         internal bool IsWallPartitionsEnabled { get; set; } = false;
 
 
-#region JukeBox
+        #region JukeBox
         [Toggle("[Juke Box] Is Mod Enabled", Order = 19, Tooltip = "Enables/Disables Juke Box from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
 
         public bool IsJukeBoxEnabled = true;
