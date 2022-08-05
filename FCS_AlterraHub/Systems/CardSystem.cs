@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -8,6 +9,7 @@ using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCSCommon.Utilities;
+using UnityEngine;
 using Random = System.Random;
 #if SUBNAUTICA_STABLE
 
@@ -167,15 +169,18 @@ namespace FCS_AlterraHub.Systems
         /// Loads saved account details
         /// </summary>
         /// <param name="accounts"></param>
-        public void Load(AccountDetails account)
+        public IEnumerator Load(AccountDetails account)
         {
+
             try
             {
+                WaitScreen.ManualWaitItem creditMessage = null;
+
 
                 if (_accountLoaded)
                 {
                     QuickLogger.Debug($"Account already loaded. Canceling load operation for {account.Username}.", true);
-                    return;
+                    yield break;
                 }
 
                 if (account != null)
@@ -191,6 +196,10 @@ namespace FCS_AlterraHub.Systems
                     QuickLogger.Debug($"{account.Username} | Debt Payed: {_accountDetails.AlterraDebitPayed}",true);
 
                     _accountLoaded = true;
+
+                    creditMessage = WaitScreen.Add($"Alterra account loaded for player {account.Username}");
+
+                    //WaitScreen.Remove(creditMessage);
                 }
             }
             catch (Exception e)

@@ -18,6 +18,7 @@ using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 using Object = UnityEngine.Object;
+using UWE;
 #if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
 #else
@@ -373,7 +374,7 @@ namespace FCS_AlterraHub.Configuration
 
             if (_saveData != null)
             {
-                CardSystem.main.Load(_saveData.AccountDetails);
+                CoroutineHost.StartCoroutine(CardSystem.main.Load(_saveData.AccountDetails));
             }
         }
         
