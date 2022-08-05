@@ -56,6 +56,10 @@ namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Buildable
 
                 GameObjectHelpers.AddConstructableBounds(prefab, size, center);
 
+                    // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
+                    var lwe = prefab.AddComponent<LargeWorldEntity>();
+                    lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
+
                 var model = prefab.FindChild("model");
 
                 //========== Allows the building animation and material colors ==========// 
@@ -118,6 +122,10 @@ namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Buildable
                 skyApplier.renderers = renderers;
                 skyApplier.anchorSky = Skies.Auto;
                 //========== Allows the building animation and material colors ==========// 
+
+                // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
+                var lwe = prefab.AddComponent<LargeWorldEntity>();
+                lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
 
                 // Add constructible
                 var constructable = prefab.AddComponent<Constructable>();

@@ -175,6 +175,8 @@ namespace FCS_AlterraHub.Buildables
                     
                     if (!LoadAsset(Mod.AlterraHubStationPrefabName, QPatch.GlobalBundle, out var alterraHubFabricatorPrefab)) return false;
                     AlterraHubFabricatorPrefab = alterraHubFabricatorPrefab;
+                    WorldHelpers.CreateBeacon(AlterraHubFabricatorPrefab, Mod.AlterraHubStationPingType,
+                        "AlterraHub Fabrication Facility (320m)");
 
                     if (!LoadAsset("PDAShipmentItem", QPatch.GlobalBundle, out var pdaShipmentItemPrefab,false)) return false;
                      PDAShipmentItemPrefab = pdaShipmentItemPrefab;
@@ -205,6 +207,7 @@ namespace FCS_AlterraHub.Buildables
 
                     if (!LoadAssetV2("AlterraHubTransportDrone", QPatch.GlobalBundle, out var alterraHubTransportDronePrefab)) return false;
                     AlterraHubTransportDronePrefab = alterraHubTransportDronePrefab;
+                    WorldHelpers.CreateBeacon(AlterraHubTransportDronePrefab, Mod.AlterraTransportDronePingType, $"Transport Drone", false);
 
                     if (!LoadAssetV2("BLUEPRINT_DATA_DISC", QPatch.GlobalBundle, out var blueprintDataDiscPrefab)) return false;
                     BluePrintDataDiscPrefab = blueprintDataDiscPrefab;                    

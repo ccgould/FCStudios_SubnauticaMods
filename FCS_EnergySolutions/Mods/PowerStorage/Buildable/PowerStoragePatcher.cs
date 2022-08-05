@@ -160,8 +160,12 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Buildable
                 var result = new TaskResult<GameObject>();
                 yield return CraftData.GetPrefabForTechTypeAsync(TechType.SolarPanel, false, result);
                 PowerRelay solarPowerRelay = result.Get().GetComponent<PowerRelay>();
-                
-                var ps = prefab.AddComponent<PowerSource>();
+
+                // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
+                var lwe = prefab.AddComponent<LargeWorldEntity>();
+                lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
+
+            var ps = prefab.AddComponent<PowerSource>();
                 ps.maxPower = 10000f;
 
                 var pFX = prefab.AddComponent<PowerFX>();

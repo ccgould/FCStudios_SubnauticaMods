@@ -170,8 +170,8 @@ namespace FCS_AlterraHub.Mono
                             if(GetItemCount(item) <= operation.PullWhenAmountIsAbove) continue;
                         }
 
-                        QuickLogger.Debug($"Device {operation.DeviceId}: {operation.Device.GetStorage()?.StorageCount()}|{operation.MaxAmount}", true);
-                        if (operation.Device.CanBeStored(1, item) && operation.Device.GetStorage() != null && operation.Device.GetStorage()?.StorageCount() < operation.MaxAmount)
+                        QuickLogger.Debug($"Device {operation.DeviceId}: {operation.Device.GetItemsContainer()?.count}|{operation.MaxAmount}", true);
+                        if (operation.Device.CanBeStored(1, item) && operation.Device.GetItemsContainer() != null && operation.Device.GetItemsContainer().count < operation.MaxAmount)
                         {
 #if SUBNAUTICA_STABLE
                             var result = TakeItem(item).Pickup(false).GetTechType().ToInventoryItemLegacy();
@@ -655,9 +655,9 @@ namespace FCS_AlterraHub.Mono
 
             foreach (FcsDevice device in BaseFcsStorage)
             {
-                if(device?.GetStorage()?.ItemsContainer == null)continue;
+                if(device?.GetItemsContainer() == null)continue;
                 
-                if (device.GetStorage().ItemsContainer.Contains(techType))
+                if (device.GetItemsContainer().Contains(techType))
                 {
                     return true;
                 }
@@ -686,12 +686,12 @@ namespace FCS_AlterraHub.Mono
                 {
                     if(!device.TabID.Equals("SB")) continue;
 
-                    var storage = device?.GetStorage()?.ItemsContainer;
+                    var storage = device?.GetItemsContainer();
 
                     if (storage == null || !storage.Contains(techType)) continue;
 
                     QuickLogger.Debug("Took Item from Seabreeze", true);
-                    return device.GetStorage().RemoveItemFromContainer(techType);
+                    return device.GetItemsContainer().RemoveItem(techType);
                 }
             }
 
@@ -701,12 +701,12 @@ namespace FCS_AlterraHub.Mono
                 {
                     if (!device.TabID.Equals("RM")) continue;
 
-                    var storage = device?.GetStorage()?.ItemsContainer;
+                    var storage = device?.GetItemsContainer();
 
                     if (storage == null || !storage.Contains(techType)) continue;
 
                     QuickLogger.Debug("Took Item from Replicator", true);
-                    return device.GetStorage().RemoveItemFromContainer(techType);
+                    return device.GetItemsContainer().RemoveItem(techType);
                 }
             }
 
@@ -716,12 +716,12 @@ namespace FCS_AlterraHub.Mono
                 {
                     if (!device.TabID.Equals("HH")) continue;
 
-                    var storage = device?.GetStorage()?.ItemsContainer;
+                    var storage = device?.GetItemsContainer();
 
                     if (storage == null || !storage.Contains(techType)) continue;
 
                     QuickLogger.Debug("Took Item from Harvester", true);
-                    return device.GetStorage().RemoveItemFromContainer(techType);
+                    return device.GetItemsContainer().RemoveItem(techType);
                 }
             }
 
@@ -730,12 +730,12 @@ namespace FCS_AlterraHub.Mono
             {
                 foreach (FcsDevice device in BaseFcsStorage)
                 {
-                    var storage = device?.GetStorage()?.ItemsContainer;
+                    var storage = device?.GetItemsContainer();
 
                     if (storage == null || !storage.Contains(techType)) continue;
 
                     QuickLogger.Debug("Took Item from FCSDevice", true);
-                    return device.GetStorage().RemoveItemFromContainer(techType);
+                    return device.GetItemsContainer().RemoveItem(techType);
                 }
             }
 
@@ -843,11 +843,11 @@ namespace FCS_AlterraHub.Mono
         {
             if (item.ContainsKey(resource.Key))
             {
-                item[resource.Key] += device.GetStorage().ItemsContainer.GetCount(resource.Key);
+                item[resource.Key] += device.GetItemsContainer().GetCount(resource.Key);
             }
             else
             {
-                item.Add(resource.Key, device.GetStorage().ItemsContainer.GetCount(resource.Key));
+                item.Add(resource.Key, device.GetItemsContainer().GetCount(resource.Key));
             }
         }
 
@@ -1034,7 +1034,7 @@ namespace FCS_AlterraHub.Mono
         {
             if(sc == null) return;
 
-            if (sc.GetStorage()?.ItemsContainer == null)
+            if (sc.GetItemsContainer() == null)
             {
                 QuickLogger.Debug($"Failed to add {sc.UnitID} at {sc.BaseId} because ItemsContainer returned null",true);
                 return;
@@ -1048,16 +1048,16 @@ namespace FCS_AlterraHub.Mono
                 }
             }
 
-            foreach (var item in sc.GetStorage().ItemsContainer.GetItemTypes())
+            foreach (var item in sc.GetItemsContainer().GetItemTypes())
             {
-                for (int i = 0; i < sc.GetStorage().ItemsContainer.GetCount(item); i++)
+                for (int i = 0; i < sc.GetItemsContainer().GetCount(item); i++)
                 {
                     AddItemsToTracker(sc, item);
                 }
             }
 
-            sc.GetStorage().ItemsContainer.onAddItem += (item) => AddItemsToTracker(sc, item.item.GetTechType());
-            sc.GetStorage().ItemsContainer.onRemoveItem += (item) => RemoveItemsFromTracker(sc, item.item.GetTechType());
+            sc.GetItemsContainer().onAddItem += (item) => AddItemsToTracker(sc, item.item.GetTechType());
+            sc.GetItemsContainer().onRemoveItem += (item) => RemoveItemsFromTracker(sc, item.item.GetTechType());
         }
 
         public void RemoveItemsFromTracker(StorageContainer sc, TechType item, int amountToRemove = 1)

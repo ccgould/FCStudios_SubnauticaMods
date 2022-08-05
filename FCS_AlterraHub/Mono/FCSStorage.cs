@@ -164,6 +164,7 @@ namespace FCS_AlterraHub.Mono
 
         public virtual Pickupable RemoveItemFromContainer(TechType techType)
         {
+
            return ItemsContainer.RemoveItem(techType);
         }
 

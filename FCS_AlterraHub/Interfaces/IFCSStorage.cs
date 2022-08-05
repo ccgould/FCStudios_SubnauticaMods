@@ -4,7 +4,7 @@ using FCS_AlterraHub.Mono;
 
 namespace FCS_AlterraHub.Interfaces
 {
-    public interface IFCSStorage
+    public interface IFCSStorage : IStorageConnection
     {
         int GetContainerFreeSpace { get; }
         bool IsFull { get; }
@@ -23,6 +23,10 @@ namespace FCS_AlterraHub.Interfaces
         bool ContainsItem(TechType techType);
         ItemsContainer ItemsContainer { get; }
         int StorageCount();
+    }
+
+    public interface IStorageConnection
+    {
     }
 
     public interface IFCSDumpContainer

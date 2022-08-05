@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
@@ -75,6 +76,10 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Buildable
                 skyApplier.anchorSky = Skies.Auto;
                 //========== Allows the building animation and material colors ==========// 
 
+                // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
+                var lwe = prefab.AddComponent<LargeWorldEntity>();
+                lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
+
                 // Add constructible
                 var constructable = prefab.AddComponent<Constructable>();
 
@@ -110,6 +115,12 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Buildable
             }
 
             return null;
+        }
+
+        public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
+        {
+            gameObject.Set(GetGameObject());
+            yield break;
         }
 
         protected override RecipeData GetBlueprintRecipe()

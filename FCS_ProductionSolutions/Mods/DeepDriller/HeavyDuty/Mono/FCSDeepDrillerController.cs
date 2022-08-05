@@ -449,7 +449,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
             return techType.ToPickupable();
 #else
             var itemTask = new TaskResult<InventoryItem>();
-            CouroutineManager.WaitCoroutine(techType.ToInventoryItem(itemTask));
+            CoroutineManager.WaitCoroutine(techType.ToInventoryItem(itemTask));
             return itemTask.Get().item;
 #endif
         }

@@ -50,7 +50,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
 
         public override Type UpdateState()
         {
-#if SUBNAUTICA_STABLE
+
             if (_operation != null)
             {
                 _timeLeft -= Time.deltaTime;
@@ -66,12 +66,12 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
                     _timeLeft = MAXTIME;
                 }
             }
-#endif
+
 
             return typeof(CrafterCraftingState);
         }
 
-#if SUBNAUTICA_STABLE
+
         private bool TryCraft()
         {
             
@@ -83,8 +83,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
             }
 
 
-            if ( IsCraftRecipeFulfilledAdvanced(_operation.TechType) &&
-                CheckIfLinkedItemsAllowed())
+            if ( IsCraftRecipeFulfilledAdvanced(_operation.TechType) && CheckIfLinkedItemsAllowed())
             {
                 QuickLogger.Debug("Crafting", true);
 
@@ -120,7 +119,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
             QuickLogger.Debug("try craft failed", true);
             return false;
         }
-#endif
+
 
         private bool IsLimitedCheck()
         {
@@ -147,7 +146,11 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
                 foreach (var dataLinkedItem in _operation.LinkedItems)
                 {
                     QuickLogger.Debug("Crafting Linked Item", true);
+#if SUBNAUTICA_STABLE
                     Craft(dataLinkedItem);
+#else
+                    Craft(dataLinkedItem ,null);
+#endif
                 }
             }
         }
@@ -184,16 +187,25 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
 
             for (int i = 0; i < _operation.ReturnAmount; i++)
             {
+#if SUBNAUTICA_STABLE
                 result = Craft(techType);
-            }
-
-            if (result)
-            {
-                OnItemComplete();
+                if (result)
+                {
+                    OnItemComplete();
+                }
+#else
+                CoroutineHost.StartCoroutine(Craft(techType, (result =>
+                {
+                    if (result)
+                    {
+                        OnItemComplete();
+                    }
+                })));
+#endif
             }
         }
 
-
+#if SUBNAUTICA_STABLE
         private bool Craft(TechType techType)
         {
             bool result;
@@ -212,6 +224,30 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
             _manager.Crafter.CraftMachine.AppendItemToBelt(techType);
 
             return result;
+        }
+#else
+#endif
+        private IEnumerator Craft(TechType techType, Action<bool> callback)
+        {
+            bool result = false;
+            if (_manager.Crafter.Manager.IsAllowedToAdd(techType, 1, true))
+            {
+                QuickLogger.Debug("Item was allowed trying to add network", true);
+
+                var pickupableTask = new TaskResult<bool>();
+                yield return AttemptToAddToNetwork(techType, pickupableTask);
+                result = pickupableTask.Get();
+                QuickLogger.Debug($"Result : {result}", true);
+            }
+            else
+            {
+                QuickLogger.Debug("Item not allowed adding to storage", true);
+                result = _manager.Crafter.AddItemToStorage(techType);
+            }
+
+            _manager.Crafter.CraftMachine.AppendItemToBelt(techType);
+
+            callback?.Invoke(result);
         }
 
         private void OnItemComplete()
@@ -280,17 +316,17 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
             yield break;
         }
 #endif
+
+#if SUBNAUTICA_STABLE
         private bool AttemptToAddToNetwork(TechType techType)
         {
-#if SUBNAUTICA_STABLE
-            var inventoryItem = techType.ToInventoryItemLegacy(); 
-#else 
-            var itemTask = new TaskResult<InventoryItem>();
-            CouroutineManager.WaitCoroutine(techType.ToInventoryItem(itemTask));
-            var inventoryItem = itemTask.Get();
-#endif
+            QuickLogger.Debug($"Attempting to add {techType} to network",true);
 
-            QuickLogger.Debug($"InventoryItemLegacy returned: {Language.main.Get(inventoryItem.item.GetTechType())}");
+
+
+            var inventoryItem = techType.ToInventoryItemLegacy();
+
+        QuickLogger.Debug($"InventoryItemLegacy returned: {Language.main.Get(inventoryItem.item.GetTechType())}");
 
             var result = BaseManager.AddItemToNetwork(_manager.Crafter.Manager, inventoryItem, true);
 
@@ -304,8 +340,33 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
 
             return result;
         }
+#else
+        private IEnumerator AttemptToAddToNetwork(TechType techType, IOut<bool> boolResult)
+        {
+            QuickLogger.Debug($"Attempting to add {techType} to network", true);
 
-        #region EasyCraft Code
+            var itemTask = new TaskResult<InventoryItem>();
+            yield return techType.ToInventoryItem(itemTask);
+
+            var inventoryItem = itemTask.Get();
+            QuickLogger.Debug($"InventoryItemLegacy returned: {Language.main.Get(inventoryItem.item.GetTechType())}");
+
+            var result = BaseManager.AddItemToNetwork(_manager.Crafter.Manager, inventoryItem, true);
+
+            if (!result)
+            {
+                _manager.Crafter.ShowMessage(
+                    $"Failed to add {Language.main.Get(techType)} to storage. Please build a locker, remote storage or add more space to your data storage system. Your item will be added to the autocrafter storage/");
+                _manager.Crafter.AddItemToStorage(techType);
+                GameObject.Destroy(inventoryItem.item.gameObject);
+            }
+
+            boolResult.Set(true);
+            yield break;
+        }
+#endif
+
+#region EasyCraft Code
 
 
         public bool IsCraftRecipeFulfilledAdvanced(TechType techType)
@@ -599,10 +660,15 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
         }
 
 
-        #endregion
+#endregion
 
         public Dictionary<TechType, int> GetConsumables()
         {
+            //if (_operation == null)
+            //{
+            //    EnterState();
+            //}
+
             var ingredients = new Dictionary<TechType, int>();
 
             var data = CraftDataHandler.GetTechData(_operation.TechType);

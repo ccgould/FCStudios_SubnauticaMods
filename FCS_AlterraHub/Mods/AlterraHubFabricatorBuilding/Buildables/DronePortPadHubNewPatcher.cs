@@ -58,7 +58,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Buildables
                 //========== Allows the building animation and material colors ==========// 
 
                 var lw = prefab.AddComponent<LargeWorldEntity>();
-                lw.cellLevel = LargeWorldEntity.CellLevel.VeryFar;
+                lw.cellLevel = LargeWorldEntity.CellLevel.Global;
 
                 // Add constructible
                 var constructable = prefab.AddComponent<Constructable>();
@@ -112,7 +112,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Buildables
                 //========== Allows the building animation and material colors ==========// 
 
                 var lw = prefab.AddComponent<LargeWorldEntity>();
-                lw.cellLevel = LargeWorldEntity.CellLevel.VeryFar;
+                lw.cellLevel = LargeWorldEntity.CellLevel.Global;
 
                 // Add constructible
                 var constructable = prefab.AddComponent<Constructable>();
@@ -150,7 +150,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Buildables
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
+#if SUBNAUTICA_STABLE
                     new(TechType.VehicleStorageModule,1),
+#else
+                    //new(TechType.SeaTruckStorageModule,1),
+#endif
                     new(TechType.TitaniumIngot,2),
                     new(TechType.Beacon,1),
                     new(TechType.WiringKit,1),

@@ -27,10 +27,12 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Antenna
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DSSTabID, Mod.ModPackID);
+            
             Manager?.AlertNewAntennaPlaced(this);
+
             if (Manager == null)
             {
-                MotorHandler.StopMotor();
+                MotorHandler?.StopMotor();
             }
         }
 

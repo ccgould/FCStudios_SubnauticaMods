@@ -293,7 +293,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             if (_portManager == null)
             {
                 _portManager = gameObject.GetComponentInParent<PortManager>();
-                _portManager.RegisterDronePort(this);
+                _portManager?.RegisterDronePort(this);
             }
 
             if (_colorManager == null)

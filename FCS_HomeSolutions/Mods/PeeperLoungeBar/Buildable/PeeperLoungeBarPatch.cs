@@ -89,6 +89,10 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
                 constructable.model = model;
                 constructable.techType = TechType;
 
+                // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
+                var lwe = prefab.AddComponent<LargeWorldEntity>();
+                lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
+
                 prefab.AddComponent<PrefabIdentifier>().ClassId = ClassID;
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<DecorationController>();

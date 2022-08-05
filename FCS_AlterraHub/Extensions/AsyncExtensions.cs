@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using FCSCommon.Utilities;
 using SMLHelper.V2.Handlers;
 using UnityEngine;
 using UWE;
@@ -49,7 +50,8 @@ namespace FCS_AlterraHub.Extensions
             {
                 var itemResult = new TaskResult<InventoryItem>();
                 yield return techType.ToInventoryItem(itemResult);
-                container.UnsafeAdd(itemResult.Get());
+                var item = itemResult.Get();
+                container.UnsafeAdd(item);
             }
         }
         
@@ -61,7 +63,7 @@ namespace FCS_AlterraHub.Extensions
 
                 yield return result;
 
-                var go = result.GetResult();
+                var go = GameObject.Instantiate(result.GetResult());
 
                 if (!go.TryGetComponent(out Pickupable pickupable))
                     pickupable = go.AddComponent<Pickupable>();
@@ -69,6 +71,11 @@ namespace FCS_AlterraHub.Extensions
                 PickupReplacement(pickupable);
                 item.Set(new InventoryItem(pickupable));
             }
+            else
+            {
+                QuickLogger.DebugError("ToInventoryItem: TechType is None ");
+            }
+
 
             yield break;
         }

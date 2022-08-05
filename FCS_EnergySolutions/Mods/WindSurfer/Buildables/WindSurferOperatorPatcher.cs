@@ -226,7 +226,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Buildables
 
             // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
             var lwe = prefab.AddComponent<LargeWorldEntity>();
-            lwe.cellLevel = LargeWorldEntity.CellLevel.Far;
+            lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
 
             // Add constructible
             var constructable = prefab.AddComponent<Constructable>();

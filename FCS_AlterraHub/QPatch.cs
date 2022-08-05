@@ -59,7 +59,10 @@ namespace FCS_AlterraHub
             Mod.LoadAudioFiles();
             
             QuickLogger.DebugLogsEnabled = Configuration.EnableDebugLogs;
-            
+
+            //Create Pings
+            CreatePingTypes();
+
             //Load Prefabs
             AlterraHub.GetPrefabs();
             
@@ -85,13 +88,6 @@ namespace FCS_AlterraHub
             }
 
             BoosterSound = AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "booster.mp3"));
-
-            Mod.AlterraHubStationPingType = WorldHelpers.CreatePingType("Station", "Station",
-                ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "AlterraHubPing.png")));
-
-            Mod.AlterraTransportDronePingType = WorldHelpers.CreatePingType("AlterraTransportDrone",
-                "AlterraTransportDrone", ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "TransportDronePing.png")));
-
             
             var pingMapIconType = Type.GetType("SubnauticaMap.PingMapIcon, SubnauticaMap", false, false);
             if (pingMapIconType != null)
@@ -109,6 +105,19 @@ namespace FCS_AlterraHub
 
             Mod.RegisterVoices();
         }
+
+        /// <summary>
+        /// Must be created before Model Prefabs are loaded
+        /// </summary>
+        private static void CreatePingTypes()
+        {
+            Mod.AlterraHubStationPingType = WorldHelpers.CreatePingType("Station", "Station",
+                ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "AlterraHubPing.png")));
+
+            Mod.AlterraTransportDronePingType = WorldHelpers.CreatePingType("AlterraTransportDrone", "AlterraTransportDrone",
+                ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "TransportDronePing.png")));
+        }
+
         public static Sound BoosterSound { get; set; }
 
 

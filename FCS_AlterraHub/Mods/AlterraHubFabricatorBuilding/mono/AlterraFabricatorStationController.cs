@@ -58,7 +58,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         private readonly GameObject[] _electList = new GameObject[6];
         private Dictionary<string, IDroneDestination> _ports = new();
         private Dictionary<string, Shipment> _pendingPurchase = new();
-        private HashSet<DroneController> _drones = new();
+        internal static HashSet<DroneController> _drones = new();
         private string _st;
         private PortManager _portManager;
         private string _baseID;
@@ -226,14 +226,14 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                 .AddComponent<SecurityGateController>();
             _securityGateController.Initialize();
 
-            WorldHelpers.CreateBeacon(gameObject, Mod.AlterraHubStationPingType,
-                "AlterraHub Fabrication Facility (320m)");
+            //WorldHelpers.CreateBeacon(gameObject, Mod.AlterraHubStationPingType, "AlterraHub Fabrication Facility (320m)");
+            
+            
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseLightsEmissiveController, gameObject, Color.red);
 
             OnGamePlaySettingsLoaded(Mod.GamePlaySettings);
 
             InvokeRepeating(nameof(CheckIfSecurityDoorCanUnlock), 1f, 1f);
-#endif
 
             if(!GameModeUtils.RequiresPower())
             {
@@ -612,7 +612,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                 }
                 else
                 {
-                    var drone = GameObject.FindObjectOfType<DroneController>();
+                    var drone = FindObjectOfType<DroneController>();
                     _drones.Add(drone);
                     drone.LoadData();
                 }

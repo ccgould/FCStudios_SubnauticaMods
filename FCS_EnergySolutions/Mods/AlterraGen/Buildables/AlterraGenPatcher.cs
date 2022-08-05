@@ -71,7 +71,7 @@ namespace FCS_EnergySolutions.Mods.AlterraGen.Buildables
 
                 // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
                 var lwe = prefab.AddComponent<LargeWorldEntity>();
-                lwe.cellLevel = LargeWorldEntity.CellLevel.Far;
+                lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
 
                 // Add constructible
                 var constructable = prefab.AddComponent<Constructable>();
@@ -147,7 +147,7 @@ namespace FCS_EnergySolutions.Mods.AlterraGen.Buildables
 
                 // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
                 var lwe = prefab.AddComponent<LargeWorldEntity>();
-                lwe.cellLevel = LargeWorldEntity.CellLevel.Far;
+                lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
 
                 // Add constructible
                 var constructable = prefab.AddComponent<Constructable>();
@@ -182,6 +182,7 @@ namespace FCS_EnergySolutions.Mods.AlterraGen.Buildables
                 pr.powerFX = pFX;
                 pr.maxOutboundDistance = 15;
                 pr.internalPowerSource = ps;
+                pr.powerSystemPreviewPrefab = solarPowerRelay.powerSystemPreviewPrefab;
 
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<AlterraGenController>();

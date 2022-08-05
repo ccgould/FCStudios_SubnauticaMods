@@ -44,7 +44,7 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
 
         private void UpdateScreen()
         {
-            if (_controller.PlatformTrigger == null) return;
+            if (_controller?.PlatformTrigger == null || _controller?.Manager == null) return;
 
 
             if (!_controller.Manager.HasEnoughPower(FCSElevatorController.POWERUSAGE))

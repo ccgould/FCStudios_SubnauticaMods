@@ -84,6 +84,14 @@ namespace FCS_HomeSolutions.Buildables
                 constructable.model = model;
                 constructable.techType = TechType;
 
+                if (_settings.AllowedOutside)
+                {
+                    // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
+                    var lwe = prefab.AddComponent<LargeWorldEntity>();
+                    lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
+                }
+
+
                 prefab.AddComponent<PrefabIdentifier>().ClassId = ClassID;
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<DecorationController>();

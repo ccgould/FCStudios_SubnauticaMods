@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace FCS_AlterraHub.Model
 {
@@ -14,6 +15,8 @@ namespace FCS_AlterraHub.Model
         float alpha;
         Quaternion originRotation, targetRotation;
         private bool checkIsPlayerIsBehind;
+        public Action OnVisible { get; set; }
+        public Action OnHidden { get; set; }
 
         public void Initialize(GameObject distanceActivator,GameObject lookAtActivator, float distance,bool checkIsPlayerIsBehind = false)
         {
@@ -65,6 +68,7 @@ namespace FCS_AlterraHub.Model
                 {
                     alpha = 1;
                     activeState = true;
+                    OnVisible?.Invoke();
                 }
             }
             else
@@ -73,6 +77,7 @@ namespace FCS_AlterraHub.Model
                 {
                     alpha = -1;
                     activeState = false;
+                    OnHidden?.Invoke();
                 }
             }
             target.alpha = Mathf.Clamp01(target.alpha + alpha * DayNightCycle.main.deltaTime);

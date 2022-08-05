@@ -244,6 +244,14 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
 
         private void UpdateVisibleElements()
         {
+
+            if (Manager == null)
+            {
+                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.red);
+                _status = OreConsumerStatus.None;
+                return;
+            }
+
             if (!IsOperational && _antenna.IsRunning)
             {
                 _antenna.StopMotor();

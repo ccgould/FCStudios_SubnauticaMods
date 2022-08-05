@@ -1,5 +1,5 @@
 ﻿using System;
-using FCS_HomeSolutions.Mods.Replicator.Buildables;
+using FCS_ProductionSolutions.Mods.Replicator.Buildable;
 using HarmonyLib;
 
 namespace FCS_ProductionSolutions.Mods.Replicator.Patches

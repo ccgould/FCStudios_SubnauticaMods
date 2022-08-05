@@ -3,7 +3,6 @@ using System.IO;
 using System.Reflection;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Registration;
-using FCS_HomeSolutions.Mods.Replicator.Buildables;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Buildable;
@@ -14,6 +13,7 @@ using FCS_ProductionSolutions.Mods.DeepDriller.LightDuty.Buildable;
 using FCS_ProductionSolutions.Mods.DeepDriller.Managers;
 using FCS_ProductionSolutions.Mods.HydroponicHarvester.Buildable;
 using FCS_ProductionSolutions.Mods.MatterAnalyzer.Buildable;
+using FCS_ProductionSolutions.Mods.Replicator.Buildable;
 using FCSCommon.Utilities;
 using HarmonyLib;
 using QModManager.API.ModLoading;
@@ -33,6 +33,9 @@ namespace FCS_ProductionSolutions
             FCSAlterraHubService.PublicAPI.RegisterModPack(Mod.ModPackID, Mod.ModBundleName, Assembly.GetExecutingAssembly());
             FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(Mod.ModPackID);
             FCSAlterraHubService.PublicAPI.OnPurge += Mod.Purge;
+
+            CreatePingTypes();
+
             ModelPrefab.Initialize();
 
             AuxPatchers.AdditionalPatching();
@@ -66,9 +69,6 @@ namespace FCS_ProductionSolutions
 
                 var glass = new FcsGlassCraftable();
                 glass.Patch();
-
-                var pingSprite = ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), "DeepDriller_ping.png"));
-                DeepDrillerPingType = WorldHelpers.CreatePingType("Deep Driller","Deep Driller",pingSprite);
                 
                 var deepDriller = new FCSDeepDrillerBuildable();
                 deepDriller.Patch();
@@ -122,6 +122,18 @@ namespace FCS_ProductionSolutions
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
 
             QuickLogger.Info($"Finished Patching");
+        }
+
+        /// <summary>
+        /// Must be created before Model Prefabs are loaded
+        /// </summary>
+        private static void CreatePingTypes()
+        {
+            if (Configuration.IsDeepDrillerEnabled)
+            {
+                var pingSprite = ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), "DeepDriller_ping.png"));
+                DeepDrillerPingType = WorldHelpers.CreatePingType("Deep Driller", "Deep Driller", pingSprite);
+            }
         }
 
         private bool AddROTAOre(string oreName, out TechType techType, List<TechType> techTypes = null)

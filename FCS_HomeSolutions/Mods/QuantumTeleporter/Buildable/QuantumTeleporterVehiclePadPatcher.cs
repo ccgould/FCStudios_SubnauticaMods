@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
@@ -86,6 +87,10 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Buildable
                 constructable.placeMaxDistance = 10;
                 constructable.techType = TechType;
 
+                // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
+                var lwe = prefab.AddComponent<LargeWorldEntity>();
+                lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
+
                 PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = ClassID;
 
@@ -100,6 +105,12 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Buildable
                 QuickLogger.Error(e.Message);
                 return null;
             }
+        }
+
+        public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
+        {
+            gameObject.Set(GetGameObject());
+            yield break;
         }
 
         public override string AssetsFolder { get; } = Mod.GetAssetPath();

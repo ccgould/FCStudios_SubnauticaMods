@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.Buildables;
@@ -84,6 +85,13 @@ namespace FCS_HomeSolutions.Buildables
                 constructable.model = model;
                 constructable.techType = TechType;
 
+                if (_settings.AllowedOutside)
+                {
+                    // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
+                    var lwe = prefab.AddComponent<LargeWorldEntity>();
+                    lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
+                }
+
                 prefab.AddComponent<PrefabIdentifier>().ClassId = ClassID;
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<SignController>();
@@ -98,6 +106,12 @@ namespace FCS_HomeSolutions.Buildables
             }
 
             return null;
+        }
+
+        public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
+        {
+            gameObject.Set(GetGameObject());
+            yield break;
         }
 
         protected override RecipeData GetBlueprintRecipe()

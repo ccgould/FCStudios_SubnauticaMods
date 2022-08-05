@@ -131,7 +131,7 @@ namespace FCS_EnergySolutions.Mods.JetStreamT242.Buildables
             var size = new Vector3(2.493512f, 1.875936f, 1.439421f);
             var center = new Vector3(0.07963049f, 1.088284f, 0f);
 
-            //GameObjectHelpers.AddConstructableBounds(prefab, size, center);
+            GameObjectHelpers.AddConstructableBounds(prefab, size, center);
 
             var model = prefab.FindChild("model");
 
@@ -145,10 +145,10 @@ namespace FCS_EnergySolutions.Mods.JetStreamT242.Buildables
 
             // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
             var lwe = prefab.AddComponent<LargeWorldEntity>();
-            lwe.cellLevel = LargeWorldEntity.CellLevel.Far;
+            lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
 
             // Add constructible
-            var constructable = prefab.AddComponent<Constructable>();
+            var constructable = prefab.GetComponent<Constructable>();
 
             constructable.allowedOutside = true;
             constructable.allowedInBase = true;
@@ -163,12 +163,12 @@ namespace FCS_EnergySolutions.Mods.JetStreamT242.Buildables
 
             PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
             prefabID.ClassId = ClassID;
+            prefab.AddComponent<TechTag>().type = TechType;
 
-            var taskResult = CraftData.GetPrefabForTechTypeAsync(TechType.SolarPanel);
-            yield return taskResult;
 
-            var solarPanel = taskResult.GetResult();
-            PowerRelay solarPowerRelay = solarPanel.GetComponent<PowerRelay>();
+            var result = new TaskResult<GameObject>();
+            yield return CraftData.GetPrefabForTechTypeAsync(TechType.SolarPanel, false, result);
+            PowerRelay solarPowerRelay = result.Get().GetComponent<PowerRelay>();
 
             var ps = prefab.AddComponent<PowerSource>();
             ps.maxPower = 500f;
@@ -183,7 +183,6 @@ namespace FCS_EnergySolutions.Mods.JetStreamT242.Buildables
             pr.internalPowerSource = ps;
             pr.powerSystemPreviewPrefab = solarPowerRelay.powerSystemPreviewPrefab;
 
-            prefab.AddComponent<TechTag>().type = TechType;
             prefab.AddComponent<JetStreamT242Controller>();
 
             gameObject.Set(prefab);

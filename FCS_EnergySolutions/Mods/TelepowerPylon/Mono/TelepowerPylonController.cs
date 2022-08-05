@@ -85,17 +85,17 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             {
                 foreach (ParticleSystem particle in _particles)
                 {
-                    particle.Stop();
+                    particle?.Stop();
                 }
             }
             else
             {
               _baseTelepowerPylonManager =   Manager.Habitat.gameObject.GetComponentInChildren<BaseTelepowerPylonManager>();
+              _baseTelepowerPylonManager?.RegisterPylon(this);
+              Manager?.NotifyByID(TelepowerPylonBuildable.TelepowerPylonTabID, "PylonBuilt");
             }
             InvokeRepeating(nameof(CheckTeleportationComplete), 0.2f, 0.2f);
             InvokeRepeating(nameof(UpdateStatus), 1f, 1f);
-            _baseTelepowerPylonManager.RegisterPylon(this);
-            Manager.NotifyByID(TelepowerPylonBuildable.TelepowerPylonTabID, "PylonBuilt");
         }
 
         private void CheckTeleportationComplete()
@@ -957,9 +957,9 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
                 _allowedToInteract = !hand.IsTool();
 
                 string additionalText =  string.Empty;
-                if (_baseTelepowerPylonManager.GetCurrentMode() == TelepowerPylonMode.PUSH)
+                if (_baseTelepowerPylonManager?.GetCurrentMode() == TelepowerPylonMode.PUSH)
                 {
-                    additionalText = AlterraHub.PowerPerMinute(CalculatePowerUsage() * 60);
+                    additionalText = AlterraHub.PowerPerMinuteDistance(CalculatePowerUsage() * 60);
                 }
 
                 string[] data;

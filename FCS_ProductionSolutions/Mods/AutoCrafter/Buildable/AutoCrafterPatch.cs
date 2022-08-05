@@ -78,7 +78,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Buildable
                 // Add constructible
                 var constructable = prefab.AddComponent<Constructable>();
 
-                constructable.allowedOutside = false;
+                constructable.allowedOutside = true;
                 constructable.allowedInBase = true;
                 constructable.allowedOnGround = true;
                 constructable.allowedOnWall = false;
@@ -140,7 +140,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Buildable
                 // Add constructible
                 var constructable = prefab.AddComponent<Constructable>();
 
-                constructable.allowedOutside = false;
+                constructable.allowedOutside = true;
                 constructable.allowedInBase = true;
                 constructable.allowedOnGround = true;
                 constructable.allowedOnWall = false;

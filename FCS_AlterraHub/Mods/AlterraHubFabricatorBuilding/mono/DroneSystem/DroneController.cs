@@ -41,7 +41,10 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
                 var result = IsTransporting();
                 _beacon.enabled = result;
                 _beacon.SetVisible(result);
-                PingManager.NotifyVisible(_beacon); 
+#if SUBNAUTICA_STABLE
+                       PingManager.NotifyVisible(_beacon);          
+#endif
+
             }
         }
 
@@ -58,7 +61,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
             var lodGroup = gameObject.GetComponentInChildren<LODGroup>();
             lodGroup.size = 4f;
-            _beacon = WorldHelpers.CreateBeacon(gameObject, Mod.AlterraTransportDronePingType, $"Transport Drone", false);
+            _beacon = gameObject.GetComponent<PingInstance>();
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
             IsInitialize = true;
         }
@@ -70,6 +73,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             Initialize();
             InitializeStateMachine();
             _trans = gameObject.transform;
+            AlterraFabricatorStationController._drones.Add(this);
             //InvokeRepeating(nameof(UpdateBeacon),1f,1f);
         }
 
@@ -234,8 +238,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
             return currentType != typeof(IdleState);
         }
-
-
+        
         public void SetDeparturePort(AlterraDronePortController port)
         {
             departurePort = port;

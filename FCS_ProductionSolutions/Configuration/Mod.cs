@@ -8,9 +8,9 @@ using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model.Utilities;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
-using FCS_HomeSolutions.Mods.Replicator.Buildables;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Models;
 using FCS_ProductionSolutions.Mods.HydroponicHarvester.Buildable;
+using FCS_ProductionSolutions.Mods.Replicator.Buildable;
 using FCS_ProductionSolutions.Structs;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
@@ -99,7 +99,7 @@ namespace FCS_ProductionSolutions.Configuration
             ModUtils.LoadSaveData<SaveData>(SaveDataFilename, GetSaveFileDirectory(), (data) =>
             {
                 _saveData = data;
-                //CraftingOperations = _saveData.CraftingOperations;
+                CraftingOperations = _saveData.CraftingOperations;
                 _hydroponicKnownTech = _saveData.HydroponicHarvesterKnownTech;
                 QuickLogger.Info("Save Data Loaded");
                 OnDataLoaded?.Invoke(_saveData);

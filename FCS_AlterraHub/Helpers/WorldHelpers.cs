@@ -440,7 +440,9 @@ namespace FCS_AlterraHub.Helpers
                 pingInstance.SetLabel(label);
                 pingInstance.enabled = isEnable;
             }
+            
             gameObject.SetActive(true);
+
             return pingInstance;
         }
 

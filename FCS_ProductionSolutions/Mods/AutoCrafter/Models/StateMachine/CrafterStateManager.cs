@@ -35,6 +35,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine
         public void LoadFromSave(CrafterCraftingState craftingData)
         {
             SetStates();
+            
             if (_avaliableStates[typeof(CrafterCraftingState)] is CrafterCraftingState t)
             {
                 t._timeLeft = craftingData._timeLeft;

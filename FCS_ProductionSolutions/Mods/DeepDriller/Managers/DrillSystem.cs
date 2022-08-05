@@ -188,6 +188,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
         internal virtual void Start()
         {
             LargeWorldEntity.Register(gameObject);
+
             InvokeRepeating(nameof(UpdateDrillShaftState), .5f, .5f);
             UpdateEmission();
             if (_saveData == null)
@@ -243,7 +244,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
                     OilHandler, 4, 4);
             }
 
-            _ping = WorldHelpers.CreateBeacon(gameObject, QPatch.DeepDrillerPingType, "");
+            _ping = gameObject.GetComponent<PingInstance>();
 
             IsInitialized = true;
         }

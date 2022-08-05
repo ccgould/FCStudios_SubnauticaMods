@@ -70,8 +70,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 #if SUBNAUTICA_STABLE
                         deviceStorage.AddItemToContainer(techType.ToInventoryItemLegacy());
 #else
-                        CoroutineHost.StartCoroutine(
-                            techType.AddTechTypeToContainerUnSafe(deviceStorage.ItemsContainer));
+                        CoroutineHost.StartCoroutine(techType.AddTechTypeToContainerUnSafe(deviceStorage.ItemsContainer));
 #endif
                     }
                 }

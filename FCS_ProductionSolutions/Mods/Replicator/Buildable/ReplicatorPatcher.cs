@@ -11,7 +11,6 @@ using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.Mods.Replicator.Mono;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 using UnityEngine;
@@ -20,9 +19,9 @@ using RecipeData = SMLHelper.V2.Crafting.TechData;
 using Sprite = Atlas.Sprite;
 #endif
 
-namespace FCS_HomeSolutions.Mods.Replicator.Buildables
+namespace FCS_ProductionSolutions.Mods.Replicator.Buildable
 {
-    internal partial class ReplicatorBuildable : Buildable
+    internal partial class ReplicatorBuildable : SMLHelper.V2.Assets.Buildable
     {
         public override TechGroup GroupForPDA { get; } = TechGroup.Miscellaneous;
         public override TechCategory CategoryForPDA { get; } = TechCategory.Misc;
@@ -66,6 +65,14 @@ namespace FCS_HomeSolutions.Mods.Replicator.Buildables
 
                 GameObjectHelpers.AddConstructableBounds(prefab,size,center);
 
+				SubRoot subRoot = prefab.GetComponentInParent<SubRoot>();
+				if (subRoot != null)
+				{
+                    // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
+                    var lwe = prefab.AddComponent<LargeWorldEntity>();
+                    lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
+				}
+                
                 var model = prefab.FindChild("model");
 
                 SkyApplier skyApplier = prefab.AddComponent<SkyApplier>();
@@ -133,6 +140,15 @@ namespace FCS_HomeSolutions.Mods.Replicator.Buildables
 
                 //========== Allows the building animation and material colors ==========// 
 
+
+                SubRoot subRoot = prefab.GetComponentInParent<SubRoot>();
+                if (subRoot == null)
+                {
+                    // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
+                    var lwe = prefab.AddComponent<LargeWorldEntity>();
+                    lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
+                }
+
                 QuickLogger.Debug("Adding Constructible");
 
                 // Add constructible
@@ -151,11 +167,10 @@ namespace FCS_HomeSolutions.Mods.Replicator.Buildables
                 prefabID.ClassId = ClassID;
 
 
-                prefab.SetActive(false);
-                var storageContainer = prefab.AddComponent<ReplicatorSlot>();
-                storageContainer.Initialize(25, 1, 1, FriendlyName, ClassID);
-                storageContainer.enabled = false;
-                prefab.SetActive(true);
+                prefab.AddComponent<ReplicatorSlot>();
+
+                UWEHelpers.CreateStorageContainer(prefab, prefab.FindChild("StorageRoot"), ClassID, FriendlyName, 1, 30);
+
 
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<ReplicatorController>();
