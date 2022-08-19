@@ -29,9 +29,11 @@ namespace FCS_AlterraHub.Systems
         public Action onBalanceUpdated;
         private bool _hasBeenSaved;
         private bool _accountLoaded;
+        private float _time;
 
         public TechType CardTechType { get; set; }
-        
+        public bool IsLoaded { get; private set; }
+
         /// <summary>
         /// Generates a new card number.
         /// </summary>
@@ -171,41 +173,49 @@ namespace FCS_AlterraHub.Systems
         /// <param name="accounts"></param>
         public IEnumerator Load(AccountDetails account)
         {
-
-            try
+            IsLoaded = true;
+            WaitScreen.ManualWaitItem creditMessage = null;
+            if (_accountLoaded)
             {
-                WaitScreen.ManualWaitItem creditMessage = null;
-
-
-                if (_accountLoaded)
-                {
-                    QuickLogger.Debug($"Account already loaded. Canceling load operation for {account.Username}.", true);
-                    yield break;
-                }
-
-                if (account != null)
-                {
-                    _accountDetails = account;
-                    if (account.Version.Equals("2.0"))
-                    {
-                        _accountDetails.Balance = Convert.ToDecimal(EncodeDecode.Decrypt(account.AccountBalance));
-                    }
-
-                    QuickLogger.Debug($"Alterra account loaded for player {account.Username}",true);
-                    QuickLogger.Debug($"{account.Username} | Funds: {_accountDetails.Balance}",true);
-                    QuickLogger.Debug($"{account.Username} | Debt Payed: {_accountDetails.AlterraDebitPayed}",true);
-
-                    _accountLoaded = true;
-
-                    creditMessage = WaitScreen.Add($"Alterra account loaded for player {account.Username}");
-
-                    //WaitScreen.Remove(creditMessage);
-                }
+                QuickLogger.Debug($"Account already loaded. Canceling load operation for {account.Username}.", true);
+                yield break;
             }
-            catch (Exception e)
+
+            if (account != null)
             {
-                QuickLogger.Error($"StackTrace: {e.StackTrace}");
-                QuickLogger.Error($"Message: {e.Message}");
+                _accountDetails = account;
+                if (account.Version.Equals("2.0"))
+                {
+                    _accountDetails.Balance = Convert.ToDecimal(EncodeDecode.Decrypt(account.AccountBalance));
+                }
+
+                QuickLogger.Debug($"Alterra account loaded for player {account.Username}",true);
+                QuickLogger.Debug($"{account.Username} | Funds: {_accountDetails.Balance}",true);
+                QuickLogger.Debug($"{account.Username} | Debt Payed: {_accountDetails.AlterraDebitPayed}",true);
+
+                _accountLoaded = true;
+
+                creditMessage = WaitScreen.Add($"Alterra account loaded for player {account.Username}");
+                QuickLogger.Info("Setting wait timer Credit", true);
+
+                yield return WaitForRealSeconds(2, creditMessage);
+                
+                QuickLogger.Info("Removing Credit", true);
+                WaitScreen.Remove(creditMessage);
+            }            
+
+            yield break;
+        }
+
+
+        IEnumerator WaitForRealSeconds(float seconds,WaitScreen.ManualWaitItem item)
+        {
+            float startTime = Time.realtimeSinceStartup;
+            while (Time.realtimeSinceStartup - startTime < seconds)
+            {
+                var time = Time.realtimeSinceStartup - startTime;
+                item.SetProgress((int)time, Convert.ToInt32(seconds));
+                yield return null;
             }
         }
 
