@@ -8,6 +8,7 @@ using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_StorageSolutions.Configuration;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack;
+using FCS_StorageSolutions.Mods.DataStorageSolutions.Spawnable;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
@@ -80,7 +81,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
         {
             if (IsInitialized) return;
             IsConstructed = true;
-            TabID = Mod.DSSServerTabID;
+            TabID = DSSServerSpawnable.DSSServerTabID;
             _storageAmount = gameObject.GetComponentInChildren<Text>();
 
             _rb = gameObject.GetComponent<Rigidbody>();

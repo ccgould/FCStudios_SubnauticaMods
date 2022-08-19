@@ -465,7 +465,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
 
             if (port == null)
             {
-                QuickLogger.Error("Failed to find hologram port");
+                QuickLogger.DebugError("Failed to find hologram port");
                 return false;
             }
 

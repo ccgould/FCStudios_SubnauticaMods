@@ -233,6 +233,16 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 
             InvokeRepeating(nameof(CheckIfSecurityDoorCanUnlock), 1f, 1f);
 #endif
+
+            if(!GameModeUtils.RequiresPower())
+            {
+                Main.CompleteStation();
+                if (!CardSystem.main.HasBeenRegistered())
+                {
+                    CardSystem.main.CreateUserAccount("Ryley Robinson", "RyleyRobinson4546B", "planet4546B", "4546", 0);
+                }
+            }
+
             yield break;
         }
 

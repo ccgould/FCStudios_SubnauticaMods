@@ -1,6 +1,7 @@
 ﻿using System;
 using FCS_AlterraHub.API;
 using FCS_AlterraHub.Buildables;
+using FCS_StorageSolutions.Mods.DataStorageSolutions.Spawnable;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -36,7 +37,7 @@ namespace FCS_StorageSolutions.Configuration
             }
 
             AlterraStoragePrefab = GetPrefab(Mod.AlterraStoragePrefabName);
-            DSSServerPrefab = GetPrefab(Mod.DSSServerPrefabName);
+            DSSServerPrefab = GetPrefab(DSSServerSpawnable.DSSServerPrefabName);
             DSSTerminalPrefab = GetPrefab(Mod.DSSTerminalPrefabName);
             DSSTransceiverPrefab = GetPrefab(Mod.TransceiverPrefabName);
             DSSWallServerRackPrefab = GetPrefab(Mod.DSSWallServerRackPrefabName);

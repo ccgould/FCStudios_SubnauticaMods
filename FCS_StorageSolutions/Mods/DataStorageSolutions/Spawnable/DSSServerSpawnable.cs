@@ -19,7 +19,14 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Spawnable
     {
         public override string AssetsFolder => Mod.GetAssetFolder();
 
-        public DSSServerSpawnable() : base(Mod.DSSServerClassName, Mod.DSSServerFriendlyName, Mod.DSSServerDescription)
+        public const string DSSServerTabID = "DSV";
+        internal const string DSSServerFriendlyName = "Data Disk";
+        internal const string DSSServerClassName = "DSSServer";
+        internal const string DSSServerPrefabName = "DSS_ServerDataDisc";
+        internal const string DSSServerDescription = "Data Storage for 48 items, formatted to accept all item categories. Place in a Wall Server Rack or Floor Server Rack to connect to Data Storage Network.";
+
+
+        public DSSServerSpawnable() : base(DSSServerClassName, DSSServerFriendlyName, DSSServerDescription)
         {
             OnFinishedPatching += () =>
             {
@@ -85,7 +92,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Spawnable
                 prefab.SetActive(false);
 
                 var storage = prefab.AddComponent<FCSStorage>();
-                storage.Initialize(Mod.DSSServerClassName);
+                storage.Initialize(DSSServerClassName);
                 prefab.SetActive(true);
                 
                 prefab.EnsureComponent<DSSServerController>();

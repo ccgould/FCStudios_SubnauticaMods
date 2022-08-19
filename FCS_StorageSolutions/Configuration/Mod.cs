@@ -9,6 +9,7 @@ using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Transceiver;
+using FCS_StorageSolutions.Mods.DataStorageSolutions.Spawnable;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
@@ -44,12 +45,7 @@ namespace FCS_StorageSolutions.Configuration
 
         internal const string DSSTabID = "DSS";
 
-        public const string DSSServerTabID = "DSV";
-        internal const string DSSServerFriendlyName = "Data Disk";
-        internal const string DSSServerClassName = "DSSServer";
-        internal const string DSSServerPrefabName = "DSS_ServerDataDisc";
-        internal const string DSSServerDescription = "Data Storage for 48 items, formatted to accept all item categories. Place in a Wall Server Rack or Floor Server Rack to connect to Data Storage Network.";
-
+      
         internal const string TransceiverTabID = "DTS";
         internal const string TransceiverFriendlyName = "Transceiver";
         internal const string TransceiverClassName = "DSSTransceiver";
@@ -493,7 +489,7 @@ namespace FCS_StorageSolutions.Configuration
         {
             if (_dssServerTechType == TechType.None)
             {
-                _dssServerTechType = DSSServerClassName.ToTechType();
+                _dssServerTechType = DSSServerSpawnable.DSSServerClassName.ToTechType();
             }
 
             return _dssServerTechType;

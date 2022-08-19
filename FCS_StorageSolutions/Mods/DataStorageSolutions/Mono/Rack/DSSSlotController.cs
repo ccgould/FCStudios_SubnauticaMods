@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Model;
@@ -8,6 +9,7 @@ using FCS_AlterraHub.Mono;
 using FCS_StorageSolutions.Configuration;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Transceiver;
+using FCS_StorageSolutions.Mods.DataStorageSolutions.Spawnable;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -94,6 +96,12 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             ejectBTN.onClick.AddListener((() =>
             {
                 if (_controller == null) return;
+
+                if(!PlayerInteractionHelper.CanPlayerHold(Mod.GetDSSServerTechType()))
+                {
+                    QuickLogger.ModMessage(AlterraHub.InventoryFull());
+                    return;
+                }
 
                 FindServer();
 

@@ -18,6 +18,7 @@ using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 using Object = UnityEngine.Object;
+using UWE;
 #if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
 #else
@@ -172,11 +173,13 @@ namespace FCS_AlterraHub.Configuration
                 // Declare the hashtable reference.
                 List<KnownDevice> addresses;
 
-                // Open the file containing the data that you want to deserialize.
-                FileStream fs = new FileStream(KnownDevicesPath, FileMode.Open);
+                FileStream fs = null;
 
                 try
                 {
+                    // Open the file containing the data that you want to deserialize.
+                    fs = new FileStream(KnownDevicesPath, FileMode.Open);
+
                     BinaryFormatter formatter = new BinaryFormatter();
 
                     addresses = (List<KnownDevice>)formatter.Deserialize(fs);
@@ -189,7 +192,7 @@ namespace FCS_AlterraHub.Configuration
                 }
                 finally
                 {
-                    fs.Close();
+                    fs?.Close();
                 }
 
                 foreach (KnownDevice de in addresses)
@@ -371,9 +374,9 @@ namespace FCS_AlterraHub.Configuration
             });
 
 
-            if (_saveData != null)
+            if (_saveData != null && !CardSystem.main.IsLoaded)
             {
-                CardSystem.main.Load(_saveData.AccountDetails);
+                CoroutineHost.StartCoroutine(CardSystem.main.Load(_saveData.AccountDetails));
             }
         }
         
