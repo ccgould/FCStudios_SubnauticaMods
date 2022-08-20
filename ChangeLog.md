@@ -1,4 +1,25 @@
+# What’s New & Fixed in v1.0.2
+
+## Alterra Hub Mod Suite Fixes
+
+Alterra Hub Mod Suite v1.0.2 is a small patch which contains fixes and changes for getting things ready for future updates and features.
+
+## Added Features
+
+- Juke Box
+- Juke Box Wall Speaker
+- Juke Box Sub Woofer
+
+
+
+## Bug Fixed
+
+- Alterra Storage Solutions: Server rack allowing you to remove server or transceiver from the rack when inventory of the player is full.  
+
+
+
 # What’s New & Changed in v1.0.1
+
 ## Alterra Hub Mod Suite Fixes & Tuning Update
 
 Alterra Hub Mod Suite v1.0.1 contains numerous fixes and small changes to functions that are the bread-and-butter of all minor updates, along with some changes in function to some objects. Some function changes were driven by technical necessity, some by player-interaction, and others from player feedback in tuning.

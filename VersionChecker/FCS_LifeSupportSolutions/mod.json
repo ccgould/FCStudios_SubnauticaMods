@@ -2,11 +2,11 @@
   "Id": "FCSLifeSupportSolutions",
   "DisplayName": "FCS Life Support Solutions",
   "Author": "Field Creators Studios",
-  "Version": "1.0.1.12",
+  "Version": "1.0.1.13",
   "Game": "Subnautica",
   "AssemblyName": "FCS_LifeSupportSolutions.dll",
   "VersionDependencies": {
-    "FCSAlterraHub": "1.0.1.53"
+    "FCSAlterraHub": "1.0.1.91"
   },
   "QModSAM": {
     "DeprecatedMods": [

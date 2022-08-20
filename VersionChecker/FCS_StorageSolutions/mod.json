@@ -2,11 +2,11 @@
   "Id": "FCSStorageSolutions",
   "DisplayName": "FCS Storage Solutions",
   "Author": "Field Creators Studios",
-  "Version": "1.0.1.19",
+  "Version": "1.0.1.26",
   "Game": "Subnautica",
   "AssemblyName": "FCS_StorageSolutions.dll",
   "VersionDependencies": {
-    "FCSAlterraHub": "1.0.1.53"
+    "FCSAlterraHub": "1.0.1.91"
   },
   "QModSAM": {
     "DeprecatedMods": [
