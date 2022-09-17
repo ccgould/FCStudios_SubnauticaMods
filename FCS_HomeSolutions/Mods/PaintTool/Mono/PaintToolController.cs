@@ -204,7 +204,7 @@ namespace FCS_HomeSolutions.Mods.PaintTool.Mono
 
                 if (result)
                 {
-                    if (GameModeUtils.RequiresPower() && _colorTargetMode != ColorTargetMode.Emission)
+                    if (UWEHelpers.RequiresPower() && _colorTargetMode != ColorTargetMode.Emission)
                     {
                         _paintCanFillAmount -= 1;
                     }
@@ -365,7 +365,7 @@ namespace FCS_HomeSolutions.Mods.PaintTool.Mono
 
         public override bool OnRightHandDown()
         {
-            if (_paintCanFillAmount > 0 || !GameModeUtils.RequiresPower())
+            if (_paintCanFillAmount > 0 || !UWEHelpers.RequiresPower())
             {
                 Paint();
             }

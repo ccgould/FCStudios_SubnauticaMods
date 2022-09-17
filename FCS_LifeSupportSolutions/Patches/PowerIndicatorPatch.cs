@@ -54,7 +54,7 @@ namespace FCS_LifeSupportSolutions.Patches
         public void ToggleVisibility()
         {
             if (Survival_GetWeaknessSpeedScalar.PlayerAdrenaline == null) return;
-            gameObject.SetActive(GameModeUtils.RequiresSurvival() && Survival_GetWeaknessSpeedScalar.PlayerAdrenaline.HasAdrenaline);
+            gameObject.SetActive(UWEHelpers.RequiresSurvival() && Survival_GetWeaknessSpeedScalar.PlayerAdrenaline.HasAdrenaline);
         }
     }
 }

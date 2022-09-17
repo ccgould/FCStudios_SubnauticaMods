@@ -12,12 +12,12 @@ using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Interfac
 using FCS_AlterraHub.Mods.FCSPDA.Mono;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
-using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
 using Story;
 using UnityEngine;
+using FCS_AlterraHub.Mods.Common;
 #if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
 #else
@@ -54,26 +54,18 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         private GeneratorController _generator;
         private MotorHandler _motor;
         private AntennaController _antenna;
-
         private readonly GameObject[] _electList = new GameObject[6];
-        private Dictionary<string, IDroneDestination> _ports = new();
-        private Dictionary<string, Shipment> _pendingPurchase = new();
-        private HashSet<DroneController> _drones = new();
         private string _st;
-        private PortManager _portManager;
         private string _baseID;
         private Transform _warpTrans;
-        private int MAXDRONECOUNT = 1;
         private float lodBias;
         private PingInstance _ping;
-        private Shipment _currentOrder;
         private bool _gamePlaySettingsLoaded;
         private SecurityBoxTrigger _securityBoxTrigger;
         private SecurityGateController _securityGateController;
-        private bool _completePendingOrder;
         private FCSGamePlaySettings _fcsGamePlaySettings;
         private bool _isBaseOn;
-
+        private DroneDeliveryService _deliveryDroneService;
 
         private void Update()
         {
@@ -233,8 +225,9 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 
             InvokeRepeating(nameof(CheckIfSecurityDoorCanUnlock), 1f, 1f);
 #endif
+            _deliveryDroneService = gameObject.EnsureComponent<DroneDeliveryService>();
 
-            if(!GameModeUtils.RequiresPower())
+            if (!UWEHelpers.RequiresPower())
             {
                 Main.CompleteStation();
                 if (!CardSystem.main.HasBeenRegistered())
@@ -381,28 +374,18 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                 TurnOnBase();
             }
 
-            _currentOrder = settings.CurrentOrder;
+            _deliveryDroneService.SetCurrentOrder(settings.CurrentOrder);
 
 
-            if (!string.IsNullOrWhiteSpace(_currentOrder?.OrderNumber))
+            if (!string.IsNullOrWhiteSpace(_deliveryDroneService.GetCurrentOrder()?.OrderNumber))
             {
-                FCSPDAController.Main.AddShipment(_currentOrder);
-                _completePendingOrder = true;
+                FCSPDAController.Main.AddShipment(_deliveryDroneService.GetCurrentOrder());
+                _deliveryDroneService.SetCompletePendingOrder(true);
             }
 
-            _pendingPurchase = ConvertPendingPurchase(settings.PendingPurchases) ?? _pendingPurchase;
-
-            if (_pendingPurchase != null)
-            {
-                foreach (KeyValuePair<string, Shipment> shipment in _pendingPurchase)
-                {
-                    FCSPDAController.Main.AddShipment(shipment.Value);
-                }
-            }
+            _deliveryDroneService.SetPendingPurchase(settings.PendingPurchases);
 
             UpdateBeaconState(settings.FabStationBeaconVisible, settings.FabStationBeaconColorIndex);
-
-            InvokeRepeating(nameof(TryShip), 1f, 1f);
 
             _gamePlaySettingsLoaded = true;
 
@@ -413,29 +396,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             }
 
             Mod.GamePlaySettings.IsStationSpawned = true;
-        }
-
-
-
-        private Dictionary<string, Shipment> ConvertPendingPurchase(Dictionary<string, Shipment> pendingPurchases)
-        {
-            if (pendingPurchases == null) return null;
-
-            var result = new Dictionary<string, Shipment>();
-
-            foreach (var purchase in pendingPurchases)
-            {
-                var station = FCSAlterraHubService.PublicAPI.FindDeviceWithPreFabID(purchase.Value.PortPrefabID);
-                result.Add(purchase.Key, new Shipment
-                {
-                    PortPrefabID = purchase.Value.PortPrefabID,
-                    Port = (AlterraDronePortController)station.Value,
-                    CartItems = purchase.Value.CartItems.ToList(),
-                    OrderNumber = purchase.Key
-                });
-            }
-
-            return result;
         }
 
         private void TurnOnLights()
@@ -481,267 +441,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             }
         }
 
-        public void PendAPurchase(AlterraDronePortController port, CartDropDownHandler cartItem)
-        {
-            PendAPurchase(port, cartItem.Save().ToList());
-        }
-
-        public void PendAPurchase(AlterraDronePortController port, List<CartItemSaveData> cartItem)
-        {
-            var orderNumber = Guid.NewGuid().ToString("n").Substring(0, 8);
-            var shipment = new Shipment
-            {
-                CartItems = cartItem,
-                OrderNumber = orderNumber,
-                Port = port,
-                PortPrefabID = port.GetPrefabID()
-            };
-            _pendingPurchase.Add(orderNumber, shipment);
-
-            FCSPDAController.Main.AddShipment(shipment);
-
-            SavePendingPurchase();
-        }
-
-        private void SavePendingPurchase()
-        {
-            Mod.GamePlaySettings.PendingPurchases = _pendingPurchase;
-        }
-
-        internal IDroneDestination GetAssignedPort(string prefabID)
-        {
-            return Mod.GamePlaySettings.DronePortAssigns.ContainsKey(prefabID)
-                ? _ports.ElementAt(Mod.GamePlaySettings.DronePortAssigns[prefabID]).Value
-                : null;
-        }
-
-        public void TryShip()
-        {
-            SpawnMissingDrones();
-
-            if (_completePendingOrder && _drones.Any())
-            {
-                _drones.ElementAt(0).LoadData();
-                _completePendingOrder = false;
-            }
-
-
-            if (!LargeWorldStreamer.main.IsWorldSettled() || _pendingPurchase.Count <= 0) return;
-
-            for (int i = _pendingPurchase.Count - 1; i >= 0; i--)
-            {
-                if (_drones.Count <= 0)
-                {
-                    ResetDrones();
-                }
-
-                foreach (DroneController drone in _drones)
-                {
-                    var purchase = _pendingPurchase.ElementAt(i);
-                    if (purchase.Key is null)
-                    {
-                        foreach (CartItemSaveData cartItemSaveData in purchase.Value.CartItems)
-                        {
-                            cartItemSaveData.Refund();
-                        }
-
-                        _pendingPurchase.Remove(purchase.Key);
-                        return;
-                    }
-
-                    if (drone is null)
-                    {
-                        SpawnMissingDrones(true);
-                        continue;
-                    }
-
-                    if (!drone.AvailableForTransport()) continue;
-
-                    if (drone.ShipOrder(purchase.Value.Port))
-                    {
-                        _currentOrder = purchase.Value;
-                        _pendingPurchase.Remove(purchase.Key);
-
-                        VoiceNotificationSystem.main.ShowSubtitle($"{AlterraHub.OrderBeingShipped()} {purchase.Value.Port.GetBaseName()}"); 
-
-                        Mod.GamePlaySettings.CurrentOrder = _currentOrder;
-                    }
-
-                    if (_pendingPurchase.Count <= 0) break;
-                }
-            }
-
-            SavePendingPurchase();
-        }
-
-        private void SpawnMissingDrones(bool clearDrones = false)
-        {
-            if (!_gamePlaySettingsLoaded)
-            {
-                return;
-            }
-
-            if (clearDrones)
-            {
-                ResetDrones();
-                _drones?.Clear();
-                _drones ??= new HashSet<DroneController>();
-            }
-
-
-            if (_drones.Count < MAXDRONECOUNT)
-            {
-                if (!Mod.GamePlaySettings.TransDroneSpawned)
-                {
-                    if (MAXDRONECOUNT > _ports.Count)
-                    {
-                        MAXDRONECOUNT = _ports.Count;
-                    }
-
-                    for (int i = 0; i < MAXDRONECOUNT; i++)
-                    {
-#if SUBNAUTICA_STABLE
-                        var drone = _ports.ElementAt(i).Value.SpawnDrone();
-                        _drones.Add(drone);
-                        drone.LoadData();
-#else
-                        _ports.ElementAt(i).Value.SpawnDrone(drone =>
-                        {
-                            _drones.Add(drone);
-                            drone.LoadData();
-                        });
-#endif
-                    }
-                }
-                else
-                {
-                    var drone = GameObject.FindObjectOfType<DroneController>();
-                    _drones.Add(drone);
-                    drone.LoadData();
-                }
-            }
-        }
-
-        internal void ResetDrones()
-        {
-            var drones = GameObject.FindObjectsOfType<DroneController>();
-
-            foreach (DroneController controller in drones)
-            {
-                DestroyImmediate(controller.gameObject);
-            }
-
-            ClearDronesList();
-
-            foreach (KeyValuePair<string, Shipment> shipment in _pendingPurchase)
-            {
-                FCSPDAController.Main.RemoveShipment(shipment.Value);
-                foreach (CartItemSaveData cartItem in shipment.Value.CartItems)
-                {
-                    cartItem.Refund();
-                }
-            }
-            
-            Mod.GamePlaySettings.TransDroneSpawned = false; 
-
-            SpawnMissingDrones();
-        }
-
-        internal void ClearShipmentData()
-        {
-            _pendingPurchase.Clear();
-
-            if (_currentOrder != null)
-            {
-                foreach (CartItemSaveData cartItem in _currentOrder.CartItems)
-                {
-                    cartItem.Refund();
-                }
-                FCSPDAController.Main.RemoveShipment(_currentOrder);
-                _currentOrder = new Shipment();
-            }
-
-
-            Mod.GamePlaySettings.CurrentOrder = null;
-            Mod.GamePlaySettings.PendingPurchases = new Dictionary<string, Shipment>();
-        }
-
-        private void ClearDronesList()
-        {
-            _drones ??= new HashSet<DroneController>();
-            _drones.Clear();
-        }
-
-        public IEnumerable<AlterraTransportDroneEntry> SaveDrones()
-        {
-            var drones = GameObject.FindObjectsOfType<DroneController>();
-
-            foreach (DroneController drone in drones)
-            {
-                yield return drone.Save();
-            }
-        }
-
-        public bool IsStationPort(string dockedPort)
-        {
-            if (string.IsNullOrWhiteSpace(dockedPort)) return false;
-
-            foreach (var port in _ports)
-            {
-                if (port.Value.GetPrefabID().Equals(dockedPort))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public bool IsStationBaseID(string dockedPort)
-        {
-            
-            return _portManager.GetBaseID().Equals(dockedPort);
-        }
-
-        public bool IsStationPort(IDroneDestination dockedPort)
-        {
-           return IsStationPort(dockedPort.GetPrefabID());
-        }
-
-        public IDroneDestination FindPort(int port)
-        {
-            if (_portManager == null)
-            {
-                FindPortManager();
-            }
-
-            CreatePorts();
-
-            return _portManager.FindPort(port);
-        }
-
-        private void CreatePorts()
-        {
-            if (_ports?.Count > 0) return;
-            var ports = GameObjectHelpers.FindGameObjects(gameObject, "DronePortPad_HubWreck", SearchOption.StartsWith)
-                .ToArray();
-            for (int i = 0; i < 1; i++) // forcing to only make one port
-            {
-                var portController = ports.ElementAt(i).AddComponent<AlterraDronePortController>();
-                portController.SetPortID(i);
-                _ports.Add($"Port_{i}", portController);
-                portController.Initialize();
-            }
-        }
-
-        private void FindPortManager()
-        {
-            if (_portManager == null)
-            {
-                _portManager = gameObject.GetComponent<PortManager>();
-            }
-        }
-
         public string GetPrefabId()
         {
             if (string.IsNullOrWhiteSpace(_baseID))
@@ -757,45 +456,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         {
             Player.main.SetPosition(_warpTrans.position);
             Player.main.OnPlayerPositionCheat();
-        }
-
-        public Shipment GetCurrentOrder()
-        {
-            return _currentOrder;
-        }
-
-        public AlterraDronePortController GetOpenPort()
-        {
-            return _portManager?.GetOpenPort();
-        }
-
-        public void ClearCurrentOrder()
-        {
-            FCSPDAController.Main.RemoveShipment(_currentOrder);
-            _currentOrder = new Shipment();
-            Mod.GamePlaySettings.CurrentOrder = new Shipment();
-        }
-
-        public void CancelOrder(Shipment pendingOrder)
-        {
-            if (_pendingPurchase.ContainsKey(pendingOrder.OrderNumber))
-            {
-                _pendingPurchase.Remove(pendingOrder.OrderNumber);
-            }
-        }
-
-        public float GetOrderCompletionPercentage(string orderNumber)
-        {
-            if (string.IsNullOrWhiteSpace(_currentOrder.OrderNumber)) return 0f;
-            return _currentOrder.OrderNumber.Equals(orderNumber) ? _drones.ElementAt(0).GetCompletionPercentage() : 0f;
-        }
-
-        public bool IsCurrentOrder(string orderNumber)
-        {
-
-            if (_currentOrder == null ||string.IsNullOrWhiteSpace(_currentOrder?.OrderNumber) || string.IsNullOrWhiteSpace(orderNumber))
-                return false;
-            return _currentOrder.OrderNumber.Equals(orderNumber);
         }
 
         public PingInstance GetPing()
@@ -815,15 +475,16 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             Mod.GamePlaySettings.AlterraHubDepotDoors.SecurityDoors = _securityGateController.GetHealth();
             Mod.GamePlaySettings.AlterraHubDepotPowercellSlot = _generator.Save().ToList();
             Mod.GamePlaySettings.IsPDAUnlocked = DetermineIfUnlocked();
-            Mod.GamePlaySettings.CurrentOrder = _currentOrder;
+            Mod.GamePlaySettings.CurrentOrder = _deliveryDroneService.GetCurrentOrder();
             Mod.GamePlaySettings.BreakerOn = _isBaseOn;
             Mod.GamePlaySettings.FixedPowerBoxes = _antenna.Save().ToHashSet();
-            Mod.GamePlaySettings.TransDroneSpawned = _drones.Any();
+            Mod.GamePlaySettings.TransDroneSpawned = _deliveryDroneService.GetDrones().Any();
             QuickLogger.Debug("Saving Station Complete");
         }
 
         public void CompleteStation()
         {
+#if SUBNAUTICA
             UpdateBeaconState(false);
             foreach (var keyPadAccessController in _keyPads)
             {
@@ -835,14 +496,20 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             _isBaseOn = true;
             _antenna.CompleteObjective();
             TurnOnBase();
+#endif
             QuickLogger.Debug("Station Object Complete");
         }
 
         public bool DetermineIfUnlocked()
         {
-            return _isBaseOn && _keyPads[0].IsUnlocked() && _keyPads[1].IsUnlocked() && _keyPads[2].IsUnlocked() &&
+#if SUBNAUTICA
+                        return _isBaseOn && _keyPads[0].IsUnlocked() && _keyPads[1].IsUnlocked() && _keyPads[2].IsUnlocked() &&
                    _securityGateController.IsUnlocked() && _antenna.IsAllElectricalBoxesFixed() &&
                    _antenna.IsUnlocked();
+#else
+            return true;
+#endif
+
         }
 
         public void MakeStationDirty()
@@ -859,27 +526,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             _antenna.MakeDirty();
             QuickLogger.Debug("Station Object UnComplete");
         }
-    }
 
-    internal class Shipment
-    {
-        public string PortPrefabID { get; set; }
-        private AlterraDronePortController _port;
-        internal AlterraDronePortController Port
-        {
-            get
-            {
-                if (_port == null && !string.IsNullOrWhiteSpace(PortPrefabID))
-                {
-                    _port = BaseManager.FindPort(PortPrefabID);
-                }
-
-                return _port;
-            }
-            set => _port = value;
-        }
-
-        public List<CartItemSaveData> CartItems { get; set; }
-        public string OrderNumber { get; set; }
+        public DroneDeliveryService GetDeliveryService() => _deliveryDroneService;
     }
 }

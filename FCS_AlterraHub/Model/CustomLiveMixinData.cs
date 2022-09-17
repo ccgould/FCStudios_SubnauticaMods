@@ -22,11 +22,12 @@ namespace FCS_AlterraHub.Model
             _instance.electricalDamageEffect = null;
 #if SUBNAUTICA_STABLE
             _instance.explodeOnDestroy = false;
+            _instance.invincibleInCreative = false;
 #elif BELOWZERO
             _instance.sendKillOnDeath = false;
             _instance.repairRequiresMaterials = false;
 #endif
-            _instance.invincibleInCreative = false;
+            
             _instance.knifeable = false;
             _instance.loopEffectBelowPercent = 0;
             _instance.loopingDamageEffect = null;
@@ -84,7 +85,7 @@ namespace FCS_AlterraHub.Model
                 data.destroyOnDeath = destroyOnDeath;
                 data.electricalDamageEffect = electricalDamageEffect;
                 data.sendKillOnDeath = sendKillOnDeath;
-                data.invincibleInCreative = invincibleInCreative;
+                //data.invincibleInCreative = invincibleInCreative;
                 data.knifeable = knifeable;
                 data.repairRequiresMaterials = repairRequiresMaterials;
                 data.loopEffectBelowPercent = loopEffectBelowPercent;

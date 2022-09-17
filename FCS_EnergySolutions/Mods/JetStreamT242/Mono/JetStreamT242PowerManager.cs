@@ -69,7 +69,7 @@ namespace FCS_EnergySolutions.Mods.JetStreamT242.Mono
                 return;
             }
 
-            if (GameModeUtils.RequiresPower())
+            if (UWEHelpers.RequiresPower())
             {
                 _time -= DayNightCycle.main.deltaTime;
                 var addPowerInterval = AddPowerInterval * DayNightCycle.main.dayNightSpeed;

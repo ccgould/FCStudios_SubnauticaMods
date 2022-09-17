@@ -148,8 +148,8 @@ namespace FCS_AlterraHub.Configuration
         [ConsoleCommand("ResetTransportDrones")]
         public static string ResetTransportDrones()
         {
-            AlterraFabricatorStationController.Main.ResetDrones();
-            AlterraFabricatorStationController.Main.ClearShipmentData();
+            AlterraFabricatorStationController.Main.GetDeliveryService().ResetDrones();
+            AlterraFabricatorStationController.Main.GetDeliveryService().ClearShipmentData();
 
             return $"Drones reset!";
         }        

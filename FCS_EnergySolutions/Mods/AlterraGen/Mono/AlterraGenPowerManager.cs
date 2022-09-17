@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Managers;
 using FCS_AlterraHub.Mono;
@@ -33,7 +34,7 @@ namespace FCS_EnergySolutions.Mods.AlterraGen.Mono
         {
             get
             {
-                var value = _mono != null && _mono.IsConstructed && _container.Count > 0 && PowerState != FCSPowerStates.Tripped && GameModeUtils.RequiresPower();
+                var value = _mono != null && _mono.IsConstructed && _container.Count > 0 && PowerState != FCSPowerStates.Tripped && UWEHelpers.RequiresPower();
                 return value;
             }
         }

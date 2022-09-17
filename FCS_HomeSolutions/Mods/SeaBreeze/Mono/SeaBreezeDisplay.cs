@@ -329,7 +329,7 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Mono
         internal void UpdateVisuals(PowercellData data)
         {
             
-            var charge = GameModeUtils.RequiresPower() ? data.GetCharge() : data.GetCapacity();
+            var charge = UWEHelpers.RequiresPower() ? data.GetCharge() : data.GetCapacity();
 
             float percent = charge / data.GetCapacity();
             

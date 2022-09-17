@@ -1,4 +1,5 @@
-﻿using FCS_HomeSolutions.Mods.QuantumTeleporter.Enumerators;
+﻿using FCS_AlterraHub.Helpers;
+using FCS_HomeSolutions.Mods.QuantumTeleporter.Enumerators;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Interface;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -53,7 +54,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
 
         public bool HasEnoughPower(QTTeleportTypes selectedTab)
         {
-            bool requiresEnergy = GameModeUtils.RequiresPower();
+            bool requiresEnergy = UWEHelpers.RequiresPower();
 
             if (!requiresEnergy) return true;
 

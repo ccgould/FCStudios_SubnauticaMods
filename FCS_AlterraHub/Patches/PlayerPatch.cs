@@ -123,7 +123,10 @@ namespace FCS_AlterraHub.Patches
         [HarmonyPostfix]
         private static void GetPDA_Postfix(Player __instance)
         {
-            if(FCSPDA != null) MoveFcsPdaIntoPosition(FCSPDA.gameObject);
+            if (FCSPDA != null)
+            {
+                MoveFcsPdaIntoPosition(FCSPDA.gameObject);
+            }
         }
 
         [HarmonyPatch(typeof(Player), nameof(Player.OnProtoSerialize))]
@@ -136,8 +139,14 @@ namespace FCS_AlterraHub.Patches
         
         private static void MoveFcsPdaIntoPosition(GameObject pda)
         {
-            if (defPDA == null) return;
+            if (defPDA == null)
+            {
+                QuickLogger.Info("defPDA is null");
+                return;
+            }
             if (pda.transform.position == defPDA.transform.position) return;
+
+            QuickLogger.Info("Move the FCS PDA");
             // Move the FCS PDA
             pda.transform.SetParent(defPDA.gameObject.transform.parent, false);
             Utils.ZeroTransform(pda.transform);
@@ -149,7 +158,7 @@ namespace FCS_AlterraHub.Patches
 #if SUBNAUTICA
             yield return new WaitUntil(() => player.pdaSpawn.spawnedObj != null);
 #else
-            yield return new WaitUntil(() => player.pda.prefabScreen != null);
+            yield return new WaitUntil(() => player.pda.gameObject != null);
 #endif
 
             QuickLogger.Debug("Creating FCS PDA");
@@ -157,7 +166,7 @@ namespace FCS_AlterraHub.Patches
 #if SUBNAUTICA
             defPDA = player.pdaSpawn.spawnedObj;
 #else
-            defPDA = player.pda.prefabScreen;
+            defPDA = player.pda.gameObject;
 #endif
 
             var pda = GameObject.Instantiate(AlterraHub.FcsPDAPrefab, default, default, true);

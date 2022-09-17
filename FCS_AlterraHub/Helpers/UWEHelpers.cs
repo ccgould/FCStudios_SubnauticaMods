@@ -1,6 +1,7 @@
 ﻿using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
+using System;
 using UnityEngine;
 #if SUBNAUTICA
 using RecipeData = SMLHelper.V2.Crafting.TechData;
@@ -48,6 +49,15 @@ namespace FCS_AlterraHub.Helpers
             prefab.SetActive(true);
 
             return storage;
+        }
+
+        public static bool RequiresSurvival()
+        {
+#if SUBNAUTICA
+return GameModeUtils.RequiresSurvival();
+#else 
+            return GameModeManager.GetOption<bool>(GameOption.Story);
+#endif
         }
 
 
@@ -98,6 +108,25 @@ namespace FCS_AlterraHub.Helpers
                 }
             }
             return true;
+        }
+
+
+        public static bool RequiresPower()
+        {
+#if SUBNAUTICA
+return GameModeUtils.RequiresPower();
+#else 
+            return GameModeManager.GetOption<bool>(GameOption.TechnologyRequiresPower);
+#endif
+        }
+
+        public static bool RequiresIngredients()
+        {
+#if SUBNAUTICA
+return GameModeUtils.RequiresIngredients();
+#else 
+            return GameModeManager.GetOption<bool>(GameOption.CraftingRequiresResources);
+#endif
         }
     }
 }

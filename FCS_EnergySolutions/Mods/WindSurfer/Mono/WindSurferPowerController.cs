@@ -49,7 +49,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
                 return;
             }
 
-            if (GameModeUtils.RequiresPower())
+            if (UWEHelpers.RequiresPower())
             {
                 _time -= DayNightCycle.main.deltaTime;
 

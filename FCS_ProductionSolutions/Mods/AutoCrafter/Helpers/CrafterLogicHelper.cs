@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using FCS_AlterraHub.Helpers;
 using QModManager.API;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
@@ -22,7 +23,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Helpers
             }
 
 
-            if (GameModeUtils.RequiresBlueprints())
+            if (UWEHelpers.RequiresIngredients())
             {
                 if (!QModServices.Main.ModPresent("UITweaks"))
                 {

@@ -192,7 +192,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         {
             if (destinationPort == null)
             {
-                destinationPort = AlterraFabricatorStationController.Main.GetOpenPort();
+                destinationPort = AlterraFabricatorStationController.Main.GetDeliveryService().GetOpenPort();
             }
             return destinationPort;
         }
@@ -223,7 +223,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
         internal bool AvailableForTransport()
         {
-            return !IsTransporting() && AlterraFabricatorStationController.Main.IsStationPort(GetCurrentPort());
+            return !IsTransporting() && AlterraFabricatorStationController.Main.GetDeliveryService().IsStationPort(GetCurrentPort());
         }
 
         private bool IsTransporting()
@@ -255,7 +255,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
                 {
                     QuickLogger.Debug("Destination Port not null", true);
 
-                    if (!AlterraFabricatorStationController.Main.IsStationBaseID(data.DestinationBaseID))
+                    if (!AlterraFabricatorStationController.Main.GetDeliveryService().IsStationBaseID(data.DestinationBaseID))
                     {
                         BaseManager.FindManager(data.DestinationBaseID, result =>
                         {
@@ -265,7 +265,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
                             var state = StateFactory.GetState(data.State);
                             QuickLogger.Debug($"Setting State: {state.Name}", true);
 
-                            if (state.GetType() == typeof(IdleState) && destinationPort != null && !AlterraFabricatorStationController.Main.IsStationPort(destinationPort))
+                            if (state.GetType() == typeof(IdleState) && destinationPort != null && !AlterraFabricatorStationController.Main.GetDeliveryService().IsStationPort(destinationPort))
                             {
                                 ShipOrder(destinationPort);
                             }

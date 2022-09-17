@@ -7,6 +7,7 @@ using FCS_ProductionSolutions.Mods.AutoCrafter.Helpers;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Patches;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Handlers;
+using FCS_AlterraHub.Helpers;
 #if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
 #else
@@ -219,7 +220,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
         private void ConsumeIngredients(Dictionary<TechType, int> consumable)
         {
             QuickLogger.Debug("Consume Ingredients", true);
-            if (GameModeUtils.RequiresIngredients())
+            if (UWEHelpers.RequiresIngredients())
             {
                 QuickLogger.Debug("------------------------------------------------------------", true);
                 foreach (KeyValuePair<TechType, int> valuePair in consumable)
@@ -314,7 +315,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
             _toCraftItems.Clear();
             GetRequiredItems(techType);
 
-            if (!GameModeUtils.RequiresIngredients())
+            if (!UWEHelpers.RequiresIngredients())
             {
                 return true;
             }

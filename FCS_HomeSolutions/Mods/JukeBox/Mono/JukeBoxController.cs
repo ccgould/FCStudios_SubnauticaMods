@@ -394,7 +394,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
 
         public override float GetPowerUsage()
         {
-            if (!GameModeUtils.RequiresPower())
+            if (!UWEHelpers.RequiresPower())
             {
                 return 0f;
             }

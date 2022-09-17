@@ -13,12 +13,13 @@ using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
-using FMOD;
+
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 using Object = UnityEngine.Object;
 using UWE;
+using FMOD;
 #if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
 #else
@@ -324,7 +325,7 @@ namespace FCS_AlterraHub.Configuration
 
                 if (AlterraFabricatorStationController.Main != null)
                 {
-                    foreach (AlterraTransportDroneEntry entry in AlterraFabricatorStationController.Main.SaveDrones())
+                    foreach (AlterraTransportDroneEntry entry in AlterraFabricatorStationController.Main.GetDeliveryService().SaveDrones())
                     {
                         if(entry != null)
                             newSaveData.AlterraTransportDroneEntries.Add(entry);
@@ -442,11 +443,11 @@ namespace FCS_AlterraHub.Configuration
 
         public static void LoadAudioFiles()
         {
-            AudioClips.Add("AH-Mission01-Pt1",AudioUtils.CreateSound(Path.Combine(GetAssetPath(), "Audio", "AH-Mission01-Pt1.wav")));
-            AudioClips.Add("AH-Mission01-Pt2",AudioUtils.CreateSound(Path.Combine(GetAssetPath(), "Audio", "AH-Mission01-Pt2.wav")));
-            AudioClips.Add("AH-Mission01-Pt3",AudioUtils.CreateSound(Path.Combine(GetAssetPath(), "Audio", "AH-Mission01-Pt3.wav")));
+            AudioClips.Add("AH-Mission01-Pt1", AudioUtils.CreateSound(Path.Combine(GetAssetPath(), "Audio", "AH-Mission01-Pt1.wav")));
+            AudioClips.Add("AH-Mission01-Pt2", AudioUtils.CreateSound(Path.Combine(GetAssetPath(), "Audio", "AH-Mission01-Pt2.wav")));
+            AudioClips.Add("AH-Mission01-Pt3", AudioUtils.CreateSound(Path.Combine(GetAssetPath(), "Audio", "AH-Mission01-Pt3.wav")));
         }
-        
+
         public static PingType AlterraHubStationPingType { get; set; }
         public static TechType DronePortPadHubNewTechType { get; set; }
         public static TechType AlterraTransportDroneTechType { get; set; }

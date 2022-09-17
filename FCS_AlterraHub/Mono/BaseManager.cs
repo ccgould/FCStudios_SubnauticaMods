@@ -458,7 +458,7 @@ namespace FCS_AlterraHub.Mono
                 //QuickLogger.DebugError("Habitat is null");
             }
 
-            if (!GameModeUtils.RequiresPower()) return true;
+            if (!UWEHelpers.RequiresPower()) return true;
 
             if (Habitat.powerRelay == null || Habitat.powerRelay.GetPower() < power) return false;
             return true;

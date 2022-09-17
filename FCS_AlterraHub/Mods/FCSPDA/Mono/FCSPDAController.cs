@@ -106,6 +106,88 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             }
         }
 
+
+        public bool Open()
+        {
+            QuickLogger.Debug("PDA Open : 1");
+
+            Player main = Player.main;
+
+            main.GetPDA().sequence.ForceState(true);
+
+            PlayAppropriateVoiceMessage();
+
+            TryRemove404Screen();
+
+            RefreshTeleportationPage();
+
+            CreateScreen();
+
+            FindPDA();
+
+            ChangePDAVisibility(false);
+
+            AttemptToOpenReturnsDialog();
+
+            UpdateDisplay();
+
+            DOFOperations();
+
+            SetPDAInUse(true);
+
+            if (!DetemineIfInCinematicMode(main)) return false;
+
+            SetRequiredParametersToOpenPDA();
+
+            QuickLogger.Debug("FCS PDA Is Open", true);
+            return true;
+        }
+
+
+
+        public void Close()
+        {
+            IsOpen = false;
+
+            ChangePDAVisibility(true);
+            gameObject.SetActive(false);
+            SetPDAInUse(false);
+            Player main = Player.main;
+            main.GetPDA().sequence.ForceState(false);
+            MainCameraControl.main.ResetLockedVRViewModelAngle();
+            _screen.SetActive(false);
+            Vehicle vehicle = main.GetVehicle();
+            if (vehicle != null)
+            {
+                uGUI.main.quickSlots.SetTarget(vehicle);
+            }
+
+            _accountPageHandler.Close();
+
+
+#if SUBNAUTICA_STABLE
+            MainGameController.Instance.PerformGarbageAndAssetCollection();
+#else
+            MainGameController.Instance.PerformIncrementalGarbageCollection();
+#endif
+            HandReticle.main?.UnrequestCrosshairHide();
+            Inventory.main.SetViewModelVis(true);
+            
+            
+            //sequence.Set(0.5f, false, Deactivated);
+
+            SafeAnimator.SetBool(Player.main.armsController.animator, "using_pda", false);
+            ui.Deselect(null);
+            UwePostProcessingManager.ClosePDA();
+#if SUBNAUTICA
+            _pda.ui.soundQueue.PlayImmediately(_pda.ui.soundClose);
+#else
+#endif
+            UwePostProcessingManager.ToggleDof(_depthState);
+            QuickLogger.Debug("FCS PDA Is Closed", true);
+        }
+
+
         internal void SetInstance()
         {
             if (_isInitialized) return;
@@ -188,6 +270,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         private void Update()
         {
             sequence.Update();
+
             if (sequence.active)
             {
                 float b = (SNCameraRoot.main.mainCamera.aspect > 1.5f) ? cameraFieldOfView : cameraFieldOfViewAtFourThree;
@@ -371,40 +454,6 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             _currentBaseInfo.text = $"Current Base : {text}";
         }
         
-        public bool Open()
-        {
-            QuickLogger.Debug("PDA Open : 1");
-
-            Player main = Player.main;
-
-            PlayAppropriateVoiceMessage();
-
-            TryRemove404Screen();
-            
-            RefreshTeleportationPage();
-
-            CreateScreen();
-
-            FindPDA();
-            
-            ChangePDAVisibility(false);
-
-            AttemptToOpenReturnsDialog();
-
-            UpdateDisplay();
-
-            DOFOperations();
-
-            SetPDAInUse(true);
-
-            if (!DetemineIfInCinematicMode(main)) return false;
-
-            SetRequiredParametersToOpenPDA();
-            
-            QuickLogger.Debug("FCS PDA Is Open", true);
-            return true;
-        }
-
         private void SetRequiredParametersToOpenPDA()
         {
             MainCameraControl.main.SaveLockedVRViewModelAngle();
@@ -511,43 +560,6 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             UwePostProcessingManager.ToggleDof(false);
         }
 
-        public void Close()
-        {
-            IsOpen = false;
-            ChangePDAVisibility(true);
-            _pda.isInUse = false;
-            Player main = Player.main;
-            MainCameraControl.main.ResetLockedVRViewModelAngle();
-            _screen.SetActive(false);
-            Vehicle vehicle = main.GetVehicle();
-            if (vehicle != null)
-            {
-                uGUI.main.quickSlots.SetTarget(vehicle);
-            }
-
-            _accountPageHandler.Close();
-
-
-#if SUBNAUTICA_STABLE
-            MainGameController.Instance.PerformGarbageAndAssetCollection();
-#else
-            MainGameController.Instance.PerformIncrementalGarbageCollection();
-#endif
-            HandReticle.main?.UnrequestCrosshairHide();
-            Inventory.main.SetViewModelVis(true);
-            sequence.Set(0.5f, false, Deactivated);
-            
-            SafeAnimator.SetBool(Player.main.armsController.animator, "using_pda", false);
-            ui.Deselect(null);
-            UwePostProcessingManager.ClosePDA();
-#if SUBNAUTICA
-            _pda.ui.soundQueue.PlayImmediately(_pda.ui.soundClose);
-#else
-#endif
-            UwePostProcessingManager.ToggleDof(_depthState);
-            QuickLogger.Debug("FCS PDA Is Closed", true);
-        }
-
         private void ChangePDAVisibility(bool value)
         {
             _pda.gameObject.SetActive(!value);
@@ -652,7 +664,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
                     return true;
                 }
 
-                AlterraFabricatorStationController.Main.PendAPurchase(depot, cart);
+                AlterraFabricatorStationController.Main.GetDeliveryService().PendAPurchase(depot, cart);
             }
 
             CardSystem.main.RemoveFinances(totalCash);
@@ -1069,7 +1081,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
 
             _cancelButton.onClick.AddListener((() =>
             {
-                AlterraFabricatorStationController.Main.CancelOrder(pendingOrder);
+                AlterraFabricatorStationController.Main.GetDeliveryService().CancelOrder(pendingOrder);
                 Delete();
             }));
 
@@ -1095,11 +1107,11 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
                 string.IsNullOrWhiteSpace(_pendingOrder.OrderNumber) ||
                 _pendingOrder.Port?.GetBaseName() == null) return;
 
-            var isCurrentOrder = AlterraFabricatorStationController.Main.IsCurrentOrder(_shipment.OrderNumber);
+            var isCurrentOrder = AlterraFabricatorStationController.Main.GetDeliveryService().IsCurrentOrder(_shipment.OrderNumber);
             var status = isCurrentOrder ? "Shipping" : "Pending";
             _orderName.text = $"Order: {_pendingOrder.OrderNumber}: Destination: {_pendingOrder.Port.GetBaseName()} Status: {status}";
             _cancelButton.interactable = !isCurrentOrder;
-            _slider.value = AlterraFabricatorStationController.Main.GetOrderCompletionPercentage(_shipment.OrderNumber);
+            _slider.value = AlterraFabricatorStationController.Main.GetDeliveryService().GetOrderCompletionPercentage(_shipment.OrderNumber);
         }
 
         public bool TryDelete(Shipment shipment)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Managers;
 using FCS_AlterraHub.Model;
 using FCS_HomeSolutions.Mods.SeaBreeze.Enumerators;
@@ -43,7 +44,7 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Mono
             
             _energyToConsume = _energyConsumptionPerSecond * DayNightCycle.main.deltaTime;
             var batteryChargePull = DayNightCycle.main.deltaTime * ChargeSpeed * _powercellData.GetCapacity();
-            bool requiresEnergy = GameModeUtils.RequiresPower();
+            bool requiresEnergy = UWEHelpers.RequiresPower();
             bool hasPowerToConsume = !requiresEnergy || (this.AvailablePower >= _energyToConsume) || !_powercellData.IsEmpty();
             
             if (hasPowerToConsume && !_prevPowerState)

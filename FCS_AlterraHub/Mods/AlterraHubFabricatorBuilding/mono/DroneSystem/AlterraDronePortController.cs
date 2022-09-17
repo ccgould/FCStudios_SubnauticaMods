@@ -139,7 +139,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
             OffloadItemsInBase(order, devices);
 
-            AlterraFabricatorStationController.Main.ClearCurrentOrder();
+            AlterraFabricatorStationController.Main.GetDeliveryService().ClearCurrentOrder();
 
             VoiceNotificationSystem.main.DisplayMessage( $"{AlterraHub.OrderHasBeenShipped()} {GetBaseName()}");
         }
@@ -179,14 +179,14 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
         private bool FindHubDepot(Shipment order, out IEnumerable<FcsDevice> devices)
         {
-            if (AlterraFabricatorStationController.Main.IsStationPort(this))
+            if (AlterraFabricatorStationController.Main.GetDeliveryService().IsStationPort(this))
             {
                 if (order.CartItems != null)
                 {
                     var port = (AlterraDronePortController)FCSAlterraHubService.PublicAPI.FindDeviceWithPreFabID(order.PortPrefabID).Value;
                     var items = order.CartItems;
-                    AlterraFabricatorStationController.Main.ClearCurrentOrder();
-                    AlterraFabricatorStationController.Main.PendAPurchase(port,items);
+                    AlterraFabricatorStationController.Main.GetDeliveryService().ClearCurrentOrder();
+                    AlterraFabricatorStationController.Main.GetDeliveryService().PendAPurchase(port,items);
                 }
                 devices = null;
                 return true;
@@ -216,7 +216,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
         private static bool GetCurrentOrder(out Shipment order)
         {
-            order = AlterraFabricatorStationController.Main.GetCurrentOrder();
+            order = AlterraFabricatorStationController.Main.GetDeliveryService().GetCurrentOrder();
 
             if (order.CartItems == null)
             {
@@ -329,12 +329,18 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
         public IEnumerator SpawnDrone(Action<DroneController> callback)
         {
+            QuickLogger.Info("Spawn Drone");
             var task = CraftData.GetPrefabForTechTypeAsync(Mod.AlterraTransportDroneTechType, false);
             yield return task;
 
+            QuickLogger.Info("Drone Prefab");
             var prefab = task.GetResult();
-            _assignedDrone = prefab.GetComponent<DroneController>();
-            callback?.Invoke(_assignedDrone);
+            if (prefab != null)
+            {
+                _assignedDrone = GameObject.Instantiate(prefab).GetComponent<DroneController>();
+                QuickLogger.Info("Invoke Spawn Drone");
+                callback?.Invoke(_assignedDrone);
+            }
         }
 
 

@@ -528,7 +528,7 @@ namespace FCS_AlterraHub.Helpers
             }
 
 
-            if (GameModeUtils.RequiresBlueprints())
+            if (UWEHelpers.RequiresIngredients())
             {
                 if (!QModServices.Main.ModPresent("UITweaks"))
                 {

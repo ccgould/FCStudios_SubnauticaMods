@@ -68,9 +68,11 @@
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\SecurityBoxTrigger.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\SecurityGateController.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\LightManager.cs" />
+    <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\Shipment.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Spawnables\AlterraStationSpawnable.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Spawnables\DronePortPadHubNewFragSpawnable.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Spawnables\AlterraTransportDroneSpawnable.cs" />
+    <Compile Include="Mods\Common\DroneDeliveryService.cs" />
     <Compile Include="Mods\FCSDataBox\Mono\FCSDataBoxController.cs" />
     <Compile Include="Mods\FCSDataBox\Spawnable\FCSDataBoxSpawnable.cs" />
     <Compile Include="Mods\OreConsumer\Buildable\OreConsumerPatcher.cs" />
