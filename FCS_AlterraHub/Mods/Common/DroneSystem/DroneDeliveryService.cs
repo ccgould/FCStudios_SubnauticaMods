@@ -1,24 +1,22 @@
-﻿using FCS_AlterraHub.Buildables;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Managers;
-using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono;
-using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem;
-using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Interfaces;
+using FCS_AlterraHub.Mods.Common.DroneSystem.Interfaces;
+using FCS_AlterraHub.Mods.Common.DroneSystem.Models;
 using FCS_AlterraHub.Mods.FCSPDA.Mono;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
-namespace FCS_AlterraHub.Mods.Common
+namespace FCS_AlterraHub.Mods.Common.DroneSystem
 {
     internal class DroneDeliveryService : MonoBehaviour
     {
@@ -29,6 +27,25 @@ namespace FCS_AlterraHub.Mods.Common
         private PortManager _portManager;
         private int MAXDRONECOUNT = 1;
         private bool _completePendingOrder;
+
+        private void Awake()
+        {
+            QuickLogger.Debug("FCS Station Awake", true);
+
+            if (Main == null)
+            {
+                Main = this;
+                DontDestroyOnLoad(this);
+            }
+            else if (Main != null)
+            {
+                Destroy(gameObject);
+                return;
+            }
+        }
+
+        public static DroneDeliveryService Main;
+
 
         private void Start()
         {
@@ -378,6 +395,21 @@ namespace FCS_AlterraHub.Mods.Common
         internal HashSet<DroneController> GetDrones()
         {
             return _drones;
+        }
+
+        public void OnConsoleCommand_warp()
+        {
+            
+        }
+
+        public void Save()
+        {
+
+        }
+
+        public bool DetermineIfFixed()
+        {
+            return true;
         }
     }
 }

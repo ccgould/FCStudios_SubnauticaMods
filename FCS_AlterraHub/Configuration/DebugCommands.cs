@@ -2,7 +2,7 @@
 using System.Linq;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
-using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono;
+using FCS_AlterraHub.Mods.Common.DroneSystem;
 using FCS_AlterraHub.Mods.FCSPDA.Mono;
 using FCS_AlterraHub.Mods.OreConsumer.Buildable;
 using FCS_AlterraHub.Mono;
@@ -70,13 +70,11 @@ namespace FCS_AlterraHub.Configuration
             if (value)
             {
                 FCSPDAController.ForceOpen();
-                AlterraFabricatorStationController.Main.CompleteStation();
                 QuickLogger.Message($"FCS PDA Unlocked", true);
             }
             else
             {
                 FCSPDAController.ForceClose();
-                AlterraFabricatorStationController.Main.MakeStationDirty();
                 QuickLogger.Message($"FCS PDA locked", true);
             }
         }
@@ -99,9 +97,9 @@ namespace FCS_AlterraHub.Configuration
         [ConsoleCommand("WarpStation")]
         public static string WarpStation()
         {
-            if (AlterraFabricatorStationController.Main != null)
+            if (DroneDeliveryService.Main != null)
             {
-                AlterraFabricatorStationController.Main.OnConsoleCommand_warp();
+                DroneDeliveryService.Main.OnConsoleCommand_warp();
                 return "Warped player to station";
             }
 
@@ -148,8 +146,8 @@ namespace FCS_AlterraHub.Configuration
         [ConsoleCommand("ResetTransportDrones")]
         public static string ResetTransportDrones()
         {
-            AlterraFabricatorStationController.Main.GetDeliveryService().ResetDrones();
-            AlterraFabricatorStationController.Main.GetDeliveryService().ClearShipmentData();
+            DroneDeliveryService.Main.ResetDrones();
+            DroneDeliveryService.Main.ClearShipmentData();
 
             return $"Drones reset!";
         }        

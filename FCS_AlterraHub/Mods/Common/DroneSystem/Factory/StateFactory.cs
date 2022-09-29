@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.StatesMachine;
+using FCS_AlterraHub.Mods.Common.DroneSystem.StatesMachine;
 using FCSCommon.Utilities;
 
-namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Factory
+namespace FCS_AlterraHub.Mods.Common.DroneSystem.Factory
 {
     internal static class StateFactory
     {

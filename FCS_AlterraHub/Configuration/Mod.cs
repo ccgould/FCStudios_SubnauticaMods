@@ -7,7 +7,8 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using FCS_AlterraHub.Model.Utilities;
-using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono;
+using FCS_AlterraHub.Mods.Common.DroneSystem;
+using FCS_AlterraHub.Mods.Common.DroneSystem.Models;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
@@ -240,7 +241,7 @@ namespace FCS_AlterraHub.Configuration
             {
                 QuickLogger.Debug("Saving Gameplay Settings",true);
 
-                AlterraFabricatorStationController.Main.Save();
+                DroneDeliveryService.Main.Save();
                 
                 ModUtils.Save(_gamePlaySettings, "settings.json", GetSaveFileDirectory(), OnSaveComplete);
 
@@ -323,9 +324,9 @@ namespace FCS_AlterraHub.Configuration
                     }
                 }
 
-                if (AlterraFabricatorStationController.Main != null)
+                if (DroneDeliveryService.Main != null)
                 {
-                    foreach (AlterraTransportDroneEntry entry in AlterraFabricatorStationController.Main.GetDeliveryService().SaveDrones())
+                    foreach (AlterraTransportDroneEntry entry in DroneDeliveryService.Main.SaveDrones())
                     {
                         if(entry != null)
                             newSaveData.AlterraTransportDroneEntries.Add(entry);

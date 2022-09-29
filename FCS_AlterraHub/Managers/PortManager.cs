@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem;
-using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Interfaces;
+using FCS_AlterraHub.Mods.Common.DroneSystem;
+using FCS_AlterraHub.Mods.Common.DroneSystem.Interfaces;
 using FCSCommon.Utilities;
 using UnityEngine;
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.StatesMachine
+namespace FCS_AlterraHub.Mods.Common.DroneSystem.StatesMachine
 {
     internal abstract class BaseState
     {

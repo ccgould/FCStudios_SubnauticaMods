@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Interfaces
+namespace FCS_AlterraHub.Mods.Common.DroneSystem.Interfaces
 {
     internal interface IDroneDestination
     {

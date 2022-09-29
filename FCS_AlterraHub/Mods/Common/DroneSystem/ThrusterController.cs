@@ -1,7 +1,7 @@
 ﻿using FCS_AlterraHub.Helpers;
 using UnityEngine;
 
-namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
+namespace FCS_AlterraHub.Mods.Common.DroneSystem
 {
     internal class ThrusterController: MonoBehaviour
     {

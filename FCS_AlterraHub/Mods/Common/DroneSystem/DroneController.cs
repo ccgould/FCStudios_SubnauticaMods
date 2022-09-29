@@ -6,15 +6,15 @@ using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
-using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Enums;
-using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Factory;
-using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.StatesMachine;
-using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.StatesMachine.States;
+using FCS_AlterraHub.Mods.Common.DroneSystem.Enums;
+using FCS_AlterraHub.Mods.Common.DroneSystem.Factory;
+using FCS_AlterraHub.Mods.Common.DroneSystem.StatesMachine;
+using FCS_AlterraHub.Mods.Common.DroneSystem.StatesMachine.States;
 using FCS_AlterraHub.Mono;
 using FCSCommon.Utilities;
 using UnityEngine;
 
-namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
+namespace FCS_AlterraHub.Mods.Common.DroneSystem
 {
     internal class DroneController : MonoBehaviour
     {
@@ -192,7 +192,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         {
             if (destinationPort == null)
             {
-                destinationPort = AlterraFabricatorStationController.Main.GetDeliveryService().GetOpenPort();
+                destinationPort = DroneDeliveryService.Main.GetOpenPort();
             }
             return destinationPort;
         }
@@ -223,7 +223,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
         internal bool AvailableForTransport()
         {
-            return !IsTransporting() && AlterraFabricatorStationController.Main.GetDeliveryService().IsStationPort(GetCurrentPort());
+            return !IsTransporting() && DroneDeliveryService.Main.IsStationPort(GetCurrentPort());
         }
 
         private bool IsTransporting()
@@ -238,6 +238,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
         public void SetDeparturePort(AlterraDronePortController port)
         {
+            if (port == null)
+            {
+                QuickLogger.Error("Drone Failed to Find Departure Port");
+                return;
+            }
             departurePort = port;
         }
 
@@ -255,7 +260,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
                 {
                     QuickLogger.Debug("Destination Port not null", true);
 
-                    if (!AlterraFabricatorStationController.Main.GetDeliveryService().IsStationBaseID(data.DestinationBaseID))
+                    if (!DroneDeliveryService.Main.IsStationBaseID(data.DestinationBaseID))
                     {
                         BaseManager.FindManager(data.DestinationBaseID, result =>
                         {
@@ -265,7 +270,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
                             var state = StateFactory.GetState(data.State);
                             QuickLogger.Debug($"Setting State: {state.Name}", true);
 
-                            if (state.GetType() == typeof(IdleState) && destinationPort != null && !AlterraFabricatorStationController.Main.GetDeliveryService().IsStationPort(destinationPort))
+                            if (state.GetType() == typeof(IdleState) && destinationPort != null && !DroneDeliveryService.Main.IsStationPort(destinationPort))
                             {
                                 ShipOrder(destinationPort);
                             }

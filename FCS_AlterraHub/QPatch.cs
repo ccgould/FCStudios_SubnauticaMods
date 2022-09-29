@@ -8,8 +8,7 @@ using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mods.AlterraHubDepot.Buildable;
 using FCS_AlterraHub.Mods.AlterraHubDepot.Spawnable;
-using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Buildables;
-using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Spawnables;
+using FCS_AlterraHub.Mods.Common.DroneSystem;
 using FCS_AlterraHub.Mods.Global.Spawnables;
 using FCS_AlterraHub.Mods.OreConsumer.Buildable;
 using FCS_AlterraHub.Mods.PatreonStatue.Buildable;
@@ -162,9 +161,6 @@ namespace FCS_AlterraHub
             transportDrone.Patch();
 
             BoxOpenSoundAsset = FModHelpers.CreateFmodAsset("box_open", "event:/loot/databox/box_open");
-
-            var station = new AlterraStationSpawnable();
-            station.Patch();
         }
         
         private static void PatchBuildables()

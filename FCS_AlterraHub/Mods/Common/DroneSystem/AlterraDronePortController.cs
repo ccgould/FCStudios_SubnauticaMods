@@ -9,8 +9,9 @@ using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Managers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mods.AlterraHubDepot.Mono;
-using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Enums;
-using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Interfaces;
+using FCS_AlterraHub.Mods.Common.DroneSystem.Enums;
+using FCS_AlterraHub.Mods.Common.DroneSystem.Interfaces;
+using FCS_AlterraHub.Mods.Common.DroneSystem.Models;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Objects;
@@ -19,7 +20,7 @@ using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
 using UnityEngine;
 
-namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
+namespace FCS_AlterraHub.Mods.Common.DroneSystem
 {
     internal class AlterraDronePortController : FcsDevice, IFCSSave<SaveData>, IDroneDestination, IHandTarget
     {
@@ -61,11 +62,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
             foreach (FcsDevice device in devices)
             {
-                if(device == null) continue;
+                if (device == null) continue;
 
                 if (device is AlterraHubDepotController controller && !controller.IsFull()) return false;
             }
-            
+
             return true;
         }
 
@@ -139,9 +140,9 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
             OffloadItemsInBase(order, devices);
 
-            AlterraFabricatorStationController.Main.GetDeliveryService().ClearCurrentOrder();
+            DroneDeliveryService.Main.ClearCurrentOrder();
 
-            VoiceNotificationSystem.main.DisplayMessage( $"{AlterraHub.OrderHasBeenShipped()} {GetBaseName()}");
+            VoiceNotificationSystem.main.DisplayMessage($"{AlterraHub.OrderHasBeenShipped()} {GetBaseName()}");
         }
 
         private static void OffloadItemsInBase(Shipment order, IEnumerable<FcsDevice> devices)
@@ -158,7 +159,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
             foreach (FcsDevice device in devices)
             {
-                if(device == null || device is not AlterraHubDepotController depot) continue;
+                if (device == null || device is not AlterraHubDepotController depot) continue;
 
                 //var avaliableSpace = depot.GetFreeSlotsCount();
 
@@ -179,14 +180,14 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
         private bool FindHubDepot(Shipment order, out IEnumerable<FcsDevice> devices)
         {
-            if (AlterraFabricatorStationController.Main.GetDeliveryService().IsStationPort(this))
+            if (DroneDeliveryService.Main.IsStationPort(this))
             {
                 if (order.CartItems != null)
                 {
                     var port = (AlterraDronePortController)FCSAlterraHubService.PublicAPI.FindDeviceWithPreFabID(order.PortPrefabID).Value;
                     var items = order.CartItems;
-                    AlterraFabricatorStationController.Main.GetDeliveryService().ClearCurrentOrder();
-                    AlterraFabricatorStationController.Main.GetDeliveryService().PendAPurchase(port,items);
+                    DroneDeliveryService.Main.ClearCurrentOrder();
+                    DroneDeliveryService.Main.PendAPurchase(port, items);
                 }
                 devices = null;
                 return true;
@@ -216,7 +217,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
         private static bool GetCurrentOrder(out Shipment order)
         {
-            order = AlterraFabricatorStationController.Main.GetDeliveryService().GetCurrentOrder();
+            order = DroneDeliveryService.Main.GetCurrentOrder();
 
             if (order.CartItems == null)
             {
@@ -273,8 +274,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             _animator = GetComponent<Animator>();
 
             _paths = GameObjectHelpers.FindGameObject(gameObject, "DronePort_DockingPaths").GetChildrenT().ToList();
-            
-           _entryPoint =  _paths[0].gameObject;
+
+            _entryPoint = _paths[0].gameObject;
 
             _spawnPoint = GameObjectHelpers.FindGameObject(gameObject, "SpawnPoint");
 
@@ -299,7 +300,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol,AlterraHub.BaseSecondaryCol,AlterraHub.BaseDecalsEmissiveController);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol, AlterraHub.BaseDecalsEmissiveController);
             }
 
             var antenna = GameObjectHelpers.FindGameObject(gameObject, "AntennaMeshController")?.AddComponent<MotorHandler>();
@@ -307,7 +308,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseSecondaryCol, gameObject, ColorList.GetColor(14));
-            
+
             IsInitialized = true;
         }
 
@@ -322,7 +323,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         public DroneController SpawnDrone()
         {
             var drone = Instantiate(CraftData.GetPrefabForTechType(Mod.AlterraTransportDroneTechType), _spawnPoint.transform.position, _spawnPoint.transform.rotation);
-            _assignedDrone  = drone.GetComponent<DroneController>();
+            _assignedDrone = drone.GetComponent<DroneController>();
             return _assignedDrone;
         }
 #endif
@@ -337,7 +338,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             var prefab = task.GetResult();
             if (prefab != null)
             {
-                _assignedDrone = GameObject.Instantiate(prefab).GetComponent<DroneController>();
+                _assignedDrone = Instantiate(prefab).GetComponent<DroneController>();
                 QuickLogger.Info("Invoke Spawn Drone");
                 callback?.Invoke(_assignedDrone);
             }
@@ -361,14 +362,14 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
             QuickLogger.Debug($"Closing {GetBaseName()} doors:");
         }
-        
+
         private void CreateLadders()
         {
-            if(!IsConstructed) return;
+            if (!IsConstructed) return;
             var ladder = GameObjectHelpers.FindGameObject(gameObject, "Trigger_ladder01");
             if (ladder == null) return;
             var t01 = ladder.AddComponent<CinematicLadderController>();
-            t01.Set(GameObjectHelpers.FindGameObject(gameObject, "lockingPoint").transform, "use_ladder", "rocketship_outLadder",3);
+            t01.Set(GameObjectHelpers.FindGameObject(gameObject, "lockingPoint").transform, "use_ladder", "rocketship_outLadder", 3);
         }
 
         private void ReadySaveData()
@@ -468,7 +469,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
             foreach (FcsDevice fcsDevice in devices)
             {
-                if(fcsDevice == null || fcsDevice is not AlterraHubDepotController device) continue;
+                if (fcsDevice == null || fcsDevice is not AlterraHubDepotController device) continue;
                 total += device.GetFreeSlotsCount();
             }
 
@@ -487,15 +488,15 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
         public override void OnHandHover(GUIHand hand)
         {
-            if(!IsInitialized || !IsConstructed) return;
+            if (!IsInitialized || !IsConstructed) return;
             base.OnHandHover(hand);
-            var data = new string[]{};
+            var data = new string[] { };
             data.HandHoverPDAHelperEx(GetTechType());
         }
 
         public void OnHandClick(GUIHand hand)
         {
-            
+
         }
 
         public IEnumerator PlayAndWaitForAnim(int valueToSet, string stateName, Action onCompleted)
@@ -511,7 +512,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             }
 
             //Now, Wait until the current state is done playing
-            while ((_animator.GetCurrentAnimatorStateInfo(0).normalizedTime) % 1 < 0.99f)
+            while (_animator.GetCurrentAnimatorStateInfo(0).normalizedTime % 1 < 0.99f)
             {
                 //QuickLogger.Debug("Now, Wait until the current state is done playing");
                 yield return null;

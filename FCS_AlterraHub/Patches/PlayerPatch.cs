@@ -7,6 +7,8 @@ using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.DataCollectors;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Model.Utilities;
+using FCS_AlterraHub.Mods.Common.DroneSystem;
 using FCS_AlterraHub.Mods.FCSPDA.Enums;
 using FCS_AlterraHub.Mods.FCSPDA.Mono;
 using FCS_AlterraHub.Mono;
@@ -33,6 +35,7 @@ namespace FCS_AlterraHub.Patches
         private static bool _wasPlaying;
         private static bool _firstMissionAdded;
         private static float _time;
+        private static DroneDeliveryService _droneDeliveryService;
         public static Transform SunTarget { get; private set; }
 
         [HarmonyPatch(typeof(Player), nameof(Player.Awake))]
@@ -58,6 +61,8 @@ namespace FCS_AlterraHub.Patches
 
             CoroutineHost.StartCoroutine(CreateFcsPda(__instance));
             PatreonCollector.GetData();
+            _droneDeliveryService = new GameObject().AddComponent<DroneDeliveryService>();
+
             //var shouldPlay = (bool)_shouldPlayIntro.GetValue(__instance.GetPDA());
 
 

@@ -6,8 +6,8 @@ using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
-using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono;
-using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem;
+using FCS_AlterraHub.Mods.Common.DroneSystem;
+using FCS_AlterraHub.Mods.Common.DroneSystem.Models;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.Model;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
@@ -519,24 +519,24 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
 
         private void TryRemove404Screen()
         {
-            if (AlterraFabricatorStationController.Main == null)
+            if (DroneDeliveryService.Main == null)
             {
                 MessageBoxHandler.main.Show(AlterraHub.ErrorHasOccurred("0x0001"), FCSMessageButton.OK);
                 return;
             }
             
-            _404?.SetActive(!AlterraFabricatorStationController.Main.DetermineIfUnlocked());
+            _404?.SetActive(!DroneDeliveryService.Main.DetermineIfFixed());
         }
 
         private void PlayAppropriateVoiceMessage()
         {
             if (_timesOpen > 0 && !CardSystem.main.HasBeenRegistered() && !_firstTimeOpen &&
-                AlterraFabricatorStationController.Main.DetermineIfUnlocked())
+                DroneDeliveryService.Main.DetermineIfFixed())
             {
                 VoiceNotificationSystem.main.Play("PDA_Account_Instructions_key", 26);
             }
 
-            if (_firstTimeOpen && AlterraFabricatorStationController.Main.DetermineIfUnlocked())
+            if (_firstTimeOpen && DroneDeliveryService.Main.DetermineIfFixed())
             {
                 VoiceNotificationSystem.main.Play("PDA_Instructions_key", 26);
                 _firstTimeOpen = false;
@@ -656,7 +656,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
                     return false;
                 }
 
-                if (AlterraFabricatorStationController.Main == null)
+                if (DroneDeliveryService.Main == null)
                 {
                     QuickLogger.Error("FCSStation Main is null!");
                     QuickLogger.ModMessage("The FCSStation cannot be found please contact FCSStudios for help with this issue. Order will be sent to your inventory");
@@ -664,7 +664,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
                     return true;
                 }
 
-                AlterraFabricatorStationController.Main.GetDeliveryService().PendAPurchase(depot, cart);
+                DroneDeliveryService.Main.PendAPurchase(depot, cart);
             }
 
             CardSystem.main.RemoveFinances(totalCash);
@@ -1081,7 +1081,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
 
             _cancelButton.onClick.AddListener((() =>
             {
-                AlterraFabricatorStationController.Main.GetDeliveryService().CancelOrder(pendingOrder);
+                DroneDeliveryService.Main.CancelOrder(pendingOrder);
                 Delete();
             }));
 
@@ -1103,15 +1103,15 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
 
         private void UpdateCheck()
         {
-            if (AlterraFabricatorStationController.Main == null ||
+            if (DroneDeliveryService.Main == null ||
                 string.IsNullOrWhiteSpace(_pendingOrder.OrderNumber) ||
                 _pendingOrder.Port?.GetBaseName() == null) return;
 
-            var isCurrentOrder = AlterraFabricatorStationController.Main.GetDeliveryService().IsCurrentOrder(_shipment.OrderNumber);
+            var isCurrentOrder = DroneDeliveryService.Main.IsCurrentOrder(_shipment.OrderNumber);
             var status = isCurrentOrder ? "Shipping" : "Pending";
             _orderName.text = $"Order: {_pendingOrder.OrderNumber}: Destination: {_pendingOrder.Port.GetBaseName()} Status: {status}";
             _cancelButton.interactable = !isCurrentOrder;
-            _slider.value = AlterraFabricatorStationController.Main.GetDeliveryService().GetOrderCompletionPercentage(_shipment.OrderNumber);
+            _slider.value = DroneDeliveryService.Main.GetOrderCompletionPercentage(_shipment.OrderNumber);
         }
 
         public bool TryDelete(Shipment shipment)

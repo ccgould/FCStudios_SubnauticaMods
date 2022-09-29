@@ -1,9 +1,9 @@
 ﻿using System;
 using FCS_AlterraHub.Helpers;
-using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem;
 using FCS_AlterraHub.Systems;
 using UnityEngine;
 using UnityEngine.UI;
+using FCS_AlterraHub.Mods.Common.DroneSystem;
 
 #if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
