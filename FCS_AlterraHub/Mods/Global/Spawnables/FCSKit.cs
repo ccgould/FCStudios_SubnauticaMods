@@ -16,6 +16,7 @@ namespace FCS_AlterraHub.Mods.Global.Spawnables
     {
         private readonly string _iconPath;
 
+
         public FCSKit(string classId, string friendlyName,string iconPath) : base(classId, $"{friendlyName} Kit", $"A kit that allows you to build one {friendlyName} Unit")
         {
             _iconPath = iconPath;

@@ -3,6 +3,7 @@ using System.Text;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
+using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Structs;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -94,7 +95,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
         }
         public void Show()
         {
-            if (CheckIsUnlocked() || _forceUnlock)
+            if (CheckIsUnlocked() || _forceUnlock || FCSAlterraHubService.PublicAPI.IsInOreBuildMode())
             {
                 gameObject.SetActive(true);
             }

@@ -151,9 +151,9 @@
     <Compile Include="Mods\QuantumTeleporter\Buildable\QuantumTeleporterPatcher.cs" />
     <Compile Include="Mods\QuantumTeleporter\Enumerators\QTTeleportTypes.cs" />
     <Compile Include="Mods\QuantumTeleporter\Mono\QTDisplayManager.cs" />
-    <Compile Include="Mods\QuantumTeleporter\Mono\QTPowerManager.cs" />
+    <Compile Include="Mods\QuantumTeleporter\Model\QTPowerManager.cs" />
     <Compile Include="Mods\QuantumTeleporter\Mono\QuantumTeleporterController.cs" />
-    <Compile Include="Mods\QuantumTeleporter\Mono\TeleportManager.cs" />
+    <Compile Include="Mods\QuantumTeleporter\Model\TeleportManager.cs" />
     <Compile Include="Mods\SeaBreeze\Buildable\SeaBreezeAuxPatcher.cs" />
     <Compile Include="Mods\SeaBreeze\Buildable\SeaBreezePatcher.cs" />
     <Compile Include="Mods\SeaBreeze\Display\InterfaceButton.cs" />

@@ -24,6 +24,7 @@ namespace FCS_AlterraHub.Registration
     {
         bool IsRegisteringEncyclopedia { get; set; }
         CardSystem AccountSystem { get; }
+        bool IsInOreBuildMode();
         Action OnPurge { get; set; }
         Action<BaseManager> TeleportationIgnitiated { get; set; }
         TechType FcsUnlockTechType { get; set; }
@@ -87,6 +88,11 @@ namespace FCS_AlterraHub.Registration
         internal static IFCSAlterraHubServiceInternal InternalAPI => singleton;
         public static IFCSAlterraHubService PublicAPI => singleton;
         public CardSystem AccountSystem => CardSystem.main;
+        public bool IsInOreBuildMode()
+        {
+            return QPatch.Configuration.OreBuildMode;
+        }
+
         public Action OnPurge { get; set; }
         public bool IsRegisteringEncyclopedia { get; set; }
 

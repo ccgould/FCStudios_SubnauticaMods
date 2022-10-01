@@ -9,6 +9,7 @@ using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Buildable;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Enumerators;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Interface;
+using FCS_HomeSolutions.Mods.QuantumTeleporter.Model;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Mono;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Spawnables;
 using FCS_HomeSolutions.Mods.SeaBreeze.Buildable;

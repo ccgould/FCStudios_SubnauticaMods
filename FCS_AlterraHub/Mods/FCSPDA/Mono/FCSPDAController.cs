@@ -629,44 +629,61 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         internal bool MakeAPurchase(CartDropDownHandler cart, AlterraDronePortController depot = null, bool giveToPlayer = false)
         {
             var totalCash = cart.GetTotal();
-            var sizes = GetSizes(cart);
-            if (giveToPlayer)
+
+            if (FCSAlterraHubService.PublicAPI.IsInOreBuildMode())
             {
-                if (CardSystem.main.HasEnough(totalCash) && Inventory.main.container.HasRoomFor(sizes))
+                foreach (CartItem cartItem in cart.GetItems())
                 {
-                    foreach (CartItem item in cart.GetItems())
+                    if (cartItem != null && !KnownTech.Contains(cartItem.TechType))
                     {
-                        for (int i = 0; i < item.ReturnAmount; i++)
+                        if (CraftData.IsAllowed(cartItem.TechType) && KnownTech.Add(cartItem.TechType, true))
                         {
-                            QuickLogger.Debug($"{item.ReceiveTechType}", true);
-                            PlayerInteractionHelper.GivePlayerItem(item.ReceiveTechType);
+                            ErrorMessage.AddDebug("Unlocked " + Language.main.Get(cartItem.TechType.AsString()));
                         }
                     }
-                }
-                else
-                {
-                    return false;
                 }
             }
             else
             {
-                if (depot == null || !depot.HasRoomFor(sizes))
+                var sizes = GetSizes(cart);
+                if (giveToPlayer)
                 {
-                    MessageBoxHandler.main.Show(depot == null ? AlterraHub.DepotNotFound() : AlterraHub.DepotFull(), FCSMessageButton.OK);
-                    return false;
+                    if (CardSystem.main.HasEnough(totalCash) && Inventory.main.container.HasRoomFor(sizes))
+                    {
+                        foreach (CartItem item in cart.GetItems())
+                        {
+                            for (int i = 0; i < item.ReturnAmount; i++)
+                            {
+                                QuickLogger.Debug($"{item.ReceiveTechType}", true);
+                                PlayerInteractionHelper.GivePlayerItem(item.ReceiveTechType);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
-
-                if (DroneDeliveryService.Main == null)
+                else
                 {
-                    QuickLogger.Error("FCSStation Main is null!");
-                    QuickLogger.ModMessage("The FCSStation cannot be found please contact FCSStudios for help with this issue. Order will be sent to your inventory");
-                    MakeAPurchase(cart, null, true);
-                    return true;
-                }
+                    if (depot == null || !depot.HasRoomFor(sizes))
+                    {
+                        MessageBoxHandler.main.Show(depot == null ? AlterraHub.DepotNotFound() : AlterraHub.DepotFull(), FCSMessageButton.OK);
+                        return false;
+                    }
 
-                DroneDeliveryService.Main.PendAPurchase(depot, cart);
+                    if (DroneDeliveryService.Main == null)
+                    {
+                        QuickLogger.Error("FCSStation Main is null!");
+                        QuickLogger.ModMessage("The FCSStation cannot be found please contact FCSStudios for help with this issue. Order will be sent to your inventory");
+                        MakeAPurchase(cart, null, true);
+                        return true;
+                    }
+
+                    DroneDeliveryService.Main.PendAPurchase(depot, cart);
+                }
             }
-
+            
             CardSystem.main.RemoveFinances(totalCash);
             return true;
         }

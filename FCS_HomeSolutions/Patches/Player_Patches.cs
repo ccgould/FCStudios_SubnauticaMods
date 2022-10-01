@@ -1,4 +1,5 @@
 ﻿using FCS_HomeSolutions.Mods.JukeBox.Mono;
+using FCS_HomeSolutions.Mods.QuantumTeleporter.Model;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Mono;
 using HarmonyLib;
 

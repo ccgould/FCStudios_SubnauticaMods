@@ -25,9 +25,11 @@ namespace FCS_EnergySolutions.Mods.AlterraGen.Buildables
     internal partial class AlterraGenBuildable : SMLHelper.V2.Assets.Buildable
     {
         private GameObject _prefab;
-
+        public override TechType RequiredForUnlock => FCSAlterraHubService.PublicAPI.IsInOreBuildMode() ? Mod.AlterraGenKitClassID.ToTechType() : TechType.None;
+        
         public AlterraGenBuildable() : base(Mod.AlterraGenModClassName, Mod.AlterraGenModFriendlyName, Mod.AlterraGenModDescription)
         {
+            
             _prefab = ModelPrefab.GetPrefab(Mod.AlterraGenModPrefabName,true);
 
             OnStartedPatching += () =>
@@ -198,16 +200,36 @@ namespace FCS_EnergySolutions.Mods.AlterraGen.Buildables
 
         protected override RecipeData GetBlueprintRecipe()
         {
-            QuickLogger.Debug($"Creating recipe...");
-            // Create and associate recipe to the new TechType
-            var customFabRecipe = new RecipeData()
+            TechData customFabRecipe;
+
+            if (FCSAlterraHubService.PublicAPI.IsInOreBuildMode())
             {
-                craftAmount = 1,
-                Ingredients = new List<Ingredient>()
+                // Create and associate recipe to the new TechType
+                customFabRecipe = new RecipeData()
                 {
-                    new Ingredient(Mod.AlterraGenKitClassID.ToTechType(),1)
-                }
-            };
+                    craftAmount = 1,
+                    Ingredients = new List<Ingredient>()
+                    {
+                        new Ingredient(TechType.Glass, 2),
+                        new Ingredient(TechType.PlasteelIngot, 2),
+                        new Ingredient(TechType.AdvancedWiringKit, 1),
+                        new Ingredient(TechType.Silicone, 2),
+                        new Ingredient(TechType.Lubricant, 1)
+                    }
+                };
+            }
+            else
+            {
+                customFabRecipe = new RecipeData()
+                {
+                    craftAmount = 1,
+                    Ingredients = new List<Ingredient>()
+                    {
+                        new Ingredient(Mod.AlterraGenKitClassID.ToTechType(),1)
+                    }
+                };
+            }
+
             return customFabRecipe;
         }
 

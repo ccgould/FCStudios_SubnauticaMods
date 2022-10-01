@@ -67,6 +67,9 @@ namespace FCS_AlterraHub.Configuration
         [Slider("Credit Message Delay", 0f, 600f, DefaultValue = 0, Step = 30.0f, Format = "{0}", Tooltip = "Delays credit messages by the selected amount in seconds.")]
         public float CreditMessageDelay  = 0f;
 
+        [Toggle("Ore Mode", Tooltip = "Removes the need for credit to build items. (Game restart required!)")]
+        public bool OreBuildMode = false;
+
 
         private void PDAKeyCodeChangedEvent(KeybindChangedEventArgs e)
         {

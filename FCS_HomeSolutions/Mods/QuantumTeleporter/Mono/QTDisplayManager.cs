@@ -12,6 +12,7 @@ using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Buildable;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Enumerators;
+using FCS_HomeSolutions.Mods.QuantumTeleporter.Model;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;

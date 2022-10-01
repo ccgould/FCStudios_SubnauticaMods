@@ -1,10 +1,11 @@
 ﻿using FCS_AlterraHub.Helpers;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Enumerators;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Interface;
+using FCS_HomeSolutions.Mods.QuantumTeleporter.Mono;
 using FCSCommon.Utilities;
 using UnityEngine;
 
-namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
+namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Model
 {
     internal class QTPowerManager : IQTPower
     {
@@ -17,7 +18,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
         {
             get
             {
-                while (_connectedRelay == null)
+                while (_connectedRelay == null && _mono != null && _mono.IsOperational && _mono.Manager != null)
                     UpdatePowerRelay();
 
                 return _connectedRelay;

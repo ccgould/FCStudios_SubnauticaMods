@@ -1,11 +1,10 @@
-﻿using System;
-using FCS_HomeSolutions.Configuration;
+﻿using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Enumerators;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Interface;
 using FCSCommon.Utilities;
 using UnityEngine;
 
-namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
+namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Model
 {
     internal static class TeleportManager
     {
