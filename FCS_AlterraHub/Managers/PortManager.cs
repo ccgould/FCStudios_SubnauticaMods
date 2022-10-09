@@ -1,17 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Mods.Common.DroneSystem;
 using FCS_AlterraHub.Mods.Common.DroneSystem.Interfaces;
+using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
+using FCS_AlterraHub.Mono;
+using FCS_AlterraHub.Mono.Managers;
 using FCSCommon.Utilities;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Managers
 {
-    internal class PortManager : MonoBehaviour
+    internal class PortManager : MonoBehaviour, IShippingDestination
     {
         private string _prefabIdent;
         private readonly Dictionary<string, IDroneDestination> _dronePorts = new();
+        private BaseManager _baseManager;
+        public BaseManager Manager => GetManager();
+
+        private BaseManager GetManager()
+        {
+            if (_baseManager is null)
+            {
+                _baseManager = BaseManager.FindManager(_prefabIdent);
+            }
+
+            return _baseManager;
+        }
 
         private void Start()
         {
@@ -73,6 +89,29 @@ namespace FCS_AlterraHub.Managers
             }
 
             return null;
+        }
+
+        public bool HasAccessPoint()
+        {
+            return _dronePorts.Any();
+        }
+
+        public string GetStatus()
+        {
+            return !HasAccessPoint() ? "Depot Not Built At Base" : "Ready";
+        }
+
+        public bool HasDronePort => Manager?.IsDeviceBuilt(Mod.DronePortPadHubNewTabID) ?? false;
+        public bool HasContructor { get; }
+        public bool IsVehicle { get; set; }
+        public bool SendItemsToConstructor(List<CartItem> pendingItem)
+        {
+            return false;
+        }
+
+        public string GetBaseName()
+        {
+            return Manager?.GetBaseName() ?? "Station Port";
         }
     }
 }

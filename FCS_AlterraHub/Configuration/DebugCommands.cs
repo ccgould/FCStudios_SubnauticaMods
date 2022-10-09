@@ -99,7 +99,6 @@ namespace FCS_AlterraHub.Configuration
         {
             if (DroneDeliveryService.Main != null)
             {
-                DroneDeliveryService.Main.OnConsoleCommand_warp();
                 return "Warped player to station";
             }
 
@@ -147,7 +146,6 @@ namespace FCS_AlterraHub.Configuration
         public static string ResetTransportDrones()
         {
             DroneDeliveryService.Main.ResetDrones();
-            DroneDeliveryService.Main.ClearShipmentData();
 
             return $"Drones reset!";
         }        

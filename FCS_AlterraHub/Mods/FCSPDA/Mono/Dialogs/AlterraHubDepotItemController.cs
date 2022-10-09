@@ -1,4 +1,5 @@
 ﻿using System;
+using FCS_AlterraHub.Managers;
 using FCS_AlterraHub.Mods.Common.DroneSystem;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -8,13 +9,13 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
 {
     internal class AlterraHubDepotItemController : MonoBehaviour
     {
-        internal AlterraDronePortController Destination { get; set; }
+        internal PortManager Destination { get; set; }
         internal bool IsChecked => _toggle.isOn;
 
         private Toggle _toggle;
         private ToggleGroup _toggleGroup;
 
-        internal bool Initialize(AlterraDronePortController depot,ToggleGroup toggleGroup, Transform list)
+        internal bool Initialize(PortManager depot,ToggleGroup toggleGroup, Transform list)
         {
             try
             {
@@ -26,11 +27,11 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
                 _toggleGroup = toggleGroup;
                 _toggle = gameObject.GetComponentInChildren<Toggle>();
                 _toggle.group = toggleGroup;
-                if (depot.IsFull)
-                {
-                    _toggle.enabled = false;
-                    _toggle.isOn = false;
-                }
+                //if (depot.IsFull)
+                //{
+                //    _toggle.enabled = false;
+                //    _toggle.isOn = false;
+                //}
                 gameObject.transform.localScale = Vector3.one;
                 gameObject.transform.SetParent(list,false);
                 return true;

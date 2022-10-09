@@ -8,6 +8,7 @@ using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mods.AlterraHubDepot.Buildable;
 using FCS_AlterraHub.Mods.AlterraHubDepot.Spawnable;
+using FCS_AlterraHub.Mods.AlterraHubPod.Spawnable;
 using FCS_AlterraHub.Mods.Common.DroneSystem;
 using FCS_AlterraHub.Mods.Global.Spawnables;
 using FCS_AlterraHub.Mods.OreConsumer.Buildable;
@@ -56,6 +57,7 @@ namespace FCS_AlterraHub
             GlobalBundle = FCSAssetBundlesService.PublicAPI.GetAssetBundleByName(Mod.AssetBundleName);
 
             Mod.LoadAudioFiles();
+
             
             QuickLogger.DebugLogsEnabled = Configuration.EnableDebugLogs;
             
@@ -161,6 +163,9 @@ namespace FCS_AlterraHub
             transportDrone.Patch();
 
             BoxOpenSoundAsset = FModHelpers.CreateFmodAsset("box_open", "event:/loot/databox/box_open");
+
+            var sropPod = new AlterraHubPatch();
+            sropPod.Patch();
         }
         
         private static void PatchBuildables()

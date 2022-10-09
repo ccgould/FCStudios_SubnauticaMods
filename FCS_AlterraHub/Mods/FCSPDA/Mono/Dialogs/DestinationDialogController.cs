@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using FCS_AlterraHub.Configuration;
+using FCS_AlterraHub.Managers;
 using FCS_AlterraHub.Mods.Common.DroneSystem;
 using FCS_AlterraHub.Registration;
 using UnityEngine;
@@ -52,13 +53,15 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
                 _toggles.Remove(item);
             }
 
-            foreach (var fcsDevice in FCSAlterraHubService.PublicAPI.GetRegisteredDevicesOfId(Mod.DronePortPadHubNewTabID))
+            var portManagers = FindObjectsOfType<PortManager>();
+
+
+            foreach (var portManager in portManagers)
             {
-                var depot = (AlterraDronePortController)fcsDevice.Value;
-                if(!depot.IsOperational) continue;
+                if(!portManager.HasAccessPoint()) continue;
                 var depotPrefab = GameObject.Instantiate(Buildables.AlterraHub.AlterraHubDepotItemPrefab);
                 var controller = depotPrefab.AddComponent<AlterraHubDepotItemController>();
-                if (controller.Initialize(depot, _toggleGroup, _list))
+                if (controller.Initialize(portManager, _toggleGroup, _list))
                 {
                     _toggles.Add(controller);
                 }

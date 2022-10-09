@@ -1,5 +1,7 @@
-﻿using System.Reflection;
+﻿using System.Collections.Generic;
+using System.Reflection;
 using FCS_AlterraHub.Model;
+using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Extensions
@@ -31,6 +33,14 @@ namespace FCS_AlterraHub.Extensions
         public static object GetPrivateField<T>(this T instance, string fieldName, BindingFlags bindingFlags = BindingFlags.Default)
         {
             return typeof(T).GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic | bindingFlags).GetValue(instance);
+        }
+
+        public static IEnumerable<CartItemSaveData> SaveAll(this List<CartItem> data)
+        {
+            foreach (var fieldName in data)
+            {
+                yield return fieldName.Save();
+            }
         }
     }
 }

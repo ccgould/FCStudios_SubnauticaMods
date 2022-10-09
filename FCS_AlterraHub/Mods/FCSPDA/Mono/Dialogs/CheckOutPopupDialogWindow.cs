@@ -4,6 +4,7 @@ using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mods.Common.DroneSystem;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
+using FCS_AlterraHub.Mono.Managers;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -23,11 +24,12 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
         private FCSPDAController _mono;
         private CardSystem cardSystem => CardSystem.main;
 
-        public CartDropDownHandler _cart;
+        public CartDropDownHandler _cartDropDownHandler;
         public UnityEvent onCheckOutPopupDialogClosed = new UnityEvent();
         private DestinationDialogController _destinationDialogController;
         private Text _destinationText;
-        internal AlterraDronePortController SelectedDestination { get; set; }
+        internal IShippingDestination SelectedDestination { get; set; }
+
 
         private void Initialize(FCSPDAController mono)
         {
@@ -72,7 +74,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
         private bool MakePurchase()
         {
             var totalSize = new List<Vector2int>();
-            foreach (CartItem cartItem in _cart.GetItems())
+            foreach (CartItem cartItem in _cartDropDownHandler.GetItems())
             {
                 for (int i = 0; i < cartItem.ReturnAmount; i++)
                 {
@@ -114,18 +116,22 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
                 return false;
             }
 
-            if (CardSystem.main.HasEnough(_cart.GetTotal()))
+            if (CardSystem.main.HasEnough(_cartDropDownHandler.GetTotal()))
             {
-                if (!_mono.MakeAPurchase(_cart,SelectedDestination))
+                QuickLogger.Debug("1");
+                if (StoreManager.main.CompleteOrder(_cartDropDownHandler, _cartDropDownHandler.GetOrderNumber(), SelectedDestination))
                 {
-                    return false;
+                    QuickLogger.Debug("2");
+                    _cartDropDownHandler.TransactionComplete();
+                    HideDialog();
+                    QuickLogger.Debug("3");
+                    return true;
                 }
-                _cart.TransactionComplete();
-                HideDialog();
-                return true;
             }
-
-            MessageBoxHandler.main.Show(Buildables.AlterraHub.NotEnoughMoneyOnAccount(),FCSMessageButton.OK);
+            else
+            {
+                MessageBoxHandler.main.Show(Buildables.AlterraHub.NotEnoughMoneyOnAccount(), FCSMessageButton.OK);
+            }
             return false;
         }
 
@@ -149,7 +155,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
             _destinationDialogController.Initialize(this);
             _destinationDialogController.OnClose += () =>
             {
-                _destinationText.text = $"Destination: {SelectedDestination?.Manager.GetBaseName()}";
+                _destinationText.text = $"Destination: {SelectedDestination?.GetBaseName()}";
             };
         }
 
@@ -159,14 +165,14 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
             if (!PlayerInteractionHelper.HasCard())
             {
                 _accountBalance.text = Buildables.AlterraHub.AccountBalanceFormat(0);
-                _total.text = Buildables.AlterraHub.CheckOutTotalFormat(_cart?.GetTotal() ?? 0);
+                _total.text = Buildables.AlterraHub.CheckOutTotalFormat(_cartDropDownHandler?.GetTotal() ?? 0);
                 _newBalance.text = Buildables.AlterraHub.AccountNewBalanceFormat(0);
             }
             else
             {
                 _accountBalance.text = Buildables.AlterraHub.AccountBalanceFormat(CardSystem.main.GetAccountBalance());
-                _total.text = Buildables.AlterraHub.CheckOutTotalFormat(_cart.GetTotal());
-                _newBalance.text = Buildables.AlterraHub.AccountNewBalanceFormat(CardSystem.main.GetAccountBalance() - _cart.GetTotal());
+                _total.text = Buildables.AlterraHub.CheckOutTotalFormat(_cartDropDownHandler.GetTotal());
+                _newBalance.text = Buildables.AlterraHub.AccountNewBalanceFormat(CardSystem.main.GetAccountBalance() - _cartDropDownHandler.GetTotal());
             }
         }
 
@@ -174,7 +180,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
         {
             Initialize(mono);
             ResetScreen();
-            _cart = cart;
+            _cartDropDownHandler = cart;
             UpdateScreen();
             gameObject.SetActive(true);
         }

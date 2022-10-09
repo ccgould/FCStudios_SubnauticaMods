@@ -12,6 +12,7 @@ using FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.Model;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.Mono;
+using FCS_AlterraHub.Mono.Managers;
 using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Structs;
@@ -625,87 +626,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         {
             MessageBoxHandler.main.Show(message, FCSMessageButton.OK);
         }
-
-        internal bool MakeAPurchase(CartDropDownHandler cart, AlterraDronePortController depot = null, bool giveToPlayer = false)
-        {
-            var totalCash = cart.GetTotal();
-
-            if (FCSAlterraHubService.PublicAPI.IsInOreBuildMode())
-            {
-                foreach (CartItem cartItem in cart.GetItems())
-                {
-                    if (cartItem != null && !KnownTech.Contains(cartItem.TechType))
-                    {
-                        if (CraftData.IsAllowed(cartItem.TechType) && KnownTech.Add(cartItem.TechType, true))
-                        {
-                            ErrorMessage.AddDebug("Unlocked " + Language.main.Get(cartItem.TechType.AsString()));
-                        }
-                    }
-                }
-            }
-            else
-            {
-                var sizes = GetSizes(cart);
-                if (giveToPlayer)
-                {
-                    if (CardSystem.main.HasEnough(totalCash) && Inventory.main.container.HasRoomFor(sizes))
-                    {
-                        foreach (CartItem item in cart.GetItems())
-                        {
-                            for (int i = 0; i < item.ReturnAmount; i++)
-                            {
-                                QuickLogger.Debug($"{item.ReceiveTechType}", true);
-                                PlayerInteractionHelper.GivePlayerItem(item.ReceiveTechType);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-                else
-                {
-                    if (depot == null || !depot.HasRoomFor(sizes))
-                    {
-                        MessageBoxHandler.main.Show(depot == null ? AlterraHub.DepotNotFound() : AlterraHub.DepotFull(), FCSMessageButton.OK);
-                        return false;
-                    }
-
-                    if (DroneDeliveryService.Main == null)
-                    {
-                        QuickLogger.Error("FCSStation Main is null!");
-                        QuickLogger.ModMessage("The FCSStation cannot be found please contact FCSStudios for help with this issue. Order will be sent to your inventory");
-                        MakeAPurchase(cart, null, true);
-                        return true;
-                    }
-
-                    DroneDeliveryService.Main.PendAPurchase(depot, cart);
-                }
-            }
-            
-            CardSystem.main.RemoveFinances(totalCash);
-            return true;
-        }
-
-        private static List<Vector2int> GetSizes(CartDropDownHandler cart)
-        {
-            var items = new List<Vector2int>();
-            foreach (CartItem cartItem in cart.GetItems())
-            {
-                for (int i = 0; i < cartItem.ReturnAmount; i++)
-                {
-#if SUBNAUTICA
-                    items.Add(CraftData.GetItemSize(cartItem.TechType));
-#else
-                    items.Add(TechData.GetItemSize(cartItem.TechType));
-#endif
-                }
-            }
-
-            return items;
-        }
-
+        
         public void GoToPage(PDAPages page)
         {
             foreach (KeyValuePair<PDAPages, GameObject> cachedPage in _pages)
@@ -869,7 +790,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         {
             newSaveData.FCSPDAEntry = new FCSPDAEntry
             {
-                CartItems = _cartDropDownManager?.Save() ?? new List<CartItemSaveData>()
+                //CartItems = _cartDropDownManager?.Save() ?? new List<CartItemSaveData>()
             };
 
             Mod.GamePlaySettings.Rate = GetRate();
@@ -1098,7 +1019,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
 
             _cancelButton.onClick.AddListener((() =>
             {
-                DroneDeliveryService.Main.CancelOrder(pendingOrder);
+                StoreManager.main.CancelOrder(pendingOrder);
                 Delete();
             }));
 

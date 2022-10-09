@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
+using FCS_AlterraHub.Mono.Managers;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -11,13 +11,13 @@ using UnityEngine.UI;
 
 namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
 {
-    internal class CartDropDownHandler : MonoBehaviour
+    internal class CartDropDownHandler : MonoBehaviour,IStoreClient
     {
         public Action<CartDropDownHandler> OnBuyAllBtnClick;
         private GameObject _cartList;
-        private readonly List<CartItem> _pendingItems = new List<CartItem>();
         private Text _totalAmount;
         internal Action<decimal> onTotalChanged;
+        private string _orderNumber;
 
         internal void Initialize()
         {
@@ -34,12 +34,11 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
                     return;
                 }
 
-                if (_pendingItems.Count <= 0)
+                if (StoreManager.main.GetCartCount(_orderNumber) <= 0)
                 {
                     SendMessageFromDialog(Buildables.AlterraHub.NoItemsInCart());
                     return;
                 }
-                
                 OnBuyAllBtnClick?.Invoke(this);
             });
 
@@ -68,7 +67,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
         internal void AddItem(TechType item,TechType receiveTechType,int returnAmount)
         {
             var slots = Inventory.main.container.sizeX * Inventory.main.container.sizeY;
-            if (_pendingItems.Count < slots)
+            if (StoreManager.main.GetCartCount(_orderNumber) < slots)
             {
                 CreateCartItem(item, receiveTechType,returnAmount);
                 UpdateTotalAmount();
@@ -87,12 +86,12 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
             cartItemComponent.ReceiveTechType = receiveTechType;
             cartItemComponent.ReturnAmount = returnAmount;
             cartItem.transform.SetParent(_cartList.transform, false);
-            _pendingItems.Add(cartItemComponent);
+            _orderNumber = StoreManager.main.AddItemToCart(this,_orderNumber, cartItemComponent);
 
             cartItemComponent.onRemoveBTNClicked +=(pendingItem =>
             {
                 QuickLogger.Debug("Remove Item.",true);
-                _pendingItems.Remove(pendingItem);
+                StoreManager.main.RemoveCartItem(_orderNumber, pendingItem);
                 QuickLogger.Debug("Remove Pending Item.", true);
                 Destroy(pendingItem.gameObject);
                 QuickLogger.Debug("Destroy Item.", true);
@@ -103,7 +102,8 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
 
         private void ResetDropDown()
         {
-            _pendingItems?.Clear();
+
+            StoreManager.main?.RemovePendingOrder(_orderNumber);
 
             foreach (Transform child in _cartList.transform)
             {
@@ -124,31 +124,47 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
 
         internal decimal GetTotal()
         {
-            return  _pendingItems.Sum(x => StoreInventorySystem.GetPrice(x.TechType));
+            return StoreManager.main?.GetCartTotal(_orderNumber) ?? 0;
         }
 
         internal int GetCartCount()
         {
-            return _pendingItems.Count;
+            return StoreManager.main?.GetCartCount(_orderNumber) ?? 0;
         }
         
         internal void TransactionComplete()
         {
+            _orderNumber = string.Empty;
             ResetDropDown();
             MessageBoxHandler.main.Show(Buildables.AlterraHub.PurchaseSuccessful(),FCSMessageButton.OK);
         }
 
         public IEnumerable<CartItem> GetItems()
         {
-            return _pendingItems;
+            return StoreManager.main.GetCartItems(_orderNumber);
+        }
+        
+        public StoreClientType ClientType => StoreClientType.PDA;
+        
+        public void OnOrderComplete(bool result)
+        {
         }
 
-        public IEnumerable<CartItemSaveData> Save()
+        public void OnCreatedCartItem()
         {
-            foreach (CartItem cartItem in _pendingItems)
-            {
-                yield return cartItem.Save();
-            }
+        }
+
+        public void OnDeletedCartItem()
+        {
+        }
+
+        public void OnRemoveCartItem(GameObject go)
+        {
+        }
+
+        public string GetOrderNumber()
+        {
+            return _orderNumber;
         }
     }
 }

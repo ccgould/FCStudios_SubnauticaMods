@@ -14,6 +14,7 @@ using FCS_AlterraHub.Mods.Common.DroneSystem.Interfaces;
 using FCS_AlterraHub.Mods.Common.DroneSystem.Models;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.Mono;
+using FCS_AlterraHub.Mono.Managers;
 using FCS_AlterraHub.Objects;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Systems;
@@ -140,8 +141,6 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
 
             OffloadItemsInBase(order, devices);
 
-            DroneDeliveryService.Main.ClearCurrentOrder();
-
             VoiceNotificationSystem.main.DisplayMessage($"{AlterraHub.OrderHasBeenShipped()} {GetBaseName()}");
         }
 
@@ -180,19 +179,6 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
 
         private bool FindHubDepot(Shipment order, out IEnumerable<FcsDevice> devices)
         {
-            if (DroneDeliveryService.Main.IsStationPort(this))
-            {
-                if (order.CartItems != null)
-                {
-                    var port = (AlterraDronePortController)FCSAlterraHubService.PublicAPI.FindDeviceWithPreFabID(order.PortPrefabID).Value;
-                    var items = order.CartItems;
-                    DroneDeliveryService.Main.ClearCurrentOrder();
-                    DroneDeliveryService.Main.PendAPurchase(port, items);
-                }
-                devices = null;
-                return true;
-            }
-
             devices = Manager?.GetDevices(Mod.AlterraHubDepotTabID);
 
             if (devices == null)
@@ -217,15 +203,14 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
 
         private static bool GetCurrentOrder(out Shipment order)
         {
-            order = DroneDeliveryService.Main.GetCurrentOrder();
+            order = null;
 
-            if (order.CartItems == null)
-            {
-                QuickLogger.Error("Order was null when offloading.");
-                return true;
-            }
+            //if (order.CartItems == null)
+            //{
+            //    QuickLogger.Error("Order was null when offloading.");
+            //    return true;
+            //}
 
-            ;
             return false;
         }
 
@@ -475,12 +460,7 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
 
             return total >= sizes.Count;
         }
-
-        public string GetStatus()
-        {
-            return !HasDepot() ? "Depot Not Built At Base" : "Ready";
-        }
-
+        
         public string GetBaseID()
         {
             return _portManager.GetBaseID();
