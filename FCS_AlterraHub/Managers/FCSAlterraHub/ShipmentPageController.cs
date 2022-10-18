@@ -14,7 +14,7 @@ internal class ShipmentPageController : MonoBehaviour
     private GameObject _grid;
     private List<ShipmentTracker> _trackedShipments = new();
 
-    public void Initialize(FCSPDAController controller)
+    public void Initialize(FCSAlterraHubGUI controller)
     {
         var backButton = gameObject.FindChild("BackBTN").GetComponent<Button>();
         backButton.onClick.AddListener((() =>

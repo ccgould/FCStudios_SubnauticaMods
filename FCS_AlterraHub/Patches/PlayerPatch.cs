@@ -116,7 +116,7 @@ namespace FCS_AlterraHub.Patches
                 {
                     if(Input.GetKey(KeyCode.RightControl) || Input.GetKey(KeyCode.LeftControl))
                     {
-                        FCSPDA.GoToPage(PDAPages.Teleportation);
+                        FCSPDA.Screen.GoToPage(PDAPages.Teleportation);
                         FCSPDA.Open();
                     }
                     else

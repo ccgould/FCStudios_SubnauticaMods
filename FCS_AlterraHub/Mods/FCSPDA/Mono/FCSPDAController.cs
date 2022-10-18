@@ -34,27 +34,14 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         private Sequence sequence = new(false);
         private GameObject _inputDummy;
         private uGUI_InputGroup _ui;
-        private Text _clock;
+
         private bool _isBeingDestroyed;
-        private Text _currentBiome;
-        private Text _accountName;
-        private Text _accountBalance;
-        private bool _goToEncyclopedia;
+
         private bool _depthState;
-        private readonly Dictionary<PDAPages, GameObject> _pages = new();
-        private GameObject _toggleHud;
-        private Dictionary<StoreCategory, List<StoreItem>> _storeItems = new();
-        private GameObject _storePageGrid;
-        private Text _storeLabel;
-        private CartDropDownHandler _cartDropDownManager;
-        private Text _cartButtonNumber;
-        private Text _cartAmountLabel;
-        private Text _cartTotalLabel;
-        private CheckOutPopupDialogWindow _checkoutDialog;
-        private AccountPageHandler _accountPageHandler;
+
+
         private bool _isInitialized;
         private Canvas _canvas;
-        private bool _cartLoaded;
 
         public GameObject PDAObj { get; set; }
         public float cameraFieldOfView = 62f;
@@ -77,19 +64,18 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         }
         
         #region SINGLETON PATTERN
-        private ReturnsDialogController _returnsDialogController;
         private List<MeshRenderer> _pdaMeshes = new();
-        private GameObject _screen;
+
         private Transform _pdaAnchor;
         private uGUI_CanvasScaler _canvasScalar;
-        internal EncyclopediaTabController EncyclopediaTabController { get; set; }
         public static FCSPDAController Main;
-        private GameObject _404;
-        private ShipmentPageController _shipmentPageController;
+
         private int _timesOpen;
-        private Text _currentBaseInfo;
-        private TeleportationPageController _teleportationPageController;
+
         private bool _firstTimeOpen = true;
+        internal FCSAlterraHubGUI Screen;
+        private bool _goToEncyclopedia;
+        private GameObject _screen;
 
         #endregion
 
@@ -107,7 +93,6 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             }
         }
 
-
         public bool Open()
         {
             QuickLogger.Debug("PDA Open : 1");
@@ -118,9 +103,9 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
 
             PlayAppropriateVoiceMessage();
 
-            TryRemove404Screen();
+            Screen.TryRemove404Screen();
 
-            RefreshTeleportationPage();
+            Screen.RefreshTeleportationPage();
 
             CreateScreen();
 
@@ -128,9 +113,9 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
 
             ChangePDAVisibility(false);
 
-            AttemptToOpenReturnsDialog();
+            Screen.AttemptToOpenReturnsDialog();
 
-            UpdateDisplay();
+            Screen.UpdateDisplay();
 
             DOFOperations();
 
@@ -144,7 +129,13 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             return true;
         }
 
-
+        internal void CreateScreen()
+        {
+            if (_screen == null)
+            {
+                _screen = Instantiate(AlterraHub.PDAScreenPrefab);
+            }
+        }
 
         public void Close()
         {
@@ -156,14 +147,14 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             Player main = Player.main;
             main.GetPDA().sequence.ForceState(false);
             MainCameraControl.main.ResetLockedVRViewModelAngle();
-            _screen.SetActive(false);
+            Screen.gameObject.SetActive(false);
             Vehicle vehicle = main.GetVehicle();
             if (vehicle != null)
             {
                 uGUI.main.quickSlots.SetTarget(vehicle);
             }
 
-            _accountPageHandler.Close();
+            Screen.CloseAccountPage();
 
 
 #if SUBNAUTICA_STABLE
@@ -188,17 +179,19 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             QuickLogger.Debug("FCS PDA Is Closed", true);
         }
 
-
         internal void SetInstance()
         {
             if (_isInitialized) return;
-            
             CreateScreen();
+
+            Screen = _screen.AddComponent<FCSAlterraHubGUI>();
+
+            Screen.SetInstance();
 
             _pdaAnchor = GameObjectHelpers.FindGameObject(gameObject, "ScreenAnchor").transform;
 
-            _canvasScalar = _screen.AddComponent<uGUI_CanvasScaler>();
-            var raycaster = _screen.AddComponent<uGUI_GraphicRaycaster>();
+            _canvasScalar = Screen.gameObject.AddComponent<uGUI_CanvasScaler>();
+            var raycaster = Screen.gameObject.AddComponent<uGUI_GraphicRaycaster>();
             raycaster.guiCameraSpace = true;
             raycaster.ignoreReversedGraphics = false;
 
@@ -207,67 +200,23 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             _canvasScalar.SetAnchor(_pdaAnchor.transform);
 
 
-            _canvas = _screen.GetComponent<Canvas>();
+            _canvas = Screen.GetComponentInChildren<Canvas>();
             _canvas.sortingLayerName = "PDA";
             _canvas.sortingLayerID = 1479780821;
-
-            _currentBiome = GameObjectHelpers.FindGameObject(_canvas.gameObject, "BiomeLBL")?.GetComponent<Text>();
-            _404 = GameObjectHelpers.FindGameObject(_canvas.gameObject, "404");
-            _404.FindChild("Message").GetComponent<Text>().text = AlterraHub.Error404();
-            _checkoutDialog = _canvas.gameObject.FindChild("Dialogs").FindChild("CheckOutPopUp").AddComponent<CheckOutPopupDialogWindow>();
-
-            _returnsDialogController = _canvas.gameObject.FindChild("Dialogs").FindChild("ReturnItemsDialog").AddComponent<ReturnsDialogController>();
-            _returnsDialogController.Initialize(this);
-            
-            _cartDropDownManager = _canvas.gameObject.FindChild("Dialogs").FindChild("CartDropDown").AddComponent<CartDropDownHandler>();
-            _cartDropDownManager.OnBuyAllBtnClick += OnBuyAllBtnClick;
-            _cartDropDownManager.Initialize();
-            _cartDropDownManager.onTotalChanged += amount =>
-            {
-                _cartAmountLabel.text = $"Cart Amount: {amount:n0}";
-                _cartTotalLabel.text = $"Cart Total: {_cartDropDownManager.GetCartCount()}";
-                _cartButtonNumber.text = _cartDropDownManager.GetCartCount().ToString();
-            };
-
-            _toggleHud = GameObjectHelpers.FindGameObject(_canvas.gameObject, "ToggleHud");
-            _accountName = GameObjectHelpers.FindGameObject(_canvas.gameObject, "UserName")?.GetComponent<Text>();
-            _currentBaseInfo = GameObjectHelpers.FindGameObject(_canvas.gameObject, "CurrentBaseInfo")?.GetComponent<Text>();
-            _accountBalance = GameObjectHelpers.FindGameObject(_canvas.gameObject, "AccountBalance")?.GetComponent<Text>();
-            _clock = GameObjectHelpers.FindGameObject(_canvas.gameObject, "Clock")?.GetComponent<Text>();
-
-            AddPages();
-            CreateHomePage();
-            CreateStorePage();
-            EncyclopediaPage();
-            CreateStorePagePage();
-            AccountPage();
-            LoadStore();
-            LoadShipmentPage();
-            TeleportationPage();
-
             MaterialHelpers.ApplyEmissionShader(AlterraHub.BasePrimaryCol,gameObject,Color.white,0,0.01f,0.01f);
             MaterialHelpers.ApplySpecShader(AlterraHub.BasePrimaryCol,gameObject,1, 6.15f);
             MessageBoxHandler.main.ObjectRoot = ui.gameObject;
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject,Color.cyan);
-            InvokeRepeating(nameof(UpdateDisplay), .5f, .5f);
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject,Color.cyan);    
             InGameMenuQuitPatcher.AddEventHandlerIfMissing(OnQuit);
-            _screen.SetActive(false);
+            Screen.gameObject.SetActive(false);
             _isInitialized = true;
         }
 
         private void OnDestroy()
         {
-            _accountPageHandler = null;
-            _cartDropDownManager.OnBuyAllBtnClick -= OnBuyAllBtnClick;
             _isBeingDestroyed = true;
         }
-
-        private void OnBuyAllBtnClick(CartDropDownHandler obj)
-        {
-            _checkoutDialog.ShowDialog(this, _cartDropDownManager);
-            _cartDropDownManager.ToggleVisibility();
-        }
-
+        
         private void Update()
         {
             sequence.Update();
@@ -289,170 +238,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
                 return;
             }
 
-            if (_clock != null)
-            {
-                _clock.text = WorldHelpers.GetGameTimeFormat();
-            }
-
             FPSInputModule.current.EscapeMenu();
-        }
-
-        private void CreateScreen()
-        {
-            if (_screen == null)
-            {
-                _screen = Instantiate(AlterraHub.PDAScreenPrefab);
-            }
-        }
-
-        private void AddPages()
-        {
-            foreach (PDAPages page in Enum.GetValues(typeof(PDAPages)))
-            {
-                var gPage = GameObjectHelpers.FindGameObject(_canvas.gameObject, page.ToString());
-                _pages.Add(page,gPage);
-            }
-        }
-        
-        private void CreateHomePage()
-        {
-            var pageTextLabel = _pages[PDAPages.Home].FindChild("PageName").GetComponent<Text>();
-            var radialMenu = _pages[PDAPages.Home].FindChild("RadialMenu").AddComponent<RadialMenu>();
-            radialMenu.TabAmount = 4;
-            radialMenu.AddEntry(this,ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(),"Icons", "Cart_Icon.png")),pageTextLabel,"Store",PDAPages.Store);
-            radialMenu.AddEntry(this,ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(),"Icons", "EncyclopediaIcon.png")), pageTextLabel,"Encyclopedia",PDAPages.Encyclopedia);
-            radialMenu.AddEntry(this,ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(),"Icons", "IconAccount.png")), pageTextLabel,"Account",PDAPages.AccountPage);
-            radialMenu.AddEntry(this,ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(),"Icons", "QuantumTeleporterIcon_W.png")), pageTextLabel,"Teleportation",PDAPages.Teleportation);
-            radialMenu.Rearrange();
-        }
-
-        private void CreateStorePage()
-        {
-            _cartButtonNumber = GameObjectHelpers.FindGameObject(_pages[PDAPages.Store], "CartCount").GetComponentInChildren<Text>();
-            var pageTextLabel = _pages[PDAPages.Store].FindChild("PageName").GetComponent<Text>();
-            var radialMenu = _pages[PDAPages.Store].FindChild("RadialMenu").AddComponent<RadialMenu>();
-            
-            var cartBTN = _pages[PDAPages.Store].FindChild("Cart").GetComponent<Button>();
-            cartBTN.onClick.AddListener((() =>
-            {
-                _cartDropDownManager.ToggleVisibility();
-            }));
-
-            var returnsBTN = _pages[PDAPages.Store].FindChild("Returns").GetComponent<Button>();
-            returnsBTN.onClick.AddListener(() =>
-            {
-                _returnsDialogController.Open();
-            });
-
-            var backButton = _pages[PDAPages.Store].FindChild("BackBTN").GetComponent<Button>();
-            backButton.onClick.AddListener((() =>
-            {
-                GoToPage(PDAPages.Home);
-            }));
-
-
-            radialMenu.TabAmount = 7;
-            radialMenu.AddEntry(this, ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "Icons", "HomeSolutionsIcon_W.png")), pageTextLabel, "Home Solutions", PDAPages.HomeSolutions);
-            radialMenu.AddEntry(this, ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "Icons", "LifeSupportIcon_W.png")), pageTextLabel, "Life Solutions", PDAPages.LifeSolutions);
-            radialMenu.AddEntry(this, ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "Icons", "EnergySolutionsIcon_W.png")), pageTextLabel, "Energy Solutions", PDAPages.EnergySolutions);
-            radialMenu.AddEntry(this, ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "Icons", "ProductionSolutionsIcon_W.png")), pageTextLabel, "Production Solutions", PDAPages.ProductionSolutions);
-            radialMenu.AddEntry(this, ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "Icons", "StoreSolutionsIcon_W.png")), pageTextLabel, "Storage Solutions", PDAPages.StorageSolutions);
-            radialMenu.AddEntry(this, ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "Icons", "VehicleSolutionsIcon_W.png")), pageTextLabel, "Vehicle Solutions", PDAPages.VehicleSolutions);
-            radialMenu.AddEntry(this, ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "Icons", "MiscIcon_W.png")), pageTextLabel, "Misc", PDAPages.MiscSolutions);
-
-            //Set gameobject to toggle for pages
-            _pages[PDAPages.HomeSolutions] = _pages[PDAPages.StorePage];
-            _pages[PDAPages.LifeSolutions] = _pages[PDAPages.StorePage];
-            _pages[PDAPages.EnergySolutions] = _pages[PDAPages.StorePage];
-            _pages[PDAPages.ProductionSolutions] = _pages[PDAPages.StorePage];
-            _pages[PDAPages.StorageSolutions] = _pages[PDAPages.StorePage];
-            _pages[PDAPages.VehicleSolutions] = _pages[PDAPages.StorePage];
-            _pages[PDAPages.MiscSolutions] = _pages[PDAPages.StorePage];
-
-            radialMenu.Rearrange();
-        }
-
-        private void CreateStorePagePage()
-        {
-            var backButton = _pages[PDAPages.StorePage].FindChild("BackBTN").GetComponent<Button>();
-            _cartAmountLabel = _pages[PDAPages.StorePage].FindChild("StoreHud").FindChild("CartAmount").GetComponent<Text>();
-            _cartTotalLabel = _pages[PDAPages.StorePage].FindChild("StoreHud").FindChild("CartTotal").GetComponent<Text>();
-            _storePageGrid = GameObjectHelpers.FindGameObject(_pages[PDAPages.StorePage], "Content");
-            _storeLabel = GameObjectHelpers.FindGameObject(_pages[PDAPages.StorePage], "StoreLabel").GetComponent<Text>();
-            backButton.onClick.AddListener((() =>
-            {
-                GoToPage(PDAPages.Store);
-            }));
-        }
-
-        private void LoadShipmentPage()
-        {
-
-            var shipmentButton = _pages[PDAPages.Store].FindChild("ShipmentBTN").GetComponent<Button>();
-            shipmentButton.onClick.AddListener((() =>
-            {
-                GoToPage(PDAPages.Shipment);
-            }));
-
-            _shipmentPageController = _pages[PDAPages.Shipment].AddComponent<ShipmentPageController>();
-            _shipmentPageController.Initialize(this);
-        }
-
-        private void AccountPage()
-        {
-            _accountPageHandler = new AccountPageHandler(this);
-            var backButton = _pages[PDAPages.AccountPage].FindChild("BackBTN").GetComponent<Button>();
-            backButton.onClick.AddListener((() =>
-            {
-                GoToPage(PDAPages.Home);
-            }));
-        }
-
-        private void TeleportationPage()
-        {
-            _teleportationPageController = _pages[PDAPages.Teleportation].AddComponent<TeleportationPageController>();
-            _teleportationPageController.Initialize(this);
-
-        }
-
-        private void EncyclopediaPage()
-        {
-            EncyclopediaTabController = _pages[PDAPages.Encyclopedia].AddComponent<EncyclopediaTabController>();
-            var backButton = _pages[PDAPages.Encyclopedia].FindChild("BackBTN").GetComponent<Button>();
-            backButton.onClick.AddListener((() =>
-            {
-                GoToPage(PDAPages.Home);
-            }));
-            EncyclopediaTabController.Initialize();
-        }
-
-        private void UpdateDisplay()
-        {
-            if (_currentBiome == null || _accountName == null || _currentBaseInfo == null) return;
-
-            _currentBiome.text = Player.main.GetBiomeString();
-
-            if(!string.IsNullOrWhiteSpace(CardSystem.main.GetUserName()))
-                _accountName.text = CardSystem.main.GetUserName();
-
-            _accountBalance.text = $"{CardSystem.main.GetAccountBalance():N0}";
-
-            var friendly = BaseManager.GetPlayersCurrentBase()?.GetBaseName();
-            var baseId = BaseManager.GetPlayersCurrentBase()?.GetBaseFriendlyId();
-
-            if (!string.IsNullOrWhiteSpace(friendly))
-            {
-                SetCurrentBaseInfoText($"{friendly} | {AlterraHub.BaseIDFormat(baseId)}");
-            }
-            else
-            {
-                SetCurrentBaseInfoText("N/A");
-            }
-        }
-
-        private void SetCurrentBaseInfoText(string text)
-        {
-            _currentBaseInfo.text = $"Current Base : {text}";
         }
         
         private void SetRequiredParametersToOpenPDA()
@@ -474,7 +260,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             }
 
             Inventory.main.SetViewModelVis(false);
-            _screen.SetActive(true);
+            Screen.gameObject.SetActive(true);
             UwePostProcessingManager.OpenPDA();
             SafeAnimator.SetBool(Player.main.armsController.animator, "using_pda", true);
 
@@ -504,31 +290,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         {
             _pda.isInUse = isInUse;
         }
-
-        private void AttemptToOpenReturnsDialog()
-        {
-            if (_returnsDialogController?.IsOpen ?? false)
-            {
-                _returnsDialogController.Open();
-            }
-        }
-
-        private void RefreshTeleportationPage()
-        {
-            _teleportationPageController.Refresh();
-        }
-
-        private void TryRemove404Screen()
-        {
-            if (DroneDeliveryService.Main == null)
-            {
-                MessageBoxHandler.main.Show(AlterraHub.ErrorHasOccurred("0x0001"), FCSMessageButton.OK);
-                return;
-            }
-            
-            _404?.SetActive(!DroneDeliveryService.Main.DetermineIfFixed());
-        }
-
+        
         private void PlayAppropriateVoiceMessage()
         {
             if (_timesOpen > 0 && !CardSystem.main.HasBeenRegistered() && !_firstTimeOpen &&
@@ -611,173 +373,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             }
         }
 
-        internal void ExitStore()
-        {
-            GoToPage(PDAPages.Home);
-            Close();
-        }
-
-        internal void ShowMission()
-        {
-           // uGUI_PowerIndicator_Initialize_Patch.MissionHUD.ShowMessage("Hi","Eggo"); 
-        }
-
-        internal void ShowMessage(string message)
-        {
-            MessageBoxHandler.main.Show(message, FCSMessageButton.OK);
-        }
         
-        public void GoToPage(PDAPages page)
-        {
-            foreach (KeyValuePair<PDAPages, GameObject> cachedPage in _pages)
-            {
-                cachedPage.Value?.SetActive(false);
-            }
-
-            _pages[page].SetActive(true);
-            
-            switch (page)
-            {
-                case PDAPages.Store:
-                    _toggleHud.gameObject.SetActive(true);
-                    break;
-                case PDAPages.Encyclopedia:
-                    EncyclopediaTabController.Refresh();
-                    _toggleHud.gameObject.SetActive(true);
-                    break;
-                case PDAPages.Home:
-                case PDAPages.StorePage:
-                case PDAPages.AccountPage:
-                    _toggleHud.gameObject.SetActive(true);
-                    _accountPageHandler.UpdateRequestBTN(CardSystem.main.HasBeenRegistered());
-                    break;
-                case PDAPages.Shipment:
-                    _shipmentPageController.gameObject.SetActive(true);
-                    break;
-                case PDAPages.Teleportation:
-                    _teleportationPageController.Refresh();
-                    break;
-                default:
-                    LoadStorePage(page);
-                    _toggleHud.gameObject.SetActive(false);
-                    break;
-            }
-        }
-
-        private void LoadStorePage(PDAPages pages)
-        {
-            StoreCategory category = StoreCategory.None;
-
-            switch (pages)
-            {
-                case PDAPages.HomeSolutions:
-                    category = StoreCategory.Home;
-                    _storeLabel.text = "Home Solutions";
-                    break;
-                case PDAPages.LifeSolutions:
-                    category = StoreCategory.LifeSupport;
-                    _storeLabel.text = "Life Solutions";
-                    break;
-                case PDAPages.EnergySolutions:
-                    category = StoreCategory.Energy;
-                    _storeLabel.text = "Energy Solutions";
-                    break;
-                case PDAPages.ProductionSolutions:
-                    category = StoreCategory.Production;
-                    _storeLabel.text = "Production Solutions";
-                    break;
-                case PDAPages.StorageSolutions:
-                    category = StoreCategory.Storage;
-                    _storeLabel.text = "Storage Solutions";
-                    break;
-                case PDAPages.VehicleSolutions:
-                    category = StoreCategory.Vehicles;
-                    _storeLabel.text = "Vehicle Solutions";
-                    break;
-                case PDAPages.MiscSolutions:
-                    category = StoreCategory.Misc;
-                    _storeLabel.text = "Misc";
-                    break;
-            }
-
-            foreach (var storeItem in _storeItems)
-            {
-                if (storeItem.Key == category)
-                {
-                    foreach (StoreItem item in storeItem.Value)
-                    {
-                        item.Show();
-                    }
-                }
-                else
-                {
-                    foreach (StoreItem item in storeItem.Value)
-                    {
-                        item.Hide();
-                    }
-                }
-            }
-        }
-
-        private void LoadStore()
-        {
-
-            foreach (StoreCategory category in Enum.GetValues(typeof(StoreCategory)))
-            {
-                foreach (var storeItem in FCSAlterraHubService.PublicAPI.GetRegisteredKits())
-                {
-                    if(storeItem.Value.StoreCategory != category) continue;
-                    QuickLogger.Debug($"Trying to add Store Item  {Language.main.Get(storeItem.Key)}");
-                    
-                    var item = StoreInventorySystem.CreateStoreItem(storeItem.Value, AddToCartCallBack, IsInUse);
-                    
-                    if (_storeItems.ContainsKey(category))
-                    {
-                        _storeItems[category].Add(item);
-                    }
-                    else
-                    {
-                        _storeItems.Add(category, new List<StoreItem>{item});
-                    }
-
-                    item.gameObject.transform.SetParent(_storePageGrid.transform, false);
-
-                    QuickLogger.Debug($"Added Store Item  {Language.main.Get(storeItem.Key)} with category to Panel: {storeItem.Value.StoreCategory}:");
-                }
-
-                foreach (FCSStoreEntry storeItem in QPatch.Configuration.AdditionalStoreItems)
-                {
-                    if (storeItem.StoreCategory != category) continue;
-
-                    QuickLogger.Debug($"Trying to add Store Item  {Language.main.Get(storeItem.TechType)}");
-
-                    var item = StoreInventorySystem.CreateStoreItem(storeItem, AddToCartCallBack, IsInUse);
-                    if (_storeItems.ContainsKey(category))
-                    {
-                        _storeItems[category].Add(item);
-                    }
-                    else
-                    {
-                        _storeItems.Add(category, new List<StoreItem>{item});
-                    }
-
-                    item.gameObject.transform.SetParent(_storePageGrid.transform,false);
-
-                    QuickLogger.Debug($"Added Store Item  {Language.main.Get(storeItem.TechType)} with category to Panel: {storeItem.StoreCategory}:");
-                }
-            }
-        }
-
-        private void AddToCartCallBack(TechType techType, TechType receiveTechType, int returnAmount)
-        {
-            _cartDropDownManager?.AddItem(techType, receiveTechType, returnAmount);
-        }
-
-        private bool IsInUse()
-        {
-            return IsOpen;
-        }
-
         private void OnQuit()
         {
             Mod.DeepCopySave(CardSystem.main.SaveDetails());
@@ -793,81 +389,19 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
                 //CartItems = _cartDropDownManager?.Save() ?? new List<CartItemSaveData>()
             };
 
-            Mod.GamePlaySettings.Rate = GetRate();
-            Mod.GamePlaySettings.AutomaticDebitDeduction = GetAutomaticDebitDeduction();
+            Mod.GamePlaySettings.Rate = Screen.GetRate();
+            Mod.GamePlaySettings.AutomaticDebitDeduction = Screen.GetAutomaticDebitDeduction();
             Mod.GamePlaySettings.IsPDAOpenFirstTime = _firstTimeOpen;
         }
 
-
-        public bool GetAutomaticDebitDeduction()
-        {
-            return _accountPageHandler.GetAutomaticDebitDeduction();
-        }
-
+        
         internal void LoadFromSave(FCSPDAEntry savedData)
         {
             _firstTimeOpen = Mod.GamePlaySettings.IsPDAOpenFirstTime;
 
-            if (savedData?.CartItems == null)
-            {
-                QuickLogger.Debug("Cart Items returned Null");
-            }
-            else
-            {
-                foreach (CartItemSaveData cartItem in savedData.CartItems)
-                {
-                    _cartDropDownManager.AddItem(cartItem.TechType, cartItem.ReceiveTechType, cartItem.ReturnAmount <= 0 ? 1 : cartItem.ReturnAmount);
-                }
-            }
-
-            _accountPageHandler.Refresh();
-
-            _cartLoaded = true;
+            Screen.LoadFromSave(savedData.CartItems);
         }
-
-        public void OpenEncyclopedia(TechType techType)
-        {
-            if (CheckIfPDAHasEntry(techType))
-            {
-                if (!Open()) return ;
-                GoToPage(PDAPages.Encyclopedia);
-                EncyclopediaTabController.OpenEntry(techType);
-            }
-            else
-            {
-                QuickLogger.ModMessage($"AlterraHub PDA doesn't have any entry for {Language.main.Get(techType)}");
-            }
-        }
-
-        public void OpenEncyclopedia(string techType)
-        {
-            if (CheckIfPDAHasEntry(techType))
-            {
-                if (!Open()) return;
-                GoToPage(PDAPages.Encyclopedia);
-                EncyclopediaTabController.OpenEntry(techType);
-            }
-            else
-            {
-                QuickLogger.ModMessage($"AlterraHub PDA doesn't have any entry for {Language.main.Get(techType)}");
-            }
-        }
-
-        public bool CheckIfPDAHasEntry(TechType techType)
-        {
-            return EncyclopediaTabController.HasEntry(techType);
-        }
-
-        public bool CheckIfPDAHasEntry(string techType)
-        {
-            return EncyclopediaTabController.HasEntry(techType);
-        }
-
-        public CraftNode GetCraftTree()
-        {
-            return EncyclopediaTabController.Tree;
-        }
-
+        
         public static void ForceOpen()
         {
             Player_Patches.ForceOpenPDA = true;
@@ -876,21 +410,6 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         public static void ForceClose()
         {
             Main.Close();
-        }
-
-        internal void AddShipment(Shipment shipment)
-        {
-            _shipmentPageController.AddItem(shipment);
-        }
-
-        internal void RemoveShipment(Shipment shipment)
-        {
-            _shipmentPageController.RemoveItem(shipment);
-        }
-
-        public float GetRate()
-        {
-            return _accountPageHandler.GetRate();
         }
     }
 }

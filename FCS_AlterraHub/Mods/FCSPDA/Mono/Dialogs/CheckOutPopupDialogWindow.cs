@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Managers.FCSAlterraHub;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mods.Common.DroneSystem;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
@@ -21,7 +22,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
         private Text _newBalance;
 
         private bool _isInitialized;
-        private FCSPDAController _mono;
+        private FCSAlterraHubGUI _mono;
         private CardSystem cardSystem => CardSystem.main;
 
         public CartDropDownHandler _cartDropDownHandler;
@@ -31,7 +32,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
         internal IShippingDestination SelectedDestination { get; set; }
 
 
-        private void Initialize(FCSPDAController mono)
+        private void Initialize(FCSAlterraHubGUI mono)
         {
             if (_isInitialized) return;
 
@@ -137,7 +138,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
 
         private void CreatePurchaseExitButton()
         {
-            var purchaseBTN = GameObjectHelpers.FindGameObject(_mono.ui.gameObject, "PurchaseExitBTN").GetComponent<Button>();
+            var purchaseBTN = GameObjectHelpers.FindGameObject(_mono.gameObject, "PurchaseExitBTN").GetComponent<Button>();
             purchaseBTN.onClick.AddListener(() =>
             {
                 QuickLogger.Debug("Purchase Button Clicked", true);
@@ -150,7 +151,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
 
         private void CreateDestinationPopup()
         {
-            var destinationPopDiag = GameObjectHelpers.FindGameObject(_mono.ui.gameObject, "DestinationPopUp");
+            var destinationPopDiag = GameObjectHelpers.FindGameObject(_mono.gameObject, "DestinationPopUp");
             _destinationDialogController = destinationPopDiag.AddComponent<DestinationDialogController>();
             _destinationDialogController.Initialize(this);
             _destinationDialogController.OnClose += () =>
@@ -176,7 +177,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
             }
         }
 
-        internal void ShowDialog(FCSPDAController mono, CartDropDownHandler cart)
+        internal void ShowDialog(FCSAlterraHubGUI mono, CartDropDownHandler cart)
         {
             Initialize(mono);
             ResetScreen();

@@ -45,8 +45,8 @@ namespace FCS_AlterraHub.Patches
 
             if (!FCSAlterraHubService.InternalAPI.EncyclopediaEntries.Any(x=>x.ContainsKey(craftNode.id))) return true;
 
-            if (FCSPDAController.Main?.EncyclopediaTabController != null)
-                FCSPDAController.Main.EncyclopediaTabController.OnAddEntry(node, verbose);
+            if (FCSPDAController.Main?.Screen.EncyclopediaTabController != null)
+                FCSPDAController.Main.Screen.EncyclopediaTabController.OnAddEntry(node, verbose);
             else
                 CoroutineHost.StartCoroutine(HoldNotifications(node, verbose));
             
@@ -55,9 +55,9 @@ namespace FCS_AlterraHub.Patches
 
         private static IEnumerator HoldNotifications(CraftNode node, bool verbose)
         {
-            yield return new WaitUntil(() => FCSPDAController.Main?.EncyclopediaTabController != null);
+            yield return new WaitUntil(() => FCSPDAController.Main?.Screen.EncyclopediaTabController != null);
             
-            FCSPDAController.Main.EncyclopediaTabController.OnAddEntry(node, verbose);
+            FCSPDAController.Main.Screen.EncyclopediaTabController.OnAddEntry(node, verbose);
             yield break; 
         }  
         
@@ -67,7 +67,7 @@ namespace FCS_AlterraHub.Patches
         {
             if (!FCSAlterraHubService.InternalAPI.EncyclopediaEntries.Any(x=>x.ContainsKey(entryData.key))) return true;
 
-            __result = FCSPDAController.Main.EncyclopediaTabController.GetParent(entryData, create);
+            __result = FCSPDAController.Main.Screen.EncyclopediaTabController.GetParent(entryData, create);
             return false;
         }
 
@@ -78,7 +78,7 @@ namespace FCS_AlterraHub.Patches
         {
             if (!FCSAlterraHubService.InternalAPI.EncyclopediaEntries.Any(x=>x.ContainsKey(key))) return true;
            
-            __result = FCSPDAController.Main.EncyclopediaTabController.Add(key, entry, verbose);
+            __result = FCSPDAController.Main.Screen.EncyclopediaTabController.Add(key, entry, verbose);
             return false;
         }
 

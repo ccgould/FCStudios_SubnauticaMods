@@ -444,10 +444,10 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
             CardSystem.main.AddFinances(price);
 
 
-            if (FCSPDAController.Main.GetAutomaticDebitDeduction() && !CardSystem.main.IsDebitPaid())
+            if (FCSPDAController.Main.Screen.GetAutomaticDebitDeduction() && !CardSystem.main.IsDebitPaid())
             {
                 QuickLogger.Debug("Getting ready to deduct",true);
-                deduction = MathHelpers.PercentageOfNumber(Convert.ToDecimal(FCSPDAController.Main.GetRate()), price);
+                deduction = MathHelpers.PercentageOfNumber(Convert.ToDecimal(FCSPDAController.Main.Screen.GetRate()), price);
                 CardSystem.main.PayDebit(deduction);
             }
         }

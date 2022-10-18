@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Managers.FCSAlterraHub;
 using FCS_AlterraHub.Mono;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -13,6 +14,15 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
         public override void Awake()
         {
             _interiorTrigger = GameObjectHelpers.FindGameObject(gameObject ,"door_split").EnsureComponent<InteriorTrigger>();
+
+            var canvas = gameObject.GetComponentsInChildren<Canvas>();
+            foreach (Canvas canva in canvas)
+            {
+                var screen = canva.gameObject.EnsureComponent<FCSAlterraHubGUI>();
+                screen.SetInstance();
+
+            }
+
             this.LOD = GetComponent<BehaviourLOD>();
             this.rb = GetComponent<Rigidbody>();
             this.isBase = true;
@@ -55,8 +65,9 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
             private SubRoot _subRoot;
 
 
-            private void Awake()
+            public override void Awake()
             {
+                base.Awake();
                 _subRoot = gameObject.GetComponentInParent<SubRoot>();
             }
             

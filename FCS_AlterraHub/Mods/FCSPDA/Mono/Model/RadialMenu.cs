@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using FCS_AlterraHub.Managers.FCSAlterraHub;
 using FCS_AlterraHub.Mods.FCSPDA.Enums;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,7 +15,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Model
         private float Radius = 280;
         public int TabAmount = 8;
 
-        internal RadialMenuEntry AddEntry(FCSPDAController controller, Sprite pIcon, Text pageLabel, string buttonName, PDAPages pages)
+        internal RadialMenuEntry AddEntry(FCSAlterraHubGUI controller, Sprite pIcon, Text pageLabel, string buttonName, PDAPages pages)
         {
             GameObject entry = Instantiate(Buildables.AlterraHub.PDARadialMenuEntryPrefab, transform);
             entry.transform.localScale = new Vector3(1.4f, 1.4f, 1.4f);

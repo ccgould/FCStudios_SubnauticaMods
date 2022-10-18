@@ -1,6 +1,7 @@
 ﻿using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Managers.FCSAlterraHub;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
@@ -24,18 +25,18 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
         private Text _userNameLBL;
         private GameObject _createAccountDialog;
         private Text _requestButtonText;
-        private FCSPDAController _mono;
+        private FCSAlterraHubGUI _mono;
         private readonly Text _sliderText;
         private readonly Slider _slider;
         private readonly Toggle _deductionToggle;
 
-        internal AccountPageHandler(FCSPDAController mono)
+        internal AccountPageHandler(FCSAlterraHubGUI mono)
         {
             _mono = mono;
 
-            var accountPage = GameObjectHelpers.FindGameObject(mono.ui.gameObject, "AccountPage");
+            var accountPage = GameObjectHelpers.FindGameObject(mono.gameObject, "AccountPage");
 
-            _createAccountDialog = GameObjectHelpers.FindGameObject(mono.ui.gameObject, "CreateAccountDialog");
+            _createAccountDialog = GameObjectHelpers.FindGameObject(mono.gameObject, "CreateAccountDialog");
 
             _slider = GameObjectHelpers.FindGameObject(accountPage, "Slider").GetComponent<Slider>();
             _sliderText = _slider.GetComponentInChildren<Text>();
@@ -53,7 +54,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
                 _createAccountDialog.SetActive(false);
             });
 
-            _paymentScreen = GameObjectHelpers.FindGameObject(mono.ui.gameObject, "DebtDialog");
+            _paymentScreen = GameObjectHelpers.FindGameObject(mono.gameObject, "DebtDialog");
             
             _newBalance = GameObjectHelpers.FindGameObject(_paymentScreen, "NewBalance").GetComponent<Text>();
 
@@ -209,7 +210,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
         
         private void CreateWelcomePage(GameObject accountPage)
         {
-            _userNameLBL = GameObjectHelpers.FindGameObject(_mono.ui.gameObject, "UserName").GetComponentInChildren<Text>();
+            _userNameLBL = GameObjectHelpers.FindGameObject(_mono.gameObject, "UserName").GetComponentInChildren<Text>();
             _userNameLBL.text = CardSystem.main.GetUserName();
             
             var requestButton = GameObjectHelpers.FindGameObject( accountPage, "CardRequestBTN").GetComponent<Button>();

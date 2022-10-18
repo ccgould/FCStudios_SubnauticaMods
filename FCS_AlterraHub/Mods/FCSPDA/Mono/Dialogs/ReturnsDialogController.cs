@@ -11,13 +11,12 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
         private ToggleGroup _toggleGroup;
         private Transform _list;
         private readonly List<AlterraHubReturnItemController> _toggles = new List<AlterraHubReturnItemController>();
-        private FCSPDAController _mono;
+
         public Action OnClose { get; set; }
 
 
-        internal  void Initialize(FCSPDAController mono)
+        internal  void Initialize()
         {
-            _mono = mono;
             var content = gameObject.FindChild("Content");
 
             _list = content.FindChild("Scroll View").FindChild("Viewport").FindChild("Content").transform;

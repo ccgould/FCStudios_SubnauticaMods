@@ -67,7 +67,7 @@ namespace FCS_AlterraHub.Helpers
 
             CreateText(strings);
 
-            var text = pda?.CheckIfPDAHasEntry(techType) ?? false ? AlterraHub.ViewInPDA() : string.Empty;
+            var text = pda?.Screen.CheckIfPDAHasEntry(techType) ?? false ? AlterraHub.ViewInPDA() : string.Empty;
 #if SUBNAUTICA
             main.SetInteractTextRaw(Sb.ToString(), text);
 #else
@@ -96,7 +96,7 @@ namespace FCS_AlterraHub.Helpers
 
             CreateText(strings);
 
-            var text = pda?.CheckIfPDAHasEntry(techType) ?? false ? AlterraHub.ViewInPDA() : string.Empty;
+            var text = pda?.Screen.CheckIfPDAHasEntry(techType) ?? false ? AlterraHub.ViewInPDA() : string.Empty;
 #if SUBNAUTICA
             main.SetInteractTextRaw(Sb.ToString(), text);
 #else

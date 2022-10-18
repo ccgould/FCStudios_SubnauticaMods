@@ -1,4 +1,5 @@
 ﻿using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Managers.FCSAlterraHub;
 using FCS_AlterraHub.Mods.FCSPDA.Enums;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -16,10 +17,10 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Model
         private GameObject Hover;
         private uGUI_Icon Icon;
         private PDAPages _page;
-        private FCSPDAController _controller;
+        private FCSAlterraHubGUI _controller;
 
 
-        public void Initialize(FCSPDAController controller, Text pLabel, Sprite pIcon, Text pageLabel, string buttonName,PDAPages page)
+        internal void Initialize(FCSAlterraHubGUI controller, Text pLabel, Sprite pIcon, Text pageLabel, string buttonName,PDAPages page)
         {
             Hover = GameObjectHelpers.FindGameObject(gameObject, "Backer");
             Icon = gameObject.FindChild("Icon").AddComponent<uGUI_Icon>();
