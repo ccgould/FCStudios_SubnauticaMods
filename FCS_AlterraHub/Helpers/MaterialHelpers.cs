@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using FCSCommon.Utilities;
+using Oculus.Newtonsoft.Json.Utilities.LinqBridge;
 using UnityEngine;
+using UnityEngine.UIElements;
 using UWE;
 
 namespace FCS_AlterraHub.Helpers
@@ -12,6 +14,7 @@ namespace FCS_AlterraHub.Helpers
     {
         private static Material _glassMaterial;
         private static GameObject _laterialBubbles;
+        public static Material _waterMaterial;
 
 
         /// <summary>
@@ -364,6 +367,35 @@ namespace FCS_AlterraHub.Helpers
         }
 
 
+        public static void ApplyWaterShader(GameObject gameObject)
+        {
+            var shader = Shader.Find("FX/WBOIT-WaterPlane");
+            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
+
+            QuickLogger.Info($"Shader is not null {shader is not null} {shader?.name}");
+
+            QuickLogger.Info($"Renders is not null {renderers is not null} {renderers?.Length}");
+
+            foreach (Renderer renderer in renderers)
+            {
+                renderer.material = _waterMaterial;
+
+
+                //foreach (Material material in renderer.materials)
+                //{
+                //    material.shader = shader;
+                //    material.SetColor("_Color", new Color(0.4779411f, 0.8955883f, 1f, 0.2352941f));
+                //    material.SetVector("_ScrollSpeed", new Vector4(0.05f, 0.01f, -0.02f, -0.02f));
+                //    material.SetVector("_Scale", new Vector4(0f, 0.1f, 0f, 0f));
+                //    material.SetVector("_Frequency", new Vector4(0.34f, 0.4f, 0.23f, 0.7f));
+                //    material.SetVector("_Speed", new Vector4(0f, 0f, 0f, 0f));
+                //    material.SetFloat("_MyCullVariable", 0f);
+                //}
+            }
+        }
+
+
+
         public static Material CreateV2Specular(Material mat, string textureName, float specInt, float shininess, AssetBundle assetBundle)
         {
             var shader = Shader.Find("MarmosetUBER");
@@ -493,6 +525,35 @@ namespace FCS_AlterraHub.Helpers
                     _laterialBubbles = GameObject.Instantiate(bubbles);
                     QuickLogger.Debug($"Laterial Bubbles result: {_laterialBubbles?.name}");
                 }
+
+
+                //if (_waterMaterial == null)
+                //{
+                //    var g = GameObject.FindObjectsOfType<MeshRenderer>();
+                //    foreach (MeshRenderer renderer in g)
+                //    {
+                //        if (renderer != null && renderer.materials.Any(x => x.name.Contains("WaterPlaneBaseCorridor")))
+                //        {
+                //            QuickLogger.Info("Success Found Water Material");
+
+                //            foreach (Material material in renderer.materials)
+                //            {
+                //                if (material.name.Contains("WaterPlaneBaseCorridor"))
+                //                {
+                //                    _waterMaterial = material;
+                //                    break;
+                //                }
+                //            }
+                //        }
+                //    }
+
+                //    if(_waterMaterial is null)
+                //    {
+                //        QuickLogger.Info("Water Material not found");
+
+                //    }
+
+                //}
             }
         }
 #else

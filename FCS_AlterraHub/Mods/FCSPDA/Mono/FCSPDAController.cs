@@ -5,6 +5,7 @@ using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Managers.FCSAlterraHub;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mods.Common.DroneSystem;
 using FCS_AlterraHub.Mods.Common.DroneSystem.Models;
@@ -12,7 +13,6 @@ using FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.Model;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.Mono;
-using FCS_AlterraHub.Mono.Managers;
 using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Structs;
@@ -729,7 +729,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
                     if(storeItem.Value.StoreCategory != category) continue;
                     QuickLogger.Debug($"Trying to add Store Item  {Language.main.Get(storeItem.Key)}");
                     
-                    var item = StoreInventorySystem.CreateStoreItem(storeItem.Value, AddToCardCallBack, IsInUse);
+                    var item = StoreInventorySystem.CreateStoreItem(storeItem.Value, AddToCartCallBack, IsInUse);
                     
                     if (_storeItems.ContainsKey(category))
                     {
@@ -751,7 +751,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
 
                     QuickLogger.Debug($"Trying to add Store Item  {Language.main.Get(storeItem.TechType)}");
 
-                    var item = StoreInventorySystem.CreateStoreItem(storeItem, AddToCardCallBack, IsInUse);
+                    var item = StoreInventorySystem.CreateStoreItem(storeItem, AddToCartCallBack, IsInUse);
                     if (_storeItems.ContainsKey(category))
                     {
                         _storeItems[category].Add(item);
@@ -768,7 +768,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             }
         }
 
-        private void AddToCardCallBack(TechType techType, TechType receiveTechType, int returnAmount)
+        private void AddToCartCallBack(TechType techType, TechType receiveTechType, int returnAmount)
         {
             _cartDropDownManager?.AddItem(techType, receiveTechType, returnAmount);
         }
@@ -853,7 +853,6 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             }
         }
 
-
         public bool CheckIfPDAHasEntry(TechType techType)
         {
             return EncyclopediaTabController.HasEntry(techType);
@@ -892,175 +891,6 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         public float GetRate()
         {
             return _accountPageHandler.GetRate();
-        }
-    }
-
-    internal class ShipmentPageController : MonoBehaviour
-    {
-        private GameObject _grid;
-        private List<ShipmentTracker> _trackedShipments = new();
-
-        public void Initialize(FCSPDAController controller)
-        {
-            var backButton = gameObject.FindChild("BackBTN").GetComponent<Button>();
-            backButton.onClick.AddListener((() =>
-            {
-                controller.GoToPage(PDAPages.Store);
-            }));
-
-            _grid = GameObjectHelpers.FindGameObject(gameObject, "Content");
-        }
-
-        internal void AddItem(Shipment pendingOrder)
-        {
-            //Instantiate Item
-            var item = GameObject.Instantiate(AlterraHub.PDAShipmentItemPrefab);
-            
-            //Move in scrollview
-            item.transform.SetParent(_grid.transform,false);
-
-            //Add controller
-            var shipmentTracker = item.AddComponent<ShipmentTracker>();
-            shipmentTracker.Initialize(this,pendingOrder);
-
-            _trackedShipments.Add(shipmentTracker);
-        }
-
-        public void RemoveItem(Shipment shipment)
-        {
-            foreach (ShipmentTracker shipmentTracker in _trackedShipments)
-            {
-                if (shipmentTracker.TryDelete(shipment))
-                {
-                    break;
-                }
-            }   
-        }
-    }
-
-    internal class TeleportationPageController : MonoBehaviour
-    {
-        private GameObject _grid;
-        private List<ShipmentTracker> _trackedShipments = new();
-
-        public void Initialize(FCSPDAController controller)
-        {
-            var backButton = gameObject.FindChild("BackBTN").GetComponent<Button>();
-            backButton.onClick.AddListener((() =>
-            {
-                controller.GoToPage(PDAPages.Home);
-            }));
-
-            _grid = GameObjectHelpers.FindGameObject(gameObject, "Content");
-        }
-
-        internal void Refresh()
-        {
-            QuickLogger.Debug("Refreshing Teleportation list",true);
-            foreach (Transform child in _grid.transform)
-            {
-                Destroy(child.gameObject);
-            }
-
-            foreach (BaseManager baseManager in BaseManager.Managers)
-            {
-                if (baseManager.IsValidForTeleport())
-                {
-                    //Instantiate Item
-                    var item = GameObject.Instantiate(AlterraHub.PDATeleportItemPrefab);
-                    var baseItem = item.AddComponent<BaseTeleportItem>();
-                    baseItem.Initialize(baseManager);
-                    //Move in scrollview
-                    item.transform.SetParent(_grid.transform, false);
-                }
-            }
-        }
-    }
-
-    internal class BaseTeleportItem : MonoBehaviour
-    {
-        private Text _baseName;
-        private BaseManager _baseManager;
-
-        private void Awake()
-        {
-            _baseName = GameObjectHelpers.FindGameObject(gameObject, "BaseName")?.GetComponent<Text>();
-            var button = GameObjectHelpers.FindGameObject(gameObject, "TeleportBtn")?.GetComponent<Button>();
-            button?.onClick.AddListener((() =>
-            {
-                QuickLogger.Debug($"Trying to teleport to base: {_baseManager.GetBaseName()}",true);
-                FCSAlterraHubService.PublicAPI.TeleportationIgnitiated?.Invoke(_baseManager);
-            }));
-        }
-
-        internal void Initialize(BaseManager manager)
-        {
-            _baseName.text = manager.GetBaseName();
-            _baseManager = manager;
-        }
-    }
-
-
-    internal class ShipmentTracker : MonoBehaviour
-    {
-        private Text _orderName;
-        private Slider _slider;
-        private Shipment _shipment;
-        private GameObject _itemsGrid;
-        private Button _cancelButton;
-        private Shipment _pendingOrder;
-
-        public void Initialize(ShipmentPageController shipmentPageController, Shipment pendingOrder)
-        {
-            _orderName = gameObject.FindChild("OrderNumber").GetComponent<Text>();
-            _itemsGrid = gameObject.FindChild("Items");
-            _cancelButton = GetComponentInChildren<Button>();
-            _pendingOrder = pendingOrder;
-
-            _cancelButton.onClick.AddListener((() =>
-            {
-                StoreManager.main.CancelOrder(pendingOrder);
-                Delete();
-            }));
-
-            foreach (CartItemSaveData cartItem in pendingOrder.CartItems)
-            {
-                var item = GameObject.Instantiate(AlterraHub.PDAShipmentItemNodePrefab);
-                item.FindChild("Icon").AddComponent<uGUI_Icon>().sprite = SpriteManager.Get(cartItem.ReceiveTechType);
-                item.transform.SetParent(_itemsGrid.transform,false);
-            }
-            _slider = gameObject.GetComponentInChildren<Slider>();
-            _shipment = pendingOrder;
-            InvokeRepeating(nameof(UpdateCheck),1f,1f);
-        }
-
-        private void Delete()
-        {
-            Destroy(gameObject);
-        }
-
-        private void UpdateCheck()
-        {
-            if (DroneDeliveryService.Main == null ||
-                string.IsNullOrWhiteSpace(_pendingOrder.OrderNumber) ||
-                _pendingOrder.Port?.GetBaseName() == null) return;
-
-            var isCurrentOrder = DroneDeliveryService.Main.IsCurrentOrder(_shipment.OrderNumber);
-            var status = isCurrentOrder ? "Shipping" : "Pending";
-            _orderName.text = $"Order: {_pendingOrder.OrderNumber}: Destination: {_pendingOrder.Port.GetBaseName()} Status: {status}";
-            _cancelButton.interactable = !isCurrentOrder;
-            _slider.value = DroneDeliveryService.Main.GetOrderCompletionPercentage(_shipment.OrderNumber);
-        }
-
-        public bool TryDelete(Shipment shipment)
-        {
-            if (shipment.OrderNumber.Equals(_shipment.OrderNumber))
-            {
-                Destroy(gameObject);
-                return true;
-            }
-
-            return false;
         }
     }
 }

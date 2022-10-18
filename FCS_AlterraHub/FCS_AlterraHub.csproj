@@ -39,6 +39,7 @@
     <Compile Include="Enumerators\SpeedModes.cs" />
     <Compile Include="Helpers\FModHelpers.cs" />
     <Compile Include="Helpers\TechTypeHelpers.cs" />
+    <Compile Include="Managers\FCSAlterraHub\FCSAlterraHubGUI.cs" />
     <Compile Include="Managers\PortManager.cs" />
     <Compile Include="Model\ColorTemplate.cs" />
     <Compile Include="Model\GUI\ButtonEvents\ButtonDoubleClickListener.cs" />
@@ -48,6 +49,7 @@
     <Compile Include="Model\GUI\StorageInventoryButton.cs" />
     <Compile Include="Model\GUI\uGUI_FCSDisplayItem.cs" />
     <Compile Include="Model\LadderController.cs" />
+    <Compile Include="Mods\AlterraHubPod\Mono\AlterraHubPodController.cs" />
     <Compile Include="Mods\AlterraHubPod\Spawnable\AlterraHubPatch.cs" />
     <Compile Include="Mods\Common\DroneSystem\AlterraDronePortController.cs" />
     <Compile Include="Mods\Common\DroneSystem\AlterraTransportDroneSpawnable.cs" />
@@ -71,6 +73,10 @@
     <Compile Include="Mods\Common\DroneSystem\ThrusterController.cs" />
     <Compile Include="Mods\FCSDataBox\Mono\FCSDataBoxController.cs" />
     <Compile Include="Mods\FCSDataBox\Spawnable\FCSDataBoxSpawnable.cs" />
+    <Compile Include="Managers\FCSAlterraHub\ShipmentPageController.cs" />
+    <Compile Include="Managers\FCSAlterraHub\TeleportationPageController.cs" />
+    <Compile Include="Managers\FCSAlterraHub\BaseTeleportItem.cs" />
+    <Compile Include="Managers\FCSAlterraHub\ShipmentTracker.cs" />
     <Compile Include="Mods\OreConsumer\Buildable\OreConsumerPatcher.cs" />
     <Compile Include="Configuration\Config.cs" />
     <Compile Include="Configuration\DebugCommands.cs" />
@@ -199,6 +205,7 @@
     <Compile Include="Patches\EquipmentPatcher.cs" />
     <Compile Include="Patches\PDAEncyclopedia_Patches.cs" />
     <Compile Include="Patches\SubnautiaMap_Patches.cs" />
+    <Compile Include="Patches\WaterPlanePatch.cs" />
     <Compile Include="Structs\FCSDeviceInformation.cs" />
     <Compile Include="Structs\ModPackData.cs" />
     <Compile Include="Structs\TrackedLight.cs" />

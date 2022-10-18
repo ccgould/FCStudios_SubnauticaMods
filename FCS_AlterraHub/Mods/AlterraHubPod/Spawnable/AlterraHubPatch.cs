@@ -2,12 +2,9 @@
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Managers;
+using FCS_AlterraHub.Mods.AlterraHubPod.Mono;
+using FCSCommon.Utilities;
 using SMLHelper.V2.Handlers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UWE;
 
@@ -19,7 +16,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Spawnable
         {
             OnFinishedPatching += () =>
             {
-                var spawnLocation = new Vector3(-110f, -27.33f, 557.4f);
+                //var spawnLocation = new Vector3(-110f, -27.33f, 557.4f);
+                var spawnLocation = new Vector3(-21.7f, -38.2f, 505.3f);
                 var spawnRotation = Quaternion.Euler(Vector3.zero);
                 CoordinatedSpawnsHandler.RegisterCoordinatedSpawn(new SpawnInfo(TechType, spawnLocation, spawnRotation));
             };
@@ -57,7 +55,52 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Spawnable
 
             MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID, 1f, 2f, 0.2f);
 
-            //prefab.AddComponent<AlterraFabricatorStationController>();
+            //Don't want it tipping over...
+            var stabilizier = prefab.AddComponent<Stabilizer>();
+            stabilizier.uprightAccelerationStiffness = 600f;
+
+            //Add VFXSurfaces to adjust footstep sounds. This is technically not necessary for the interior colliders, however.
+            foreach (Collider col in prefab.GetComponentsInChildren<Collider>())
+            {
+                var vfxSurface = col.gameObject.AddComponent<VFXSurface>();
+                vfxSurface.surfaceType = VFXSurfaceTypes.metal;
+            }
+
+            ////Sky appliers to make it look nicer. Not sure if it even makes a difference, but I'm sticking with it.
+            //var skyApplierInterior = interiorModels.gameObject.AddComponent<SkyApplier>();
+            //skyApplierInterior.renderers = interiorModels.GetComponentsInChildren<Renderer>();
+            //skyApplierInterior.anchorSky = Skies.BaseInterior;
+            //skyApplierInterior.SetSky(Skies.BaseInterior);
+
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, prefab, Color.cyan);
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseSecondaryCol, prefab, Color.black);
+            MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, prefab, 4f);
+
+            //The SubRoot component needs a lighting controller. Works nice too. A pain to setup in script.
+            var lights = prefab.FindChild("LightsParent").AddComponent<LightingController>();
+            lights.lights = new MultiStatesLight[0];
+            foreach (Transform child in lights.transform)
+            {
+                var newLight = new MultiStatesLight();
+                newLight.light = child.GetComponent<Light>();
+                newLight.intensities =
+                    new[]
+                    {
+                        1f, 0.5f, 0f
+                    }; //Full power: intensity 1. Emergency : intensity 0.5. No power: intensity 0.
+                lights.RegisterLight(newLight);
+            }
+
+
+            var sr = prefab.AddComponent<AlterraHubPodController>();
+
+            //Necessary for SubRoot class Update behaviour so it doesn't return an error every frame.
+            var lod = prefab.AddComponent<BehaviourLOD>();
+
+            var pr = prefab.AddComponent<BasePowerRelay>();
+            pr.maxOutboundDistance = 0;
+            pr.subRoot = sr;
+
             prefab.AddComponent<PortManager>();
 
             return prefab;
