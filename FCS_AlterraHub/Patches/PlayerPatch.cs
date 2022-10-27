@@ -82,7 +82,8 @@ namespace FCS_AlterraHub.Patches
             //{
             //    CoroutineHost.StartCoroutine(Mod.SpawnAlterraFabStation(settings));
             //};
-            Mod.LoadGamePlaySettings();
+
+            //Mod.LoadGamePlaySettings();
         }
         
         

@@ -448,7 +448,7 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
             {
                 QuickLogger.Debug("Getting ready to deduct",true);
                 deduction = MathHelpers.PercentageOfNumber(Convert.ToDecimal(FCSPDAController.Main.Screen.GetRate()), price);
-                CardSystem.main.PayDebit(deduction);
+                CardSystem.main.PayDebit(null,deduction);
             }
         }
         

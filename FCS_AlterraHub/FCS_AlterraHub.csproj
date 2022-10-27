@@ -50,6 +50,7 @@
     <Compile Include="Model\GUI\uGUI_FCSDisplayItem.cs" />
     <Compile Include="Model\LadderController.cs" />
     <Compile Include="Mods\AlterraHubPod\Mono\AlterraHubPodController.cs" />
+    <Compile Include="Mods\AlterraHubPod\Mono\DoorController.cs" />
     <Compile Include="Mods\AlterraHubPod\Spawnable\AlterraHubPatch.cs" />
     <Compile Include="Mods\Common\DroneSystem\AlterraDronePortController.cs" />
     <Compile Include="Mods\Common\DroneSystem\AlterraTransportDroneSpawnable.cs" />

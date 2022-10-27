@@ -6,11 +6,14 @@ using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Mods.AlterraHubPod.Spawnable;
 using FCS_AlterraHub.Mods.Common.DroneSystem.Enums;
 using FCS_AlterraHub.Mods.Common.DroneSystem.Factory;
+using FCS_AlterraHub.Mods.Common.DroneSystem.Interfaces;
 using FCS_AlterraHub.Mods.Common.DroneSystem.StatesMachine;
 using FCS_AlterraHub.Mods.Common.DroneSystem.StatesMachine.States;
 using FCS_AlterraHub.Mono;
+using FCS_AlterraHub.Mono.Managers;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -19,10 +22,10 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
     internal class DroneController : MonoBehaviour
     {
         [SerializeField]
-        private AlterraDronePortController departurePort;
+        private IShippingDestination departurePort;
 
         [SerializeField]
-        private AlterraDronePortController destinationPort;
+        private IShippingDestination destinationPort;
 
         private Transform _trans;
         private StateMachine _stateMachine;
@@ -100,17 +103,17 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
         }
 
 
-        internal bool ShipOrder(AlterraDronePortController destinationPort)
+        internal bool ShipOrder(IShippingDestination destination)
         {
             try
             {
-                if (destinationPort == null)
+                if (destination == null)
                 {
                     QuickLogger.Error("Destination Port returned null", true);
                     return false;
                 }
 
-                StartCoroutine(ShipOrderAsync(destinationPort));
+                StartCoroutine(ShipOrderAsync(destination));
                 return true;
             }
             catch (Exception e)
@@ -121,9 +124,10 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
             }
         }
 
-        private IEnumerator ShipOrderAsync(AlterraDronePortController destinationPort)
+        private IEnumerator ShipOrderAsync(IShippingDestination destinationPort)
         {
             this.destinationPort = destinationPort;
+            this.departurePort = AlterraHubLifePodDronePortController.main.PortManager;
             yield return new WaitForSeconds(5f);
             QuickLogger.Debug("Trying to ship");
             destinationPort.SetInboundDrone(this);
@@ -139,18 +143,23 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
 
             if(destinationPort == null) return;
 
-            destinationPort.PlayAnimationState(DronePortAnimation.Docking, () =>
+            destinationPort.ActivePort().PlayAnimationState(DronePortAnimation.Docking, () =>
             {
                 QuickLogger.Debug("Setting State To Idle",true);
                 
-                destinationPort.Offload(this);
+                destinationPort.ActivePort().Offload(this);
 
                 departurePort = destinationPort;
 
                 StateMachine.SwitchToNewState(typeof(IdleState));
 
-                _isDocking = false;
+                if (!DroneDeliveryService.Main.IsStationPort(GetCurrentPort().GetPreFabID()))
+                {
+                    QuickLogger.Debug("Getting port from station", true);
+                    ShipOrder(AlterraHubLifePodDronePortController.main.PortManager);
+                }
 
+                _isDocking = false;
                 UpdateBeacon();
             });
 
@@ -161,24 +170,25 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
         {
             if (_isDeparting) return;
 
+
+
             QuickLogger.Debug("Departing", true);
 
             _isDeparting = true;
+            departurePort.ActivePort().Depart(this);
 
-            departurePort.Depart(this);
-
-            destinationPort.Dock(this);
+            destinationPort.ActivePort().Dock(this);
 
             StateMachine.SwitchToNewState(typeof(DepartState));
 
-            departurePort.PlayAnimationState(DronePortAnimation.Departing, (() =>
+            departurePort.ActivePort().PlayAnimationState(DronePortAnimation.Departing, (() =>
             {
                 QuickLogger.Debug("Begining Transport.",true);
-                departurePort.ClearInbound();
+                departurePort.ActivePort().ClearInbound();
                 StateMachine.SwitchToNewState(typeof(ClimbState));
                 _isDeparting = false;
-
                 UpdateBeacon();
+
 
             }));
         }
@@ -188,16 +198,16 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
             return _trans;
         }
 
-        public AlterraDronePortController GetTargetPort()
+        public IShippingDestination GetTargetPort()
         {
             if (destinationPort == null)
             {
-                destinationPort = DroneDeliveryService.Main.GetOpenPort();
+                destinationPort = AlterraHubLifePodDronePortController.main.PortManager;
             }
             return destinationPort;
         }
 
-        public AlterraDronePortController GetCurrentPort()
+        public IShippingDestination GetCurrentPort()
         {
             return departurePort;
         }
@@ -209,10 +219,10 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
                 Position = transform.position.ToVec3(),
                 Rotation = transform.rotation.QuaternionToVec4(),
                 State = StateMachine.CurrentState.Name,
-                DestinationBaseID = destinationPort?.GetBaseID(),
-                DestinationPortID = destinationPort?.GetPortID() ?? 0,
-                DeparturePortID = departurePort?.GetPortID() ?? 0,
-                DepartureBaseID = departurePort?.GetBaseID()
+                DestinationBaseID = destinationPort?.ActivePort().GetBaseID(),
+                DestinationPortID = destinationPort?.ActivePort().GetPortID() ?? 0,
+                DeparturePortID = departurePort?.ActivePort().GetPortID() ?? 0,
+                DepartureBaseID = departurePort?.ActivePort().GetBaseID()
             };
         }
 
@@ -223,7 +233,7 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
 
         internal bool AvailableForTransport()
         {
-            return !IsTransporting() && DroneDeliveryService.Main.IsStationPort(GetCurrentPort());
+            return !IsTransporting() && DroneDeliveryService.Main.IsStationPort(GetCurrentPort().GetPreFabID());
         }
 
         private bool IsTransporting()
@@ -236,7 +246,7 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
         }
 
 
-        public void SetDeparturePort(AlterraDronePortController port)
+        public void SetDeparturePort(IShippingDestination port)
         {
             if (port == null)
             {
@@ -264,13 +274,13 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
                     {
                         BaseManager.FindManager(data.DestinationBaseID, result =>
                         {
-                            destinationPort = result.GetPortManager().GetOpenPort();
-                            QuickLogger.Debug($"Found Destination: {destinationPort?.GetPrefabID()}", true);
+                            destinationPort = result.GetPortManager();
+                            QuickLogger.Debug($"Found Destination: {destinationPort?.ActivePort().GetPrefabID()}", true);
 
                             var state = StateFactory.GetState(data.State);
                             QuickLogger.Debug($"Setting State: {state.Name}", true);
 
-                            if (state.GetType() == typeof(IdleState) && destinationPort != null && !DroneDeliveryService.Main.IsStationPort(destinationPort))
+                            if (state.GetType() == typeof(IdleState) && destinationPort != null && !DroneDeliveryService.Main.IsStationPort(destinationPort.GetPreFabID()))
                             {
                                 ShipOrder(destinationPort);
                             }
@@ -298,8 +308,8 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
 
         public float GetCompletionPercentage()
         {
-            if (destinationPort?.BaseTransform == null || destinationPort?.BaseTransform == null) return 0f;
-            return GetPercentageAlong(departurePort.BaseTransform.position, destinationPort.BaseTransform.position,
+            if (destinationPort?.ActivePort().BaseTransform == null || destinationPort?.ActivePort().BaseTransform == null) return 0f;
+            return GetPercentageAlong(departurePort.ActivePort().BaseTransform.position, destinationPort.ActivePort().BaseTransform.position,
                 transform.position);
         }
 
@@ -308,6 +318,11 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
             var ab = b - a;
             var ac = c - a;
             return Vector3.Dot(ac, ab) / ab.sqrMagnitude;
+        }
+
+        public IShippingDestination GetDeparturePort()
+        {
+            return departurePort;
         }
     }
 }

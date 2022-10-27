@@ -5,6 +5,7 @@ using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Managers.FCSAlterraHub;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mods.Common.DroneSystem;
@@ -186,7 +187,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
 
             Screen = _screen.AddComponent<FCSAlterraHubGUI>();
 
-            Screen.SetInstance();
+            Screen.SetInstance(FCSAlterraHubGUISender.PDA);
 
             _pdaAnchor = GameObjectHelpers.FindGameObject(gameObject, "ScreenAnchor").transform;
 
@@ -205,7 +206,6 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             _canvas.sortingLayerID = 1479780821;
             MaterialHelpers.ApplyEmissionShader(AlterraHub.BasePrimaryCol,gameObject,Color.white,0,0.01f,0.01f);
             MaterialHelpers.ApplySpecShader(AlterraHub.BasePrimaryCol,gameObject,1, 6.15f);
-            MessageBoxHandler.main.ObjectRoot = ui.gameObject;
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject,Color.cyan);    
             InGameMenuQuitPatcher.AddEventHandlerIfMissing(OnQuit);
             Screen.gameObject.SetActive(false);

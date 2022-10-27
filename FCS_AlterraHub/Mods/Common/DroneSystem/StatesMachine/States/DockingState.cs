@@ -22,7 +22,7 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem.StatesMachine.States
         {
             //Debug.Log("Docking");
             _drone.Dock();
-            var followPoint = _drone.GetTargetPort()?.GetEntryPoint();
+            var followPoint = _drone.GetTargetPort()?.ActivePort().GetEntryPoint();
 
             if (followPoint == null)
             {

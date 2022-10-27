@@ -140,7 +140,7 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
             if (FindHubDepot(order, out var devices)) return;
 
             OffloadItemsInBase(order, devices);
-
+            
             VoiceNotificationSystem.main.DisplayMessage($"{AlterraHub.OrderHasBeenShipped()} {GetBaseName()}");
         }
 
@@ -204,13 +204,15 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
         private static bool GetCurrentOrder(out Shipment order)
         {
             order = null;
+            var temp = StoreManager.main.PendingShipments.FirstOrDefault();
 
-            //if (order.CartItems == null)
-            //{
-            //    QuickLogger.Error("Order was null when offloading.");
-            //    return true;
-            //}
+            if (temp?.CartItems == null)
+            {
+                QuickLogger.Error("Order was null when offloading.");
+                return true;
+            }
 
+            order = temp;
             return false;
         }
 
@@ -466,6 +468,11 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
             return _portManager.GetBaseID();
         }
 
+        public void SetInboundDrone(DroneController droneController)
+        {
+            throw new NotImplementedException();
+        }
+
         public override void OnHandHover(GUIHand hand)
         {
             if (!IsInitialized || !IsConstructed) return;
@@ -527,6 +534,11 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
             }
         }
 
+        void IDroneDestination.ClearInbound()
+        {
+            ClearInbound();
+        }
+
         private void PlayAnimation(int value, string animationName, Action callBack)
         {
             if (_isPlaying) return;
@@ -539,11 +551,6 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
                     _animator.SetInteger(_stateHash, 0);
                 }
             ));
-        }
-
-        public void SetInboundDrone(DroneController droneController)
-        {
-            _droneInbound = droneController;
         }
     }
 }

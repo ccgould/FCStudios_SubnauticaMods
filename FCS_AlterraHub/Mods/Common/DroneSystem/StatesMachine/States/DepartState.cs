@@ -1,4 +1,5 @@
 ﻿using System;
+using FCSCommon.Utilities;
 
 namespace FCS_AlterraHub.Mods.Common.DroneSystem.StatesMachine.States
 {
@@ -19,9 +20,9 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem.StatesMachine.States
 
         public override Type Tick()
         {
-            //Debug.Log("Departing");
+            QuickLogger.Debug("Departing");
             //_drone.Depart();
-            var followPoint = _drone.GetCurrentPort()?.GetEntryPoint();
+            var followPoint = _drone.GetCurrentPort()?.ActivePort().GetEntryPoint();
 
             if (followPoint != null)
             {

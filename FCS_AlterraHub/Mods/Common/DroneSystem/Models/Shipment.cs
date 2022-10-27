@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using FCS_AlterraHub.Mods.Common.DroneSystem.Interfaces;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.Mono;
 #if SUBNAUTICA_STABLE
@@ -11,8 +12,8 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem.Models
     internal class Shipment
     {
         public string PortPrefabID { get; set; }
-        private AlterraDronePortController _port;
-        internal AlterraDronePortController Port
+        private IDroneDestination _port;
+        internal IDroneDestination Port
         {
             get
             {

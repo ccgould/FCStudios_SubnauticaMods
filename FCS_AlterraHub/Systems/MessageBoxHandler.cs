@@ -3,19 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Managers.FCSAlterraHub;
 using FCS_AlterraHub.Model;
 using FCSCommon.Utilities;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Systems
 {
-    internal class MessageBoxHandler
+    internal class MessageBoxHandler : MonoBehaviour
     {
         private Action<FCSMessageResult> _result;
         private FCSMessageBox _messageBox;
         private GameObject _objectRoot;
-        public static MessageBoxHandler main = new MessageBoxHandler();
         private readonly Queue<MessageBoxData> _messageQueue = new Queue<MessageBoxData>();
+        private static Dictionary<FCSAlterraHubGUISender,FCSAlterraHubGUI> _registeredGUI = new();
 
         private void TestMessagQueue()
         {
@@ -32,6 +33,15 @@ namespace FCS_AlterraHub.Systems
                 {
                     _messageBox = GameObjectHelpers.FindGameObject(ObjectRoot, "MessageBox").AddComponent<FCSMessageBox>();
                 }
+            }
+        }
+
+        public void Initialize(GameObject go, FCSAlterraHubGUISender sender)
+        {
+            var gui = ObjectRoot.GetComponentInChildren<FCSAlterraHubGUI>();
+            if (gui is not null && !_registeredGUI.ContainsValue(gui))
+            {
+                _registeredGUI.Add(sender,gui);
             }
         }
 
@@ -78,6 +88,15 @@ namespace FCS_AlterraHub.Systems
             public FCSMessageButton Button { get; }
 
             public string Message { get; }
+        }
+
+        public static void ShowMessage(string message, FCSAlterraHubGUISender sender)
+        {
+           var guis =  _registeredGUI.Where(x => x.Key == sender);
+           foreach (var gui in guis)
+           {
+               gui.Value.ShowMessage(message);
+           }
         }
     }
 }

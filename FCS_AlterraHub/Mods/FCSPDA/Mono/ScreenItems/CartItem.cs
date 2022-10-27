@@ -55,15 +55,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
 
         internal CartItemSaveData Save()
         {
-            return new() { TechType = TechType, ReceiveTechType = ReceiveTechType, ReturnAmount = ReturnAmount};
-        }
-
-        public void Refund()
-        {
-            for (int i = 0; i < ReturnAmount; i++)
-            {
-                CardSystem.main.Refund(ReceiveTechType);
-            }
+            return new() { TechType = TechType, ReceiveTechType = ReceiveTechType, ReturnAmount = ReturnAmount, Sender = FCSAlterraHubGUISender.None};
         }
     }
 
@@ -72,12 +64,14 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
         [JsonProperty] internal TechType TechType { get; set; }
         [JsonProperty] internal TechType ReceiveTechType { get; set; }
         [JsonProperty] internal int ReturnAmount { get; set; }
+        [JsonProperty] internal FCSAlterraHubGUISender Sender;
         internal AlterraDronePortController Port { get; set; }
+
         public void Refund()
         {
             for (int i = 0; i < ReturnAmount; i++)
             {
-                CardSystem.main.Refund(ReceiveTechType);
+                CardSystem.main.Refund(Sender,ReceiveTechType);
             }
         }
     }

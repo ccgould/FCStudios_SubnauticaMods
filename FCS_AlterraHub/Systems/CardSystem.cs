@@ -7,6 +7,7 @@ using System.Text;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Managers.FCSAlterraHub;
 using FCS_AlterraHub.Model;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -93,7 +94,7 @@ namespace FCS_AlterraHub.Systems
         /// </summary>
         /// <param name="amount">The amount of credit to add to the account.</param>
         /// <returns>Boolean on success</returns>
-        public bool AddFinances(decimal amount)
+        public bool AddFinances(decimal amount, FCSAlterraHubGUISender sender = FCSAlterraHubGUISender.PDA)
         {
             try
             {
@@ -112,7 +113,7 @@ namespace FCS_AlterraHub.Systems
             {
                 QuickLogger.Error($"[AddFinances]: {e.Message}");
                 QuickLogger.Error($"[AddFinances]: {e.StackTrace}");
-                MessageBoxHandler.main.Show(AlterraHub.ErrorHasOccurred("0x0002"),FCSMessageButton.OK);
+                MessageBoxHandler.ShowMessage(AlterraHub.ErrorHasOccurred("0x0002"), sender);
                 return false;
             }
             return true;
@@ -137,7 +138,7 @@ namespace FCS_AlterraHub.Systems
                 return true;
             }
             
-            MessageBoxHandler.main.Show(string.Format(AlterraHub.NotEnoughMoneyOnAccount(), 0), FCSMessageButton.OK);
+            //gui.ShowMessage(string.Format(AlterraHub.NotEnoughMoneyOnAccount(), 0));
             return false;
         }
 
@@ -267,7 +268,7 @@ namespace FCS_AlterraHub.Systems
         /// <param name="userName"></param>
         /// <param name="password"></param>
         /// <param name="pin"></param>
-        public bool CreateUserAccount(string fullName, string userName, string password, string pin,decimal accountBalance = 0)
+        public bool CreateUserAccount(string fullName, string userName, string password, string pin,decimal accountBalance = 0,FCSAlterraHubGUISender sender = FCSAlterraHubGUISender.PDA)
         {
             if (_accountDetails == null)
             {
@@ -286,7 +287,7 @@ namespace FCS_AlterraHub.Systems
 
                 if (HasBeenRegistered())
                 {
-                    MessageBoxHandler.main.Show(AlterraHub.AccountCreated(GetAccountBalance().ToString("N0")), FCSMessageButton.OK);
+                    MessageBoxHandler.ShowMessage(AlterraHub.AccountCreated(GetAccountBalance().ToString("N0")),sender);
                     if (!PlayerInteractionHelper.HasCard())
                     {
                         var newCard = PlayerInteractionHelper.GivePlayerItem(Mod.DebitCardTechType);
@@ -326,7 +327,7 @@ namespace FCS_AlterraHub.Systems
                 sb.Append(",");
             }
 
-            MessageBoxHandler.main.Show(AlterraHub.AccountSetupError(sb.ToString()), FCSMessageButton.OK);
+            MessageBoxHandler.ShowMessage(AlterraHub.AccountSetupError(sb.ToString()),sender);
 
             return false;
             //QPatch.MissionManagerGM.NotifyDeviceAction(Mod.AlterraHubTechType,Mod.DebitCardTechType,DeviceActionType.CREATEITEM);
@@ -359,7 +360,7 @@ namespace FCS_AlterraHub.Systems
             return _accountDetails.AlterraDebitPayed >= AlterraDebit;
         }
 
-        public bool PayDebit(decimal amount)
+        public bool PayDebit(FCSAlterraHubGUI gui, decimal amount)
         {
             QuickLogger.Debug($"Trying to add {amount} to {AlterraHub.DebtBalanceFormat(AlterraBalance())}", true);
 
@@ -455,7 +456,7 @@ namespace FCS_AlterraHub.Systems
             return _accountDetails;
         }
 
-        public void Refund(TechType techType, bool checkIfKit = true)
+        public void Refund(FCSAlterraHubGUISender gui, TechType techType, bool checkIfKit = true)
         {
             AddFinances( StoreInventorySystem.GetPrice(techType, checkIfKit));
         }
@@ -464,5 +465,12 @@ namespace FCS_AlterraHub.Systems
         {
             return _accountDetails.AlterraDebitPayed > 0;
         }
+    }
+
+    public enum FCSAlterraHubGUISender
+    {
+        None = -1,
+        PDA = 0,
+        AlterraHub = 1
     }
 }

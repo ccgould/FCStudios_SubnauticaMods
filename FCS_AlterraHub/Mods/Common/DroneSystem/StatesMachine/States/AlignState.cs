@@ -21,7 +21,7 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem.StatesMachine.States
         public override Type Tick()
         {
             //Debug.Log("Aligning Drone");
-            var rot = Quaternion.LookRotation(_drone.GetTargetPort().GetEntryPoint().transform.forward, Vector3.up);
+            var rot = Quaternion.LookRotation(_drone.GetTargetPort().ActivePort().GetEntryPoint().transform.forward, Vector3.up);
             transform.rotation = Quaternion.Slerp(transform.rotation, rot, 1f * Time.deltaTime);
 
             //Thanks to https://forum.unity.com/threads/checking-if-rotation-is-complete.515058/ user McDev02

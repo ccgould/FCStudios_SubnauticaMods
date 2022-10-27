@@ -5,8 +5,11 @@ using System.Linq;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Managers;
 using FCS_AlterraHub.Model;
+using FCS_AlterraHub.Mods.AlterraHubPod.Spawnable;
 using FCS_AlterraHub.Mods.Common.DroneSystem;
+using FCS_AlterraHub.Mods.Common.DroneSystem.Interfaces;
 using FCS_AlterraHub.Mods.Common.DroneSystem.Models;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs;
 using FCS_AlterraHub.Registration;
@@ -19,7 +22,7 @@ namespace FCS_AlterraHub.Mono.Managers
 {
     internal class StoreManager  : MonoBehaviour
     {
-        public Dictionary<string, List<CartItem>> PendingItems {get;set;} = new();
+        public Dictionary<ShipmentInfo, List<CartItem>> PendingItems {get;set;} = new();
         public List<Shipment> PendingShipments {get;set;} = new();
 
         public static StoreManager main;
@@ -31,20 +34,20 @@ namespace FCS_AlterraHub.Mono.Managers
             main = this;
         }
 
-        internal bool CompleteOrder(IStoreClient sender, string orderNumber, IShippingDestination destination)
+        internal bool CompleteOrder(IStoreClient sender, ShipmentInfo shipmentInfo)
         {
             bool wasOrderSuccessfull = false;
             
-            if (string.IsNullOrWhiteSpace(orderNumber) || !PendingItems.ContainsKey(orderNumber)) return false;
+            if (string.IsNullOrWhiteSpace(shipmentInfo?.OrderNumber) || !PendingItems.ContainsKey(shipmentInfo)) return false;
             QuickLogger.Debug("Complete Order 1");
 
-            var cart = PendingItems[orderNumber];
+            var cart = PendingItems[shipmentInfo];
 
-            var totalCash = GetCartTotal(orderNumber);
+            var totalCash = GetCartTotal(shipmentInfo);
 
             if (FCSAlterraHubService.PublicAPI.IsInOreBuildMode())
             {
-                foreach (CartItem cartItem in GetCartItems(orderNumber))
+                foreach (CartItem cartItem in GetCartItems(shipmentInfo))
                 {
                     if (cartItem != null && !KnownTech.Contains(cartItem.TechType))
                     {
@@ -55,28 +58,28 @@ namespace FCS_AlterraHub.Mono.Managers
                     }
                 }
 
-                PendingItems.Remove(orderNumber);
+                PendingItems.Remove(shipmentInfo);
             }
             else
             {
                 QuickLogger.Debug("Complete Order 2");
-                var sizes = GetSizes(orderNumber);
+                var sizes = GetSizes(shipmentInfo);
 
                 switch (sender.ClientType)
                     {
                         case StoreClientType.PDA:
                         case StoreClientType.Hub:
-                            if (destination.HasContructor)
+                            if (shipmentInfo.Destination.HasContructor)
                             {
-                                if (destination.SendItemsToConstructor(PendingItems[orderNumber]))
+                                if (shipmentInfo.Destination.SendItemsToConstructor(PendingItems[shipmentInfo]))
                                 {
-                                    PendingItems.Remove(orderNumber);
+                                    PendingItems.Remove(shipmentInfo);
                                 }
                             }
-                            else if (destination.HasDronePort)
+                            else if (shipmentInfo.Destination.HasDronePort)
                             {
                                 QuickLogger.Debug("Complete Order 3");
-                                DroneDeliveryService.Main.ShipOrder(destination, orderNumber, (result) =>
+                                DroneDeliveryService.Main.ShipOrder(shipmentInfo.Destination, shipmentInfo.OrderNumber, (result) =>
                                 {
                                     if (!result) //If failed to ship Item give player items in inventory
                                     {
@@ -95,8 +98,8 @@ namespace FCS_AlterraHub.Mono.Managers
                                     else
                                     {
                                         QuickLogger.Debug("Complete Order 5");
-                                        CreateOrder(sender, orderNumber);
-                                        PendingItems.Remove(orderNumber);
+                                        CreateOrder(sender, shipmentInfo);
+                                        PendingItems.Remove(shipmentInfo);
                                         wasOrderSuccessfull = true;
                                     }
                                 });
@@ -132,44 +135,46 @@ namespace FCS_AlterraHub.Mono.Managers
             return wasOrderSuccessfull;
         }
 
-        public string AddItemToCart(IStoreClient sender,string orderNumber, CartItem cartItemComponent)
+        public ShipmentInfo AddItemToCart(IStoreClient sender,ShipmentInfo shipmentInfo, CartItem cartItemComponent)
         {
-            
-            if (string.IsNullOrEmpty(orderNumber))
+
+
+            if (string.IsNullOrEmpty(shipmentInfo?.OrderNumber))
             {
-                orderNumber = Guid.NewGuid().ToString("n").Substring(0, 8);
-                PendingItems.Add(orderNumber, new List<CartItem>
+                shipmentInfo = new ShipmentInfo();
+                shipmentInfo.OrderNumber = Guid.NewGuid().ToString("n").Substring(0, 8);
+                PendingItems.Add(shipmentInfo, new List<CartItem>
                 {
                     cartItemComponent
                 });
             }
-            else if(PendingItems.ContainsKey(orderNumber))
+            else if(PendingItems.ContainsKey(shipmentInfo))
             {
-                PendingItems[orderNumber].Add(cartItemComponent);
+                PendingItems[shipmentInfo].Add(cartItemComponent);
             }
             sender.OnCreatedCartItem();
 
             cartItemComponent.onRemoveBTNClicked += (pendingItem =>
             {
-                PendingItems[orderNumber].Remove(pendingItem);
+                PendingItems[shipmentInfo].Remove(pendingItem);
                 sender.OnRemoveCartItem(pendingItem.gameObject);
                 //Destroy(pendingItem.gameObject);
             });
 
-            return orderNumber;
+            return shipmentInfo;
         }
 
-        public void CreateOrder(IStoreClient sender, string orderNumber)
+        public void CreateOrder(IStoreClient sender, ShipmentInfo shipmentInfo)
         {
-            if (string.IsNullOrEmpty(orderNumber) || !PendingItems.ContainsKey(orderNumber)) return;
+            if (string.IsNullOrEmpty(shipmentInfo?.OrderNumber) || !PendingItems.ContainsKey(shipmentInfo)) return;
 
             if (PendingItems.Any() && DeliveryService is not null)
             {
                 //DeliveryService.SetCurrentOrder();
                 PendingShipments.Add(new Shipment
                 {
-                    CartItems = PendingItems[orderNumber].SaveAll().ToList(),
-                    OrderNumber = orderNumber,
+                    CartItems = PendingItems[shipmentInfo].SaveAll().ToList(),
+                    OrderNumber = shipmentInfo.OrderNumber,
                     //Port = port,
                     //PortPrefabID = port.GetPrefabID()
                 });
@@ -178,39 +183,41 @@ namespace FCS_AlterraHub.Mono.Managers
             }
         }
 
-        public decimal GetCartTotal(string orderNumber)
+        public decimal GetCartTotal(ShipmentInfo shipmentInfo)
         {
-            if (string.IsNullOrEmpty(orderNumber) || !PendingItems.ContainsKey(orderNumber)) return 0;
-            return PendingItems[orderNumber].Sum(x => StoreInventorySystem.GetPrice(x.TechType));
+            if (string.IsNullOrEmpty(shipmentInfo?.OrderNumber) || !PendingItems.ContainsKey(shipmentInfo)) return 0;
+            return PendingItems[shipmentInfo].Sum(x => StoreInventorySystem.GetPrice(x.TechType));
         }
 
-        public int GetCartCount(string orderNumber)
+        public int GetCartCount(ShipmentInfo shipmentInfo)
         {
-            if (string.IsNullOrEmpty(orderNumber) || !PendingItems.ContainsKey(orderNumber)) return 0;
-            return PendingItems[orderNumber].Count;
+            if (shipmentInfo is null || !PendingItems.ContainsKey(shipmentInfo)) return 0;
+            return PendingItems[shipmentInfo].Count;
         }
 
-        public IEnumerable<CartItem> GetCartItems(string orderNumber)
+        public IEnumerable<CartItem> GetCartItems(ShipmentInfo shipmentInfo)
         {
-            return PendingItems[orderNumber];
+            return PendingItems[shipmentInfo];
         }
 
-        public void RemoveCartItem(string orderNumber, CartItem pendingItem)
+        public void RemoveCartItem(ShipmentInfo shipmentInfo, CartItem pendingItem)
         {
-            if(PendingItems.ContainsKey(orderNumber))
-                PendingItems[orderNumber].Remove(pendingItem);
+            if(PendingItems.ContainsKey(shipmentInfo))
+                PendingItems[shipmentInfo].Remove(pendingItem);
         }
 
-        public void RemovePendingOrder(string orderNumber)
+        public void RemovePendingOrder(ShipmentInfo shipmentInfo)
         {
-            if (!string.IsNullOrWhiteSpace(orderNumber) && PendingItems.ContainsKey(orderNumber))
-                PendingItems.Remove(orderNumber);
+            if (shipmentInfo == null) return;
+
+            if (!string.IsNullOrWhiteSpace(shipmentInfo.OrderNumber) && PendingItems.ContainsKey(shipmentInfo))
+                PendingItems.Remove(shipmentInfo);
         }
         
-        private List<Vector2int> GetSizes(string orderNumber)
+        private List<Vector2int> GetSizes(ShipmentInfo shipmentInfo)
         {
             var items = new List<Vector2int>();
-            foreach (CartItem cartItem in GetCartItems(orderNumber))
+            foreach (CartItem cartItem in GetCartItems(shipmentInfo))
             {
                 for (int i = 0; i < cartItem.ReturnAmount; i++)
                 {
@@ -231,6 +238,12 @@ namespace FCS_AlterraHub.Mono.Managers
         }
     }
 
+    internal class ShipmentInfo
+    {
+        public string OrderNumber { get; set; }
+        public IShippingDestination Destination { get; set; }
+    }
+
     internal interface IShippingDestination
     {
         public bool HasDronePort { get; }
@@ -238,6 +251,9 @@ namespace FCS_AlterraHub.Mono.Managers
         public bool IsVehicle { get; set; }
         bool SendItemsToConstructor(List<CartItem> pendingItem);
         string GetBaseName();
+        void SetInboundDrone(DroneController droneController);
+        IDroneDestination ActivePort();
+        string GetPreFabID();
     }
 
 

@@ -34,6 +34,12 @@ namespace FCS_AlterraHub.Helpers
         {
             try
             {
+                if (go is null)
+                {
+                    QuickLogger.Error($"Failed to find GameObject with the name: {name} root gameObject returned null");
+                    return null;
+                }
+
                 var renders = FindGameObject(go?.transform);
                 
                 foreach (GameObject mesh in renders)
@@ -82,9 +88,7 @@ namespace FCS_AlterraHub.Helpers
             }
             return null;
         }
-
-
-
+        
         public static GameObject FindParentWithName(GameObject childObject, string objectName)
         {
             Transform t = childObject.transform;

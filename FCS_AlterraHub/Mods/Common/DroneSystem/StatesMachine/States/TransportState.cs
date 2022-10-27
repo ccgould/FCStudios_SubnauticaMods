@@ -30,7 +30,7 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem.StatesMachine.States
                 return typeof(IdleState);
             }
 
-            _targetPos = new Vector3(_drone.GetTargetPort().GetEntryPoint().position.x, 100, _drone.GetTargetPort().GetEntryPoint().position.z);
+            _targetPos = new Vector3(_drone.GetTargetPort().ActivePort().GetEntryPoint().position.x, 100, _drone.GetTargetPort().ActivePort().GetEntryPoint().position.z);
 
             if (transform.position == _targetPos)
             {
@@ -38,12 +38,12 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem.StatesMachine.States
             }
 
 
-            if (_drone?.GetCurrentPort()?.GetEntryPoint() != null)
+            if (_drone?.GetCurrentPort()?.ActivePort().GetEntryPoint() != null)
             {
 
                 float destDistance = Vector3.Distance(transform.position, _targetPos);
 
-                float depDistance = Vector3.Distance(transform.position, _drone.GetCurrentPort().GetEntryPoint().position);
+                float depDistance = Vector3.Distance(transform.position, _drone.GetCurrentPort().ActivePort().GetEntryPoint().position);
 
                 if (depDistance <= 20 || destDistance <= 20)
                 {

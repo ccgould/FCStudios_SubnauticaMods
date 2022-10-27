@@ -34,12 +34,12 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem.StatesMachine.States
 
             var targetPos = new Vector3(transform.position.x, 100, transform.position.z);
 
-            if (_drone?.GetCurrentPort()?.GetEntryPoint() != null)
+            if (_drone?.GetCurrentPort()?.ActivePort().GetEntryPoint() != null)
             {
 
                 float destDistance = Vector3.Distance(transform.position, targetPos);
 
-                float depDistance = Vector3.Distance(transform.position, _drone.GetCurrentPort().GetEntryPoint().position);
+                float depDistance = Vector3.Distance(transform.position, _drone.GetCurrentPort().ActivePort().GetEntryPoint().position);
 
                 if (depDistance <= 20 || destDistance <= 20)
                 {

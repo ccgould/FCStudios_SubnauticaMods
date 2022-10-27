@@ -5,6 +5,7 @@ using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Managers;
+using FCS_AlterraHub.Mods.AlterraHubPod.Spawnable;
 using FCS_AlterraHub.Mods.Common.DroneSystem.Interfaces;
 using FCS_AlterraHub.Mods.Common.DroneSystem.Models;
 using FCS_AlterraHub.Mods.FCSPDA.Mono;
@@ -41,8 +42,7 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
         }
 
         public static DroneDeliveryService Main;
-
-
+        
         private void Start()
         {
             //InvokeRepeating(nameof(TryShip), 1f, 1f);
@@ -160,18 +160,18 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
 
         internal void ResetDrones()
         {
-            var drones = GameObject.FindObjectsOfType<DroneController>();
+            //var drones = GameObject.FindObjectsOfType<DroneController>();
 
-            foreach (DroneController controller in drones)
-            {
-                DestroyImmediate(controller.gameObject);
-            }
+            //foreach (DroneController controller in drones)
+            //{
+            //    DestroyImmediate(controller.gameObject);
+            //}
 
-            ClearDronesList();
+            //ClearDronesList();
             
-            Mod.GamePlaySettings.TransDroneSpawned = false;
+            //Mod.GamePlaySettings.TransDroneSpawned = false;
 
-            SpawnMissingDrones();
+            //SpawnMissingDrones();
         }
 
         private void ClearDronesList()
@@ -225,10 +225,10 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
 
             CreatePorts();
 
-            return _portManager.FindPort(port);
+            return _portManager?.FindPort(port);
         }
 
-        public AlterraDronePortController GetOpenPort()
+        public IDroneDestination GetOpenPort()
         {
             return _portManager?.GetOpenPort();
         }
@@ -284,6 +284,13 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
 
         public void ShipOrder(IShippingDestination destination, string orderNumber, Action<bool> callback)
         {
+            QuickLogger.Debug("Delivery Initiated",true);
+            var portManager = AlterraHubLifePodDronePortController.main.GetDronePortController();
+
+            var drone = portManager.SpawnDrone();
+
+            drone?.ShipOrder(destination);
+
             callback?.Invoke(true);
         }
 

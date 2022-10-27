@@ -17,6 +17,7 @@ namespace FCS_AlterraHub.Managers
         private string _prefabIdent;
         private readonly Dictionary<string, IDroneDestination> _dronePorts = new();
         private BaseManager _baseManager;
+        private DroneController _inboundDrone;
         public BaseManager Manager => GetManager();
 
         private BaseManager GetManager()
@@ -65,7 +66,7 @@ namespace FCS_AlterraHub.Managers
             return (from port in _dronePorts where port.Value.GetPortID() == dockedPortId select port.Value).FirstOrDefault();
         }
 
-        public AlterraDronePortController FindPort(string prefabId)
+        public IDroneDestination FindPort(string prefabId)
         {
             QuickLogger.Debug($"Port Count:{_dronePorts.Count} | Port ID: {prefabId}");
             foreach (KeyValuePair<string, IDroneDestination> port in _dronePorts)
@@ -74,18 +75,18 @@ namespace FCS_AlterraHub.Managers
                 if (port.Key.Equals(prefabId.Trim(),StringComparison.OrdinalIgnoreCase))
                 {
                     QuickLogger.Debug("Target Port Found", true);
-                    return (AlterraDronePortController)port.Value;
+                    return port.Value;
                 }
             }
 
             return null;
         }
 
-        public AlterraDronePortController GetOpenPort()
+        public IDroneDestination GetOpenPort()
         {
             foreach (KeyValuePair<string, IDroneDestination> port in _dronePorts)
             {
-                if (!port.Value.IsOccupied) return (AlterraDronePortController)port.Value;
+                if (!port.Value.IsOccupied) return port.Value;
             }
 
             return null;
@@ -112,6 +113,31 @@ namespace FCS_AlterraHub.Managers
         public string GetBaseName()
         {
             return Manager?.GetBaseName() ?? "Station Port";
+        }
+
+        public void SetInboundDrone(DroneController droneController)
+        {
+            _inboundDrone = droneController;
+        }
+
+        public IDroneDestination ActivePort()
+        {
+            return _dronePorts.FirstOrDefault().Value;
+        }
+
+        public string GetPreFabID()
+        {
+            return _baseManager.BaseID;
+        }
+
+        public DroneController SpawnDrone()
+        {
+            foreach (KeyValuePair<string, IDroneDestination> destination in _dronePorts)
+            {
+                return destination.Value.SpawnDrone();
+            }
+
+            return null;
         }
     }
 }

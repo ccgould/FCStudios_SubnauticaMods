@@ -9,6 +9,7 @@ using static Equipment;
 using UnityEngine.UI;
 using FCS_AlterraHub.Mods.FCSPDA.Enums;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
@@ -27,7 +28,7 @@ using System.Linq.Expressions;
 
 namespace FCS_AlterraHub.Managers.FCSAlterraHub
 {
-    internal class FCSAlterraHubGUI : MonoBehaviour
+    public class FCSAlterraHubGUI : MonoBehaviour
     {
         private Text _cartButtonNumber;
         private Text _cartAmountLabel;
@@ -55,8 +56,9 @@ namespace FCS_AlterraHub.Managers.FCSAlterraHub
         private bool _isInitialized;
         private Canvas _canvas;
         private GameObject _toggleHud;
+        private MessageBoxHandler _messageBox;
         public bool IsOpen { get; set; }
-
+        public FCSAlterraHubGUISender SenderType { get; set; }
 
         private void Update()
         {
@@ -67,34 +69,32 @@ namespace FCS_AlterraHub.Managers.FCSAlterraHub
         }
 
 
-        internal void SetInstance()
+        internal void SetInstance(FCSAlterraHubGUISender sender)
         {
             if (_isInitialized) return;
 
+            SenderType = SenderType;
             _canvas = gameObject.GetComponent<Canvas>();
+            _messageBox = gameObject.AddComponent<MessageBoxHandler>();
             _currentBiome = GameObjectHelpers.FindGameObject(_canvas.gameObject, "BiomeLBL")?.GetComponent<Text>();
+            
             _404 = GameObjectHelpers.FindGameObject(_canvas.gameObject, "404");
-            _404.FindChild("Message").GetComponent<Text>().text = AlterraHub.Error404();
-            _checkoutDialog = _canvas.gameObject.FindChild("Dialogs").FindChild("CheckOutPopUp").AddComponent<CheckOutPopupDialogWindow>();
 
-            _returnsDialogController = _canvas.gameObject.FindChild("Dialogs").FindChild("ReturnItemsDialog").AddComponent<ReturnsDialogController>();
-            _returnsDialogController.Initialize();
-
-            _cartDropDownManager = _canvas.gameObject.FindChild("Dialogs").FindChild("CartDropDown").AddComponent<CartDropDownHandler>();
-            _cartDropDownManager.OnBuyAllBtnClick += OnBuyAllBtnClick;
-            _cartDropDownManager.Initialize();
-            _cartDropDownManager.onTotalChanged += amount =>
+            if (_404 is not null)
             {
-                _cartAmountLabel.text = $"Cart Amount: {amount:n0}";
-                _cartTotalLabel.text = $"Cart Total: {_cartDropDownManager.GetCartCount()}";
-                _cartButtonNumber.text = _cartDropDownManager.GetCartCount().ToString();
-            };
+                _404.FindChild("Message").GetComponent<Text>().text = AlterraHub.Error404();
+            }
 
+            
+            _checkoutDialog = GameObjectHelpers.FindGameObject(_canvas.gameObject,"CheckOutPopUp")?.AddComponent<CheckOutPopupDialogWindow>();
+            _returnsDialogController = GameObjectHelpers.FindGameObject(_canvas.gameObject, "ReturnItemsDialog")?.AddComponent<ReturnsDialogController>();
+            _returnsDialogController?.Initialize(this);
             _toggleHud = GameObjectHelpers.FindGameObject(_canvas.gameObject, "ToggleHud");
             _accountName = GameObjectHelpers.FindGameObject(_canvas.gameObject, "UserName")?.GetComponent<Text>();
             _currentBaseInfo = GameObjectHelpers.FindGameObject(_canvas.gameObject, "CurrentBaseInfo")?.GetComponent<Text>();
             _accountBalance = GameObjectHelpers.FindGameObject(_canvas.gameObject, "AccountBalance")?.GetComponent<Text>();
             _clock = GameObjectHelpers.FindGameObject(_canvas.gameObject, "Clock")?.GetComponent<Text>();
+
 
             AddPages();
             CreateHomePage();
@@ -106,9 +106,24 @@ namespace FCS_AlterraHub.Managers.FCSAlterraHub
             LoadShipmentPage();
             TeleportationPage();
 
+            _cartDropDownManager = GameObjectHelpers.FindGameObject(_canvas.gameObject, "CartDropDown")?.AddComponent<CartDropDownHandler>();
+            
+            if (_cartDropDownManager is not null)
+            {
+                _cartDropDownManager.OnBuyAllBtnClick += OnBuyAllBtnClick;
+                _cartDropDownManager.Initialize(this);
+                _cartDropDownManager.onTotalChanged += amount =>
+                {
+                    _cartAmountLabel.text = $"Cart Amount: {amount:n0}";
+                    _cartTotalLabel.text = $"Cart Total: {_cartDropDownManager.GetCartCount()}";
+                    _cartButtonNumber.text = _cartDropDownManager.GetCartCount().ToString();
+                };
+            }
+
+
             MaterialHelpers.ApplyEmissionShader(AlterraHub.BasePrimaryCol, gameObject, Color.white, 0, 0.01f, 0.01f);
             MaterialHelpers.ApplySpecShader(AlterraHub.BasePrimaryCol, gameObject, 1, 6.15f);
-            MessageBoxHandler.main.ObjectRoot = gameObject;
+            _messageBox.ObjectRoot = gameObject;
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
             InvokeRepeating(nameof(UpdateDisplay), .5f, .5f);
             _isInitialized = true;
@@ -132,8 +147,10 @@ namespace FCS_AlterraHub.Managers.FCSAlterraHub
 
         private void CreateHomePage()
         {
-            var pageTextLabel = _pages[PDAPages.Home].FindChild("PageName").GetComponent<Text>();
-            var radialMenu = _pages[PDAPages.Home].FindChild("RadialMenu").AddComponent<RadialMenu>();
+            var pageTextLabel = _pages[PDAPages.Home]?.FindChild("PageName")?.GetComponent<Text>();
+            var radialMenu = _pages[PDAPages.Home]?.FindChild("RadialMenu")?.AddComponent<RadialMenu>();
+
+            if (radialMenu is null) return;
             radialMenu.TabAmount = 4;
             radialMenu.AddEntry(this, ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "Icons", "Cart_Icon.png")), pageTextLabel, "Store", PDAPages.Store);
             radialMenu.AddEntry(this, ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "Icons", "EncyclopediaIcon.png")), pageTextLabel, "Encyclopedia", PDAPages.Encyclopedia);
@@ -144,15 +161,18 @@ namespace FCS_AlterraHub.Managers.FCSAlterraHub
 
         private void CreateStorePage()
         {
-            _cartButtonNumber = GameObjectHelpers.FindGameObject(_pages[PDAPages.Store], "CartCount").GetComponentInChildren<Text>();
-            var pageTextLabel = _pages[PDAPages.Store].FindChild("PageName").GetComponent<Text>();
-            var radialMenu = _pages[PDAPages.Store].FindChild("RadialMenu").AddComponent<RadialMenu>();
+            _cartButtonNumber = GameObjectHelpers.FindGameObject(_pages[PDAPages.Store], "CartCount")?.GetComponentInChildren<Text>();
+            var pageTextLabel = _pages[PDAPages.Store]?.FindChild("PageName")?.GetComponent<Text>();
+            var radialMenu = _pages[PDAPages.Store]?.FindChild("RadialMenu")?.AddComponent<RadialMenu>();
 
-            var cartBTN = _pages[PDAPages.Store].FindChild("Cart").GetComponent<Button>();
-            cartBTN.onClick.AddListener((() =>
+            var cartBTN = _pages[PDAPages.Store]?.FindChild("Cart")?.GetComponent<Button>();
+            if (cartBTN != null)
             {
-                _cartDropDownManager.ToggleVisibility();
-            }));
+                cartBTN.onClick.AddListener((() =>
+                {
+                    _cartDropDownManager.ToggleVisibility();
+                }));
+            }
 
             var returnsBTN = _pages[PDAPages.Store].FindChild("Returns").GetComponent<Button>();
             returnsBTN.onClick.AddListener(() =>
@@ -160,21 +180,27 @@ namespace FCS_AlterraHub.Managers.FCSAlterraHub
                 _returnsDialogController.Open();
             });
 
-            var backButton = _pages[PDAPages.Store].FindChild("BackBTN").GetComponent<Button>();
-            backButton.onClick.AddListener((() =>
+            var backButton = _pages[PDAPages.Store]?.FindChild("BackBTN")?.GetComponent<Button>();
+            if (backButton != null)
             {
-                GoToPage(PDAPages.Home);
-            }));
+                backButton.onClick.AddListener((() =>
+                {
+                    GoToPage(PDAPages.Home);
+                }));
+            }
 
+            if (radialMenu is not null)
+            {
+                radialMenu.TabAmount = 7;
+                radialMenu.AddEntry(this, ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "Icons", "HomeSolutionsIcon_W.png")), pageTextLabel, "Home Solutions", PDAPages.HomeSolutions);
+                radialMenu.AddEntry(this, ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "Icons", "LifeSupportIcon_W.png")), pageTextLabel, "Life Solutions", PDAPages.LifeSolutions);
+                radialMenu.AddEntry(this, ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "Icons", "EnergySolutionsIcon_W.png")), pageTextLabel, "Energy Solutions", PDAPages.EnergySolutions);
+                radialMenu.AddEntry(this, ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "Icons", "ProductionSolutionsIcon_W.png")), pageTextLabel, "Production Solutions", PDAPages.ProductionSolutions);
+                radialMenu.AddEntry(this, ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "Icons", "StoreSolutionsIcon_W.png")), pageTextLabel, "Storage Solutions", PDAPages.StorageSolutions);
+                radialMenu.AddEntry(this, ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "Icons", "VehicleSolutionsIcon_W.png")), pageTextLabel, "Vehicle Solutions", PDAPages.VehicleSolutions);
+                radialMenu.AddEntry(this, ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "Icons", "MiscIcon_W.png")), pageTextLabel, "Misc", PDAPages.MiscSolutions);
+            }
 
-            radialMenu.TabAmount = 7;
-            radialMenu.AddEntry(this, ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "Icons", "HomeSolutionsIcon_W.png")), pageTextLabel, "Home Solutions", PDAPages.HomeSolutions);
-            radialMenu.AddEntry(this, ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "Icons", "LifeSupportIcon_W.png")), pageTextLabel, "Life Solutions", PDAPages.LifeSolutions);
-            radialMenu.AddEntry(this, ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "Icons", "EnergySolutionsIcon_W.png")), pageTextLabel, "Energy Solutions", PDAPages.EnergySolutions);
-            radialMenu.AddEntry(this, ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "Icons", "ProductionSolutionsIcon_W.png")), pageTextLabel, "Production Solutions", PDAPages.ProductionSolutions);
-            radialMenu.AddEntry(this, ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "Icons", "StoreSolutionsIcon_W.png")), pageTextLabel, "Storage Solutions", PDAPages.StorageSolutions);
-            radialMenu.AddEntry(this, ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "Icons", "VehicleSolutionsIcon_W.png")), pageTextLabel, "Vehicle Solutions", PDAPages.VehicleSolutions);
-            radialMenu.AddEntry(this, ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "Icons", "MiscIcon_W.png")), pageTextLabel, "Misc", PDAPages.MiscSolutions);
 
             //Set gameobject to toggle for pages
             _pages[PDAPages.HomeSolutions] = _pages[PDAPages.StorePage];
@@ -185,20 +211,24 @@ namespace FCS_AlterraHub.Managers.FCSAlterraHub
             _pages[PDAPages.VehicleSolutions] = _pages[PDAPages.StorePage];
             _pages[PDAPages.MiscSolutions] = _pages[PDAPages.StorePage];
 
-            radialMenu.Rearrange();
+            radialMenu?.Rearrange();
         }
 
         private void CreateStorePagePage()
         {
-            var backButton = _pages[PDAPages.StorePage].FindChild("BackBTN").GetComponent<Button>();
-            _cartAmountLabel = _pages[PDAPages.StorePage].FindChild("StoreHud").FindChild("CartAmount").GetComponent<Text>();
-            _cartTotalLabel = _pages[PDAPages.StorePage].FindChild("StoreHud").FindChild("CartTotal").GetComponent<Text>();
+            var backButton = _pages[PDAPages.StorePage]?.FindChild("BackBTN")?.GetComponent<Button>();
+            _cartAmountLabel = _pages[PDAPages.StorePage].FindChild("StoreHud")?.FindChild("CartAmount").GetComponent<Text>();
+            _cartTotalLabel = _pages[PDAPages.StorePage].FindChild("StoreHud")?.FindChild("CartTotal").GetComponent<Text>();
             _storePageGrid = GameObjectHelpers.FindGameObject(_pages[PDAPages.StorePage], "Content");
-            _storeLabel = GameObjectHelpers.FindGameObject(_pages[PDAPages.StorePage], "StoreLabel").GetComponent<Text>();
-            backButton.onClick.AddListener((() =>
+            _storeLabel = GameObjectHelpers.FindGameObject(_pages[PDAPages.StorePage], "StoreLabel")?.GetComponent<Text>();
+
+            if (backButton != null)
             {
-                GoToPage(PDAPages.Store);
-            }));
+                backButton.onClick.AddListener((() =>
+                {
+                    GoToPage(PDAPages.Store);
+                }));
+            }
         }
 
         private void LoadShipmentPage()
@@ -422,7 +452,7 @@ namespace FCS_AlterraHub.Managers.FCSAlterraHub
 
         internal void ShowMessage(string message)
         {
-            MessageBoxHandler.main.Show(message, FCSMessageButton.OK);
+            _messageBox.Show(message, FCSMessageButton.OK);
         }
 
         internal void RefreshTeleportationPage()
@@ -434,7 +464,7 @@ namespace FCS_AlterraHub.Managers.FCSAlterraHub
         {
             if (DroneDeliveryService.Main == null)
             {
-                MessageBoxHandler.main.Show(AlterraHub.ErrorHasOccurred("0x0001"), FCSMessageButton.OK);
+                _messageBox.Show(AlterraHub.ErrorHasOccurred("0x0001"), FCSMessageButton.OK);
                 return;
             }
 

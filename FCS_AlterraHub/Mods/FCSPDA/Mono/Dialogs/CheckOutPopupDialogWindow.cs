@@ -95,7 +95,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
 
             if (SelectedDestination == null)
             {
-                MessageBoxHandler.main.Show( Buildables.AlterraHub.NoDestinationFound(),FCSMessageButton.OK);
+                _mono.ShowMessage( Buildables.AlterraHub.NoDestinationFound());
                 return false;
             }
 
@@ -107,20 +107,23 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
 
             if (!CardSystem.main.HasBeenRegistered())
             {
-                MessageBoxHandler.main.Show(Buildables.AlterraHub.AccountNotFoundFormat(),FCSMessageButton.OK);
+                _mono.ShowMessage(Buildables.AlterraHub.AccountNotFoundFormat());
                 return false;
             }
 
             if (Inventory.main.container.GetCount(Mod.DebitCardTechType) <= 0)
             {
-                MessageBoxHandler.main.Show(Buildables.AlterraHub.CardNotDetected(),FCSMessageButton.OK);
+                _mono.ShowMessage(Buildables.AlterraHub.CardNotDetected());
                 return false;
             }
 
             if (CardSystem.main.HasEnough(_cartDropDownHandler.GetTotal()))
             {
                 QuickLogger.Debug("1");
-                if (StoreManager.main.CompleteOrder(_cartDropDownHandler, _cartDropDownHandler.GetOrderNumber(), SelectedDestination))
+
+                _cartDropDownHandler.GetShipmentInfo().Destination = SelectedDestination;
+
+                if (StoreManager.main.CompleteOrder(_cartDropDownHandler, _cartDropDownHandler.GetShipmentInfo()))
                 {
                     QuickLogger.Debug("2");
                     _cartDropDownHandler.TransactionComplete();
@@ -131,7 +134,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
             }
             else
             {
-                MessageBoxHandler.main.Show(Buildables.AlterraHub.NotEnoughMoneyOnAccount(), FCSMessageButton.OK);
+                _mono.ShowMessage(Buildables.AlterraHub.NotEnoughMoneyOnAccount());
             }
             return false;
         }

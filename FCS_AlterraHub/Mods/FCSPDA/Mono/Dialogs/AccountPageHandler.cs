@@ -29,10 +29,12 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
         private readonly Text _sliderText;
         private readonly Slider _slider;
         private readonly Toggle _deductionToggle;
+        private FCSAlterraHubGUISender _sender;
 
         internal AccountPageHandler(FCSAlterraHubGUI mono)
         {
             _mono = mono;
+            _sender = mono.SenderType;
 
             var accountPage = GameObjectHelpers.FindGameObject(mono.gameObject, "AccountPage");
 
@@ -84,7 +86,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
             {
                 if (_paymentInput.text.Contains("-"))
                 {
-                    MessageBoxHandler.main.Show(Buildables.AlterraHub.NegativeNumbersNotAllowed(), FCSMessageButton.OK);
+                    _mono.ShowMessage(Buildables.AlterraHub.NegativeNumbersNotAllowed());
                     _paymentInput.text = string.Empty;
                     return;
                 }
@@ -95,11 +97,11 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
                         QuickLogger.ModMessage(AlterraHub.DebitHasBeenPaid());
                         return;
                     }
-                    CardSystem.main.PayDebit(_pendingPayment);
+                    CardSystem.main.PayDebit(_mono,_pendingPayment);
                 }
                 else
                 {
-                    MessageBoxHandler.main.Show(Buildables.AlterraHub.NotEnoughMoneyOnAccount(),FCSMessageButton.OK,null);
+                    _mono.ShowMessage(Buildables.AlterraHub.NotEnoughMoneyOnAccount());
                 }
 
                 HidePaymentScreen();
@@ -126,7 +128,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
             {
                 if (PlayerInteractionHelper.CanPlayerHold(Mod.DebitCardTechType))
                 {
-                    if (CardSystem.main.CreateUserAccount(_fullName, _userName, _password, _pin))
+                    if (CardSystem.main.CreateUserAccount(_fullName, _userName, _password, _pin,0, _sender))
                     {
                         _userNameLBL.text = CardSystem.main.GetUserName();
                         _createAccountDialog.SetActive(false);
@@ -135,7 +137,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
                 }
                 else
                 {
-                    MessageBoxHandler.main.Show(Buildables.AlterraHub.NoSpaceAccountCreation(),FCSMessageButton.OK,null);
+                    _mono.ShowMessage(Buildables.AlterraHub.NoSpaceAccountCreation());
                 }
             });
             
@@ -224,8 +226,8 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
                     //Check if player has any FiberMesh and Magniette
                     if (!PlayerHasIngredients())
                     {
-                        MessageBoxHandler.main.Show(string.Format(Buildables.AlterraHub.CardRequirementsMessageFormat(),
-                            LanguageHelpers.GetLanguage(TechType.FiberMesh), LanguageHelpers.GetLanguage(TechType.Magnetite)),FCSMessageButton.OK,null);
+                        _mono.ShowMessage(string.Format(Buildables.AlterraHub.CardRequirementsMessageFormat(),
+                            LanguageHelpers.GetLanguage(TechType.FiberMesh), LanguageHelpers.GetLanguage(TechType.Magnetite)));
                         return;
                     }
 

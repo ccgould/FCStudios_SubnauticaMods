@@ -25,7 +25,7 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem.StatesMachine.States
         public override Type Tick()
         {
             //QuickLogger.Debug("Descending", true);
-            var target = _drone.GetTargetPort().GetEntryPoint().position;
+            var target = _drone.GetTargetPort().ActivePort().GetEntryPoint().position;
             if (transform.position == target)
             {
                 _straightened = false;
@@ -34,11 +34,11 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem.StatesMachine.States
 
             var targetPos = new Vector3(transform.position.x, 100, transform.position.z);
 
-            if (_drone?.GetTargetPort()?.GetEntryPoint() != null)
+            if (_drone?.GetTargetPort()?.ActivePort().GetEntryPoint() != null)
             {
                 float destDistance = Vector3.Distance(transform.position, targetPos);
 
-                float depDistance = Vector3.Distance(transform.position, _drone.GetTargetPort().GetEntryPoint().position);
+                float depDistance = Vector3.Distance(transform.position, _drone.GetTargetPort().ActivePort().GetEntryPoint().position);
 
                 if (depDistance <= 20 || destDistance <= 20)
                 {
@@ -65,7 +65,7 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem.StatesMachine.States
                 _straightened = true;
             }
 
-            var rot = Quaternion.LookRotation(_drone.GetTargetPort().GetEntryPoint().transform.forward, Vector3.up);
+            var rot = Quaternion.LookRotation(_drone.GetTargetPort().ActivePort().GetEntryPoint().transform.forward, Vector3.up);
             transform.rotation = Quaternion.Slerp(transform.rotation, rot, 1f * Time.deltaTime);
 
 

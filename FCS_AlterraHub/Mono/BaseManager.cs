@@ -10,6 +10,7 @@ using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Managers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mods.Common.DroneSystem;
+using FCS_AlterraHub.Mods.Common.DroneSystem.Interfaces;
 using FCS_AlterraHub.Mono.Controllers;
 using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
@@ -1668,7 +1669,7 @@ namespace FCS_AlterraHub.Mono
             return (from device in _registeredDevices where device.Key == telepowerPylonTabId select device.Value.UnitID).ToList();
         }
 
-        internal static AlterraDronePortController FindPort(string portPrefabId)
+        internal static IDroneDestination FindPort(string portPrefabId)
         {
             foreach (BaseManager baseManager in Managers)
             {

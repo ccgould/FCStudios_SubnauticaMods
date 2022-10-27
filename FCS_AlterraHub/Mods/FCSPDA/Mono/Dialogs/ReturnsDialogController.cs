@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FCS_AlterraHub.Managers.FCSAlterraHub;
 using FCS_AlterraHub.Systems;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,12 +12,14 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
         private ToggleGroup _toggleGroup;
         private Transform _list;
         private readonly List<AlterraHubReturnItemController> _toggles = new List<AlterraHubReturnItemController>();
+        private FCSAlterraHubGUI _mono;
 
         public Action OnClose { get; set; }
 
 
-        internal  void Initialize()
+        internal  void Initialize(FCSAlterraHubGUI mono)
         {
+            _mono = mono;
             var content = gameObject.FindChild("Content");
 
             _list = content.FindChild("Scroll View").FindChild("Viewport").FindChild("Content").transform;
@@ -32,7 +35,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
                 {
                     if (toggle.IsChecked)
                     {
-                        CardSystem.main.Refund(toggle.InventoryItem.item.GetTechType());
+                        CardSystem.main.Refund(FCSAlterraHubGUISender.None,toggle.InventoryItem.item.GetTechType());
                         Destroy(toggle.InventoryItem.item.gameObject);
                     }
                 }

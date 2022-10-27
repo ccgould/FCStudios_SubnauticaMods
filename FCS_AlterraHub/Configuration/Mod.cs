@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using FCS_AlterraHub.Model.Utilities;
+using FCS_AlterraHub.Mods.AlterraHubPod.Mono;
 using FCS_AlterraHub.Mods.Common.DroneSystem;
 using FCS_AlterraHub.Mods.Common.DroneSystem.Models;
 using FCS_AlterraHub.Mono;
@@ -145,7 +146,7 @@ namespace FCS_AlterraHub.Configuration
             {
                 if (_gamePlaySettings == null)
                 {
-                    _gamePlaySettings = new FCSGamePlaySettings();
+                    _gamePlaySettings = LoadGamePlaySettings();
                 }
 
                 return _gamePlaySettings;
@@ -239,10 +240,17 @@ namespace FCS_AlterraHub.Configuration
         {
             try
             {
+                if (_gamePlaySettings == null)
+                {
+                    _gamePlaySettings = new FCSGamePlaySettings();
+                }
+
                 QuickLogger.Debug("Saving Gameplay Settings",true);
 
                 DroneDeliveryService.Main.Save();
-                
+                AlterraHubPodController.main.Save();
+
+
                 ModUtils.Save(_gamePlaySettings, "settings.json", GetSaveFileDirectory(), OnSaveComplete);
 
                 if (File.Exists(Path.Combine(GetSaveFileDirectory(), "settings.json")))
@@ -253,18 +261,22 @@ namespace FCS_AlterraHub.Configuration
                 {
                     QuickLogger.DebugError("Gameplay Settings Save Not Found", true);
                 }
-                return true;
             }
             catch (Exception e)
             {
                 QuickLogger.Error($"Error: {e.Message} | StackTrace: {e.StackTrace}");
                 return false;
             }
+
+            return true;
         }
 
-        internal static void LoadGamePlaySettings()
+        internal static FCSGamePlaySettings LoadGamePlaySettings()
         {
             QuickLogger.Info("Loading Game Play Settings...");
+
+            if(_gamePlaySettings != null) return _gamePlaySettings;
+            
             ModUtils.LoadSaveData<FCSGamePlaySettings>("settings.json", GetSaveFileDirectory(), data =>
             {
                 QuickLogger.Debug($"Finished loading Game Play Settings : {JsonConvert.SerializeObject(data, Formatting.Indented)}");
@@ -277,6 +289,8 @@ namespace FCS_AlterraHub.Configuration
             }
 
             NotifyGamePlayLoaded();
+
+            return _gamePlaySettings;
         }
 
         private static void NotifyGamePlayLoaded()
@@ -561,11 +575,9 @@ namespace FCS_AlterraHub.Configuration
     
     public class KeyPadAccessSave
     {
-        public bool KeyPad1;
-        public bool KeyPad2;
-        public bool KeyPad3;
-        public bool KeyPad4;
-        public float SecurityDoors;
+        public Tuple<bool,bool> ChamberDoor01 = new(false,false);
+        public Tuple<bool, bool> ChamberDoor02 = new(false, false);
+        public Tuple<bool, bool> SlideUpDoor01 = new(true, false);
     }
 
     [Serializable]
