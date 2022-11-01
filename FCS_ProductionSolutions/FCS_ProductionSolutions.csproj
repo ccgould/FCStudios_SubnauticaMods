@@ -141,6 +141,12 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Mods\IonCubeGenerator\Buildable\" />
+    <Folder Include="Mods\IonCubeGenerator\Configuration\" />
+    <Folder Include="Mods\IonCubeGenerator\Craftables\" />
+    <Folder Include="Mods\IonCubeGenerator\Display\Patching\" />
+    <Folder Include="Mods\IonCubeGenerator\Enums\" />
+    <Folder Include="Mods\IonCubeGenerator\Interfaces\" />
+    <Folder Include="Mods\IonCubeGenerator\Mono\" />
     <Folder Include="Patches\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
