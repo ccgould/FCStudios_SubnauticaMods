@@ -103,7 +103,7 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
         }
 
 
-        internal bool ShipOrder(IShippingDestination destination)
+        internal bool ShipOrder(IShippingDestination destination,bool isReturning = false)
         {
             try
             {
@@ -112,8 +112,7 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
                     QuickLogger.Error("Destination Port returned null", true);
                     return false;
                 }
-
-                StartCoroutine(ShipOrderAsync(destination));
+                StartCoroutine(ShipOrderAsync(destination,isReturning));
                 return true;
             }
             catch (Exception e)
@@ -124,16 +123,18 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
             }
         }
 
-        private IEnumerator ShipOrderAsync(IShippingDestination destinationPort)
+        private IEnumerator ShipOrderAsync(IShippingDestination destinationPort,bool isReturning)
         {
             this.destinationPort = destinationPort;
-            this.departurePort = AlterraHubLifePodDronePortController.main.PortManager;
+            this.departurePort = isReturning ? departurePort : AlterraHubLifePodDronePortController.main.PortManager;
             yield return new WaitForSeconds(5f);
             QuickLogger.Debug("Trying to ship");
             destinationPort.SetInboundDrone(this);
             Depart();
             yield break;
         }
+
+        //TODO Destroy drone once landed back to station
 
         public void Dock()
         {
@@ -149,14 +150,18 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
                 
                 destinationPort.ActivePort().Offload(this);
 
-                departurePort = destinationPort;
+                //departurePort = destinationPort;
 
                 StateMachine.SwitchToNewState(typeof(IdleState));
 
-                if (!DroneDeliveryService.Main.IsStationPort(GetCurrentPort().GetPreFabID()))
+                if (!AlterraHubLifePodDronePortController.main.PortManager.ContainsPort(GetCurrentPort()))
                 {
                     QuickLogger.Debug("Getting port from station", true);
-                    ShipOrder(AlterraHubLifePodDronePortController.main.PortManager);
+                    ShipOrder(AlterraHubLifePodDronePortController.main.PortManager,true);
+                }
+                else
+                {
+                    StartCoroutine(DestroyDrone());
                 }
 
                 _isDocking = false;
@@ -164,6 +169,13 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
             });
 
             _isDocking = true;
+        }
+
+        private IEnumerator DestroyDrone()
+        {
+            yield return new WaitForSeconds(2);
+            Destroy(gameObject);
+            yield break;
         }
 
         public void Depart()
@@ -253,6 +265,8 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
                 QuickLogger.Error("Drone Failed to Find Departure Port");
                 return;
             }
+
+            QuickLogger.Debug("Setting Departure Port", true);
             departurePort = port;
         }
 

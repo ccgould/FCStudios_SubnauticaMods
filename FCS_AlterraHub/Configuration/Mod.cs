@@ -22,6 +22,7 @@ using UnityEngine;
 using Object = UnityEngine.Object;
 using UWE;
 using FMOD;
+using static GameAchievements;
 #if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
 #else
@@ -538,6 +539,25 @@ namespace FCS_AlterraHub.Configuration
             }
 
             return new PatreonStatueDataEntry() { Id = id };
+        }
+
+        public static AlterraHubConstructorEntry GetAlterraHubConstructorEntrySaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.AlterraHubConstructorEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new AlterraHubConstructorEntry() { Id = id };
         }
     }
 

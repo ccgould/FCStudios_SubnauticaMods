@@ -6,6 +6,7 @@ using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Mods.AlterraHubConstructor.Buildable;
 using FCS_AlterraHub.Mods.AlterraHubDepot.Buildable;
 using FCS_AlterraHub.Mods.AlterraHubDepot.Spawnable;
 using FCS_AlterraHub.Mods.AlterraHubPod.Spawnable;
@@ -179,6 +180,9 @@ namespace FCS_AlterraHub
 
             var dronePortBuilable = new DronePortPadHubNewPatcher();
             dronePortBuilable.Patch();
+
+            var alterraHubConstructor = new AlterraHubFabricatorPatcher();
+            alterraHubConstructor.Patch();
 
             var patreonStatueBuilable = new PatreonStatuePatcher();
             patreonStatueBuilable.Patch();

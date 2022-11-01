@@ -217,7 +217,7 @@ namespace FCS_AlterraHub.Buildables
 
                     if (!LoadAssetV2("fcs_BlueprintBox", QPatch.GlobalBundle, out var fcsDataBox)) return false;
                     DataBoxPrefab = fcsDataBox;
-
+                    
                     _initialized = true;
                 }
 
@@ -230,7 +230,9 @@ namespace FCS_AlterraHub.Buildables
                 return false;
             }
         }
-        
+
+
+
         private static void AddComponentsToEncyclopediaEntry(GameObject encyclopediaEntryPrefab)
         {
             encyclopediaEntryPrefab.SetActive(false);

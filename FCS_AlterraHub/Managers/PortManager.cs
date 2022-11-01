@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Configuration;
+using FCS_AlterraHub.Mods.AlterraHubFabricator.Mono;
 using FCS_AlterraHub.Mods.Common.DroneSystem;
 using FCS_AlterraHub.Mods.Common.DroneSystem.Interfaces;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
@@ -16,6 +17,7 @@ namespace FCS_AlterraHub.Managers
     {
         private string _prefabIdent;
         private readonly Dictionary<string, IDroneDestination> _dronePorts = new();
+        private readonly Dictionary<string, AlterraHubConstructorController> _alterraHubConstructors = new ();
         private BaseManager _baseManager;
         private DroneController _inboundDrone;
         public BaseManager Manager => GetManager();
@@ -103,11 +105,12 @@ namespace FCS_AlterraHub.Managers
         }
 
         public bool HasDronePort => Manager?.IsDeviceBuilt(Mod.DronePortPadHubNewTabID) ?? false;
-        public bool HasContructor { get; }
+        public bool HasContructor => _alterraHubConstructors.Any();
         public bool IsVehicle { get; set; }
         public bool SendItemsToConstructor(List<CartItem> pendingItem)
         {
-            return false;
+            var constructors = _alterraHubConstructors.FirstOrDefault( x => x.Value.IsConstructed);
+            return constructors.Value.ShipItems(pendingItem);
         }
 
         public string GetBaseName()
@@ -138,6 +141,29 @@ namespace FCS_AlterraHub.Managers
             }
 
             return null;
+        }
+
+        public bool ContainsPort(IDroneDestination port)
+        {
+            return _dronePorts.ContainsValue(port);
+        }
+
+        public bool ContainsPort(IShippingDestination port)
+        {
+            return _dronePorts.ContainsValue(port.ActivePort());
+        }
+
+        public void RegisterConstructor(AlterraHubConstructorController constructor)
+        {
+            if (!_alterraHubConstructors.ContainsKey(constructor.GetPrefabID()))
+            {
+                _alterraHubConstructors.Add(constructor.GetPrefabID(),constructor);
+            }
+        }
+
+        public void UnRegisterConstructor(AlterraHubConstructorController constructor)
+        {
+            _alterraHubConstructors.Remove(constructor.GetPrefabID());
         }
     }
 }

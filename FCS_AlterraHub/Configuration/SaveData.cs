@@ -59,6 +59,15 @@ namespace FCS_AlterraHub.Configuration
         public string State { get; set; }
     }
 
+    internal class AlterraHubConstructorEntry : ISaveDataEntry
+    {
+        public string Id { get; set; }
+        public ColorTemplateSave ColorTemplate { get; set; }
+        public string BaseId { get; set; }
+
+    }
+
+
     internal class PatreonStatueDataEntry : ISaveDataEntry
     {
         public string Id { get; set; }
@@ -84,7 +93,7 @@ namespace FCS_AlterraHub.Configuration
         [JsonProperty] internal List<AlterraHubDepotEntry> AlterraHubDepotEntries { get; set; } = new();
         [JsonProperty] internal List<AlterraDronePortEntry> AlterraDronePortEntries { get; set; } = new();
         [JsonProperty] internal List<AlterraTransportDroneEntry> AlterraTransportDroneEntries { get; set; } = new();
-
+        [JsonProperty] internal List<AlterraHubConstructorEntry> AlterraHubConstructorEntries = new();
         [JsonProperty] internal List<BaseSaveData> BaseSaves = new();
     }
 }

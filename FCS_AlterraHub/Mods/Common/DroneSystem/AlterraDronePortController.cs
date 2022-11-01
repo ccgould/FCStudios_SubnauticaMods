@@ -282,6 +282,9 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
             {
                 _portManager = gameObject.GetComponentInParent<PortManager>();
                 _portManager.RegisterDronePort(this);
+
+                var droneDoorTrigger = GameObjectHelpers.FindGameObject(gameObject, "DockTrigger").AddComponent<DroneDoorTrigger>();
+                droneDoorTrigger.Port = _portManager;
             }
 
             if (_colorManager == null)
@@ -295,7 +298,6 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
 
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseSecondaryCol, gameObject, ColorList.GetColor(14));
-
             IsInitialized = true;
         }
 

@@ -112,7 +112,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Spawnable
             pr.subRoot = sr;
 
             var portManager = prefab.AddComponent<PortManager>();
-
+            var droneDoorTrigger = GameObjectHelpers.FindGameObject(prefab, "DockTrigger").AddComponent<DroneDoorTrigger>();
+            droneDoorTrigger.Port = portManager;
             var dronePortController = prefab.AddComponent<AlterraHubLifePodDronePortController>();
             dronePortController.PortManager = portManager;
             return prefab;

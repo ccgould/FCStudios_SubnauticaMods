@@ -49,6 +49,8 @@
     <Compile Include="Model\GUI\StorageInventoryButton.cs" />
     <Compile Include="Model\GUI\uGUI_FCSDisplayItem.cs" />
     <Compile Include="Model\LadderController.cs" />
+    <Compile Include="Mods\AlterraHubFabricator\Buildable\AlterraHubFabricatorPatcher.cs" />
+    <Compile Include="Mods\AlterraHubFabricator\Mono\AlterraHubConstructorController.cs" />
     <Compile Include="Mods\AlterraHubPod\Mono\AlterraHubPodController.cs" />
     <Compile Include="Mods\AlterraHubPod\Mono\DoorController.cs" />
     <Compile Include="Mods\AlterraHubPod\Spawnable\AlterraHubPatch.cs" />
@@ -56,6 +58,7 @@
     <Compile Include="Mods\Common\DroneSystem\AlterraTransportDroneSpawnable.cs" />
     <Compile Include="Mods\Common\DroneSystem\DroneController.cs" />
     <Compile Include="Mods\Common\DroneSystem\DroneDeliveryService.cs" />
+    <Compile Include="Mods\Common\DroneSystem\DroneDoorTrigger.cs" />
     <Compile Include="Mods\Common\DroneSystem\DronePortPadHubNewPatcher.cs" />
     <Compile Include="Mods\Common\DroneSystem\Enums\DronePortAnimation.cs" />
     <Compile Include="Mods\Common\DroneSystem\Factory\StateFactory.cs" />

@@ -140,6 +140,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Mods\IonCubeGenerator\Buildable\" />
     <Folder Include="Patches\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
