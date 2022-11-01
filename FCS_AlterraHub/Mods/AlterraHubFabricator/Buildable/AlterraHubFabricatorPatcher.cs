@@ -88,6 +88,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubConstructor.Buildable
                 var storage = UWEHelpers.CreateStorageContainer(prefab, null, ClassID, "AlterraHub Constructor", 6, 8);
                 
                 controller.Storage = storage;
+                
                 return prefab;
 
             }

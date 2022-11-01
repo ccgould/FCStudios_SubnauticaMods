@@ -11,6 +11,7 @@ using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Mods.Replicator.Buildables;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Models;
 using FCS_ProductionSolutions.Mods.HydroponicHarvester.Buildable;
+using FCS_ProductionSolutions.Mods.IonCubeGenerator.Interfaces;
 using FCS_ProductionSolutions.Structs;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
@@ -365,6 +366,23 @@ namespace FCS_ProductionSolutions.Configuration
             }
 
             return new DeepDrillerLightDutySaveDataEntry() { Id = id };
+        }
+
+        public static ICubeGeneratorSaveHandler GetIonCubeGeneratorSaveData(string id)
+        {
+            LoadData();
+            foreach (IonCubeGeneratorSaveDataEntry ionCubeGeneratorSaveDataEntry in Mod.GetSaveData().IonCubeGeneratorEntries)
+            {
+                if (!string.IsNullOrEmpty(ionCubeGeneratorSaveDataEntry.Id) && ionCubeGeneratorSaveDataEntry.Id == id)
+                {
+                    return ionCubeGeneratorSaveDataEntry;
+                }
+            }
+
+            return new IonCubeGeneratorSaveDataEntry
+            {
+                Id = id
+            };
         }
     }
 }

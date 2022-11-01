@@ -10,6 +10,7 @@ using FCS_ProductionSolutions.Mods.DeepDriller.Configuration;
 using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Structs;
 using FCS_ProductionSolutions.Mods.HydroponicHarvester.Enumerators;
 using FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono;
+using FCS_ProductionSolutions.Mods.IonCubeGenerator.Interfaces;
 using FCS_ProductionSolutions.Structs;
 #if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
@@ -90,9 +91,48 @@ namespace FCS_ProductionSolutions.Configuration
         [JsonProperty] internal bool IsBrakeSet { get; set; }
         [JsonProperty] internal string BeaconName { get; set; }
         [JsonProperty] internal bool IsPingVisible { get; set; }
-    }    
-    
-    
+    }
+
+    [Serializable]
+    internal class IonCubeGeneratorSaveDataEntry : ICubeGeneratorSaveHandler, ICubeGeneratorSaveData
+    {
+        private Mods.IonCubeGenerator.Enums.SpeedModes _currentSpeedMode;
+
+        [JsonProperty]
+        internal string Id { get; set; }
+        [JsonProperty]
+        internal string SaveVersion { get; set; } = "1.0";
+        [JsonProperty]
+        internal ColorTemplateSave ColorTemplate { get; set; }
+        public void LoadData(ICubeGeneratorSaveData cubeGenerator)
+        {
+            cubeGenerator.NumberOfCubes = NumberOfCubes;
+            cubeGenerator.StartUpProgress = StartUpProgress;
+            cubeGenerator.GenerationProgress = GenerationProgress;
+            cubeGenerator.CoolDownProgress = CoolDownProgress;
+            cubeGenerator.CurrentSpeedMode = (Mods.IonCubeGenerator.Enums.SpeedModes)CurrentSpeedMode;
+        }
+
+        public void SaveData(ICubeGeneratorSaveData cubeGenerator)
+        {
+
+        }
+
+        public int NumberOfCubes { get; set; }
+        public float StartUpProgress { get; set; }
+        public float GenerationProgress { get; set; }
+        public float CoolDownProgress { get; set; }
+
+        Mods.IonCubeGenerator.Enums.SpeedModes ICubeGeneratorSaveData.CurrentSpeedMode
+        {
+            get => _currentSpeedMode;
+            set => _currentSpeedMode = value;
+        }
+
+        public SpeedModes CurrentSpeedMode { get; set; }
+    }
+
+
     [Serializable]
     internal class DeepDrillerLightDutySaveDataEntry : ISaveDataEntry
     {
@@ -150,5 +190,6 @@ namespace FCS_ProductionSolutions.Configuration
         [JsonProperty] internal List<AutoCrafterDataEntry> AutoCrafterDataEntries = new();
         [JsonProperty] internal List<FCSDNASampleData> HydroponicHarvesterKnownTech { get; set; } = new();
         [JsonProperty] internal Dictionary<string, CraftingOperation> CraftingOperations { get; set; } = new();
+        internal List<IonCubeGeneratorSaveDataEntry> IonCubeGeneratorEntries { get; set; } = new();
     }
 }

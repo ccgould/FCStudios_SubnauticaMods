@@ -13,6 +13,7 @@ using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Ores;
 using FCS_ProductionSolutions.Mods.DeepDriller.LightDuty.Buildable;
 using FCS_ProductionSolutions.Mods.DeepDriller.Managers;
 using FCS_ProductionSolutions.Mods.HydroponicHarvester.Buildable;
+using FCS_ProductionSolutions.Mods.IonCubeGenerator.Buildable;
 using FCS_ProductionSolutions.Mods.MatterAnalyzer.Buildable;
 using FCSCommon.Utilities;
 using HarmonyLib;
@@ -117,6 +118,8 @@ namespace FCS_ProductionSolutions
                 var dssAutoCrafter = new AutoCrafterPatch();
                 dssAutoCrafter.Patch();
             }
+
+            CubeGeneratorBuildable.PatchSMLHelper();
 
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));

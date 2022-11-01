@@ -63,6 +63,31 @@
     <Compile Include="Mods\DeepDriller\Patchers\DeepDrillerHudPages.cs" />
     <Compile Include="Mods\DeepDriller\Patchers\PowerIndicatorPatch.cs" />
     <Compile Include="Mods\HydroponicHarvester\Patches\StorageContainerPatches.cs" />
+    <Compile Include="Mods\IonCubeGenerator\Buildable\CubeGeneratorAuxPatcher.cs" />
+    <Compile Include="Mods\IonCubeGenerator\Buildable\CubeGeneratorModelPrefab.cs" />
+    <Compile Include="Mods\IonCubeGenerator\Buildable\CubeGeneratorPatcher.cs" />
+    <Compile Include="Mods\IonCubeGenerator\Configuration\MenuConfiguration.cs" />
+    <Compile Include="Mods\IonCubeGenerator\Configuration\ModConfiguration.cs" />
+    <Compile Include="Mods\IonCubeGenerator\Craftables\AlienElectronicsCasePrefab.cs" />
+    <Compile Include="Mods\IonCubeGenerator\Craftables\AlienEletronicsCase.cs" />
+    <Compile Include="Mods\IonCubeGenerator\Craftables\AlienIngot.cs" />
+    <Compile Include="Mods\IonCubeGenerator\Craftables\AlienIngotPrefab.cs" />
+    <Compile Include="Mods\IonCubeGenerator\Display\InterfaceButton.cs" />
+    <Compile Include="Mods\IonCubeGenerator\Display\IonGeneratorDisplay.cs" />
+    <Compile Include="Mods\IonCubeGenerator\Display\OnScreenButton.cs" />
+    <Compile Include="Mods\IonCubeGenerator\Display\Patching\DisplayLanguagePatching.cs" />
+    <Compile Include="Mods\IonCubeGenerator\Enums\CubePhases.cs" />
+    <Compile Include="Mods\IonCubeGenerator\Enums\InterfaceButtonMode.cs" />
+    <Compile Include="Mods\IonCubeGenerator\Enums\SpeedModes.cs" />
+    <Compile Include="Mods\IonCubeGenerator\Interfaces\ICubeContainer.cs" />
+    <Compile Include="Mods\IonCubeGenerator\Interfaces\ICubeGeneratorSaveData.cs" />
+    <Compile Include="Mods\IonCubeGenerator\Interfaces\ICubeGeneratorSaveHandler.cs" />
+    <Compile Include="Mods\IonCubeGenerator\Interfaces\ICubeProduction.cs" />
+    <Compile Include="Mods\IonCubeGenerator\Mono\CubeGeneratorAnimator.cs" />
+    <Compile Include="Mods\IonCubeGenerator\Mono\CubeGeneratorAudioHandler.cs" />
+    <Compile Include="Mods\IonCubeGenerator\Mono\CubeGeneratorContainer.cs" />
+    <Compile Include="Mods\IonCubeGenerator\Mono\CubeGeneratorProducer.cs" />
+    <Compile Include="Mods\IonCubeGenerator\Mono\TriggerFixer.cs" />
     <Compile Include="Mods\Replicator\Patches\StorageContainerPatches.cs" />
     <Compile Include="Structs\DNASampleData.cs" />
     <Compile Include="Configuration\Mod.cs" />
@@ -140,13 +165,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Mods\IonCubeGenerator\Buildable\" />
-    <Folder Include="Mods\IonCubeGenerator\Configuration\" />
-    <Folder Include="Mods\IonCubeGenerator\Craftables\" />
-    <Folder Include="Mods\IonCubeGenerator\Display\Patching\" />
-    <Folder Include="Mods\IonCubeGenerator\Enums\" />
-    <Folder Include="Mods\IonCubeGenerator\Interfaces\" />
-    <Folder Include="Mods\IonCubeGenerator\Mono\" />
     <Folder Include="Patches\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
