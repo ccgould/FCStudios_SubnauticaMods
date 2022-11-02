@@ -217,8 +217,8 @@ namespace FCS_AlterraHub.Managers.FCSAlterraHub
         private void CreateStorePagePage()
         {
             var backButton = _pages[PDAPages.StorePage]?.FindChild("BackBTN")?.GetComponent<Button>();
-            _cartAmountLabel = _pages[PDAPages.StorePage].FindChild("StoreHud")?.FindChild("CartAmount").GetComponent<Text>();
-            _cartTotalLabel = _pages[PDAPages.StorePage].FindChild("StoreHud")?.FindChild("CartTotal").GetComponent<Text>();
+            _cartAmountLabel = _pages[PDAPages.StorePage].FindChild("StoreHud")?.FindChild("CartAmount")?.GetComponent<Text>();
+            _cartTotalLabel = _pages[PDAPages.StorePage].FindChild("StoreHud")?.FindChild("CartTotal")?.GetComponent<Text>();
             _storePageGrid = GameObjectHelpers.FindGameObject(_pages[PDAPages.StorePage], "Content");
             _storeLabel = GameObjectHelpers.FindGameObject(_pages[PDAPages.StorePage], "StoreLabel")?.GetComponent<Text>();
 

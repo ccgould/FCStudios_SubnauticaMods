@@ -1,15 +1,22 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Extensions;
+using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Managers;
 using FCS_AlterraHub.Model;
+using FCS_AlterraHub.Model.Converters;
 using FCS_AlterraHub.Mods.AlterraHubConstructor.Buildable;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCSCommon.Interfaces;
 using FCSCommon.Utilities;
+using Oculus.Newtonsoft.Json.Utilities.LinqBridge;
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace FCS_AlterraHub.Mods.AlterraHubFabricator.Mono
 {
@@ -18,9 +25,17 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricator.Mono
         private PortManager _portManager;
         private bool _runStartUpOnEnable;
         private AlterraHubConstructorEntry _savedData;
+        
         private bool _isFromSave;
-        private List<TechType> _storage = new();
         public StorageContainer Storage;
+        private Text _amount;
+        private Text _shippingInfo;
+        private Image _icon;
+        private FMOD_CustomLoopingEmitter _machineSound;
+        private IEnumerable<CartItemSaveData> _pendingItems;
+        private float _requestedTime;
+        private float _totalTime;
+        private float _countDown;
 
         private void ReadySaveData()
         {
@@ -38,6 +53,61 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricator.Mono
                 _portManager = Manager.Habitat.GetComponentInChildren<PortManager>();
                 _portManager.RegisterConstructor(this);
             }
+
+            Storage.container.onAddItem += item =>
+            {
+                UpdateTotals();
+            };
+
+            Storage.container.onRemoveItem += item =>
+            {
+                UpdateTotals();
+
+                if (!Storage.container.Any())
+                {
+                    _icon.fillAmount = 0;
+                }
+            };
+
+            Storage.container.isAllowedToAdd += (pickupable, verbose) => false;
+        }
+
+        private void OnEnable()
+        {
+            if (_runStartUpOnEnable)
+            {
+                if (!IsInitialized)
+                {
+                    Initialize();
+                }
+
+                if (_isFromSave)
+                {
+                    if (_savedData == null)
+                    {
+                        ReadySaveData();
+                    }
+
+                    _colorManager.LoadTemplate(_savedData.ColorTemplate);
+                    _requestedTime = _savedData.RequestedTime;
+                    _totalTime = _savedData.TotalTime;
+                    _countDown = _savedData.CountDown;
+
+                    if (_savedData.PendingItems?.Any() ?? false)
+                    {
+                        StartCoroutine(PerformShipping(_savedData.PendingItems, _savedData.PendingItems.Count() * 3.0f));
+                    }
+
+                }
+
+                _runStartUpOnEnable = false;
+            }
+        }
+
+        private void UpdateTotals()
+        {
+            if(_amount == null) return;
+            _amount.text = $"Total: {Storage?.container?.count ?? 0}";
         }
 
         public override void OnDestroy()
@@ -51,6 +121,25 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricator.Mono
 
         public override void Initialize()
         {
+            if (IsInitialized) return;
+
+            if (_machineSound == null)
+            {
+                _machineSound = FModHelpers.CreateCustomLoopingEmitter(gameObject, "water_filter_loop", "event:/sub/base/water_filter_loop");
+            }
+
+            if (_colorManager == null)
+            {
+                _colorManager = gameObject.AddComponent<ColorManager>();
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol);
+            }
+
+            _amount = GameObjectHelpers.FindGameObject(gameObject, "Amount")?.GetComponent<Text>();
+            _shippingInfo = GameObjectHelpers.FindGameObject(gameObject, "ShippingInfo")?.GetComponent<Text>();
+            _icon = GameObjectHelpers.FindGameObject(gameObject, "iconFill")?.GetComponent<Image>();
+
+            UpdateTotals();
+
             IsInitialized = true;
         }
 
@@ -117,26 +206,20 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricator.Mono
             _savedData.Id = GetPrefabID();
             _savedData.ColorTemplate = _colorManager.SaveTemplate();
             _savedData.BaseId = BaseId;
-            QuickLogger.Debug($"Saving ID {_savedData.Id}", true);
+            _savedData.PendingItems = _pendingItems;
+            _savedData.RequestedTime =  _requestedTime;
+            _savedData.TotalTime =  _totalTime;
+            _savedData.CountDown =  _countDown;
+        QuickLogger.Debug($"Saving ID {_savedData.Id}", true);
             newSaveData.AlterraHubConstructorEntries.Add(_savedData);
         }
 
-        public bool ShipItems(List<CartItem> pendingItem)
+        public bool ShipItems(IEnumerable<CartItemSaveData> pendingItem)
         {
+
             try
             {
-                foreach (CartItem item in pendingItem)
-                {
-                    for (int i = 0; i < item.ReturnAmount; i++)
-                    {
-
-#if SUBNAUTICA_STABLE
-                        Storage.container.UnsafeAdd(item.ReceiveTechType.ToInventoryItemLegacy());
-#else
-                        StartCoroutine(item.ReceiveTechType.AddTechTypeToContainerUnSafe(Storage.container));
-#endif
-                    }
-                }
+                StartCoroutine(PerformShipping(pendingItem,pendingItem.Count() * 3.0f));
             }
             catch (Exception e)
             {
@@ -146,6 +229,56 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricator.Mono
             }
 
             return true;
+        }
+
+        private void ToggleEffectsAndSound(bool isRunning)
+        {
+            if (_machineSound == null) return;
+
+            if (isRunning)
+            {
+                if (!_machineSound._playing) _machineSound.Play();
+            }
+            else
+            {
+                if (_machineSound._playing) _machineSound.Stop();
+            }
+        }
+
+        private IEnumerator PerformShipping(IEnumerable<CartItemSaveData> pendingItem, float time = 3)
+        {
+            _pendingItems = pendingItem;
+            //to whatever you want
+            _requestedTime = time;
+            _totalTime = 0;
+            _countDown = time;
+            Storage.enabled = false;
+            ToggleEffectsAndSound(true);
+            while (_totalTime <= time)
+            {
+                _icon.fillAmount = _totalTime / time;
+                _totalTime += Time.deltaTime;
+                _countDown -= Time.deltaTime;
+                _shippingInfo.text = TimeConverters.SecondsToHMS(_countDown);
+                yield return null;
+            }
+
+            foreach (var item in pendingItem)
+            {
+                for (int i = 0; i < item.ReturnAmount; i++)
+                {
+
+#if SUBNAUTICA_STABLE
+                    Storage.container.UnsafeAdd(item.ReceiveTechType.ToInventoryItemLegacy());
+#else
+                        StartCoroutine(item.ReceiveTechType.AddTechTypeToContainerUnSafe(Storage.container));
+#endif
+                }
+            }
+
+            _pendingItems = null;
+            Storage.enabled = true;
+            ToggleEffectsAndSound(false);
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Configuration;
+using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Mods.AlterraHubFabricator.Mono;
 using FCS_AlterraHub.Mods.Common.DroneSystem;
 using FCS_AlterraHub.Mods.Common.DroneSystem.Interfaces;
@@ -110,7 +111,7 @@ namespace FCS_AlterraHub.Managers
         public bool SendItemsToConstructor(List<CartItem> pendingItem)
         {
             var constructors = _alterraHubConstructors.FirstOrDefault( x => x.Value.IsConstructed);
-            return constructors.Value.ShipItems(pendingItem);
+            return constructors.Value.ShipItems(pendingItem.SaveAll());
         }
 
         public string GetBaseName()

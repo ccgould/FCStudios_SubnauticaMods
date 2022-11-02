@@ -5,6 +5,8 @@ using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Managers;
 using FCS_AlterraHub.Managers.FCSAlterraHub;
+using FCS_AlterraHub.Mods.AlterraHubConstructor.Buildable;
+using FCS_AlterraHub.Mods.AlterraHubFabricator.Mono;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
@@ -39,6 +41,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
 
             _isFlashingHash = Animator.StringToHash("IsFlashing");
 
+            var controller =GameObjectHelpers.FindGameObject(gameObject, "FCS_AlterraHubFabricator")?.EnsureComponent<AlterraHubConstructorController>();
+            var storage = UWEHelpers.CreateStorageContainer(controller.gameObject, null, AlterraHubFabricatorPatcher.AlterraHubConstructorClassID, "AlterraHub Constructor", 6, 8);
+            controller.Initialize();
+            controller.Storage = storage;
+
             this.LOD = GetComponent<BehaviourLOD>();
             this.rb = GetComponent<Rigidbody>();
             this.isBase = true;
@@ -60,16 +67,17 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
             
             try
             {
+                _screenAnimator = GameObjectHelpers.FindGameObject(gameObject, "ScreenStatus").GetComponent<Animator>();
+                _screenStatusText = _screenAnimator.GetComponent<Text>();
+
                 SetupDoors();
 
                 LoadSave();
 
-                FindScreens();
-
                 SetupKeyPad();
 
-                _screenAnimator = GameObjectHelpers.FindGameObject(gameObject, "ScreenStatus").GetComponent<Animator>();
-                _screenStatusText = _screenAnimator.GetComponent<Text>();
+                FindScreens();
+                
             }
             catch (Exception e)
             {

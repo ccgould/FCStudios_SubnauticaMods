@@ -64,7 +64,10 @@ namespace FCS_AlterraHub.Configuration
         public string Id { get; set; }
         public ColorTemplateSave ColorTemplate { get; set; }
         public string BaseId { get; set; }
-
+        public IEnumerable<CartItemSaveData> PendingItems { get; set; }
+        public float RequestedTime { get; set; }
+        public float TotalTime { get; set; }
+        public float CountDown { get; set; }
     }
 
 

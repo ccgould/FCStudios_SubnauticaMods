@@ -74,6 +74,7 @@ namespace FCS_AlterraHub.Mono.Managers
                                 if (shipmentInfo.Destination.SendItemsToConstructor(PendingItems[shipmentInfo]))
                                 {
                                     PendingItems.Remove(shipmentInfo);
+                                    wasOrderSuccessfull = true;
                                 }
                             }
                             else if (shipmentInfo.Destination.HasDronePort)
