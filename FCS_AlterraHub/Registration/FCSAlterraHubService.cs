@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,6 +12,7 @@ using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Structs;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
+using FMOD;
 using SMLHelper.V2.Handlers;
 #if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
@@ -55,12 +57,14 @@ namespace FCS_AlterraHub.Registration
         /// <param name="id"></param>
         /// <returns></returns>
         Dictionary<string, FcsDevice> GetRegisteredDevicesOfId(string id);
+        BaseManager GetRegisteredBaseOfId(string id);
         void RegisterBase(BaseManager manager);
         void UnRegisterBase(BaseManager manager);
         void RegisterEncyclopediaEntry(string modID);
         void RegisterModPack(string modID, string modPackName, Assembly assembly);
         void CreateStoreEntry(TechType techType, TechType receiveTechType,int returnAmount, decimal cost, StoreCategory category,bool forceUnlocked = false);
         FCSGamePlaySettings GetGamePlaySettings();
+        HashSet<BaseManager> GetRegisteredBases();
     }
 
     internal interface IFCSAlterraHubServiceInternal
@@ -83,6 +87,7 @@ namespace FCS_AlterraHub.Registration
         private List<string> _patchedMods = new();
         private Dictionary<TechType, int> _globallyBuiltTech = new();
         private Dictionary<string, ModPackData> _registeredModPacks = new();
+        private HashSet<BaseManager> _registeredBases = new();
         public List<Dictionary<string, List<EncyclopediaEntryData>>> EncyclopediaEntries { get; set; } = new();
         public Dictionary<PingType, string> PingTypes { get; set; } = new();
         internal static IFCSAlterraHubServiceInternal InternalAPI => singleton;
@@ -299,6 +304,11 @@ namespace FCS_AlterraHub.Registration
             return Mod.GamePlaySettings;
         }
 
+        public HashSet<BaseManager> GetRegisteredBases()
+        {
+            return _registeredBases;
+        }
+
         public Dictionary<TechType, FCSStoreEntry> GetRegisteredKits()
         {
             return _storeItems;
@@ -488,6 +498,11 @@ namespace FCS_AlterraHub.Registration
                 .ToDictionary(x => x.Key, x => x.Value);
         }
 
+        public BaseManager GetRegisteredBaseOfId(string id)
+        {
+            return _registeredBases.FirstOrDefault(x => x.BaseID.Equals(id, StringComparison.OrdinalIgnoreCase));
+        }
+
         public void RegisterTechLight(TechLight techLight)
         {
             BaseManagerSetup(techLight);
@@ -572,6 +587,8 @@ namespace FCS_AlterraHub.Registration
                 manager.BaseFriendlyID = knownDevices.FirstOrDefault(x => x.PrefabID.Equals(manager.BaseID)).ToString();
             }
 
+            _registeredBases.Add(manager);
+
             QuickLogger.Debug($"Registering Device: {manager.BaseID}");
         }
 
@@ -582,6 +599,7 @@ namespace FCS_AlterraHub.Registration
                 if (!string.IsNullOrEmpty(knownDevice.PrefabID) && knownDevice.PrefabID.Equals(manager.BaseID))
                 {
                     knownDevices.Remove(knownDevice);
+                    _registeredBases.Remove(manager);
                     break;
                 }
             }

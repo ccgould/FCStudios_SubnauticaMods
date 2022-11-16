@@ -175,6 +175,8 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
                     }
                 }
             }
+
+            StoreManager.main.CompleteOrder(order);
         }
 
         private bool FindHubDepot(Shipment order, out IEnumerable<FcsDevice> devices)

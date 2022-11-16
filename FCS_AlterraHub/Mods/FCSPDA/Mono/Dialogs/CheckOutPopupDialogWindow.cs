@@ -41,25 +41,32 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
             _accountBalance = GameObjectHelpers.FindGameObject(gameObject, "AccountBalance").GetComponent<Text>();
 
             _total = GameObjectHelpers.FindGameObject(gameObject, "Total").GetComponent<Text>();
+
             _newBalance = GameObjectHelpers.FindGameObject(gameObject, "NewBalance").GetComponent<Text>();
+
             _destinationText = GameObjectHelpers.FindGameObject(gameObject, "Destination").GetComponent<Text>();
-            
+
             CreatePurchaseButton();
             CreatePurchaseExitButton();
             CreateDestinationPopup();
-
-            var destinationButton = GameObjectHelpers.FindGameObject(gameObject, "DestinationBTN").GetComponent<Button>();
-            destinationButton.onClick.AddListener((() =>
-            {
-                _destinationDialogController.Open();
-            }));
-            var backBtn = GameObjectHelpers.FindGameObject(gameObject, "CloseBTN").GetComponent<Button>();
-            backBtn.onClick.AddListener(HideDialog);
-
+            CreateDestinationButton();
+            CreateBackButton();
             CardSystem.main.onBalanceUpdated += UpdateScreen;
-            //_mono.AlterraHubTrigger.onTriggered += value => { UpdateScreen(); };
-            
+
             _isInitialized = true;
+        }
+
+        private void CreateBackButton()
+        {
+            var backBtn = GameObjectHelpers.FindGameObject(gameObject, "CloseBTN").GetComponent<Button>();
+
+            backBtn.onClick.AddListener(HideDialog);
+        }
+
+        private void CreateDestinationButton()
+        {
+            var destinationButton = GameObjectHelpers.FindGameObject(gameObject, "DestinationBTN").GetComponent<Button>();
+            destinationButton.onClick.AddListener((() => { _destinationDialogController.Open(); }));
         }
 
         private void CreatePurchaseButton()
@@ -121,7 +128,10 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
             {
                 QuickLogger.Debug("1");
 
-                _cartDropDownHandler.GetShipmentInfo().Destination = SelectedDestination;
+                _cartDropDownHandler.GetShipmentInfo().DestinationID = SelectedDestination.GetPreFabID();
+
+                _cartDropDownHandler.GetShipmentInfo().BaseName = SelectedDestination.GetBaseName();
+
 
                 if (StoreManager.main.CompleteOrder(_cartDropDownHandler, _cartDropDownHandler.GetShipmentInfo()))
                 {
@@ -159,7 +169,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
             _destinationDialogController.Initialize(this);
             _destinationDialogController.OnClose += () =>
             {
-                _destinationText.text = $"Destination: {SelectedDestination?.GetBaseName()}";
+                _destinationText.text = $"DestinationID: {SelectedDestination?.GetBaseName()}";
             };
         }
 
@@ -201,7 +211,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
             _accountBalance.text = Buildables.AlterraHub.AccountBalanceFormat(0);
             _total.text = Buildables.AlterraHub.CheckOutTotalFormat(0);
             _newBalance.text = Buildables.AlterraHub.CheckOutTotalFormat(0);
-            _destinationText.text = "Destination:";
+            _destinationText.text = "DestinationID:";
             SelectedDestination = null;
         }
     }

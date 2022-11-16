@@ -109,7 +109,7 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
             {
                 if (destination == null)
                 {
-                    QuickLogger.Error("Destination PortManager returned null", true);
+                    QuickLogger.Error("DestinationID PortManager returned null", true);
                     return false;
                 }
                 StartCoroutine(ShipOrderAsync(destination,isReturning));
@@ -133,8 +133,6 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
             Depart();
             yield break;
         }
-
-        //TODO Destroy drone once landed back to station
 
         public void Dock()
         {
@@ -282,14 +280,14 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
 
                 if (!string.IsNullOrWhiteSpace(data.DestinationBaseID))
                 {
-                    QuickLogger.Debug("Destination PortManager not null", true);
+                    QuickLogger.Debug("DestinationID PortManager not null", true);
 
                     if (!DroneDeliveryService.Main.IsStationBaseID(data.DestinationBaseID))
                     {
                         BaseManager.FindManager(data.DestinationBaseID, result =>
                         {
                             destinationPort = result.GetPortManager();
-                            QuickLogger.Debug($"Found Destination: {destinationPort?.ActivePort().GetPrefabID()}", true);
+                            QuickLogger.Debug($"Found DestinationID: {destinationPort?.ActivePort().GetPrefabID()}", true);
 
                             var state = StateFactory.GetState(data.State);
                             QuickLogger.Debug($"Setting State: {state.Name}", true);
@@ -317,6 +315,7 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
                 _trans.position = data.Position.ToVector3();
                 _trans.rotation = data.Rotation.Vec4ToQuaternion();
             }
+
             _dataLoaded = true;
         }
 

@@ -49,19 +49,19 @@ internal class ShipmentTracker : MonoBehaviour
     private void UpdateCheck()
     {
         if (DroneDeliveryService.Main == null ||
-            string.IsNullOrWhiteSpace(_pendingOrder.OrderNumber) ||
-            _pendingOrder.Port?.GetBaseName() == null) return;
+            string.IsNullOrWhiteSpace(_pendingOrder.Info.OrderNumber) ||
+            string.IsNullOrEmpty(_pendingOrder.Info.BaseName)) return;
 
-        var isCurrentOrder = DroneDeliveryService.Main.IsCurrentOrder(_shipment.OrderNumber);
+        var isCurrentOrder = DroneDeliveryService.Main.IsCurrentOrder(_shipment.Info.OrderNumber);
         var status = isCurrentOrder ? "Shipping" : "Pending";
-        _orderName.text = $"Order: {_pendingOrder.OrderNumber}: Destination: {_pendingOrder.Port.GetBaseName()} Status: {status}";
+        _orderName.text = $"Order: {_pendingOrder.Info.OrderNumber}: DestinationID: {_pendingOrder.Info.BaseName} Status: {status}";
         _cancelButton.interactable = !isCurrentOrder;
-        _slider.value = DroneDeliveryService.Main.GetOrderCompletionPercentage(_shipment.OrderNumber);
+        _slider.value = DroneDeliveryService.Main.GetOrderCompletionPercentage(_shipment.Info.OrderNumber);
     }
 
     public bool TryDelete(Shipment shipment)
     {
-        if (shipment.OrderNumber.Equals(_shipment.OrderNumber))
+        if (shipment.Info.OrderNumber.Equals(_shipment.Info.OrderNumber))
         {
             Destroy(gameObject);
             return true;

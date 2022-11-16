@@ -2,6 +2,8 @@
 using FCS_AlterraHub.Mods.Common.DroneSystem.Interfaces;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.Mono;
+using FCS_AlterraHub.Mono.Managers;
+
 #if SUBNAUTICA_STABLE
 
 #else
@@ -11,23 +13,8 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem.Models
 {
     internal class Shipment
     {
-        public string PortPrefabID { get; set; }
-        private IDroneDestination _port;
-        internal IDroneDestination Port
-        {
-            get
-            {
-                if (_port == null && !string.IsNullOrWhiteSpace(PortPrefabID))
-                {
-                    _port = BaseManager.FindPort(PortPrefabID);
-                }
-
-                return _port;
-            }
-            set => _port = value;
-        }
+        public ShipmentInfo Info { get; set; }
 
         public List<CartItemSaveData> CartItems { get; set; }
-        public string OrderNumber { get; set; }
     }
 }

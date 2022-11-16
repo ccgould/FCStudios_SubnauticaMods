@@ -36,7 +36,7 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
                 pickUp.isPickupable = false;
 
                 var lw = prefab.AddComponent<LargeWorldEntity>();
-                lw.cellLevel = LargeWorldEntity.CellLevel.Global;
+                lw.cellLevel = LargeWorldEntity.CellLevel.Far;
 
                 //Renderer
                 var renderer = prefab.GetComponentInChildren<Renderer>();

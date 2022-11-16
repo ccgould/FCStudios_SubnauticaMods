@@ -25,8 +25,6 @@ namespace FCS_AlterraHub.Mono.Managers
 {
     internal class StoreManager  : MonoBehaviour
     {
-        //public Dictionary<ShipmentInfo, List<CartItemSaveData>> PendingItems {get;set;} = new();
-
         public List<KeyValuePair<ShipmentInfo, List<CartItemSaveData>>> PendingItems { get; set; } = new();
 
         public List<Shipment> PendingShipments {get;set;} = new();
@@ -51,6 +49,8 @@ namespace FCS_AlterraHub.Mono.Managers
 
             var totalCash = GetCartTotal(shipmentInfo);
 
+            shipmentInfo.TotalCash = totalCash;
+
             if (FCSAlterraHubService.PublicAPI.IsInOreBuildMode())
             {
                 foreach (CartItemSaveData cartItem in GetCartItems(shipmentInfo))
@@ -70,46 +70,25 @@ namespace FCS_AlterraHub.Mono.Managers
             {
                 QuickLogger.Debug("Complete Order 2");
                 var sizes = GetSizes(shipmentInfo);
-
+                shipmentInfo.Sizes = sizes;
+                var portManager = FCSAlterraHubService.PublicAPI.GetRegisteredBaseOfId(shipmentInfo.DestinationID)
+                    .GetPortManager();
                 switch (sender.ClientType)
                     {
                         case StoreClientType.PDA:
                         case StoreClientType.Hub:
-                            if (shipmentInfo.Destination.HasContructor)
+                            if (portManager.HasContructor)
                             {
-                                if (shipmentInfo.Destination.SendItemsToConstructor(GetCartItems(shipmentInfo)))
+                                if (portManager.SendItemsToConstructor(GetCartItems(shipmentInfo)))
                                 {
                                     RemovePendingItem(shipmentInfo);
                                     wasOrderSuccessfull = true;
                                 }
                             }
-                            else if (shipmentInfo.Destination.HasDronePort)
+                            else if (portManager.HasDronePort)
                             {
                                 QuickLogger.Debug("Complete Order 3");
-                                DroneDeliveryService.Main.ShipOrder(shipmentInfo.Destination, shipmentInfo.OrderNumber, (result) =>
-                                {
-                                    if (!result) //If failed to ship Item give player items in inventory
-                                    {
-                                        if (CardSystem.main.HasEnough(totalCash) && Inventory.main.container.HasRoomFor(sizes))
-                                        {
-                                            foreach (CartItemSaveData item in cart)
-                                            {
-                                                for (int i = 0; i < item.ReturnAmount; i++)
-                                                {
-                                                    QuickLogger.Debug($"{item.ReceiveTechType}", true);
-                                                    PlayerInteractionHelper.GivePlayerItem(item.ReceiveTechType);
-                                                }
-                                            }
-                                        }
-                                    }
-                                    else
-                                    {
-                                        QuickLogger.Debug("Complete Order 5");
-                                        CreateOrder(sender, shipmentInfo);
-                                        RemovePendingItem(shipmentInfo);
-                                        wasOrderSuccessfull = true;
-                                    }
-                                });
+                                wasOrderSuccessfull = Ship(sender, shipmentInfo, portManager, cart);
                             }
                             break;
                         case StoreClientType.Vehicle:
@@ -139,6 +118,37 @@ namespace FCS_AlterraHub.Mono.Managers
 
             CardSystem.main.RemoveFinances(totalCash);
             sender.OnOrderComplete(wasOrderSuccessfull);
+            return wasOrderSuccessfull;
+        }
+
+        private bool Ship(IStoreClient sender, ShipmentInfo shipmentInfo, PortManager portManager, List<CartItemSaveData> cart)
+        {
+            bool wasOrderSuccessfull = false;
+
+            DroneDeliveryService.Main.ShipOrder(portManager, shipmentInfo.OrderNumber, (result) =>
+            {
+                if (!result) //If failed to ship Item give player items in inventory
+                {
+                    if (CardSystem.main.HasEnough(shipmentInfo.TotalCash) && Inventory.main.container.HasRoomFor(shipmentInfo.Sizes))
+                    {
+                        foreach (CartItemSaveData item in cart)
+                        {
+                            for (int i = 0; i < item.ReturnAmount; i++)
+                            {
+                                QuickLogger.Debug($"{item.ReceiveTechType}", true);
+                                PlayerInteractionHelper.GivePlayerItem(item.ReceiveTechType);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    QuickLogger.Debug("Complete Order 5");
+                    CreateOrder(sender, shipmentInfo);
+                    RemovePendingItem(shipmentInfo);
+                    wasOrderSuccessfull = true;
+                }
+            });
             return wasOrderSuccessfull;
         }
 
@@ -205,16 +215,13 @@ namespace FCS_AlterraHub.Mono.Managers
 
             if (PendingItems.Any() && DeliveryService is not null)
             {
-                //DeliveryService.SetCurrentOrder();
                 PendingShipments.Add(new Shipment
                 {
                     CartItems = GetCartItems(shipmentInfo),
-                    OrderNumber = shipmentInfo.OrderNumber,
-                    //PortManager = port,
-                    //PortPrefabID = port.GetPrefabID()
+                    Info = shipmentInfo
                 });
 
-                sender.OnOrderComplete(true);
+                sender?.OnOrderComplete(true);
             }
         }
 
@@ -264,7 +271,7 @@ namespace FCS_AlterraHub.Mono.Managers
             return items;
         }
 
-        public void CancelOrder(Shipment pendingOrder)
+        internal void CancelOrder(Shipment pendingOrder)
         {
             PendingShipments.Remove(pendingOrder);
         }
@@ -278,7 +285,7 @@ namespace FCS_AlterraHub.Mono.Managers
             };
         }
 
-        public void LoadSave()
+        internal void LoadSave()
         {
             var saveData = Mod.GamePlaySettings.StoreManagerSaveData;
             
@@ -290,7 +297,18 @@ namespace FCS_AlterraHub.Mono.Managers
             if (saveData?.PendingShipments is not null)
             {
                 PendingShipments = saveData.PendingShipments;
+
+                if (PendingShipments.Any())
+                {
+                    var shipment = PendingShipments.First();
+                    Ship(null, shipment.Info, FCSAlterraHubService.PublicAPI.GetRegisteredBaseOfId(shipment.Info.DestinationID).GetPortManager(),shipment.CartItems);
+                }
             }
+        }
+
+        internal void CompleteOrder(Shipment shipment)
+        {
+            PendingShipments.Remove(shipment);
         }
     }
 
@@ -309,7 +327,12 @@ namespace FCS_AlterraHub.Mono.Managers
         [JsonProperty]
         internal string OrderNumber { get; set; }
         [JsonProperty]
-        internal string Destination { get; set; }
+        internal string DestinationID { get; set; }
+        [JsonProperty]
+        internal decimal TotalCash { get; set; }
+        [JsonProperty]
+        internal List<Vector2int> Sizes { get; set; }
+        public string BaseName { get; set; }
     }
 
     internal interface IShippingDestination

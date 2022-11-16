@@ -87,7 +87,6 @@ namespace FCS_AlterraHub.Mono
         public readonly HashSet<FcsDevice> BaseServers = new();
         public readonly HashSet<FcsDevice> BaseFcsStorage = new();
         public readonly HashSet<FcsDevice> BaseAntennas = new();
-        public readonly HashSet<FcsDevice> BaseTerminals = new();
         private PortManager _portManager;
         public SubRoot Habitat { get; set; }
         public static Action<BaseManager> OnManagerCreated { get; set; }

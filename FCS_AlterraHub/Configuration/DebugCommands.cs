@@ -1,13 +1,17 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
+using System.Text;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mods.Common.DroneSystem;
 using FCS_AlterraHub.Mods.FCSPDA.Mono;
 using FCS_AlterraHub.Mods.OreConsumer.Buildable;
 using FCS_AlterraHub.Mono;
+using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
+using RadicalLibrary;
 using SMLHelper.V2.Commands;
 using UWE;
 
@@ -154,6 +158,21 @@ namespace FCS_AlterraHub.Configuration
         public static string OnEveningCommand()
         {
             DayNightCycle.main.SetDayNightTime(0.86f);
+
+            return $"Time Set to Evening";
+        }
+
+        [ConsoleCommand("PrintBaseLog")]
+        public static string OnPrintBaseLogCommand()
+        {
+            StringBuilder builder = new StringBuilder();
+
+            foreach (var curBase in FCSAlterraHubService.PublicAPI.GetRegisteredBases())
+            {
+                builder.Append($"Base Name {curBase.BaseFriendlyID} | Base ID {curBase.BaseID} | Is Visible: {curBase.IsVisible}");
+            }
+            
+            FileManager.CreateFile(Path.Combine(Mod.GetModDirectory(), "BaseLog.log"), builder.ToString(),true);
 
             return $"Time Set to Evening";
         }
