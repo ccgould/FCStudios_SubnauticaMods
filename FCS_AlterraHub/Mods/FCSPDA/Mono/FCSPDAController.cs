@@ -391,7 +391,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         
         internal void LoadFromSave()
         {
-            Screen.LoadFromSave();
+            Screen.LoadFromSave(Mod.GamePlaySettings.PDAShipmentInfo);
         }
         
         public static void ForceOpen()

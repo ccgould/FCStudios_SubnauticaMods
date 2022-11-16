@@ -568,21 +568,12 @@ namespace FCS_AlterraHub.Managers.FCSAlterraHub
             _cartDropDownManager.OnBuyAllBtnClick -= OnBuyAllBtnClick;
         }
 
-        internal void LoadFromSave()
+        internal void LoadFromSave(ShipmentInfo shipmentInfo)
         {
-            //if (savedDataCartItems == null)
-            //{
-            //    QuickLogger.Debug("Cart Items returned Null");
-            //}
-            //else
-            //{
-            //    foreach (CartItemSaveData cartItem in savedDataCartItems)
-            //    {
-            //        _cartDropDownManager.AddItem(cartItem.TechType, cartItem.ReceiveTechType, cartItem.ReturnAmount <= 0 ? 1 : cartItem.ReturnAmount);
-            //    }
-            //}
-
-            _cartDropDownManager.LoadShipmentInfo(Mod.GamePlaySettings.PDAShipmentInfo);
+            if (shipmentInfo != null)
+            {
+                _cartDropDownManager.LoadShipmentInfo(shipmentInfo);
+            }
 
             _accountPageHandler.Refresh();
 
@@ -593,6 +584,5 @@ namespace FCS_AlterraHub.Managers.FCSAlterraHub
         {
             return _cartDropDownManager.GetShipmentInfo();
         }
-        
     }
 }

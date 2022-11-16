@@ -194,7 +194,7 @@ namespace FCS_AlterraHub.Mono.Managers
 
         private bool HasShipment(ShipmentInfo info)
         {
-            return PendingItems.Any(x => x.Key.Equals(info));
+            return PendingItems.Any(x => x.Key.OrderNumber.Equals(info.OrderNumber));
         }
 
         private void RemovePendingItem(ShipmentInfo shipment)
@@ -206,7 +206,7 @@ namespace FCS_AlterraHub.Mono.Managers
 
         internal List<CartItemSaveData> GetCartItems(ShipmentInfo info)
         {
-            return PendingItems.FirstOrDefault(x => x.Key.Equals(info)).Value;
+            return PendingItems.FirstOrDefault(x => x.Key.OrderNumber.Equals(info.OrderNumber)).Value;
         }
 
         public void CreateOrder(IStoreClient sender, ShipmentInfo shipmentInfo)
@@ -304,6 +304,8 @@ namespace FCS_AlterraHub.Mono.Managers
                     Ship(null, shipment.Info, FCSAlterraHubService.PublicAPI.GetRegisteredBaseOfId(shipment.Info.DestinationID).GetPortManager(),shipment.CartItems);
                 }
             }
+
+            QuickLogger.Debug("Store Manager Save Loaded");
         }
 
         internal void CompleteOrder(Shipment shipment)

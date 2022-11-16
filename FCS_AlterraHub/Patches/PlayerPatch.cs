@@ -67,9 +67,10 @@ namespace FCS_AlterraHub.Patches
 
             _storeManager = new GameObject("StoreManager").AddComponent<StoreManager>();
             _storeManager.DeliveryService = _droneDeliveryService;
+            _storeManager.LoadSave();
 
 
-            var water = GameObject.Find("");
+            //var water = GameObject.Find("");
 
             Material yourMaterial = (Material)Resources.Load("WaterPlaneBaseMoonPool", typeof(Material));
             QuickLogger.Info($"Water Material Found: {yourMaterial is not null}");

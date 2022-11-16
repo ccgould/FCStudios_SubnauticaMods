@@ -175,6 +175,18 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
         public void LoadShipmentInfo(ShipmentInfo info)
         {
             _shipmentInfo = info;
+            var cartItems = StoreManager.main.GetCartItems(_shipmentInfo);
+            if (cartItems == null)
+            {
+                QuickLogger.Debug("Cart Items returned Null");
+            }
+            else
+            {
+                foreach (CartItemSaveData cartItem in cartItems)
+                {
+                    AddItem(cartItem.TechType, cartItem.ReceiveTechType, cartItem.ReturnAmount <= 0 ? 1 : cartItem.ReturnAmount);
+                }
+            }
         }
     }
 }

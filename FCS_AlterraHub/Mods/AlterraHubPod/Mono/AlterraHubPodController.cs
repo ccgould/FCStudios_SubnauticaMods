@@ -84,9 +84,13 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
 
                 FindScreens();
 
+                _screens[0].LoadFromSave(Mod.GamePlaySettings.Screen1ShipmentInfo);
+                _screens[1].LoadFromSave(Mod.GamePlaySettings.Screen2ShipmentInfo);
+                _screens[2].LoadFromSave(Mod.GamePlaySettings.Screen3ShipmentInfo);
             }
             catch (Exception e)
             {
+                QuickLogger.Error(e.Message);
                 QuickLogger.Error(e.StackTrace);
             }
         }
@@ -132,6 +136,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
             _chamberDoor01.LoadSave(settings.AlterraHubDepotDoors.ChamberDoor01);
             _chamberDoor02.LoadSave(settings.AlterraHubDepotDoors.ChamberDoor02);
             _slideUpDoor01.LoadSave(settings.AlterraHubDepotDoors.SlideUpDoor01);
+            QuickLogger.Debug("Pod Save Loaded");
         }
 
         private IEnumerator WaterPumpSystem(bool isDraining = true)
