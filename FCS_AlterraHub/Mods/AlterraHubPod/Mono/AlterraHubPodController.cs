@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
@@ -34,6 +35,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
         private Color buttonSColorFlood = new Color(0, 210, 255, 255);
         private Animator _screenAnimator;
         public static AlterraHubPodController main;
+        public PortManager PortManager;
 
         public override void Awake()
         {
@@ -41,10 +43,13 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
 
             _isFlashingHash = Animator.StringToHash("IsFlashing");
 
-            var controller =GameObjectHelpers.FindGameObject(gameObject, "FCS_AlterraHubFabricator")?.EnsureComponent<AlterraHubConstructorController>();
-            var storage = UWEHelpers.CreateStorageContainer(controller.gameObject, null, AlterraHubFabricatorPatcher.AlterraHubConstructorClassID, "AlterraHub Constructor", 6, 8);
-            controller.Initialize();
-            controller.Storage = storage;
+            var constructorController =GameObjectHelpers.FindGameObject(gameObject, "FCS_AlterraHubFabricator")?.EnsureComponent<AlterraHubConstructorController>();
+            var storage = UWEHelpers.CreateStorageContainer(constructorController.gameObject, null, AlterraHubFabricatorPatcher.AlterraHubConstructorClassID, "AlterraHub Constructor", 6, 8);
+            constructorController.Initialize();
+            constructorController.IsConstructed = true;
+            constructorController.Storage = storage;
+
+            PortManager.RegisterConstructor(constructorController);
 
             this.LOD = GetComponent<BehaviourLOD>();
             this.rb = GetComponent<Rigidbody>();
@@ -60,6 +65,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
         private int _isFlashingHash;
         private Text _keyPadModuleText;
         private Text _screenStatusText;
+        private List<FCSAlterraHubGUI> _screens = new();
 
         public override void Start()
         {
@@ -77,7 +83,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
                 SetupKeyPad();
 
                 FindScreens();
-                
+
             }
             catch (Exception e)
             {
@@ -93,6 +99,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
             _keyPadModuleText = _keyPadModuleButton.GetComponentInChildren<Text>();
             _keyPadModuleButton.onClick.AddListener((() =>
             {
+                if(!WorldHelpers.CheckIfInRange(Player.mainObject,_keyPadModuleButton.gameObject,2)) return;
                 if (Player.main.currentSub is null)
                 {
                     StartCoroutine(WaterPumpSystem());
@@ -110,9 +117,12 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
 
             foreach (Canvas canva in canvas)
             {
-                if (canva.transform.parent.name.Equals("KeyPadModule", StringComparison.OrdinalIgnoreCase)) continue;
+                QuickLogger.Debug($"Screen Name: {canva.transform.parent.name}");
+                if (canva.transform.parent.name.Equals("KeyPadModule", StringComparison.OrdinalIgnoreCase) || canva.transform.parent.name.Equals("FCS_AlterraHubFabricator", StringComparison.OrdinalIgnoreCase)) continue;
+                QuickLogger.Debug("Screen Passed!");
                 var screen = canva.gameObject.EnsureComponent<FCSAlterraHubGUI>();
                 screen.SetInstance(FCSAlterraHubGUISender.AlterraHub);
+                _screens.Add(screen);
             }
         }
 
@@ -241,9 +251,13 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
             QuickLogger.Debug("Saving Station");
             //Mod.GamePlaySettings.FabStationBeaconColorIndex = GetPing().colorIndex;
             //Mod.GamePlaySettings.FabStationBeaconVisible = GetPing().visible;
-            Mod.GamePlaySettings.AlterraHubDepotDoors.ChamberDoor02 = new(_chamberDoor01.doorLocked, _chamberDoor01.doorOpen);
-            Mod.GamePlaySettings.AlterraHubDepotDoors.ChamberDoor02 = new(_chamberDoor02.doorLocked, _chamberDoor02.doorOpen);
-            Mod.GamePlaySettings.AlterraHubDepotDoors.SlideUpDoor01 = new(_slideUpDoor01.doorLocked, _slideUpDoor01.doorOpen);
+            Mod.GamePlaySettings.AlterraHubDepotDoors.ChamberDoor02 = new Tuple<bool, bool>(_chamberDoor01.doorLocked, _chamberDoor01.doorOpen);
+            Mod.GamePlaySettings.AlterraHubDepotDoors.ChamberDoor02 = new Tuple<bool, bool>(_chamberDoor02.doorLocked, _chamberDoor02.doorOpen);
+            Mod.GamePlaySettings.AlterraHubDepotDoors.SlideUpDoor01 = new Tuple<bool, bool>(_slideUpDoor01.doorLocked, _slideUpDoor01.doorOpen);
+            Mod.GamePlaySettings.Screen1ShipmentInfo = _screens[0].GetShipmentInfo();
+            Mod.GamePlaySettings.Screen2ShipmentInfo = _screens[1].GetShipmentInfo();
+            Mod.GamePlaySettings.Screen3ShipmentInfo = _screens[2].GetShipmentInfo();
+
             //Mod.GamePlaySettings.AlterraHubDepotDoors.KeyPad4 = _keyPads[3].IsUnlocked();
             //Mod.GamePlaySettings.AlterraHubDepotPowercellSlot = _generator.Save().ToList();
             //Mod.GamePlaySettings.IsPDAUnlocked = DetermineIfUnlocked();

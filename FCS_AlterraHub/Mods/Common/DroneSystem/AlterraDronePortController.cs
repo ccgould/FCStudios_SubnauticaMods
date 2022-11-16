@@ -95,7 +95,7 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
 
         public string GetBaseName()
         {
-            return Manager?.GetBaseName() ?? "Station Port";
+            return Manager?.GetBaseName() ?? "Station PortManager";
         }
 
         public void Depart(DroneController droneController)
@@ -284,7 +284,7 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
                 _portManager.RegisterDronePort(this);
 
                 var droneDoorTrigger = GameObjectHelpers.FindGameObject(gameObject, "DockTrigger").AddComponent<DroneDoorTrigger>();
-                droneDoorTrigger.Port = _portManager;
+                droneDoorTrigger.PortManager = _portManager;
             }
 
             if (_colorManager == null)
@@ -401,7 +401,7 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
-            QuickLogger.Debug($"In OnProtoSerialize - Port controller");
+            QuickLogger.Debug($"In OnProtoSerialize - PortManager controller");
 
             if (!Mod.IsSaving())
             {
@@ -439,7 +439,7 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
 
             if (_hasTransportInbound)
             {
-                reason = "Port has a transport inbound please wait until delivery is complete";
+                reason = "PortManager has a transport inbound please wait until delivery is complete";
                 return false;
             }
 

@@ -53,6 +53,7 @@
     <Compile Include="Mods\AlterraHubFabricator\Mono\AlterraHubConstructorController.cs" />
     <Compile Include="Mods\AlterraHubPod\Mono\AlterraHubPodController.cs" />
     <Compile Include="Mods\AlterraHubPod\Mono\DoorController.cs" />
+    <Compile Include="Mods\AlterraHubPod\Spawnable\AlterraHubLifePodDronePortController.cs" />
     <Compile Include="Mods\AlterraHubPod\Spawnable\AlterraHubPatch.cs" />
     <Compile Include="Mods\Common\DroneSystem\AlterraDronePortController.cs" />
     <Compile Include="Mods\Common\DroneSystem\AlterraTransportDroneSpawnable.cs" />

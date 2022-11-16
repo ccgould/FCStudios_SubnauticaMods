@@ -75,7 +75,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
         private bool MakePurchase()
         {
             var totalSize = new List<Vector2int>();
-            foreach (CartItem cartItem in _cartDropDownHandler.GetItems())
+            foreach (CartItemSaveData cartItem in _cartDropDownHandler.GetItems())
             {
                 for (int i = 0; i < cartItem.ReturnAmount; i++)
                 {

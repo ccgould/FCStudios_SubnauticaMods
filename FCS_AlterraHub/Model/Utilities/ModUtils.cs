@@ -48,12 +48,13 @@ namespace FCS_AlterraHub.Model.Utilities
             errorArgs.ErrorContext.Handled = true;
         }
 
-        public static void LoadSaveData<TSaveData>(string fileName, string saveDirectory, Action<TSaveData> onSuccess) where TSaveData : new()
+        public static void LoadSaveData<TSaveData>(string fileName, string saveDirectory, Action<TSaveData> onSuccess, Action onFailed = null) where TSaveData : new()
         {
             var path = Path.Combine(saveDirectory, fileName);
             
             if (!File.Exists(path))
             {
+                onFailed?.Invoke();
                 return;
             }
             var save = File.ReadAllText(path);

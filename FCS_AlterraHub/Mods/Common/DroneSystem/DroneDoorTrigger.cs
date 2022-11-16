@@ -7,7 +7,7 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem;
 
 internal class DroneDoorTrigger : MonoBehaviour
 {
-    public PortManager Port;
+    public PortManager PortManager;
 
     private void OnTriggerEnter(Collider collider)
     {
@@ -21,7 +21,7 @@ internal class DroneDoorTrigger : MonoBehaviour
 
             if (droneController is not null)
             {
-                droneController.SetDeparturePort(Port);
+                droneController.SetDeparturePort(PortManager);
             }
             else
             {

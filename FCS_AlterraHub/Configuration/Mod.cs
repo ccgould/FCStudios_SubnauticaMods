@@ -11,6 +11,7 @@ using FCS_AlterraHub.Mods.AlterraHubPod.Mono;
 using FCS_AlterraHub.Mods.Common.DroneSystem;
 using FCS_AlterraHub.Mods.Common.DroneSystem.Models;
 using FCS_AlterraHub.Mono;
+using FCS_AlterraHub.Mono.Managers;
 using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Systems;
@@ -233,7 +234,7 @@ namespace FCS_AlterraHub.Configuration
 
         public static Dictionary<string, Sound> AudioClips = new();
         private static AccountDetails _tempAccountDetails;
-        private static FCSGamePlaySettings _gamePlaySettings = new();
+        private static FCSGamePlaySettings _gamePlaySettings;
         public static TechType FCSDataBoxTechType { get; set; }
 
 
@@ -250,6 +251,7 @@ namespace FCS_AlterraHub.Configuration
 
                 DroneDeliveryService.Main.Save();
                 AlterraHubPodController.main.Save();
+                StoreManager.main.Save();
 
 
                 ModUtils.Save(_gamePlaySettings, "settings.json", GetSaveFileDirectory(), OnSaveComplete);
@@ -282,12 +284,10 @@ namespace FCS_AlterraHub.Configuration
             {
                 QuickLogger.Debug($"Finished loading Game Play Settings : {JsonConvert.SerializeObject(data, Formatting.Indented)}");
                 GamePlaySettings = data;
-            });
-
-            if(GamePlaySettings == null)
+            },(() =>
             {
                 SaveGamePlaySettings();
-            }
+            }));
 
             NotifyGamePlayLoaded();
 
@@ -426,15 +426,6 @@ namespace FCS_AlterraHub.Configuration
             return new OreConsumerDataEntry { Id = id };
         }
         
-        internal static FCSPDAEntry GetAlterraHubSaveData()
-        {
-            LoadData();
-
-            var saveData = GetSaveData();
-
-            return saveData.FCSPDAEntry ?? new FCSPDAEntry();
-        }
-
         internal static BaseSaveData GetBaseSaveData(string instanceId)
         {
             LoadData();
@@ -578,6 +569,12 @@ namespace FCS_AlterraHub.Configuration
         [JsonProperty] internal Shipment CurrentOrder { get; set; }
         public int FabStationBeaconColorIndex { get; set; }
         public bool FabStationBeaconVisible { get; set; } = true;
+        [JsonProperty] internal StoreManagerSaveData StoreManagerSaveData { get; set; }
+        [JsonProperty] internal ShipmentInfo Screen1ShipmentInfo { get; set; }
+        [JsonProperty] internal ShipmentInfo Screen2ShipmentInfo { get; set; }
+        [JsonProperty] internal ShipmentInfo Screen3ShipmentInfo { get; set; }
+        [JsonProperty] internal ShipmentInfo PDAShipmentInfo { get; set; }
+
         public float Rate = 10;
         public bool AutomaticDebitDeduction;
 

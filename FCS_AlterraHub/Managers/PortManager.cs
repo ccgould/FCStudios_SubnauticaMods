@@ -71,13 +71,13 @@ namespace FCS_AlterraHub.Managers
 
         public IDroneDestination FindPort(string prefabId)
         {
-            QuickLogger.Debug($"Port Count:{_dronePorts.Count} | Port ID: {prefabId}");
+            QuickLogger.Debug($"PortManager Count:{_dronePorts.Count} | PortManager ID: {prefabId}");
             foreach (KeyValuePair<string, IDroneDestination> port in _dronePorts)
             {
                 QuickLogger.Debug($"Checking: {port.Key}");
                 if (port.Key.Equals(prefabId.Trim(),StringComparison.OrdinalIgnoreCase))
                 {
-                    QuickLogger.Debug("Target Port Found", true);
+                    QuickLogger.Debug("Target PortManager Found", true);
                     return port.Value;
                 }
             }
@@ -108,15 +108,15 @@ namespace FCS_AlterraHub.Managers
         public bool HasDronePort => Manager?.IsDeviceBuilt(Mod.DronePortPadHubNewTabID) ?? false;
         public bool HasContructor => _alterraHubConstructors.Any();
         public bool IsVehicle { get; set; }
-        public bool SendItemsToConstructor(List<CartItem> pendingItem)
+        public bool SendItemsToConstructor(List<CartItemSaveData> pendingItem)
         {
             var constructors = _alterraHubConstructors.FirstOrDefault( x => x.Value.IsConstructed);
-            return constructors.Value.ShipItems(pendingItem.SaveAll());
+            return constructors.Value.ShipItems(pendingItem);
         }
 
         public string GetBaseName()
         {
-            return Manager?.GetBaseName() ?? "Station Port";
+            return Manager?.GetBaseName() ?? "Station PortManager";
         }
 
         public void SetInboundDrone(DroneController droneController)

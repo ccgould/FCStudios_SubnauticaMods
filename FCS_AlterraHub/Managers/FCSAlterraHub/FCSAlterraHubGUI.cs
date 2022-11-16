@@ -25,6 +25,7 @@ using FCSCommon.Utilities;
 using FCS_AlterraHub.Mods.Common.DroneSystem.Models;
 using FCSCommon.Interfaces;
 using System.Linq.Expressions;
+using FCS_AlterraHub.Mono.Managers;
 
 namespace FCS_AlterraHub.Managers.FCSAlterraHub
 {
@@ -567,23 +568,31 @@ namespace FCS_AlterraHub.Managers.FCSAlterraHub
             _cartDropDownManager.OnBuyAllBtnClick -= OnBuyAllBtnClick;
         }
 
-        internal void LoadFromSave(IEnumerable<CartItemSaveData> savedDataCartItems)
+        internal void LoadFromSave()
         {
-            if (savedDataCartItems == null)
-            {
-                QuickLogger.Debug("Cart Items returned Null");
-            }
-            else
-            {
-                foreach (CartItemSaveData cartItem in savedDataCartItems)
-                {
-                    _cartDropDownManager.AddItem(cartItem.TechType, cartItem.ReceiveTechType, cartItem.ReturnAmount <= 0 ? 1 : cartItem.ReturnAmount);
-                }
-            }
+            //if (savedDataCartItems == null)
+            //{
+            //    QuickLogger.Debug("Cart Items returned Null");
+            //}
+            //else
+            //{
+            //    foreach (CartItemSaveData cartItem in savedDataCartItems)
+            //    {
+            //        _cartDropDownManager.AddItem(cartItem.TechType, cartItem.ReceiveTechType, cartItem.ReturnAmount <= 0 ? 1 : cartItem.ReturnAmount);
+            //    }
+            //}
+
+            _cartDropDownManager.LoadShipmentInfo(Mod.GamePlaySettings.PDAShipmentInfo);
 
             _accountPageHandler.Refresh();
 
             _cartLoaded = true;
         }
+
+        internal ShipmentInfo GetShipmentInfo()
+        {
+            return _cartDropDownManager.GetShipmentInfo();
+        }
+        
     }
 }

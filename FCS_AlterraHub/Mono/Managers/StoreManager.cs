@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
 using System.Linq;
 using FCS_AlterraHub.Buildables;
+using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Managers;
@@ -15,6 +16,8 @@ using FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
+using Oculus.Newtonsoft.Json;
+using SMLHelper.V2.Json.ExtensionMethods;
 using UnityEngine;
 
 
@@ -22,7 +25,10 @@ namespace FCS_AlterraHub.Mono.Managers
 {
     internal class StoreManager  : MonoBehaviour
     {
-        public Dictionary<ShipmentInfo, List<CartItem>> PendingItems {get;set;} = new();
+        //public Dictionary<ShipmentInfo, List<CartItemSaveData>> PendingItems {get;set;} = new();
+
+        public List<KeyValuePair<ShipmentInfo, List<CartItemSaveData>>> PendingItems { get; set; } = new();
+
         public List<Shipment> PendingShipments {get;set;} = new();
 
         public static StoreManager main;
@@ -38,18 +44,18 @@ namespace FCS_AlterraHub.Mono.Managers
         {
             bool wasOrderSuccessfull = false;
             
-            if (string.IsNullOrWhiteSpace(shipmentInfo?.OrderNumber) || !PendingItems.ContainsKey(shipmentInfo)) return false;
+            if (string.IsNullOrWhiteSpace(shipmentInfo?.OrderNumber) || !HasShipment(shipmentInfo)) return false;
             QuickLogger.Debug("Complete Order 1");
 
-            var cart = PendingItems[shipmentInfo];
+            var cart = GetCartItems(shipmentInfo);
 
             var totalCash = GetCartTotal(shipmentInfo);
 
             if (FCSAlterraHubService.PublicAPI.IsInOreBuildMode())
             {
-                foreach (CartItem cartItem in GetCartItems(shipmentInfo))
+                foreach (CartItemSaveData cartItem in GetCartItems(shipmentInfo))
                 {
-                    if (cartItem != null && !KnownTech.Contains(cartItem.TechType))
+                    if (!KnownTech.Contains(cartItem.TechType))
                     {
                         if (CraftData.IsAllowed(cartItem.TechType) && KnownTech.Add(cartItem.TechType, true))
                         {
@@ -58,7 +64,7 @@ namespace FCS_AlterraHub.Mono.Managers
                     }
                 }
 
-                PendingItems.Remove(shipmentInfo);
+                RemovePendingItem(shipmentInfo);
             }
             else
             {
@@ -71,9 +77,9 @@ namespace FCS_AlterraHub.Mono.Managers
                         case StoreClientType.Hub:
                             if (shipmentInfo.Destination.HasContructor)
                             {
-                                if (shipmentInfo.Destination.SendItemsToConstructor(PendingItems[shipmentInfo]))
+                                if (shipmentInfo.Destination.SendItemsToConstructor(GetCartItems(shipmentInfo)))
                                 {
-                                    PendingItems.Remove(shipmentInfo);
+                                    RemovePendingItem(shipmentInfo);
                                     wasOrderSuccessfull = true;
                                 }
                             }
@@ -86,7 +92,7 @@ namespace FCS_AlterraHub.Mono.Managers
                                     {
                                         if (CardSystem.main.HasEnough(totalCash) && Inventory.main.container.HasRoomFor(sizes))
                                         {
-                                            foreach (CartItem item in cart)
+                                            foreach (CartItemSaveData item in cart)
                                             {
                                                 for (int i = 0; i < item.ReturnAmount; i++)
                                                 {
@@ -100,7 +106,7 @@ namespace FCS_AlterraHub.Mono.Managers
                                     {
                                         QuickLogger.Debug("Complete Order 5");
                                         CreateOrder(sender, shipmentInfo);
-                                        PendingItems.Remove(shipmentInfo);
+                                        RemovePendingItem(shipmentInfo);
                                         wasOrderSuccessfull = true;
                                     }
                                 });
@@ -144,20 +150,21 @@ namespace FCS_AlterraHub.Mono.Managers
             {
                 shipmentInfo = new ShipmentInfo();
                 shipmentInfo.OrderNumber = Guid.NewGuid().ToString("n").Substring(0, 8);
-                PendingItems.Add(shipmentInfo, new List<CartItem>
-                {
-                    cartItemComponent
-                });
+                
+                AddNewItem(shipmentInfo, new List<CartItemSaveData>
+               {
+                   cartItemComponent.Save()
+               });
             }
-            else if(PendingItems.ContainsKey(shipmentInfo))
+            else  if(PendingItems.Any(x=>x.Key.Equals(shipmentInfo)))
             {
-                PendingItems[shipmentInfo].Add(cartItemComponent);
+                AddNewItemToExisting(shipmentInfo, cartItemComponent.Save());
             }
             sender.OnCreatedCartItem();
 
             cartItemComponent.onRemoveBTNClicked += (pendingItem =>
             {
-                PendingItems[shipmentInfo].Remove(pendingItem);
+                AddNewItemToExisting(shipmentInfo,pendingItem.Save());
                 sender.OnRemoveCartItem(pendingItem.gameObject);
                 //Destroy(pendingItem.gameObject);
             });
@@ -165,18 +172,45 @@ namespace FCS_AlterraHub.Mono.Managers
             return shipmentInfo;
         }
 
+        private void AddNewItem(ShipmentInfo shipmentInfo, List<CartItemSaveData> cartItemSaveDatas)
+        {
+            PendingItems.Add(new KeyValuePair<ShipmentInfo, List<CartItemSaveData>>(shipmentInfo, cartItemSaveDatas));
+        }
+
+        private void AddNewItemToExisting(ShipmentInfo shipmentInfo, CartItemSaveData cartItemSaveDatas)
+        {
+            PendingItems.First(x=>x.Key.Equals(shipmentInfo)).Value.Add(cartItemSaveDatas);
+        }
+
+        private bool HasShipment(ShipmentInfo info)
+        {
+            return PendingItems.Any(x => x.Key.Equals(info));
+        }
+
+        private void RemovePendingItem(ShipmentInfo shipment)
+        {
+            var pair = PendingItems.FirstOrDefault(x => x.Key.Equals(shipment));
+            PendingItems.Remove(pair);
+
+        }
+
+        internal List<CartItemSaveData> GetCartItems(ShipmentInfo info)
+        {
+            return PendingItems.FirstOrDefault(x => x.Key.Equals(info)).Value;
+        }
+
         public void CreateOrder(IStoreClient sender, ShipmentInfo shipmentInfo)
         {
-            if (string.IsNullOrEmpty(shipmentInfo?.OrderNumber) || !PendingItems.ContainsKey(shipmentInfo)) return;
+            if (string.IsNullOrEmpty(shipmentInfo?.OrderNumber) || !HasShipment(shipmentInfo)) return;
 
             if (PendingItems.Any() && DeliveryService is not null)
             {
                 //DeliveryService.SetCurrentOrder();
                 PendingShipments.Add(new Shipment
                 {
-                    CartItems = PendingItems[shipmentInfo].SaveAll().ToList(),
+                    CartItems = GetCartItems(shipmentInfo),
                     OrderNumber = shipmentInfo.OrderNumber,
-                    //Port = port,
+                    //PortManager = port,
                     //PortPrefabID = port.GetPrefabID()
                 });
 
@@ -186,39 +220,36 @@ namespace FCS_AlterraHub.Mono.Managers
 
         public decimal GetCartTotal(ShipmentInfo shipmentInfo)
         {
-            if (string.IsNullOrEmpty(shipmentInfo?.OrderNumber) || !PendingItems.ContainsKey(shipmentInfo)) return 0;
-            return PendingItems[shipmentInfo].Sum(x => StoreInventorySystem.GetPrice(x.TechType));
+            if (string.IsNullOrEmpty(shipmentInfo?.OrderNumber) || !HasShipment(shipmentInfo)) return 0;
+            return GetCartItems(shipmentInfo).Sum(x => StoreInventorySystem.GetPrice(x.TechType));
         }
 
         public int GetCartCount(ShipmentInfo shipmentInfo)
         {
-            if (shipmentInfo is null || !PendingItems.ContainsKey(shipmentInfo)) return 0;
-            return PendingItems[shipmentInfo].Count;
+            if (shipmentInfo is null || !HasShipment(shipmentInfo)) return 0;
+            return GetCartItems(shipmentInfo).Count;
         }
 
-        public IEnumerable<CartItem> GetCartItems(ShipmentInfo shipmentInfo)
+        public void RemoveCartItem(ShipmentInfo shipmentInfo, CartItemSaveData pendingItem)
         {
-            return PendingItems[shipmentInfo];
-        }
 
-        public void RemoveCartItem(ShipmentInfo shipmentInfo, CartItem pendingItem)
-        {
-            if(PendingItems.ContainsKey(shipmentInfo))
-                PendingItems[shipmentInfo].Remove(pendingItem);
+
+             if(PendingItems.Any(x=>x.Key.Equals(shipmentInfo)))
+                 GetCartItems(shipmentInfo).Remove(pendingItem);
         }
 
         public void RemovePendingOrder(ShipmentInfo shipmentInfo)
         {
             if (shipmentInfo == null) return;
 
-            if (!string.IsNullOrWhiteSpace(shipmentInfo.OrderNumber) && PendingItems.ContainsKey(shipmentInfo))
-                PendingItems.Remove(shipmentInfo);
+            if (!string.IsNullOrWhiteSpace(shipmentInfo.OrderNumber) && HasShipment(shipmentInfo))
+                RemovePendingItem(shipmentInfo);
         }
         
         private List<Vector2int> GetSizes(ShipmentInfo shipmentInfo)
         {
             var items = new List<Vector2int>();
-            foreach (CartItem cartItem in GetCartItems(shipmentInfo))
+            foreach (CartItemSaveData cartItem in GetCartItems(shipmentInfo))
             {
                 for (int i = 0; i < cartItem.ReturnAmount; i++)
                 {
@@ -237,12 +268,48 @@ namespace FCS_AlterraHub.Mono.Managers
         {
             PendingShipments.Remove(pendingOrder);
         }
+
+        public void Save()
+        {
+            Mod.GamePlaySettings.StoreManagerSaveData = new StoreManagerSaveData
+            {
+                PendingItems = PendingItems,
+                PendingShipments = PendingShipments
+            };
+        }
+
+        public void LoadSave()
+        {
+            var saveData = Mod.GamePlaySettings.StoreManagerSaveData;
+            
+            if (saveData?.PendingItems is not null)
+            {
+                PendingItems = saveData.PendingItems;
+            }
+
+            if (saveData?.PendingShipments is not null)
+            {
+                PendingShipments = saveData.PendingShipments;
+            }
+        }
     }
 
-    internal class ShipmentInfo
+    [JsonObject]
+    internal class StoreManagerSaveData
     {
-        public string OrderNumber { get; set; }
-        public IShippingDestination Destination { get; set; }
+        [JsonProperty]
+        internal List<KeyValuePair<ShipmentInfo, List<CartItemSaveData>>> PendingItems { get; set; } = new();
+        [JsonProperty]
+        internal List<Shipment> PendingShipments { get; set; } = new();
+    }
+
+
+    public class ShipmentInfo
+    {
+        [JsonProperty]
+        internal string OrderNumber { get; set; }
+        [JsonProperty]
+        internal string Destination { get; set; }
     }
 
     internal interface IShippingDestination
@@ -250,7 +317,7 @@ namespace FCS_AlterraHub.Mono.Managers
         public bool HasDronePort { get; }
         public bool HasContructor { get; }
         public bool IsVehicle { get; set; }
-        bool SendItemsToConstructor(List<CartItem> pendingItem);
+        bool SendItemsToConstructor(List<CartItemSaveData> pendingItem);
         string GetBaseName();
         void SetInboundDrone(DroneController droneController);
         IDroneDestination ActivePort();

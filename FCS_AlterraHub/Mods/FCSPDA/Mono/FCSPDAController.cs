@@ -73,7 +73,6 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
 
         private int _timesOpen;
 
-        private bool _firstTimeOpen = true;
         internal FCSAlterraHubGUI Screen;
         private bool _goToEncyclopedia;
         private GameObject _screen;
@@ -293,16 +292,16 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         
         private void PlayAppropriateVoiceMessage()
         {
-            if (_timesOpen > 0 && !CardSystem.main.HasBeenRegistered() && !_firstTimeOpen &&
+            if (_timesOpen > 0 && !CardSystem.main.HasBeenRegistered() && !Mod.GamePlaySettings.IsPDAOpenFirstTime &&
                 DroneDeliveryService.Main.DetermineIfFixed())
             {
                 VoiceNotificationSystem.main.Play("PDA_Account_Instructions_key", 26);
             }
 
-            if (_firstTimeOpen && DroneDeliveryService.Main.DetermineIfFixed())
+            if (Mod.GamePlaySettings.IsPDAOpenFirstTime && DroneDeliveryService.Main.DetermineIfFixed())
             {
                 VoiceNotificationSystem.main.Play("PDA_Instructions_key", 26);
-                _firstTimeOpen = false;
+                Mod.GamePlaySettings.IsPDAOpenFirstTime = false;
                 _timesOpen++;
                 Mod.SaveGamePlaySettings();
             }
@@ -384,22 +383,15 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
 
         internal void Save(SaveData newSaveData)
         {
-            newSaveData.FCSPDAEntry = new FCSPDAEntry
-            {
-                //CartItems = _cartDropDownManager?.Save() ?? new List<CartItemSaveData>()
-            };
-
+            Mod.GamePlaySettings.PDAShipmentInfo = Screen.GetShipmentInfo();
             Mod.GamePlaySettings.Rate = Screen.GetRate();
             Mod.GamePlaySettings.AutomaticDebitDeduction = Screen.GetAutomaticDebitDeduction();
-            Mod.GamePlaySettings.IsPDAOpenFirstTime = _firstTimeOpen;
         }
 
         
-        internal void LoadFromSave(FCSPDAEntry savedData)
+        internal void LoadFromSave()
         {
-            _firstTimeOpen = Mod.GamePlaySettings.IsPDAOpenFirstTime;
-
-            Screen.LoadFromSave(savedData.CartItems);
+            Screen.LoadFromSave();
         }
         
         public static void ForceOpen()

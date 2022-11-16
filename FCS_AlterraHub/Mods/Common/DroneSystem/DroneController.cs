@@ -109,7 +109,7 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
             {
                 if (destination == null)
                 {
-                    QuickLogger.Error("Destination Port returned null", true);
+                    QuickLogger.Error("Destination PortManager returned null", true);
                     return false;
                 }
                 StartCoroutine(ShipOrderAsync(destination,isReturning));
@@ -262,11 +262,11 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
         {
             if (port == null)
             {
-                QuickLogger.Error("Drone Failed to Find Departure Port");
+                QuickLogger.Error("Drone Failed to Find Departure PortManager");
                 return;
             }
 
-            QuickLogger.Debug("Setting Departure Port", true);
+            QuickLogger.Debug("Setting Departure PortManager", true);
             departurePort = port;
         }
 
@@ -282,7 +282,7 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
 
                 if (!string.IsNullOrWhiteSpace(data.DestinationBaseID))
                 {
-                    QuickLogger.Debug("Destination Port not null", true);
+                    QuickLogger.Debug("Destination PortManager not null", true);
 
                     if (!DroneDeliveryService.Main.IsStationBaseID(data.DestinationBaseID))
                     {

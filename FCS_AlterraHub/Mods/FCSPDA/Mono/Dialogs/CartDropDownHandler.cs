@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Managers.FCSAlterraHub;
 using FCS_AlterraHub.Model;
@@ -95,7 +96,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
             cartItemComponent.onRemoveBTNClicked +=(pendingItem =>
             {
                 QuickLogger.Debug("Remove Item.",true);
-                StoreManager.main.RemoveCartItem(_shipmentInfo, pendingItem);
+                StoreManager.main.RemoveCartItem(_shipmentInfo, pendingItem.Save());
                 QuickLogger.Debug("Remove Pending Item.", true);
                 Destroy(pendingItem.gameObject);
                 QuickLogger.Debug("Destroy Item.", true);
@@ -143,7 +144,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
             _mono.ShowMessage(Buildables.AlterraHub.PurchaseSuccessful());
         }
 
-        public IEnumerable<CartItem> GetItems()
+        public IEnumerable<CartItemSaveData> GetItems()
         {
             return StoreManager.main.GetCartItems(_shipmentInfo);
         }
@@ -169,6 +170,11 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
         public ShipmentInfo GetShipmentInfo()
         {
             return _shipmentInfo;
+        }
+
+        public void LoadShipmentInfo(ShipmentInfo info)
+        {
+            _shipmentInfo = info;
         }
     }
 }

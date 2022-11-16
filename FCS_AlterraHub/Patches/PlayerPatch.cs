@@ -197,7 +197,7 @@ namespace FCS_AlterraHub.Patches
             FCSPDA = controller;
             controller.PDAObj = defPDA;
             controller.SetInstance();
-            controller.LoadFromSave(Mod.GetAlterraHubSaveData());
+            controller.LoadFromSave();
             AddUnlockedEncyclopediaEntries(FCSAlterraHubService.InternalAPI.EncyclopediaEntries);
             pda.SetActive(false);
             QuickLogger.Debug("FCS PDA Created");

@@ -79,11 +79,6 @@ namespace FCS_AlterraHub.Configuration
 
     }
 
-    [Serializable]
-    internal class FCSPDAEntry
-    {
-        [JsonProperty(PropertyName = "C")] internal IEnumerable<CartItemSaveData> CartItems { get; set; }
-    }
     
     [Serializable]
     internal class SaveData
@@ -91,7 +86,6 @@ namespace FCS_AlterraHub.Configuration
         [JsonProperty] internal float SaveVersion { get; set; } = 1.0f;
         [JsonProperty] internal List<OreConsumerDataEntry> OreConsumerEntries = new();
         [JsonProperty] internal List<PatreonStatueDataEntry> PatreonStatueEntries = new();
-        [JsonProperty] internal FCSPDAEntry FCSPDAEntry = new();
         [JsonProperty(PropertyName = "Acc")] internal AccountDetails AccountDetails { get; set; }
         [JsonProperty] internal List<AlterraHubDepotEntry> AlterraHubDepotEntries { get; set; } = new();
         [JsonProperty] internal List<AlterraDronePortEntry> AlterraDronePortEntries { get; set; } = new();
