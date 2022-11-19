@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using FCS_AlterraHub.Configuration;
+using FCSCommon.Utilities;
 using UnityEngine;
 using UWE;
 
@@ -70,6 +71,18 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
             if (NoCostConsoleCommand.main?.unlockDoors ?? false)
             {
                 UnlockDoor();
+            }
+
+            QuickLogger.Debug("Door Controller Start");
+
+            if (_saveData is not null)
+            {
+                doorLocked = _saveData.Item1;
+
+                if (_saveData.Item2)
+                {
+                    Open();
+                }
             }
         }
 
@@ -208,10 +221,12 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
         public void Open()
         {
             if(doorLocked || doorOpen) return;
+
             if (doorOpenMethod == OpenMethodEnum.Manual || doorOpenMethod == OpenMethodEnum.None)
             {
                 doorOpen = true;
             }
+
             if (openSound)
             {
                 openSound.Play();
@@ -259,6 +274,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
         public Quaternion openRot;
         private DoorDirection _doorDirection = DoorDirection.Left;
         public float PositionOffset;
+        private Tuple<bool, bool> _saveData;
 
         public enum OpenMethodEnum
         {
@@ -284,8 +300,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
 
         public void LoadSave(Tuple<bool,bool> settings)
         {
-            doorLocked = settings.Item1;
-            doorOpen = settings.Item2;
+            QuickLogger.Debug($"DoorController: {settings.Item1} | {settings.Item2}");
+            _saveData = settings;
         }
     }
 }

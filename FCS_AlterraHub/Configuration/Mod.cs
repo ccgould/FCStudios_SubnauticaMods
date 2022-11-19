@@ -284,13 +284,13 @@ namespace FCS_AlterraHub.Configuration
             {
                 QuickLogger.Debug($"Finished loading Game Play Settings : {JsonConvert.SerializeObject(data, Formatting.Indented)}");
                 GamePlaySettings = data;
-            },(() =>
+
+                NotifyGamePlayLoaded();
+            }, (() =>
             {
                 SaveGamePlaySettings();
             }));
-
-            NotifyGamePlayLoaded();
-
+            
             return _gamePlaySettings;
         }
 
@@ -556,7 +556,7 @@ namespace FCS_AlterraHub.Configuration
     public class FCSGamePlaySettings
     {
         public List<string> AlterraHubDepotPowercellSlot = new();
-        public KeyPadAccessSave AlterraHubDepotDoors = new();
+        public KeyPadAccessSave AlterraHubDepotDoors { get; set; } =new ();
         public bool BreakerOn;
         public bool IsPDAUnlocked;
         public HashSet<int> FixedPowerBoxes = new();
@@ -592,9 +592,9 @@ namespace FCS_AlterraHub.Configuration
     
     public class KeyPadAccessSave
     {
-        public Tuple<bool,bool> ChamberDoor01 = new(false,false);
-        public Tuple<bool, bool> ChamberDoor02 = new(false, false);
-        public Tuple<bool, bool> SlideUpDoor01 = new(true, false);
+        public Tuple<bool,bool> ChamberDoor01;
+        public Tuple<bool, bool> ChamberDoor02;
+        public Tuple<bool, bool> SlideUpDoor01;
     }
 
     [Serializable]

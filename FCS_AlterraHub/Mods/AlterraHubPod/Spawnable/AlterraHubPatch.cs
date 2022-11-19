@@ -68,14 +68,21 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Spawnable
             }
 
             ////Sky appliers to make it look nicer. Not sure if it even makes a difference, but I'm sticking with it.
-            //var skyApplierInterior = interiorModels.gameObject.AddComponent<SkyApplier>();
-            //skyApplierInterior.renderers = interiorModels.GetComponentsInChildren<Renderer>();
-            //skyApplierInterior.anchorSky = Skies.BaseInterior;
-            //skyApplierInterior.SetSky(Skies.BaseInterior);
+
+            var interiorModels = GameObjectHelpers.FindGameObject(prefab, "static_interior_mesh");
+            var skyApplierInterior = interiorModels.AddComponent<SkyApplier>();
+            skyApplierInterior.renderers = interiorModels.GetComponentsInChildren<Renderer>();
+            skyApplierInterior.anchorSky = Skies.BaseInterior;
+            skyApplierInterior.SetSky(Skies.BaseInterior);
 
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, prefab, Color.cyan);
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseSecondaryCol, prefab, Color.black);
-            MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, prefab, 4f);
+            //MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, prefab, 0f);
+            //MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseFloor01Interior, prefab, 0f);
+            //MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseOpaqueInterior, prefab, 0f);
+
+
+
 
             //The SubRoot component needs a lighting controller. Works nice too. A pain to setup in script.
             var lights = prefab.FindChild("LightsParent").AddComponent<LightingController>();
@@ -92,8 +99,13 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Spawnable
                 lights.RegisterLight(newLight);
             }
 
+            lights.emissiveController.intensities = new[] { 1f, 0.7f, 0f };
+
 
             var sr = prefab.AddComponent<AlterraHubPodController>();
+            sr.skyappl = skyApplierInterior;
+
+
 
             //Necessary for SubRoot class Update behaviour so it doesn't return an error every frame.
             var lod = prefab.AddComponent<BehaviourLOD>();

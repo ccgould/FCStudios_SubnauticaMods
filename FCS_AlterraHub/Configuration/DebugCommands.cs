@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Mods.AlterraHubPod.Mono;
 using FCS_AlterraHub.Mods.Common.DroneSystem;
 using FCS_AlterraHub.Mods.FCSPDA.Mono;
 using FCS_AlterraHub.Mods.OreConsumer.Buildable;
@@ -101,8 +102,9 @@ namespace FCS_AlterraHub.Configuration
         [ConsoleCommand("WarpStation")]
         public static string WarpStation()
         {
-            if (DroneDeliveryService.Main != null)
+            if (AlterraHubPodController.main != null)
             {
+                AlterraHubPodController.main.OnConsoleCommand_warp();
                 return "Warped player to station";
             }
 

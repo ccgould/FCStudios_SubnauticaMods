@@ -433,14 +433,11 @@ namespace FCS_AlterraHub.Managers.FCSAlterraHub
             return IsOpen;
         }
 
-
-
         private void AddToCartCallBack(TechType techType, TechType receiveTechType, int returnAmount)
         {
             _cartDropDownManager?.AddItem(techType, receiveTechType, returnAmount);
         }
-
-
+        
         internal void ExitStore()
         {
             GoToPage(PDAPages.Home);

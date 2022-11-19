@@ -11,6 +11,7 @@ using FCS_AlterraHub.Mods.AlterraHubFabricator.Mono;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
+using Oculus.Newtonsoft.Json.Utilities.LinqBridge;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -43,18 +44,20 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
 
             _isFlashingHash = Animator.StringToHash("IsFlashing");
 
-            var constructorController =GameObjectHelpers.FindGameObject(gameObject, "FCS_AlterraHubFabricator")?.EnsureComponent<AlterraHubConstructorController>();
+            var constructorController = GameObjectHelpers.FindGameObject(gameObject, "FCS_AlterraHubFabricator")?.EnsureComponent<AlterraHubConstructorController>();
             var storage = UWEHelpers.CreateStorageContainer(constructorController.gameObject, null, AlterraHubFabricatorPatcher.AlterraHubConstructorClassID, "AlterraHub Constructor", 6, 8);
             constructorController.Initialize();
             constructorController.IsConstructed = true;
             constructorController.Storage = storage;
-
+            
             PortManager.RegisterConstructor(constructorController);
 
             this.LOD = GetComponent<BehaviourLOD>();
             this.rb = GetComponent<Rigidbody>();
             this.isBase = true;
             this.lightControl = GetComponentInChildren<LightingController>();
+            
+
             this.modulesRoot = gameObject.transform;
             this.powerRelay = GetComponent<BasePowerRelay>();
             BaseManager.FindManager(this);
@@ -62,10 +65,20 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
             //StartCoroutine(TryApplyMaterial());
         }
 
+
+        private void test()
+        {
+            lightControl.RegisterSkyApplier(skyappl);
+        }
+
         private int _isFlashingHash;
         private Text _keyPadModuleText;
         private Text _screenStatusText;
         private List<FCSAlterraHubGUI> _screens = new();
+        private FCSGamePlaySettings _settings;
+        private List<PodSolarClusterController> _clusters = new ();
+        private Transform _warpTrans;
+        public SkyApplier skyappl;
 
         public override void Start()
         {
@@ -76,22 +89,58 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
                 _screenAnimator = GameObjectHelpers.FindGameObject(gameObject, "ScreenStatus").GetComponent<Animator>();
                 _screenStatusText = _screenAnimator.GetComponent<Text>();
 
+                var clusters = GameObjectHelpers.FindGameObjects(gameObject, "static_pod_solarpanel_mesh", SearchOption.StartsWith);
+
+                for (int i = 0; i < clusters.Count(); i++)
+                {
+                    var controller = clusters.ElementAt(i).gameObject.AddComponent<PodSolarClusterController>();
+                    controller.Initialize(i);
+                    powerRelay.AddInboundPower(controller.GetPowerSource());
+                    _clusters.Add(controller);
+                }
+
+
                 SetupDoors();
+
+                FindScreens();
 
                 LoadSave();
 
                 SetupKeyPad();
 
-                FindScreens();
+                test();
 
-                _screens[0].LoadFromSave(Mod.GamePlaySettings.Screen1ShipmentInfo);
-                _screens[1].LoadFromSave(Mod.GamePlaySettings.Screen2ShipmentInfo);
-                _screens[2].LoadFromSave(Mod.GamePlaySettings.Screen3ShipmentInfo);
+                //powerRelay.powerUpEvent.AddHandler(gameObject, (parms =>
+                //{
+                //    QuickLogger.Debug("Life Pod Power Up");
+                //    MaterialHelpers.ToggleEmission("fcs01_Floor01_Interior", gameObject,true);
+                //    MaterialHelpers.ToggleEmission("fcs01_BO_Interior",gameObject,true);
+                //    MaterialHelpers.ToggleEmission("fcs01_BLEC", gameObject,true);
+
+                //}));
+
+                //powerRelay.powerDownEvent.AddHandler(gameObject, (parms =>
+                //{
+                //    QuickLogger.Debug("Life Pod Power Down");
+                //    MaterialHelpers.ToggleEmission("fcs01_Floor01_Interior", gameObject, false);
+                //    MaterialHelpers.ToggleEmission("fcs01_BO_Interior", gameObject, false);
+                //    MaterialHelpers.ToggleEmission("fcs01_BLEC", gameObject, false);
+                //}));
+
+                //InvokeRepeating(nameof(PowerCheck), 1, 1);
             }
             catch (Exception e)
             {
                 QuickLogger.Error(e.Message);
                 QuickLogger.Error(e.StackTrace);
+            }
+        }
+
+        private void PowerCheck()
+        {
+            if (powerRelay.isPowered && powerRelay.lastPowered)
+            {
+
             }
         }
 
@@ -132,10 +181,22 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
 
         private void LoadSave()
         {
-            var settings = Mod.GamePlaySettings;
-            _chamberDoor01.LoadSave(settings.AlterraHubDepotDoors.ChamberDoor01);
-            _chamberDoor02.LoadSave(settings.AlterraHubDepotDoors.ChamberDoor02);
-            _slideUpDoor01.LoadSave(settings.AlterraHubDepotDoors.SlideUpDoor01);
+             _settings = Mod.GamePlaySettings;
+
+             _chamberDoor01.LoadSave(_settings.AlterraHubDepotDoors.ChamberDoor01);
+             _chamberDoor02.LoadSave(_settings.AlterraHubDepotDoors.ChamberDoor02);
+             _slideUpDoor01.LoadSave(_settings.AlterraHubDepotDoors.SlideUpDoor01);
+
+             _screens[0].LoadFromSave(Mod.GamePlaySettings.Screen1ShipmentInfo);
+             _screens[1].LoadFromSave(Mod.GamePlaySettings.Screen2ShipmentInfo);
+             _screens[2].LoadFromSave(Mod.GamePlaySettings.Screen3ShipmentInfo);
+
+             foreach (int boxID in Mod.GamePlaySettings.FixedPowerBoxes)
+             {
+                 var electricalBox = _clusters.FirstOrDefault(x => x.Id == boxID);
+                 electricalBox?.Fix(true);
+             }
+
             QuickLogger.Debug("Pod Save Loaded");
         }
 
@@ -206,6 +267,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
             //var interiorTrigger = GameObjectHelpers.FindGameObject(gameObject, "InteriorTrigger").EnsureComponent<InteriorTrigger>();
 
             var externalDoorTrigger = GameObjectHelpers.FindGameObject(gameObject, "ExternalDoorTrigger").EnsureComponent<ExteriorTrigger>();
+            _warpTrans = externalDoorTrigger.transform;
+
 
             _chamberDoor01 = GameObjectHelpers.FindGameObject(gameObject, "ChamberDoor01").AddComponent<DoorController>();
             _chamberDoor01.PositionOffset = 0.526f;
@@ -215,12 +278,14 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
 
 
             _chamberDoor02 = GameObjectHelpers.FindGameObject(gameObject, "ChamberDoor02").AddComponent<DoorController>();
+            //_chamberDoor02.Initialize();
             _chamberDoor02.PositionOffset = 0.526f;
             _chamberDoor02.UnlockDoor();
             _chamberDoor02.SetDoorDirection(DoorController.DoorDirection.Left);
             externalDoorTrigger.Door2 = _chamberDoor02;
 
             _slideUpDoor01 = GameObjectHelpers.FindGameObject(gameObject, "SlideUpDoor01").AddComponent<DoorController>();
+           // _slideUpDoor01.Initialize();
             _slideUpDoor01.PositionOffset = 2.074096f;
             _slideUpDoor01.SetDoorDirection(DoorController.DoorDirection.Up);
             _slideUpDoor01.UnlockDoor();
@@ -256,9 +321,9 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
             QuickLogger.Debug("Saving Station");
             //Mod.GamePlaySettings.FabStationBeaconColorIndex = GetPing().colorIndex;
             //Mod.GamePlaySettings.FabStationBeaconVisible = GetPing().visible;
-            Mod.GamePlaySettings.AlterraHubDepotDoors.ChamberDoor02 = new Tuple<bool, bool>(_chamberDoor01.doorLocked, _chamberDoor01.doorOpen);
-            Mod.GamePlaySettings.AlterraHubDepotDoors.ChamberDoor02 = new Tuple<bool, bool>(_chamberDoor02.doorLocked, _chamberDoor02.doorOpen);
-            Mod.GamePlaySettings.AlterraHubDepotDoors.SlideUpDoor01 = new Tuple<bool, bool>(_slideUpDoor01.doorLocked, _slideUpDoor01.doorOpen);
+            Mod.GamePlaySettings.AlterraHubDepotDoors.ChamberDoor01 = new System.Tuple<bool, bool>(_chamberDoor01.doorLocked, _chamberDoor01.doorOpen);
+            Mod.GamePlaySettings.AlterraHubDepotDoors.ChamberDoor02 = new System.Tuple<bool, bool>(_chamberDoor02.doorLocked, _chamberDoor02.doorOpen);
+            Mod.GamePlaySettings.AlterraHubDepotDoors.SlideUpDoor01 = new System.Tuple<bool, bool>(_slideUpDoor01.doorLocked, _slideUpDoor01.doorOpen);
             Mod.GamePlaySettings.Screen1ShipmentInfo = _screens[0].GetShipmentInfo();
             Mod.GamePlaySettings.Screen2ShipmentInfo = _screens[1].GetShipmentInfo();
             Mod.GamePlaySettings.Screen3ShipmentInfo = _screens[2].GetShipmentInfo();
@@ -268,7 +333,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
             //Mod.GamePlaySettings.IsPDAUnlocked = DetermineIfUnlocked();
             //Mod.GamePlaySettings.CurrentOrder = _currentOrder;
             //Mod.GamePlaySettings.BreakerOn = _isBaseOn;
-            //Mod.GamePlaySettings.FixedPowerBoxes = _antenna.Save().ToHashSet();
             //Mod.GamePlaySettings.TransDroneSpawned = _drones.Any();
             QuickLogger.Debug("Saving Station Complete");
         }
@@ -319,6 +383,12 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
                 Door1.Close();
                 Door2.Close();
             }
+        }
+
+        public void OnConsoleCommand_warp()
+        {
+            Player.main.SetPosition(_warpTrans.position);
+            Player.main.OnPlayerPositionCheat();
         }
     }
 }
