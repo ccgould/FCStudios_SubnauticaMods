@@ -7,9 +7,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
     {
         private float terminationSqrDistance = 4f;
         private Player player;
-#if !SUBNAUTICA_STABLE
         private RectTransform rt;
-#endif
 
 
         public override void Awake()
@@ -49,11 +47,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
         {
             if (base.enabled && !base.selected)
             {
-#if SUBNAUTICA
-                HandReticle.main.SetInteractText("Use Terminal");
-#else
                 HandReticle.main.SetTextRaw(HandReticle.TextType.Use, "Use Terminal");
-#endif
                 HandReticle.main.SetIcon(HandReticle.IconType.Interact);
             }
         }

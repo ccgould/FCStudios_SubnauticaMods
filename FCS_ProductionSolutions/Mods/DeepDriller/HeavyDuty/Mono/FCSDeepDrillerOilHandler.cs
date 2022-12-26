@@ -20,8 +20,8 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         public Action<FcsDevice, TechType> OnContainerRemoveItem { get; set; }
         public bool IsFull { get; }
         private const float KDayInSeconds = 1200f;
-        private readonly float _setOilTime = KDayInSeconds * QPatch.Configuration.DDOilTimePeriodInDays;
-        private readonly float _lubricantRefillAmount = KDayInSeconds * QPatch.Configuration.DDOilRestoresInDays;
+        private readonly float _setOilTime = KDayInSeconds * Main.Configuration.DDOilTimePeriodInDays;
+        private readonly float _lubricantRefillAmount = KDayInSeconds * Main.Configuration.DDOilRestoresInDays;
         private float _oil;
         private float _elapsed;
 
@@ -34,7 +34,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
             {
                 if (_oil > 0 && _mono.IsOperational)
                 {
-                    var lusePerDay = KDayInSeconds + 16 * (_mono.GetOresPerDayCountInt() - QPatch.Configuration.DDDefaultOrePerDay);
+                    var lusePerDay = KDayInSeconds + 16 * (_mono.GetOresPerDayCountInt() - Main.Configuration.DDDefaultOrePerDay);
                     var lusePerSecond = lusePerDay / 1200;
                     _oil -= lusePerSecond;
                 }
@@ -115,13 +115,9 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         {
             if (_oil - KDayInSeconds >= 0)
             {
-#if SUBNAUTICA_STABLE
-            return techType.ToPickupable();
-#else
                 var itemTask = new TaskResult<InventoryItem>();
                 CouroutineManager.WaitCoroutine(techType.ToInventoryItem(itemTask));
                 return itemTask.Get().item;
-#endif
             }
 
             return null;

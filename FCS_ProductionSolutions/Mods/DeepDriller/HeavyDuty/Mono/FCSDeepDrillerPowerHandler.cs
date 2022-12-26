@@ -184,11 +184,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 
         private float GetDepthScalar()
         {
-#if SUBNAUTICA
-            float time = Mathf.Clamp01((MaxDepth - Ocean.main.GetDepthOf(base.gameObject)) / MaxDepth);
-#elif BELOWZERO
             float time = Mathf.Clamp01((MaxDepth - Ocean.GetDepthOf(base.gameObject)) / MaxDepth);
-#endif
             return _depthCurve.Evaluate(time);
         }
 
@@ -249,7 +245,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 
         internal string GetSolarPowerData()
         {
-            return $"Solar panel (sun: {Mathf.RoundToInt(GetRechargeScalar() * 100f)}% charge {Mathf.RoundToInt(_powerBank.SolarPanel.GetCharge())}/{Mathf.RoundToInt(QPatch.Configuration.DDSolarCapacity)})";
+            return $"Solar panel (sun: {Mathf.RoundToInt(GetRechargeScalar() * 100f)}% charge {Mathf.RoundToInt(_powerBank.SolarPanel.GetCharge())}/{Mathf.RoundToInt(Main.Configuration.DDSolarCapacity)})";
         }
 
         /// <summary>
@@ -353,7 +349,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 
         public override float GetDevicePowerCapacity()
         {
-            return QPatch.Configuration.DDInternalBatteryCapacity;
+            return Main.Configuration.DDInternalBatteryCapacity;
         }
         
         public override void TogglePowerState()

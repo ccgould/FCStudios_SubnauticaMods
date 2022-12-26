@@ -18,7 +18,7 @@ namespace DataStorageSolutions.Patches
         public static void GetToolTip(InventoryItem item, TooltipData data)
 #endif
         {
-            if (!QPatch.Configuration.ShowServerCustomToolTip) return;
+            if (!Main.Configuration.ShowServerCustomToolTip) return;
 
             if (_serverTechType == TechType.None)
             {

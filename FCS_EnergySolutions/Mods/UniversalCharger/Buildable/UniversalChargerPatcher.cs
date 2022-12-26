@@ -44,60 +44,6 @@ namespace FCS_EnergySolutions.Mods.UniversalCharger.Buildable
             };
         }
 
-
-
-#if SUBNAUTICA_STABLE
-        public override GameObject GetGameObject()
-        {
-            try
-            {
-                var prefab = GameObject.Instantiate(ModelPrefab.UniversalChargerPrefab);
-
-                var center = new Vector3(0f, -0.014202f, 0.3327329f);
-                var size = new Vector3(1.461404f, 1.353021f, 0.4319195f);
-
-                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
-
-                var model = prefab.FindChild("model");
-
-                //========== Allows the building animation and material colors ==========// 
-                Shader shader = Shader.Find("MarmosetUBER");
-                Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
-                SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
-                skyApplier.renderers = renderers;
-                skyApplier.anchorSky = Skies.Auto;
-                //========== Allows the building animation and material colors ==========// 
-
-                // Add constructible
-                var constructable = prefab.AddComponent<Constructable>();
-                constructable.allowedOutside = false;
-                constructable.allowedInBase = true;
-                constructable.allowedOnGround = false;
-                constructable.allowedOnWall = true;
-                constructable.rotationEnabled = false;
-                constructable.allowedOnCeiling = false;
-                constructable.allowedInSub = true;
-                constructable.allowedOnConstructables = false;
-                constructable.model = model;
-                constructable.techType = TechType;
-
-                PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
-                prefabID.ClassId = ClassID;
-                prefab.AddComponent<TechTag>().type = TechType;
-
-                UWEHelpers.CreateStorageContainer(prefab, prefab.FindChild("EquipmentRoot"), ClassID, "", 4, 4,true);
-
-                prefab.AddComponent<UniversalChargerController>();
-                return prefab;
-            }
-            catch (Exception e)
-            {
-                QuickLogger.Error(e.Message);
-            }
-
-            return null;
-        }
-#else
         public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
         {
             var prefab = GameObject.Instantiate(ModelPrefab.UniversalChargerPrefab);
@@ -138,7 +84,6 @@ namespace FCS_EnergySolutions.Mods.UniversalCharger.Buildable
             gameObject.Set(prefab);
             yield break;
         }
-#endif
 
 
         protected override RecipeData GetBlueprintRecipe()

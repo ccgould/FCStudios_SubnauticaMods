@@ -14,11 +14,7 @@ using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
 using FMOD;
 using SMLHelper.V2.Handlers;
-#if SUBNAUTICA_STABLE
-using Oculus.Newtonsoft.Json;
-#else
 using Newtonsoft.Json;
-#endif
 
 namespace FCS_AlterraHub.Registration
 {
@@ -95,7 +91,7 @@ namespace FCS_AlterraHub.Registration
         public CardSystem AccountSystem => CardSystem.main;
         public bool IsInOreBuildMode()
         {
-            return QPatch.Configuration.OreBuildMode;
+            return Main.Configuration.OreBuildMode;
         }
 
         public Action OnPurge { get; set; }
@@ -393,9 +389,6 @@ namespace FCS_AlterraHub.Registration
                             key = data.Key,
                             nodes = PDAEncyclopedia.ParsePath(entryData.Path),
                             path = entryData.Path,
-#if SUBNAUTICA
-                            timeCapsule = false,                            
-#endif
                             unlocked = entryData.Unlocked
                         });
 

@@ -5,11 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using FCS_AlterraHub.Mods.Common.DroneSystem;
 
-#if SUBNAUTICA_STABLE
-using Oculus.Newtonsoft.Json;
-#else
 using Newtonsoft.Json;
-#endif
 
 namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
 {

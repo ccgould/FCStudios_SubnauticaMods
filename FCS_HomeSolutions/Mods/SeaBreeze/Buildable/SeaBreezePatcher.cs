@@ -90,7 +90,7 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Buildable
 
                 prefab.SetActive(false);
                 var storageContainer = prefab.AddComponent<FCSFridge>();
-                storageContainer.Initialize(QPatch.Configuration.SeaBreezeStorageLimit, 1, 1, FriendlyName, ClassID);
+                storageContainer.Initialize(Main.Configuration.SeaBreezeStorageLimit, 1, 1, FriendlyName, ClassID);
                 storageContainer.enabled = false;
                 prefab.SetActive(true);
 

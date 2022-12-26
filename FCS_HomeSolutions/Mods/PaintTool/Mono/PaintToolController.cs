@@ -145,7 +145,7 @@ namespace FCS_HomeSolutions.Mods.PaintTool.Mono
             if (uGUI_PaintToolColorPicker.Main != null && !uGUI_PaintToolColorPicker.Main.IsOpen())
             {
                 //TODO use the % operator to replace this watch unity videoplayer  tut in your youTube lib
-                if (base.isDrawn && Input.GetKeyDown(QPatch.Configuration.PaintToolSelectColorForwardKeyCode))
+                if (base.isDrawn && Input.GetKeyDown(Main.Configuration.PaintToolSelectColorForwardKeyCode))
                 {
                     _currentTemplateIndex += 1;
 
@@ -156,7 +156,7 @@ namespace FCS_HomeSolutions.Mods.PaintTool.Mono
 
                     ChangeColor(_currentTemplates.ElementAt(_currentTemplateIndex));
                 }
-                else if (base.isDrawn && Input.GetKeyDown(QPatch.Configuration.PaintToolSelectColorBackKeyCode))
+                else if (base.isDrawn && Input.GetKeyDown(Main.Configuration.PaintToolSelectColorBackKeyCode))
                 {
                     _currentTemplateIndex -= 1;
 
@@ -167,7 +167,7 @@ namespace FCS_HomeSolutions.Mods.PaintTool.Mono
 
                     ChangeColor(_currentTemplates.ElementAt(_currentTemplateIndex));
                 }
-                else if(base.isDrawn && Input.GetKeyDown(QPatch.Configuration.PaintToolColorSampleKeyCode))
+                else if(base.isDrawn && Input.GetKeyDown(Main.Configuration.PaintToolColorSampleKeyCode))
                 {
                     var device = GetFCSDeviceFromTarget();
                     if (device != null)
@@ -232,7 +232,7 @@ namespace FCS_HomeSolutions.Mods.PaintTool.Mono
 
         private void SavePrefabClassId(GameObject objRoot)
         {
-            if (QPatch.Configuration.EnableDebugLogs && QPatch.Configuration.DeveloperModeEnabled)
+            if (Main.Configuration.EnableDebugLogs && Main.Configuration.DeveloperModeEnabled)
             {
                 if (!Mod.PrefabClassIDS.ContainsKey(objRoot.name))
                 {
@@ -388,9 +388,9 @@ namespace FCS_HomeSolutions.Mods.PaintTool.Mono
         {
             if (string.IsNullOrWhiteSpace(message))
             {
-                message = $"Change Template: {GameInput.GetBindingName(GameInput.Button.AltTool, GameInput.BindingSet.Primary)} | Color Sample {QPatch.Configuration.PaintToolColorSampleKeyCode}";
+                message = $"Change Template: {GameInput.GetBindingName(GameInput.Button.AltTool, GameInput.BindingSet.Primary)} | Color Sample {Main.Configuration.PaintToolColorSampleKeyCode}";
             }
-            return $"Press Change Colors ({QPatch.Configuration.PaintToolSelectColorBackKeyCode})/({QPatch.Configuration.PaintToolSelectColorForwardKeyCode}) | Use Paint Can: {GameInput.GetBindingName(GameInput.Button.Reload, GameInput.BindingSet.Primary)} | {message}";
+            return $"Press Change Colors ({Main.Configuration.PaintToolSelectColorBackKeyCode})/({Main.Configuration.PaintToolSelectColorForwardKeyCode}) | Use Paint Can: {GameInput.GetBindingName(GameInput.Button.Reload, GameInput.BindingSet.Primary)} | {message}";
         }
 
         public List<ColorTemplate> GetTemplates()

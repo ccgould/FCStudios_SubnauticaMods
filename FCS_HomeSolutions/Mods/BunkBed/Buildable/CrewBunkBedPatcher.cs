@@ -50,29 +50,7 @@ namespace FCS_HomeSolutions.Mods.BunkBed.Buildable
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
             };
         }
-
-#if SUBNAUTICA_STABLE
-        public override GameObject GetGameObject()
-        {
-            try
-            {
-                var prefab = AddChair(CraftData.GetPrefabForTechType(TechType.NarrowBed, false));
-
-                var mesh = GameObject.Instantiate(_gameObject);
-                mesh.SetActive(false);
-
-                ProcessBed(prefab, mesh);
-
-                return prefab;
-            }
-            catch (Exception e)
-            {
-                QuickLogger.Error(e.Message);
-                return null;
-            }
-        }
-#endif
-
+        
         public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
         {
             var task = new TaskResult<GameObject>();

@@ -73,7 +73,7 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Mono
                 if (DisplayManager != null)
                 {
                     var numberOfItems = FridgeComponent.NumberOfItems;
-                    DisplayManager.OnContainerUpdate(numberOfItems, QPatch.Configuration.SeaBreezeStorageLimit);
+                    DisplayManager.OnContainerUpdate(numberOfItems, Main.Configuration.SeaBreezeStorageLimit);
                     DisplayManager.UpdateScreenLabel(NameController.GetCurrentName(), NameController);
                 }
 
@@ -114,7 +114,7 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Mono
         {
             PageStateHash = Animator.StringToHash("PageState");
 
-            QPatch.Configuration.OnSeaBreezeGameModeChanged += OnModModeChanged;
+            Main.Configuration.OnSeaBreezeGameModeChanged += OnModModeChanged;
 
             if (PrefabId == null)
             {
@@ -136,7 +136,7 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Mono
                 FridgeComponent = gameObject.GetComponent<FCSFridge>();
                 FridgeComponent.OnContainerUpdate += OnFridgeContainerUpdate;
                 FridgeComponent.Initialize(this);
-                FridgeComponent.SetModMode(QPatch.Configuration.SeaBreezeModMode);
+                FridgeComponent.SetModMode(Main.Configuration.SeaBreezeModMode);
             }
 
             if (_colorManager == null)
@@ -161,7 +161,7 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Mono
                 DisplayManager = gameObject.AddComponent<SeaBreezeDisplay>();
                 DisplayManager.Setup(this);
                 //Refresh the Count on the screen
-                OnFridgeContainerUpdate(0, QPatch.Configuration.SeaBreezeStorageLimit);
+                OnFridgeContainerUpdate(0, Main.Configuration.SeaBreezeStorageLimit);
             }
 
             if (NameController == null)

@@ -536,19 +536,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             if (!IsInitialized || !IsConstructed || _interfaceInteraction.IsInRange)
             {
                 main.SetIcon(HandReticle.IconType.Default);
-#if SUBNAUTICA
-                main.SetInteractTextRaw(string.Empty,string.Empty);
-#else
                 main.SetTextRaw(HandReticle.TextType.Hand, string.Empty);
-#endif
                 return;
             }
 
-#if SUBNAUTICA
-            main.SetInteractTextRaw($"Power Usage Per Second: {GetPowerUsage()}","");
-#else
-            main.SetTextRaw(HandReticle.TextType.Hand,$"Power Usage Per Second: {GetPowerUsage()}");
-#endif
+            main.SetTextRaw(HandReticle.TextType.Hand, $"Power Usage Per Second: {GetPowerUsage()}");
             main.SetIcon(HandReticle.IconType.Info);
         }
 

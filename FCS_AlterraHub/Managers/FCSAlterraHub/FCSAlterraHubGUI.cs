@@ -405,7 +405,7 @@ namespace FCS_AlterraHub.Managers.FCSAlterraHub
                     QuickLogger.Debug($"Added Store Item  {Language.main.Get(storeItem.Key)} with category to Panel: {storeItem.Value.StoreCategory}:");
                 }
 
-                foreach (FCSStoreEntry storeItem in QPatch.Configuration.AdditionalStoreItems)
+                foreach (FCSStoreEntry storeItem in Main.Configuration.AdditionalStoreItems)
                 {
                     if (storeItem.StoreCategory != category) continue;
 

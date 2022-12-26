@@ -10,7 +10,7 @@ namespace FCS_HomeSolutions.Patches
         [HarmonyPrefix]
         private static bool ReleaseEventPrefix(FMOD_CustomEmitter __instance)
         {
-            if (__instance == null || !QPatch.Configuration.IsJukeBoxEnabled) return true;
+            if (__instance == null || !Main.Configuration.IsJukeBoxEnabled) return true;
 
             var baseJukeBox = Player.main.currentSub.gameObject.GetComponentInChildren<BaseJukeBox>();
 

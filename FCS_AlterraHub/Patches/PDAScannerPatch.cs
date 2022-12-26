@@ -23,7 +23,7 @@ namespace FCS_AlterraHub.Patches
             QuickLogger.Debug($"Contains Complete Entry: {PDAScanner.ContainsCompleteEntry(techType) || KnownTech.Contains(techType)}", true);
             if (PDAScanner.ContainsCompleteEntry(techType) || KnownTech.Contains(techType))
             {
-                //QPatch.MissionManagerGM.NotifyItemScanned(techType);
+                //Main.MissionManagerGM.NotifyItemScanned(techType);
             }
         }
     }

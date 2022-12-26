@@ -48,26 +48,6 @@ namespace FCS_HomeSolutions.Mods.Sofas.Buildable
 
         }
 
-        #if SUBNAUTICA_STABLE
-        public GameObject CreateGameObject(float additionalHeight = 0f)
-        {
-            try
-            {
-                var prefab = AddChair(CraftData.GetPrefabForTechType(TechType.StarshipChair, false), additionalHeight);
-                var mesh = GameObject.Instantiate(_gameObject);
-                mesh.SetActive(false);
-                
-                ProcessChair(prefab, mesh);
-
-                return prefab;
-            }
-            catch (Exception e)
-            {
-                QuickLogger.Error(e.Message);
-                return null;
-            }
-        }
-        #endif
 
         public IEnumerator CreateGameObjectAsync(IOut<GameObject> gameObject, float additionalHeight = 0f)
         {

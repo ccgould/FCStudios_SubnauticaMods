@@ -48,7 +48,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
         private Random _fishRandom;
 
         public Channel AudioTrack { get; set; }
-        private float _speed => QPatch.Configuration.PeeperLoungeBarTurnSpeed;
+        private float _speed => Main.Configuration.PeeperLoungeBarTurnSpeed;
 
         private void Start()
         {
@@ -217,7 +217,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
 
         public bool GetCanPlay()
         {
-            if (!QPatch.Configuration.PeeperLoungeBarPlayVoice) return false;
+            if (!Main.Configuration.PeeperLoungeBarPlayVoice) return false;
             return DayNightCycle.main.timePassedAsFloat >= this.timeNextPlay;
         }
 
@@ -231,7 +231,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
                 AudioTrack.setPaused(WorldHelpers.CheckIfPaused());
             }
 
-            if (WorldHelpers.CheckIfInRange(Player.main.gameObject, gameObject, 5) && !uGUI.isLoading)
+            if (WorldHelpers.CheckIfInRange(Player.main.gameObject, gameObject, 5))
             {
                 _sc.enabled = false;
                 Vector3 eulerAngles = Quaternion
@@ -306,9 +306,6 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
 
             var zero = new VECTOR();
             AudioTrack.set3DAttributes(ref pos, ref zero
-#if SUBNAUTICA_STABLE
-                , ref zero
-#endif
             );
 
             AudioTrack.isPlaying(out var isPlaying);
@@ -316,11 +313,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
             if (!isPlaying)
             {
                 var clip = FindAudioClip(trackName);
-                Subtitles
-#if SUBNAUTICA
-                    .main
-#endif
-                    .Add(clip.Message, null);
+                Subtitles.Add(clip.Message, null);
                 AudioTrack = AudioUtils.PlaySound(clip.Sound, SoundChannel.Master);
             }
         }
@@ -339,7 +332,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
 
                     IsInitialized = true;
 
-                    if (!_introHasBeenPlayed && !uGUI.isLoading)
+                    if (!_introHasBeenPlayed)
                     {
                         if (!FCSAlterraHubService.PublicAPI.GetGamePlaySettings().ConditionMet("PLBIntroPlayed"))
                         {

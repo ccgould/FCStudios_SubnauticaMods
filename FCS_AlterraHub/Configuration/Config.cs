@@ -7,11 +7,7 @@ using SMLHelper.V2.Options;
 using SMLHelper.V2.Options.Attributes;
 using UnityEngine;
 using UnityEngine.Events;
-#if SUBNAUTICA_STABLE
-using Oculus.Newtonsoft.Json;
-#else
 using Newtonsoft.Json;
-#endif
 
 namespace FCS_AlterraHub.Configuration
 {
@@ -25,8 +21,8 @@ namespace FCS_AlterraHub.Configuration
         [Toggle("Enable Debugs", Order = 0), OnChange(nameof(EnableDebugsToggleEvent))]
         public bool EnableDebugLogs = false;
 
-        [JsonIgnore]
-        public UnityAction<int> onGameModeChanged;
+        //[JsonIgnore]
+        internal UnityAction<int> onGameModeChanged;
 
         [Keybind("Open/Close FCS PDA"), OnChange(nameof(PDAKeyCodeChangedEvent))]
         public KeyCode FCSPDAKeyCode  = KeyCode.F2;
@@ -47,7 +43,7 @@ namespace FCS_AlterraHub.Configuration
             OnPlaySoundToggleEvent?.Invoke(e.Value);
         }
 
-        [JsonIgnore]
+        //[JsonIgnore]
         internal Action<bool> OnPlaySoundToggleEvent { get; set; }
 
         [Toggle("[Alterra Transport Drone] Enable Drone Audio", Order = 1, Tooltip = "Enables/Disables the sound effects on the drone.")]
@@ -93,7 +89,7 @@ namespace FCS_AlterraHub.Configuration
                 QuickLogger.DebugLogsEnabled = false;
                 QuickLogger.Info("Debug logs disabled");
             }
-            //QPatch.Configuration.Save();
+            //Main.Configuration.Save();
         }
     }
 

@@ -17,12 +17,12 @@ namespace FCS_EnergySolutions.Patches
             QuickLogger.Debug($"Awake Called on {__instance.gameObject.activeSelf} | {__instance.gameObject.transform.position != Vector3.zero}");
             if (__instance.gameObject.activeSelf && __instance.gameObject.transform.position != Vector3.zero)
             {
-                if (QPatch.Configuration.IsPowerStorageEnabled)
+                if (Main.Configuration.IsPowerStorageEnabled)
                 {
                     __instance.gameObject.AddComponent<BasePowerStorage>();
                 }
 
-                if (QPatch.Configuration.IsTelepowerPylonEnabled)
+                if (Main.Configuration.IsTelepowerPylonEnabled)
                 {
                    var baseTPowerManager = __instance.gameObject.EnsureComponent<BaseTelepowerPylonManager>();
                    baseTPowerManager.SubRoot = __instance;
@@ -40,7 +40,7 @@ namespace FCS_EnergySolutions.Patches
         public static void Postfix(ref SubRoot __instance)
         {
 
-            if (QPatch.Configuration.IsTelepowerPylonEnabled)
+            if (Main.Configuration.IsTelepowerPylonEnabled)
             {
                 var baseTPowerManager = __instance.gameObject.GetComponent<BaseTelepowerPylonManager>();
                 BaseTelepowerPylonManager.UnRegisterPylonManager(baseTPowerManager);

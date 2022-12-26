@@ -23,7 +23,7 @@
       powershell Compress-Archive -Path '$(TargetDir)' -DestinationPath '$(SolutionDir)..\QModZips\$(GameName)\$(ProjectName)$(Configuration).zip' -Force
 
       mkdir "$(GameDir)\QMods\$(ProjectName)"
-      xcopy "$(TargetDir)$(TargetFileName)" "$(GameDir)\QMods\$(ProjectName)\" /Y /I
+      xcopy "$(TargetDir)$(TargetFileName)" "$(GameDir)\BepInEx\plugins\$(ProjectName)\" /Y /I
     </PostBuildEvent>
   </PropertyGroup>
 </Project>

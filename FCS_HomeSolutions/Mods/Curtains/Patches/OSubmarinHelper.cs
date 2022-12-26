@@ -59,7 +59,7 @@
 //        [HarmonyPrefix]
 //        public static bool SetPlaceOnSurface_Prefix( RaycastHit hit, ref Vector3 position, ref Quaternion rotation)
 //        {
-//            if (!QPatch.Configuration.IsCurtainEnabled) return true;
+//            if (!Main.Configuration.IsCurtainEnabled) return true;
 //			GameObject ghostModel = (GameObject)_ghostModel.GetValue(null);
 //            QuickLogger.Debug($"SetPlaceOnSurface {ghostModel.name}", true);
 //            if (ghostModel?.name != null && ghostModel.name.StartsWith(ModelName))
@@ -82,7 +82,7 @@
 //        [HarmonyPrefix]
 //        public static bool UpdateAllowed_Postfix(ref bool __result)
 //        {
-//            if (!QPatch.Configuration.IsCurtainEnabled) return true;
+//            if (!Main.Configuration.IsCurtainEnabled) return true;
 
 //            GameObject ghostModel = (GameObject)_ghostModel.GetValue(null);
 //            if (ghostModel?.name != null && ghostModel.name.StartsWith(ModelName))
@@ -117,7 +117,7 @@
 //        [HarmonyPostfix]
 //        public static void CheckSurfaceType_Postfix(ref bool __result, SurfaceType surfaceType)
 //		{
-//            if (!QPatch.Configuration.IsCurtainEnabled) return;
+//            if (!Main.Configuration.IsCurtainEnabled) return;
 
 //            GameObject ghostModel = (GameObject)_ghostModel.GetValue(null);
 

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
+using BepInEx;
 using DataStorageSolutions.Patches;
 using FCS_AlterraHub.Registration;
 using FCS_StorageSolutions.Configuration;
@@ -8,8 +10,6 @@ using FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Spawnable;
 using FCSCommon.Utilities;
 using HarmonyLib;
-using QModManager.API;
-using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
 
 namespace FCS_StorageSolutions
@@ -18,19 +18,27 @@ namespace FCS_StorageSolutions
      * Storage Solutions is a pack of Subnautica Mods that allow you to store items in the game.
      * This mod can be configured to show certain mods before runtime and can only be changed before runtime.
      */
-    [QModCore]
-    public class QPatch
+    [BepInPlugin(GUID, MODNAME, VERSION)]
+    public class Main : BaseUnityPlugin
     {
+        #region [Declarations]
+
+        public const string
+            MODNAME = "FCS_StorageSolutions",
+            AUTHOR = "FieldCreatorsStudios",
+            GUID = AUTHOR + "_" + MODNAME,
+            VERSION = "1.0.0.0";
         internal static Config Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<Config>();
         public static bool IsDockedVehicleStorageAccessInstalled { get; set; }
+        #endregion
 
-        [QModPatch]
-        public void Patch()
+
+        private void Awake()
         {
             FCSAlterraHubService.PublicAPI.RegisterModPack(Mod.ModPackID, Mod.ModBundleName, Assembly.GetExecutingAssembly());
             FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(Mod.ModPackID);
 
-            IsDockedVehicleStorageAccessInstalled = QModServices.Main.ModPresent("DockedVehicleStorageAccess");
+            IsDockedVehicleStorageAccessInstalled = BepInEx.Bootstrap.Chainloader.PluginInfos.Values.Any(x => x.Metadata.Name.Equals("DockedVehicleStorageAccess"));
 
 
             ModelPrefab.Initialize();

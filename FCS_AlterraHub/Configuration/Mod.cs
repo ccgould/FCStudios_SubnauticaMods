@@ -24,11 +24,7 @@ using Object = UnityEngine.Object;
 using UWE;
 using FMOD;
 using static GameAchievements;
-#if SUBNAUTICA_STABLE
-using Oculus.Newtonsoft.Json;
-#else
 using Newtonsoft.Json;
-#endif
 
 
 namespace FCS_AlterraHub.Configuration
@@ -232,7 +228,7 @@ namespace FCS_AlterraHub.Configuration
             }
         }
 
-        public static Dictionary<string, Sound> AudioClips = new();
+        //public static Dictionary<string, Sound> AudioClips = new();
         private static AccountDetails _tempAccountDetails;
         private static FCSGamePlaySettings _gamePlaySettings;
         public static TechType FCSDataBoxTechType { get; set; }
@@ -448,12 +444,12 @@ namespace FCS_AlterraHub.Configuration
             return null;
         }
 
-        public static void LoadAudioFiles()
-        {
-            AudioClips.Add("AH-Mission01-Pt1", AudioUtils.CreateSound(Path.Combine(GetAssetPath(), "Audio", "AH-Mission01-Pt1.wav")));
-            AudioClips.Add("AH-Mission01-Pt2", AudioUtils.CreateSound(Path.Combine(GetAssetPath(), "Audio", "AH-Mission01-Pt2.wav")));
-            AudioClips.Add("AH-Mission01-Pt3", AudioUtils.CreateSound(Path.Combine(GetAssetPath(), "Audio", "AH-Mission01-Pt3.wav")));
-        }
+        //public static void LoadAudioFiles()
+        //{
+        //    AudioClips.Add("AH-Mission01-Pt1", AudioUtils.CreateSound(Path.Combine(GetAssetPath(), "Audio", "AH-Mission01-Pt1.wav")));
+        //    AudioClips.Add("AH-Mission01-Pt2", AudioUtils.CreateSound(Path.Combine(GetAssetPath(), "Audio", "AH-Mission01-Pt2.wav")));
+        //    AudioClips.Add("AH-Mission01-Pt3", AudioUtils.CreateSound(Path.Combine(GetAssetPath(), "Audio", "AH-Mission01-Pt3.wav")));
+        //}
 
         public static PingType AlterraHubStationPingType { get; set; }
         public static TechType DronePortPadHubNewTechType { get; set; }

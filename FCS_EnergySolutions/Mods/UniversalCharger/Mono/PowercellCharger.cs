@@ -40,8 +40,9 @@ namespace FCS_EnergySolutions.Mods.UniversalCharger.Mono
             this.ui = _mono.GetUI();
             this.uiPowered = GameObjectHelpers.FindGameObject(_mono.gameObject, "Powered");
             this.uiUnpowered = GameObjectHelpers.FindGameObject(_mono.gameObject, "UnPowered");
-            this.uiUnpoweredText = uiUnpowered.GetComponentInChildren<Text>();
-            
+            //TODO V2 Fix
+            //this.uiUnpoweredText = uiUnpowered.GetComponentInChildren<Text>();
+
             if (this.slotDefinitions == null)
             {
                 slotDefinitions = new();
@@ -81,7 +82,8 @@ namespace FCS_EnergySolutions.Mods.UniversalCharger.Mono
                 {
                     id = slotName,
                     bar = _uiBatteries[index].FindChild("BatteryFill").GetComponent<Image>(),
-                    text = _uiBatteries[index].GetComponentInChildren<Text>()
+                    //TODO V2 Fix
+                    //text = _uiBatteries[index].GetComponentInChildren<Text>()
                 });
             }
 

@@ -137,85 +137,85 @@ namespace FCS_AlterraHub.Buildables
 
                     QuickLogger.Debug("GetPrefabs");
                     
-                    if (!LoadAssetV2("fcsPDA", QPatch.GlobalBundle, out var fcsPDAPrefab)) return false;
+                    if (!LoadAssetV2("fcsPDA", Main.GlobalBundle, out var fcsPDAPrefab)) return false;
                     FcsPDAPrefab = fcsPDAPrefab;                    
                     
-                    if (!LoadAssetV2("RadialMenuEntry", QPatch.GlobalBundle, out var pdaRadialMenuEntryPrefab)) return false;
+                    if (!LoadAssetV2("RadialMenuEntry", Main.GlobalBundle, out var pdaRadialMenuEntryPrefab)) return false;
                     PDARadialMenuEntryPrefab = pdaRadialMenuEntryPrefab;
 
-                    if (!LoadAsset(Mod.CardPrefabName, QPatch.GlobalBundle,out var cardPrefabGo)) return false;
+                    if (!LoadAsset(Mod.CardPrefabName, Main.GlobalBundle,out var cardPrefabGo)) return false;
                     DebitCardPrefab = cardPrefabGo;
                     
-                    if (!LoadAsset(Mod.KitPrefabName, QPatch.GlobalBundle, out var kitPrefabGo)) return false; 
+                    if (!LoadAsset(Mod.KitPrefabName, Main.GlobalBundle, out var kitPrefabGo)) return false; 
                     KitPrefab = kitPrefabGo;
 
 
-                    if (!LoadAsset("CartItem", QPatch.GlobalBundle, out var cartItemPrefabGo)) return false;
+                    if (!LoadAsset("CartItem", Main.GlobalBundle, out var cartItemPrefabGo)) return false;
                     CartItemPrefab = cartItemPrefabGo;
 
 
-                    if (!LoadAssetV2("AlterraHubDepot", QPatch.GlobalBundle, out var alterraHubDepotPrefab)) return false;
+                    if (!LoadAssetV2("AlterraHubDepot", Main.GlobalBundle, out var alterraHubDepotPrefab)) return false;
                     AlterraHubDepotPrefab = alterraHubDepotPrefab;
                     
-                    if (!LoadAsset("StoreItem", QPatch.GlobalBundle, out var itemPrefabGo)) return false;
+                    if (!LoadAsset("StoreItem", Main.GlobalBundle, out var itemPrefabGo)) return false;
                     ItemPrefab = itemPrefabGo;
 
-                    if (!LoadAsset("MissionMessageBox", QPatch.GlobalBundle, out var missionMessageBox, false)) return false;
+                    if (!LoadAsset("MissionMessageBox", Main.GlobalBundle, out var missionMessageBox, false)) return false;
                     MissionMessageBoxPrefab = missionMessageBox;
 
-                    if (!LoadSpriteAsset("arrowUp", QPatch.GlobalBundle, out var arrowUp)) return false;
+                    if (!LoadSpriteAsset("arrowUp", Main.GlobalBundle, out var arrowUp)) return false;
                     UpArrow = arrowUp;
 
-                    if (!LoadSpriteAsset("arrowDown", QPatch.GlobalBundle, out var arrowDown)) return false;
+                    if (!LoadSpriteAsset("arrowDown", Main.GlobalBundle, out var arrowDown)) return false;
                     DownArrow = arrowDown;
 
-                    if (!LoadAsset("EncyclopediaEntry", QPatch.GlobalBundle, out var encyclopediaEntryPrefab)) return false;
+                    if (!LoadAsset("EncyclopediaEntry", Main.GlobalBundle, out var encyclopediaEntryPrefab)) return false;
                     AddComponentsToEncyclopediaEntry(encyclopediaEntryPrefab);
                     EncyclopediaEntryPrefab = encyclopediaEntryPrefab;                    
                     
-                    if (!LoadAsset(Mod.AlterraHubStationPrefabName, QPatch.GlobalBundle, out var alterraHubFabricatorPrefab)) return false;
+                    if (!LoadAsset(Mod.AlterraHubStationPrefabName, Main.GlobalBundle, out var alterraHubFabricatorPrefab)) return false;
                     AlterraHubFabricatorPrefab = alterraHubFabricatorPrefab;
 
-                    if (!LoadAsset("PDAShipmentItem", QPatch.GlobalBundle, out var pdaShipmentItemPrefab,false)) return false;
+                    if (!LoadAsset("PDAShipmentItem", Main.GlobalBundle, out var pdaShipmentItemPrefab,false)) return false;
                      PDAShipmentItemPrefab = pdaShipmentItemPrefab;
 
 
-                     if (!LoadAsset("PDAShipmentItemNode", QPatch.GlobalBundle, out var pdaShipmentItemNodePrefab, false)) return false;
+                     if (!LoadAsset("PDAShipmentItemNode", Main.GlobalBundle, out var pdaShipmentItemNodePrefab, false)) return false;
                      PDAShipmentItemNodePrefab = pdaShipmentItemNodePrefab;
 
-                    if (!LoadAsset("PDATeleportItem", QPatch.GlobalBundle, out var pdaTeleportItemPrefab, false)) return false;
+                    if (!LoadAsset("PDATeleportItem", Main.GlobalBundle, out var pdaTeleportItemPrefab, false)) return false;
                      PDATeleportItemPrefab = pdaTeleportItemPrefab;
 
 
-                    if (!LoadAsset("AlterraHubDepotItem", QPatch.GlobalBundle, out var alterraHubDepotItemPrefab)) return false;
+                    if (!LoadAsset("AlterraHubDepotItem", Main.GlobalBundle, out var alterraHubDepotItemPrefab)) return false;
                     AlterraHubDepotItemPrefab = alterraHubDepotItemPrefab;                    
                     
-                    if (!LoadAsset("uGUI_PDAScreen", QPatch.GlobalBundle, out var pdaCanvas)) return false;
+                    if (!LoadAsset("uGUI_PDAScreen", Main.GlobalBundle, out var pdaCanvas)) return false;
                     PDAScreenPrefab = pdaCanvas;
 
-                    if (!LoadSpriteAsset("EncyclopediaEntryBackgroundHover", QPatch.GlobalBundle, out var hovered)) return false;
+                    if (!LoadSpriteAsset("EncyclopediaEntryBackgroundHover", Main.GlobalBundle, out var hovered)) return false;
                     EncyclopediaEntryBackgroundHover = hovered;
-                    if (!LoadSpriteAsset("EncyclopediaEntryBackgroundSelected", QPatch.GlobalBundle, out var selected)) return false;
+                    if (!LoadSpriteAsset("EncyclopediaEntryBackgroundSelected", Main.GlobalBundle, out var selected)) return false;
                     EncyclopediaEntryBackgroundSelected = selected;
-                    if (!LoadSpriteAsset("EncyclopediaEntryBackgroundNormal", QPatch.GlobalBundle, out var normal)) return false;
+                    if (!LoadSpriteAsset("EncyclopediaEntryBackgroundNormal", Main.GlobalBundle, out var normal)) return false;
                     EncyclopediaEntryBackgroundNormal = normal;
 
-                    if (!LoadAssetV2("DronePortPad_HubNew", QPatch.GlobalBundle, out var dronePortPadHubNewPrefab)) return false;
+                    if (!LoadAssetV2("DronePortPad_HubNew", Main.GlobalBundle, out var dronePortPadHubNewPrefab)) return false;
                     DronePortPadHubNewPrefab = dronePortPadHubNewPrefab;
 
-                    if (!LoadAssetV2("AlterraHubTransportDrone", QPatch.GlobalBundle, out var alterraHubTransportDronePrefab)) return false;
+                    if (!LoadAssetV2("AlterraHubTransportDrone", Main.GlobalBundle, out var alterraHubTransportDronePrefab)) return false;
                     AlterraHubTransportDronePrefab = alterraHubTransportDronePrefab;
 
-                    if (!LoadAssetV2("BLUEPRINT_DATA_DISC", QPatch.GlobalBundle, out var blueprintDataDiscPrefab)) return false;
+                    if (!LoadAssetV2("BLUEPRINT_DATA_DISC", Main.GlobalBundle, out var blueprintDataDiscPrefab)) return false;
                     BluePrintDataDiscPrefab = blueprintDataDiscPrefab;                    
                     
-                    if (!LoadAsset("ImageSelectorItem", QPatch.GlobalBundle, out var imageSelectorItemPrefab,false)) return false;
+                    if (!LoadAsset("ImageSelectorItem", Main.GlobalBundle, out var imageSelectorItemPrefab,false)) return false;
                     ImageSelectorItemPrefab = imageSelectorItemPrefab;
 
-                    if (!LoadAsset("ImageSelectorUI", QPatch.GlobalBundle, out var imageSelectorPrefab, false)) return false;
+                    if (!LoadAsset("ImageSelectorUI", Main.GlobalBundle, out var imageSelectorPrefab, false)) return false;
                     ImageSelectorHUDPrefab = imageSelectorPrefab;
 
-                    if (!LoadAssetV2("fcs_BlueprintBox", QPatch.GlobalBundle, out var fcsDataBox)) return false;
+                    if (!LoadAssetV2("fcs_BlueprintBox", Main.GlobalBundle, out var fcsDataBox)) return false;
                     DataBoxPrefab = fcsDataBox;
                     
                     _initialized = true;
@@ -238,9 +238,11 @@ namespace FCS_AlterraHub.Buildables
             encyclopediaEntryPrefab.SetActive(false);
             var listEntry = encyclopediaEntryPrefab.AddComponent<uGUI_ListEntry>();
             listEntry.layoutElement = encyclopediaEntryPrefab.FindChild("ImageContainer").GetComponentInChildren<LayoutElement>();
-#if SUBNAUTICA
-            listEntry.text = encyclopediaEntryPrefab.GetComponentInChildren<Text>();
-#endif
+
+            //TODO V2 Find Fix
+            //#if SUBNAUTICA
+//            listEntry.text = encyclopediaEntryPrefab.GetComponentInChildren<Text>();
+//#endif
             listEntry.icon = encyclopediaEntryPrefab.FindChild("ImageContainer").FindChild("Arrow").GetComponent<Image>();
             listEntry.background = encyclopediaEntryPrefab.GetComponent<Image>();
             encyclopediaEntryPrefab.SetActive(true);
@@ -413,121 +415,121 @@ namespace FCS_AlterraHub.Buildables
 
         public static void ApplyShadersV2(GameObject prefab)
         {
-            ApplyShadersV2(prefab,QPatch.GlobalBundle);
+            ApplyShadersV2(prefab,Main.GlobalBundle);
         }
 
         public static void LoadV2Materials()
         {
             if (_v2MaterialsLoaded) return;
 
-            if (QPatch.GlobalBundle == null)
+            if (Main.GlobalBundle == null)
             {
-                QPatch.GlobalBundle = FCSAssetBundlesService.PublicAPI.GetAssetBundleByName(Mod.AssetBundleName);
+                Main.GlobalBundle = FCSAssetBundlesService.PublicAPI.GetAssetBundleByName(Mod.AssetBundleName);
             }
 
-            if (QPatch.GlobalBundle == null)
+            if (Main.GlobalBundle == null)
             {
                 QuickLogger.Error($"[LoadV2Materials] GlobalBundle returned null stopping process");
                 return;
             }
 
             #region BasePrimaryCol
-            Material basePrimaryCol = QPatch.GlobalBundle.LoadAsset<Material>(BasePrimaryCol);
-            MaterialHelpers.CreateV2NormalMaterial(basePrimaryCol, TBaseColorNormal, QPatch.GlobalBundle);
-            MaterialHelpers.CreateV2Specular(basePrimaryCol, TBaseColorSpec, 1, 3, QPatch.GlobalBundle);
+            Material basePrimaryCol = Main.GlobalBundle.LoadAsset<Material>(BasePrimaryCol);
+            MaterialHelpers.CreateV2NormalMaterial(basePrimaryCol, TBaseColorNormal, Main.GlobalBundle);
+            MaterialHelpers.CreateV2Specular(basePrimaryCol, TBaseColorSpec, 1, 3, Main.GlobalBundle);
             _v2Materials.Add(BasePrimaryCol, basePrimaryCol);
             #endregion
 
             #region BaseSecondaryCol
-            Material baseSecondaryCol = QPatch.GlobalBundle.LoadAsset<Material>(BaseSecondaryCol);
-            MaterialHelpers.CreateV2NormalMaterial(baseSecondaryCol, TBaseColorNormal, QPatch.GlobalBundle);
-            MaterialHelpers.CreateV2Specular(baseSecondaryCol, TBaseColorSpec, 1, 3, QPatch.GlobalBundle);
+            Material baseSecondaryCol = Main.GlobalBundle.LoadAsset<Material>(BaseSecondaryCol);
+            MaterialHelpers.CreateV2NormalMaterial(baseSecondaryCol, TBaseColorNormal, Main.GlobalBundle);
+            MaterialHelpers.CreateV2Specular(baseSecondaryCol, TBaseColorSpec, 1, 3, Main.GlobalBundle);
 
             _v2Materials.Add(BaseSecondaryCol, baseSecondaryCol);
             #endregion
             
             #region BaseTexDecals
-            Material baseTexDecals = QPatch.GlobalBundle.LoadAsset<Material>(BaseTexDecals);
-            MaterialHelpers.CreateV2NormalMaterial(baseTexDecals, TBaseNormal, QPatch.GlobalBundle);
-            MaterialHelpers.CreateV2ApplyAlphaMaterial(baseTexDecals, QPatch.GlobalBundle);
-            MaterialHelpers.CreateV2Specular(baseTexDecals, TBaseSpec, 1, 3, QPatch.GlobalBundle);
+            Material baseTexDecals = Main.GlobalBundle.LoadAsset<Material>(BaseTexDecals);
+            MaterialHelpers.CreateV2NormalMaterial(baseTexDecals, TBaseNormal, Main.GlobalBundle);
+            MaterialHelpers.CreateV2ApplyAlphaMaterial(baseTexDecals, Main.GlobalBundle);
+            MaterialHelpers.CreateV2Specular(baseTexDecals, TBaseSpec, 1, 3, Main.GlobalBundle);
             _v2Materials.Add(BaseTexDecals, baseTexDecals);
             #endregion
 
             #region BaseLightsEmissiveController
-            Material baseLightsEmissiveController = QPatch.GlobalBundle.LoadAsset<Material>(BaseLightsEmissiveController);
-            MaterialHelpers.CreateV2NormalMaterial(baseLightsEmissiveController, TBaseNormal, QPatch.GlobalBundle);
-            MaterialHelpers.CreateV2ApplyAlphaMaterial(baseLightsEmissiveController, QPatch.GlobalBundle);
-            MaterialHelpers.CreateV2EmissionMaterial(baseLightsEmissiveController, TBaseEmission, QPatch.GlobalBundle, Color.white);
+            Material baseLightsEmissiveController = Main.GlobalBundle.LoadAsset<Material>(BaseLightsEmissiveController);
+            MaterialHelpers.CreateV2NormalMaterial(baseLightsEmissiveController, TBaseNormal, Main.GlobalBundle);
+            MaterialHelpers.CreateV2ApplyAlphaMaterial(baseLightsEmissiveController, Main.GlobalBundle);
+            MaterialHelpers.CreateV2EmissionMaterial(baseLightsEmissiveController, TBaseEmission, Main.GlobalBundle, Color.white);
             _v2Materials.Add(BaseLightsEmissiveController, baseLightsEmissiveController);
             #endregion
 
             #region BaseDecalsEmissiveController
-            Material baseDecalsEmissiveController = QPatch.GlobalBundle.LoadAsset<Material>(BaseDecalsEmissiveController);
-            MaterialHelpers.CreateV2NormalMaterial(baseDecalsEmissiveController, TBaseNormal, QPatch.GlobalBundle);
-            MaterialHelpers.CreateV2ApplyAlphaMaterial(baseDecalsEmissiveController, QPatch.GlobalBundle);
-            MaterialHelpers.CreateV2EmissionMaterial(baseDecalsEmissiveController, TBaseEmission, QPatch.GlobalBundle, Color.white);
+            Material baseDecalsEmissiveController = Main.GlobalBundle.LoadAsset<Material>(BaseDecalsEmissiveController);
+            MaterialHelpers.CreateV2NormalMaterial(baseDecalsEmissiveController, TBaseNormal, Main.GlobalBundle);
+            MaterialHelpers.CreateV2ApplyAlphaMaterial(baseDecalsEmissiveController, Main.GlobalBundle);
+            MaterialHelpers.CreateV2EmissionMaterial(baseDecalsEmissiveController, TBaseEmission, Main.GlobalBundle, Color.white);
             _v2Materials.Add(BaseDecalsEmissiveController, baseDecalsEmissiveController);
             #endregion
             
             #region BaseFloor01Interior
-            Material baseFloor01Interior = QPatch.GlobalBundle.LoadAsset<Material>(BaseFloor01Interior);
-            MaterialHelpers.CreateV2NormalMaterial(baseFloor01Interior, TFloorNormal, QPatch.GlobalBundle);
-            MaterialHelpers.CreateV2EmissionMaterial(baseFloor01Interior, TFloorEmission, QPatch.GlobalBundle, Color.white);
+            Material baseFloor01Interior = Main.GlobalBundle.LoadAsset<Material>(BaseFloor01Interior);
+            MaterialHelpers.CreateV2NormalMaterial(baseFloor01Interior, TFloorNormal, Main.GlobalBundle);
+            MaterialHelpers.CreateV2EmissionMaterial(baseFloor01Interior, TFloorEmission, Main.GlobalBundle, Color.white);
             _v2Materials.Add(BaseFloor01Interior, baseFloor01Interior);
             #endregion
 
             #region BaseFloor01Exterior
-            Material baseFloor01Exterior = QPatch.GlobalBundle.LoadAsset<Material>(BaseFloor01Exterior);
-            MaterialHelpers.CreateV2NormalMaterial(baseFloor01Exterior, TFloorNormal, QPatch.GlobalBundle);
+            Material baseFloor01Exterior = Main.GlobalBundle.LoadAsset<Material>(BaseFloor01Exterior);
+            MaterialHelpers.CreateV2NormalMaterial(baseFloor01Exterior, TFloorNormal, Main.GlobalBundle);
             _v2Materials.Add(BaseFloor01Exterior, baseFloor01Exterior);
             #endregion
 
             #region BaseFloor02Exterior
-            Material baseFloor02Exterior = QPatch.GlobalBundle.LoadAsset<Material>(BaseFloor02Exterior);
-            MaterialHelpers.CreateV2ApplyAlphaMaterial(baseFloor02Exterior, QPatch.GlobalBundle);
-            MaterialHelpers.CreateV2NormalMaterial(baseFloor02Exterior, TFloor2Normal, QPatch.GlobalBundle);
-            MaterialHelpers.CreateV2Specular(baseFloor02Exterior, TFloor2Spec, 1, 3, QPatch.GlobalBundle);
+            Material baseFloor02Exterior = Main.GlobalBundle.LoadAsset<Material>(BaseFloor02Exterior);
+            MaterialHelpers.CreateV2ApplyAlphaMaterial(baseFloor02Exterior, Main.GlobalBundle);
+            MaterialHelpers.CreateV2NormalMaterial(baseFloor02Exterior, TFloor2Normal, Main.GlobalBundle);
+            MaterialHelpers.CreateV2Specular(baseFloor02Exterior, TFloor2Spec, 1, 3, Main.GlobalBundle);
             _v2Materials.Add(BaseFloor02Exterior, baseFloor02Exterior);
             #endregion
 
             #region BaseOpaqueInterior
-            Material baseOpaqueInterior = QPatch.GlobalBundle.LoadAsset<Material>(BaseOpaqueInterior);
-            MaterialHelpers.CreateV2NormalMaterial(baseOpaqueInterior, TBaseNormal, QPatch.GlobalBundle);
-            MaterialHelpers.CreateV2EmissionMaterial(baseOpaqueInterior, TEmissionInterior, QPatch.GlobalBundle, Color.white);
-            MaterialHelpers.CreateV2Specular(baseOpaqueInterior, TBaseSpec, 1, 3, QPatch.GlobalBundle);
+            Material baseOpaqueInterior = Main.GlobalBundle.LoadAsset<Material>(BaseOpaqueInterior);
+            MaterialHelpers.CreateV2NormalMaterial(baseOpaqueInterior, TBaseNormal, Main.GlobalBundle);
+            MaterialHelpers.CreateV2EmissionMaterial(baseOpaqueInterior, TEmissionInterior, Main.GlobalBundle, Color.white);
+            MaterialHelpers.CreateV2Specular(baseOpaqueInterior, TBaseSpec, 1, 3, Main.GlobalBundle);
             _v2Materials.Add(BaseOpaqueInterior, baseOpaqueInterior);
             #endregion
 
             #region BaseOpaqueExterior
-            Material baseOpaqueExterior = QPatch.GlobalBundle.LoadAsset<Material>(BaseOpaqueExterior);
-            MaterialHelpers.CreateV2NormalMaterial(baseOpaqueExterior, TBaseNormal, QPatch.GlobalBundle);
-            MaterialHelpers.CreateV2Specular(baseOpaqueExterior, TBaseSpec, 1, 3, QPatch.GlobalBundle);
+            Material baseOpaqueExterior = Main.GlobalBundle.LoadAsset<Material>(BaseOpaqueExterior);
+            MaterialHelpers.CreateV2NormalMaterial(baseOpaqueExterior, TBaseNormal, Main.GlobalBundle);
+            MaterialHelpers.CreateV2Specular(baseOpaqueExterior, TBaseSpec, 1, 3, Main.GlobalBundle);
             _v2Materials.Add(BaseOpaqueExterior, baseOpaqueExterior);
             #endregion
 
             #region BaseDecalsInterior
-            Material baseDecalsInterior = QPatch.GlobalBundle.LoadAsset<Material>(BaseDecalsInterior);
-            MaterialHelpers.CreateV2ApplyAlphaMaterial(baseDecalsInterior, QPatch.GlobalBundle);
-            MaterialHelpers.CreateV2NormalMaterial(baseDecalsInterior, TBaseNormal, QPatch.GlobalBundle);
-            MaterialHelpers.CreateV2EmissionMaterial(baseDecalsInterior, TEmissionInterior, QPatch.GlobalBundle, Color.white);
-            MaterialHelpers.CreateV2Specular(baseDecalsInterior, TBaseSpec, 1, 3, QPatch.GlobalBundle);
+            Material baseDecalsInterior = Main.GlobalBundle.LoadAsset<Material>(BaseDecalsInterior);
+            MaterialHelpers.CreateV2ApplyAlphaMaterial(baseDecalsInterior, Main.GlobalBundle);
+            MaterialHelpers.CreateV2NormalMaterial(baseDecalsInterior, TBaseNormal, Main.GlobalBundle);
+            MaterialHelpers.CreateV2EmissionMaterial(baseDecalsInterior, TEmissionInterior, Main.GlobalBundle, Color.white);
+            MaterialHelpers.CreateV2Specular(baseDecalsInterior, TBaseSpec, 1, 3, Main.GlobalBundle);
             _v2Materials.Add(BaseDecalsInterior, baseDecalsInterior);
             #endregion
 
             #region BaseDecalsExterior
-            Material baseDecalsExterior = QPatch.GlobalBundle.LoadAsset<Material>(BaseDecalsExterior);
-            MaterialHelpers.CreateV2NormalMaterial(baseDecalsExterior, TBaseNormal, QPatch.GlobalBundle);
-            MaterialHelpers.CreateV2ApplyAlphaMaterial(baseDecalsExterior, QPatch.GlobalBundle);
-            MaterialHelpers.CreateV2Specular(baseDecalsExterior, TBaseSpec, 1, 3, QPatch.GlobalBundle);
+            Material baseDecalsExterior = Main.GlobalBundle.LoadAsset<Material>(BaseDecalsExterior);
+            MaterialHelpers.CreateV2NormalMaterial(baseDecalsExterior, TBaseNormal, Main.GlobalBundle);
+            MaterialHelpers.CreateV2ApplyAlphaMaterial(baseDecalsExterior, Main.GlobalBundle);
+            MaterialHelpers.CreateV2Specular(baseDecalsExterior, TBaseSpec, 1, 3, Main.GlobalBundle);
             _v2Materials.Add(BaseDecalsExterior, baseDecalsExterior);
             #endregion
 
             #region BaseBeaconLightEmissiveController
-            Material baseBeaconLightsEmissiveController = QPatch.GlobalBundle.LoadAsset<Material>(BaseBeaconLightEmissiveController);
-            MaterialHelpers.CreateV2NormalMaterial(baseBeaconLightsEmissiveController, TBaseNormal, QPatch.GlobalBundle);
-            MaterialHelpers.CreateV2ApplyAlphaMaterial(baseBeaconLightsEmissiveController, QPatch.GlobalBundle);
-            MaterialHelpers.CreateV2EmissionMaterial(baseBeaconLightsEmissiveController, TBaseEmission, QPatch.GlobalBundle, Color.red);
+            Material baseBeaconLightsEmissiveController = Main.GlobalBundle.LoadAsset<Material>(BaseBeaconLightEmissiveController);
+            MaterialHelpers.CreateV2NormalMaterial(baseBeaconLightsEmissiveController, TBaseNormal, Main.GlobalBundle);
+            MaterialHelpers.CreateV2ApplyAlphaMaterial(baseBeaconLightsEmissiveController, Main.GlobalBundle);
+            MaterialHelpers.CreateV2EmissionMaterial(baseBeaconLightsEmissiveController, TBaseEmission, Main.GlobalBundle, Color.red);
             _v2Materials.Add(BaseBeaconLightEmissiveController, baseBeaconLightsEmissiveController);
             #endregion
 
@@ -554,6 +556,12 @@ namespace FCS_AlterraHub.Buildables
         private static void ReplaceShadersV2(GameObject prefab,string materialName)
         {
 
+            if (prefab is null)
+            {
+                QuickLogger.Error("Prefab was null when trying to replace shaders V2");
+                return;
+            }
+
             LoadV2Materials();
 
             Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>(true);
@@ -562,6 +570,7 @@ namespace FCS_AlterraHub.Buildables
 
             foreach (Renderer renderer in renderers)
             {
+                if(renderer != null) continue;
                 //QuickLogger.Debug($"Processing: {renderer.name} Materials Count: {renderer.materials.Length}");
 
                 for (var index = 0; index < renderer.materials.Length; index++)
@@ -609,7 +618,7 @@ namespace FCS_AlterraHub.Buildables
 
         public static GameObject GetPrefab(string prefabName)
         {
-            LoadAssetV2(prefabName, QPatch.GlobalBundle, out var result);
+            LoadAssetV2(prefabName, Main.GlobalBundle, out var result);
             return result;
         }
     }

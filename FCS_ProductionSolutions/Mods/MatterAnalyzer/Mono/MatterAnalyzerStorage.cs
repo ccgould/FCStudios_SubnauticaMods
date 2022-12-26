@@ -45,34 +45,12 @@ namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono
 
                 if (growingPlant != null)
                 {
-#if SUBNAUTICA
-                    var pickPrefab = GetPickPrefab(growingPlant);
-                    
-                    if (pickPrefab != null)
-                    {
-                        QuickLogger.Debug($"PickPrefab: {Language.main.Get(pickPrefab.pickTech)}", true);
-                        _device.PickTech = pickPrefab.pickTech;
-                        pickTypeSet = true;
-                    }
-                    else
-                    {
-                        QuickLogger.Debug($"PickPrefab Not Found Checking Pickupable", true);
-                        var pickup = growingPlant.grownModelPrefab.GetComponentInChildren<Pickupable>();
-                        if (pickup != null)
-                        {
-                            QuickLogger.Debug($"Pickup: {Language.main.Get(pickup.GetTechType())}", true);
-                            _device.PickTech = pickup.GetTechType();
-                            pickTypeSet = true;
-                        }
-                    }
-#else
                     if (growingPlant.plantTechType != TechType.None)
                     {
                         QuickLogger.Debug($"Pickup: {Language.main.Get(growingPlant.plantTechType)}", true);
                         _device.PickTech = growingPlant.plantTechType;
                         pickTypeSet = true;
                     }
-#endif
 
                     if (!pickTypeSet)
                     {
@@ -96,12 +74,6 @@ namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono
             return true;
         }
 
-#if SUBNAUTICA
-        private static PickPrefab GetPickPrefab(GrowingPlant growingPlant)
-        {
-            return growingPlant.grownModelPrefab.GetComponentInChildren<PickPrefab>();
-        }
-#endif
 
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {

@@ -14,7 +14,7 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Patches
         public static bool OnHandHover_Prefix(StorageContainer __instance, ref GUIHand hand)
         {
             //return false to skip execution of the original.
-            if (!QPatch.Configuration.IsSeaBreezeEnabled) return true;
+            if (!Main.Configuration.IsSeaBreezeEnabled) return true;
             return !__instance.gameObject.name.StartsWith(SeaBreezeBuildable.SeaBreezeClassID, StringComparison.OrdinalIgnoreCase);
         }
 
@@ -23,7 +23,7 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Patches
         public static bool OnHandClick_Prefix(StorageContainer __instance, ref GUIHand guiHand)
         {
             //return false to skip execution of the original.
-            if (!QPatch.Configuration.IsSeaBreezeEnabled) return true;
+            if (!Main.Configuration.IsSeaBreezeEnabled) return true;
             return !__instance.gameObject.name.StartsWith(SeaBreezeBuildable.SeaBreezeClassID, StringComparison.OrdinalIgnoreCase);
         }
     }

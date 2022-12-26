@@ -109,7 +109,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
             if (_isRangeVisible)
             {
                 CreatePoints(Mathf.Clamp(_currentDistance + DayNightCycle.main.deltaTime * LerpSpeed * 1, 0,
-                    QPatch.Configuration.DDDrillAlterraStorageRange));
+                    Main.Configuration.DDDrillAlterraStorageRange));
             }
             else
             {
@@ -410,12 +410,8 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
                     Mathf.RoundToInt(DeepDrillerPowerManager.GetSourcePower(DeepDrillerPowerSources.Solar)),
                     Mathf.RoundToInt(DeepDrillerPowerManager.GetSourcePowerCapacity(DeepDrillerPowerSources.Solar))));
 
-#if SUBNAUTICA
-                HandReticle.main.SetInteractText(_sb.ToString(), AlterraHub.ViewInPDA(),false,false,HandReticle.Hand.None);
-#else
                 _sb.Append(AlterraHub.ViewInPDA());
                 HandReticle.main.SetTextRaw(HandReticle.TextType.Hand, _sb.ToString());
-#endif
                 HandReticle.main.SetIcon(HandReticle.IconType.Info, 1f);
             }
         }
@@ -460,13 +456,9 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
             var result = DeepDrillerContainer.OnlyRemoveItemFromContainer(techType);
 
             if (!result) return null;
-#if SUBNAUTICA_STABLE
-            return techType.ToPickupable();
-#else
             var itemTask = new TaskResult<InventoryItem>();
             CouroutineManager.WaitCoroutine(techType.ToInventoryItem(itemTask));
             return itemTask.Get().item;
-#endif
         }
 
         #endregion

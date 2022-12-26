@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using BepInEx;
 using FCS_AlterraHub.API;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Objects;
@@ -40,7 +41,6 @@ using FCS_HomeSolutions.Mods.TrashRecycler.Buildable;
 using FCS_HomeSolutions.Mods.TV.Buildable;
 using FCSCommon.Utilities;
 using HarmonyLib;
-using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
@@ -58,17 +58,24 @@ namespace FCS_HomeSolutions
 
     //TODO Change the media location to be a list of locations instead of the folder
 
-    [QModCore]
-    public class QPatch
+    [BepInPlugin(GUID, MODNAME, VERSION)]
+    public class Main : BaseUnityPlugin
     {
+        #region [Declarations]
+
+        public const string
+            MODNAME = "FCS_HomenSolutions",
+            AUTHOR = "FieldCreatorsStudios",
+            GUID = AUTHOR + "_" + MODNAME,
+            VERSION = "1.0.0.0";
         internal static Config Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<Config>();
 
         internal static Dictionary<string, Texture2D> Patterns = new();
 
         internal static Dictionary<Texture2D, Sprite> PatternsIcon = new();
-        
-        [QModPatch]
-        public void Patch()
+        #endregion
+
+        private void Awake()
         {
             FCSAlterraHubService.PublicAPI.RegisterModPack(Mod.ModPackID,Mod.ModBundleName, Assembly.GetExecutingAssembly());
             FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(Mod.ModPackID);
@@ -191,14 +198,14 @@ namespace FCS_HomeSolutions
             var sink = new SinkBuildable();
             sink.Patch();
 
-            //var jukeBox = new JukeBoxBuildable();
-            //jukeBox.Patch();
+            var jukeBox = new JukeBoxBuildable();
+            jukeBox.Patch();
 
-            //var jukeboxSpeaker = new JukeBoxSpeakerBuildable();
-            //jukeboxSpeaker.Patch();
+            var jukeboxSpeaker = new JukeBoxSpeakerBuildable();
+            jukeboxSpeaker.Patch();
 
-            //var JukeBoxSubWoofer = new JukeBoxSubWooferBuildable();
-            //JukeBoxSubWoofer.Patch();
+            var JukeBoxSubWoofer = new JukeBoxSubWooferBuildable();
+            JukeBoxSubWoofer.Patch();
 
             if (Configuration.IsHatchStairwayEnabled)
             {
@@ -228,12 +235,7 @@ namespace FCS_HomeSolutions
             PatchBenches();
 
             PatchMiscItems();
-
-            if (Configuration.IsWallPartitionsEnabled)
-            {
-                //PatchWalls();
-            }
-
+            
             var narrowBed = new CrewBunkBedPatcher("FCSCrewBunkBed", "Crew Bunk Bed", "Bunk Bed suitable for small quarters or communal sleeping quarters. Services 2 crew members.", "BunkBed_Kit", "FCS_CrewBunkerBed", 100000);
             narrowBed.Patch();
             
@@ -247,6 +249,8 @@ namespace FCS_HomeSolutions
 
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
+
+            QuickLogger.Info($"Finished patching. Version: {QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly())}");
         }
 
         private void PatchWalls()

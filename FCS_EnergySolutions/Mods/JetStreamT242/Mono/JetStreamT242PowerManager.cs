@@ -102,11 +102,11 @@ namespace FCS_EnergySolutions.Mods.JetStreamT242.Mono
 
         internal float GetBiomeData(string biome)
         {
-            if (QPatch.Configuration.JetStreamT242BiomeSpeeds == null) return 0;
+            if (Main.Configuration.JetStreamT242BiomeSpeeds == null) return 0;
 
             QuickLogger.Debug($"Finding the speed for the biome {biome}",true);
 
-            foreach (KeyValuePair<string, float> biomeSpeed in QPatch.Configuration.JetStreamT242BiomeSpeeds)
+            foreach (KeyValuePair<string, float> biomeSpeed in Main.Configuration.JetStreamT242BiomeSpeeds)
             {
                 if (biome.Trim().StartsWith(biomeSpeed.Key,StringComparison.OrdinalIgnoreCase))
                 {
@@ -210,9 +210,10 @@ namespace FCS_EnergySolutions.Mods.JetStreamT242.Mono
                 }
             }
 
-            if (Input.GetKeyDown(FCS_AlterraHub.QPatch.Configuration.PDAInfoKeyCode))
+            if (Input.GetKeyDown(FCS_AlterraHub.Main.Configuration.PDAInfoKeyCode))
             {
-                FCSPDAController.Main.OpenEncyclopedia(_mono.GetTechType());
+                //TODO V2 FIx
+                //FCSPDAController.Main.OpenEncyclopedia(_mono.GetTechType());
             }
         }
 

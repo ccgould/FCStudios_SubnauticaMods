@@ -16,7 +16,7 @@ using FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
-using Oculus.Newtonsoft.Json;
+using Newtonsoft.Json;
 using SMLHelper.V2.Json.ExtensionMethods;
 using UnityEngine;
 

@@ -2,15 +2,11 @@
 using System.IO;
 using System.Reflection;
 using FCSCommon.Utilities;
-using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Handlers;
+using Newtonsoft.Json;
 
 namespace FCS_ProductionSolutions.Mods.IonCubeGenerator.Configuration
 {
-#if SUBNAUTICA
-#elif BELOWZERO
-    using Newtonsoft.Json;
-#endif
 
     internal class ModConfiguration
     {

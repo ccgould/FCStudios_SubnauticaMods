@@ -188,11 +188,7 @@ namespace FCS_EnergySolutions.Mods.JetStreamT242.Mono
 
         internal float GetDepth()
         {
-#if SUBNAUTICA
-            return gameObject == null ? 0f : Ocean.main.GetDepthOf(gameObject);
-#elif BELOWZERO
             return gameObject == null ? 0f : Ocean.GetDepthOf(gameObject);
-#endif
         }
 
         public void Save(SaveData newSaveData, ProtobufSerializer serializer)

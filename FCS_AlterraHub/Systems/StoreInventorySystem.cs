@@ -54,7 +54,7 @@ namespace FCS_AlterraHub.Systems
             //Price will be calculated by the ingredients of an item if an ingredient is unknown it will apply a default value to that item
             if (OrePrices.ContainsKey(techType))
             {
-                return OrePrices[techType] * (decimal)QPatch.Configuration.OrePayoutMultiplier;
+                return OrePrices[techType] * (decimal)Main.Configuration.OrePayoutMultiplier;
             }
 
             return 0;

@@ -266,7 +266,7 @@ namespace FCS_HomeSolutions.Configuration
             foreach (KeyValuePair<CraftTree.Type, ModCraftTreeRoot> entry in customTrees)
             {
                 QuickLogger.Debug($"Crafting Tree: {entry.Key}");
-                if (QPatch.Configuration.AlienChiefCustomFoodTrees.Contains(entry.Key.ToString()))
+                if (Main.Configuration.AlienChiefCustomFoodTrees.Contains(entry.Key.ToString()))
                 {
                     GetCraftTreeData(entry.Value.CraftNode);
                 }

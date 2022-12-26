@@ -44,11 +44,7 @@ namespace FCS_AlterraHub.Helpers
 
             if (strings == null || main == null) return;
             CreateText(strings);
-#if SUBNAUTICA
-            main.SetInteractTextRaw(Sb.ToString(), AlterraHub.ViewInPDA());
-#else
-            main.SetTextRaw(HandReticle.TextType.Hand , $"{Sb}/n {AlterraHub.ViewInPDA()}");
-#endif
+            main.SetTextRaw(HandReticle.TextType.Hand, $"{Sb}/n {AlterraHub.ViewInPDA()}");
 
         }
 
@@ -68,11 +64,7 @@ namespace FCS_AlterraHub.Helpers
             CreateText(strings);
 
             var text = pda?.Screen.CheckIfPDAHasEntry(techType) ?? false ? AlterraHub.ViewInPDA() : string.Empty;
-#if SUBNAUTICA
-            main.SetInteractTextRaw(Sb.ToString(), text);
-#else
             main.SetTextRaw(HandReticle.TextType.Count, $"{Sb}/n {text}");
-#endif
 
 
             if (icon == HandReticle.IconType.Progress)
@@ -97,11 +89,7 @@ namespace FCS_AlterraHub.Helpers
             CreateText(strings);
 
             var text = pda?.Screen.CheckIfPDAHasEntry(techType) ?? false ? AlterraHub.ViewInPDA() : string.Empty;
-#if SUBNAUTICA
-            main.SetInteractTextRaw(Sb.ToString(), text);
-#else
             main.SetTextRaw(HandReticle.TextType.Count, $"{Sb}/n {text}");
-#endif
 
 
             if (icon == HandReticle.IconType.Progress)

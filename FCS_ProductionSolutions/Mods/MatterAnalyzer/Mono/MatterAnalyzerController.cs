@@ -271,21 +271,14 @@ namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono
             IsInitialized = true;
         }
 
-#if SUBNAUTICA_STABLE
-        private void SetSeed(TechType techType)
-        {
-            Seed = techType.ToInventoryItemLegacy()?.item?.gameObject.GetComponentInChildren<Plantable>();
-        }
-#else
         private IEnumerator SetSeed(TechType techType)
         {
             TaskResult<InventoryItem> taskResult = new TaskResult<InventoryItem>();
-            yield return AsyncExtensions.ToInventoryItemAsync(techType,taskResult);
+            yield return AsyncExtensions.ToInventoryItemAsync(techType, taskResult);
             var inventoryItem = taskResult.Get();
             Seed = inventoryItem?.item?.gameObject.GetComponentInChildren<Plantable>();
             yield break;
         }
-#endif
 
         private void OnIpcMessage(string message)
         {

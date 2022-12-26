@@ -109,8 +109,9 @@ internal class AlterraHubLifePodDronePortController : MonoBehaviour, IDroneDesti
 #if SUBNAUTICA_STABLE
     public DroneController SpawnDrone()
     {
-        var drone = Instantiate(CraftData.GetPrefabForTechType(Mod.AlterraTransportDroneTechType), _spawnPoint.transform.position, _spawnPoint.transform.rotation);
-        _assignedDrone = drone.GetComponent<DroneController>();
+        //TODO V2 Fix
+        //    var drone = Instantiate(CraftData.GetPrefabForTechType(Mod.AlterraTransportDroneTechType), _spawnPoint.transform.position, _spawnPoint.transform.rotation);
+        //    _assignedDrone = drone.GetComponent<DroneController>();
         return _assignedDrone;
     }
 #endif

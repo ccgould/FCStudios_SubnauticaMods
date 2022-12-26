@@ -16,7 +16,7 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Mono
         public Action OnBreakerTripped { get; set; }
         public Action OnBreakerReset { get; set; }
 
-        private readonly float _energyConsumptionPerSecond =QPatch.Configuration.SeaBreezePowerUsage;
+        private readonly float _energyConsumptionPerSecond =Main.Configuration.SeaBreezePowerUsage;
         private float AvailablePower => _connectedRelay.GetPower() + _powercellData.GetCharge();
         public Action OnPowerOutage { get; set; }
         public Action OnPowerResume { get; set; }
@@ -26,7 +26,7 @@ namespace FCS_HomeSolutions.Mods.SeaBreeze.Mono
 
         private SeaBreezeController _mono;
 
-        public bool NotAllowToOperate => !_mono.IsConstructed || _connectedRelay == null || !QPatch.Configuration.SeaBreezeUseBasePower || _powercellData == null;
+        public bool NotAllowToOperate => !_mono.IsConstructed || _connectedRelay == null || !Main.Configuration.SeaBreezeUseBasePower || _powercellData == null;
 
         private PowerRelay _connectedRelay;
         private float _energyToConsume;

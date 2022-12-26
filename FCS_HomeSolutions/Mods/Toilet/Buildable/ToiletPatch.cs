@@ -20,24 +20,7 @@ namespace FCS_HomeSolutions.Mods.Toilet.Buildable
         {
         }
 
-#if SUBNAUTICA_STABLE
-        public override GameObject GetGameObject()
-        {
-            try
-            {
-                var obj = CreateGameObject(0f);
-                var center = new Vector3(-0.003933489f, 1.415764f, 0.005244613f);
-                var size = new Vector3(1.128494f, 2.60179f, 0.895113f);
-                GameObjectHelpers.AddConstructableBounds(obj, size, center);
-                return obj;
-            }
-            catch (Exception e)
-            {
-                QuickLogger.Error(e.Message);
-                return null;
-            }
-        }
-#endif
+
         public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
         {
             var task = new TaskResult<GameObject>();

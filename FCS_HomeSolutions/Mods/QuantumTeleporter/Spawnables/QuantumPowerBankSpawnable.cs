@@ -211,7 +211,8 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Spawnables
                                 return false;
                             }
 
-                            FCSPDAController.Main.GoToPage(PDAPages.Home);
+                            //TODO V2 Fix
+                            //FCSPDAController.Main.GoToPage(PDAPages.Home);
                             FCSPDAController.Main.Close();
                             TeleportManager.TeleportPlayer(bankController, destinationTeleporter, Player.main.IsPiloting() ? QTTeleportTypes.Vehicle : QTTeleportTypes.Global);
                             QuickLogger.ModMessage("Teleport SuccessFull");

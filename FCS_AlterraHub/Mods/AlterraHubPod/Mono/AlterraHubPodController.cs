@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Managers;
@@ -11,7 +12,7 @@ using FCS_AlterraHub.Mods.AlterraHubFabricator.Mono;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
-using Oculus.Newtonsoft.Json.Utilities.LinqBridge;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.UI;
 

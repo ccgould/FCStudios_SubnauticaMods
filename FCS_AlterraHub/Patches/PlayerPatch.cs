@@ -112,7 +112,7 @@ namespace FCS_AlterraHub.Patches
             }
 
 
-            if (Input.GetKeyDown(QPatch.Configuration.FCSPDAKeyCode) || ForceOpenPDA && !__instance.GetPDA().isOpen)
+            if (Input.GetKeyDown(Main.Configuration.FCSPDAKeyCode) || ForceOpenPDA && !__instance.GetPDA().isOpen)
             {
                 if (!FCSPDA.IsOpen)
                 {
@@ -173,19 +173,11 @@ namespace FCS_AlterraHub.Patches
 
         private static IEnumerator CreateFcsPda(Player player)
         {
-#if SUBNAUTICA
-            yield return new WaitUntil(() => player.pdaSpawn.spawnedObj != null);
-#else
             yield return new WaitUntil(() => player.pda.gameObject != null);
-#endif
 
             QuickLogger.Debug("Creating FCS PDA");
 
-#if SUBNAUTICA
-            defPDA = player.pdaSpawn.spawnedObj;
-#else
             defPDA = player.pda.gameObject;
-#endif
 
             var pda = GameObject.Instantiate(AlterraHub.FcsPDAPrefab, default, default, true);
             var canvas = pda.GetComponentInChildren<Canvas>();

@@ -228,12 +228,12 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
             }
 
 
-            QPatch.Configuration.Convert();
+            Main.Configuration.Convert();
 #if DEBUG
-            QuickLogger.Debug($"Addition Ore: {QPatch.Configuration.DDBiomeOresTechType.Count}");
+            QuickLogger.Debug($"Addition Ore: {Main.Configuration.DDBiomeOresTechType.Count}");
 #endif
 
-            foreach (KeyValuePair<string, List<TechType>> valuePair in QPatch.Configuration.DDBiomeOresTechType)
+            foreach (KeyValuePair<string, List<TechType>> valuePair in Main.Configuration.DDBiomeOresTechType)
             {
 #if DEBUG
                 QuickLogger.Debug($"Checking if biomes match {currentBiome} => {valuePair.Key} = {valuePair.Key.Equals(currentBiome,StringComparison.OrdinalIgnoreCase)}");

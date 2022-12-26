@@ -1,9 +1,4 @@
-﻿#if SUBNAUTICA_STABLE
-using Oculus.Newtonsoft.Json;
-
-#else
-using Newtonsoft.Json;
-#endif
+﻿using Newtonsoft.Json;
 
 namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Structs
 {

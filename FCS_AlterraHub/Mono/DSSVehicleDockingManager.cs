@@ -9,7 +9,6 @@ namespace FCS_AlterraHub.Mono
     public class DSSVehicleDockingManager : MonoBehaviour
     {
         private bool _extractingItems;
-        private readonly bool _isVDSInstalled = QPatch.IsDockedVehicleStorageAccessInstalled;
         private BaseManager _manager;
         private List<Vehicle> _vehiclesSnapshot;
         private Dictionary<int, int> Subscibers = new Dictionary<int, int>();
@@ -235,11 +234,7 @@ namespace FCS_AlterraHub.Mono
                 Player main = Player.main;
                 PDA pda = main.GetPDA();
                 Inventory.main.SetUsedStorage(container);
-#if SUBNAUTICA_STABLE
-                pda.Open(PDATab.Inventory, null, null, 4f);
-#else
                 pda.Open(PDATab.Inventory);
-#endif
                 break;
             }
         }

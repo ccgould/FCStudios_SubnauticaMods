@@ -52,8 +52,8 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
                 _baseName.text = _mono.GetName();
                 _message.text = AuxPatchers.TeleporterConfirmMessage();
                 _requirements.text = AuxPatchers.Requirements(
-                    QPatch.Configuration.QuantumTeleporterInternalTeleportPowerUsage,
-                    QPatch.Configuration.QuantumTeleporterGlobalTeleportPowerUsage);
+                    Main.Configuration.QuantumTeleporterInternalTeleportPowerUsage,
+                    Main.Configuration.QuantumTeleporterGlobalTeleportPowerUsage);
                 _teleportGrid.DrawPage();
                 _homeNetworkToggleBtn.Select();
             }

@@ -43,7 +43,7 @@ namespace FCS_LifeSupportSolutions.Patches
         
         public static bool Prefix(ref Player __instance, ref bool __result)
         {
-            if (!QPatch.Configuration.BaseUtilityUnitAffectPlayerOxygen|| !QPatch.Configuration.BaseUtilityUnitIsModEnabled) return true;
+            if (!Main.Configuration.BaseUtilityUnitAffectPlayerOxygen|| !Main.Configuration.BaseUtilityUnitIsModEnabled) return true;
 
             GetDefaultO2Level(__instance);
 
@@ -97,7 +97,7 @@ namespace FCS_LifeSupportSolutions.Patches
         {
             outResult = false;
             float o2Available = instance.oxygenMgr.GetOxygenAvailable();
-            float o2Capacity = QPatch.IsRefillableOxygenTanksInstalled ? DefaultO2Level : Player.main.oxygenMgr.GetOxygenCapacity();
+            float o2Capacity = Main.IsRefillableOxygenTanksInstalled ? DefaultO2Level : Player.main.oxygenMgr.GetOxygenCapacity();
 
             if (o2Available >= o2Capacity)
                 return;
@@ -127,7 +127,7 @@ namespace FCS_LifeSupportSolutions.Patches
                 }
             }
 
-            var requiredTankCount = manager.GetRequiredTankCount(QPatch.Configuration.SmallBaseOxygenHardcore);
+            var requiredTankCount = manager.GetRequiredTankCount(Main.Configuration.SmallBaseOxygenHardcore);
 
             float ActiveTankCount = manager.ActiveBaseOxygenTankCount;
 

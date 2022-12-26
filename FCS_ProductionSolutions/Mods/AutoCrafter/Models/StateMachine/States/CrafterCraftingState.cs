@@ -8,12 +8,8 @@ using FCS_ProductionSolutions.Mods.AutoCrafter.Patches;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Handlers;
 using FCS_AlterraHub.Helpers;
-#if SUBNAUTICA_STABLE
-using Oculus.Newtonsoft.Json;
-#else
 using Newtonsoft.Json;
 using UWE;
-#endif
 
 using UnityEngine;
 
@@ -247,18 +243,13 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
                     {
                         for (int i = 0; i < Mathf.Abs(keyValuePair2.Value); i++)
                         {
-#if SUBNAUTICA_STABLE
-                            _manager.Crafter.Manager.AddItemToContainer(keyValuePair2.Key.ToInventoryItemLegacy());
-#else
                             CoroutineHost.StartCoroutine(AttemptToAddToContainerAsync(keyValuePair2.Key));
-#endif
                         }
                     }
                 }
             }
         }
 
-#if !SUBNAUTICA_STABLE
         private IEnumerator AttemptToAddToContainerAsync(TechType techType)
         {
             TaskResult<InventoryItem> taskResult = new TaskResult<InventoryItem>();
@@ -275,16 +266,11 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
 
             yield break;
         }
-#endif
         private bool AttemptToAddToNetwork(TechType techType)
         {
-#if SUBNAUTICA_STABLE
-            var inventoryItem = techType.ToInventoryItemLegacy(); 
-#else 
             var itemTask = new TaskResult<InventoryItem>();
             CouroutineManager.WaitCoroutine(techType.ToInventoryItem(itemTask));
             var inventoryItem = itemTask.Get();
-#endif
 
             QuickLogger.Debug($"InventoryItemLegacy returned: {Language.main.Get(inventoryItem.item.GetTechType())}");
 

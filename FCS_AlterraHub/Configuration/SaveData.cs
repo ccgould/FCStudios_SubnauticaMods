@@ -7,11 +7,7 @@ using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Objects;
 using FCS_AlterraHub.Systems;
-#if SUBNAUTICA_STABLE
-using Oculus.Newtonsoft.Json;
-#else
 using Newtonsoft.Json;
-#endif
 namespace FCS_AlterraHub.Configuration
 {
     [Serializable]

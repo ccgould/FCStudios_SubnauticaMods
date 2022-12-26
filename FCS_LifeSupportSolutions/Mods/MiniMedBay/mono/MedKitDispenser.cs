@@ -22,25 +22,16 @@ namespace FCS_LifeSupportSolutions.Mods.MiniMedBay.mono
             if (_mono.Container.IsContainerFull)
             {
                 main.SetIcon(HandReticle.IconType.Hand, 1f);
-#if SUBNAUTICA
-                main.SetInteractTextRaw(AuxPatchers.TakeMedKit(),"");
-#else
                 main.SetTextRaw(HandReticle.TextType.Hand, AuxPatchers.TakeMedKit());
-#endif
             }
             else
             {
                 if (_mono.Container.GetIsEmpty() == false)
                 {
                     main.SetIcon(HandReticle.IconType.Hand, 1f);
-#if SUBNAUTICA
-                    main.SetInteractTextRaw(AuxPatchers.TakeMedKit(),
-                        $"Progress: {Mathf.FloorToInt(_mono.Container.Progress * 100)}%");
-#else
                     main.SetTextRaw(HandReticle.TextType.Hand, AuxPatchers.TakeMedKit());
                     main.SetTextRaw(HandReticle.TextType.HandSubscript,
                         $"Progress: {Mathf.FloorToInt(_mono.Container.Progress * 100)}%");
-#endif
                 }
                 else
                 {

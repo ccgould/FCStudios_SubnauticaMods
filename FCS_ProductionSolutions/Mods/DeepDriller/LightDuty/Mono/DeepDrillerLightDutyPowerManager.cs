@@ -171,7 +171,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.LightDuty.Mono
             return BasePowerDraw;
         }
 
-        private float BasePowerDraw = QPatch.Configuration.DDDefaultOperationalPowerUsage + QPatch.Configuration.DDOrePowerUsage;
+        private float BasePowerDraw = Main.Configuration.DDDefaultOperationalPowerUsage + Main.Configuration.DDOrePowerUsage;
 
 
         public override float GetDevicePowerCharge()
@@ -181,7 +181,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.LightDuty.Mono
 
         public override float GetDevicePowerCapacity()
         {
-            return QPatch.Configuration.DDInternalBatteryCapacity;
+            return Main.Configuration.DDInternalBatteryCapacity;
         }
 
         public override void TogglePowerState()

@@ -9,6 +9,7 @@ using FCS_AlterraHub.Mods.PatreonStatue.Mono;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Utility;
 using UnityEngine;
+using System.Collections.Generic;
 
 #if SUBNAUTICA
 using RecipeData = SMLHelper.V2.Crafting.TechData;
@@ -36,64 +37,21 @@ namespace FCS_AlterraHub.Mods.PatreonStatue.Buildable
             _prefab = AlterraHub.GetPrefab(PatreonStatuePrefabName);
         }
 
-#if SUBNAUTICA_STABLE
-        public override GameObject GetGameObject()
+        public override string DiscoverMessage => $"{FriendlyName} Unlocked!";
+        public override List<TechType> CompoundTechsForUnlock => GetUnlocks();
+
+        private List<TechType> GetUnlocks()
         {
-            try
+            var list = new List<TechType>();
+
+            foreach (var ingredient in this.GetBlueprintRecipe().Ingredients)
             {
-                var prefab = GameObject.Instantiate(_prefab);
-
-                var center = new Vector3(0f, 1.32669f, 0.1855279f);
-                var size = new Vector3(1.439185f, 2.406436f, 1.32865f);
-
-                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
-
-                var model = prefab.FindChild("model");
-
-                //========== Allows the building animation and material colors ==========// 
-                Shader shader = Shader.Find("MarmosetUBER");
-                Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
-                SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
-                skyApplier.renderers = renderers;
-                skyApplier.anchorSky = Skies.Auto;
-                //========== Allows the building animation and material colors ==========// 
-
-                var lw = prefab.AddComponent<LargeWorldEntity>();
-                lw.cellLevel = LargeWorldEntity.CellLevel.Global;
-
-                // Add constructible
-                var constructable = prefab.AddComponent<Constructable>();
-
-                constructable.allowedOutside = false;
-                constructable.allowedInBase = true;
-                constructable.allowedOnGround = true;
-                constructable.allowedOnWall = false;
-                constructable.rotationEnabled = true;
-                constructable.allowedOnCeiling = false;
-                constructable.allowedInSub = false;
-                constructable.allowedOnConstructables = false;
-                constructable.model = model;
-                constructable.techType = TechType;
-                constructable.forceUpright = true;
-
-                PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
-                prefabID.ClassId = ClassID;
-
-                prefab.AddComponent<TechTag>().type = TechType;
-                prefab.AddComponent<PatreonStatueController>();
-
-                //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
-                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
-                return prefab;
-            }
-            catch (Exception e)
-            {
-                QuickLogger.Error(e.Message);
+                list.Add(ingredient.techType);
             }
 
-            return null;
+            return list;
         }
-#else
+
         public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
         {
             var prefab = GameObject.Instantiate(_prefab);
@@ -130,7 +88,7 @@ namespace FCS_AlterraHub.Mods.PatreonStatue.Buildable
             constructable.model = model;
             constructable.techType = TechType;
             constructable.forceUpright = true;
-            
+
             PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
             prefabID.ClassId = ClassID;
 
@@ -142,7 +100,6 @@ namespace FCS_AlterraHub.Mods.PatreonStatue.Buildable
             gameObject.Set(prefab);
             yield break;
         }
-#endif
 
         protected override RecipeData GetBlueprintRecipe()
         {

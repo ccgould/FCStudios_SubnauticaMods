@@ -174,21 +174,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Mono
             }
         }
 
-
-#if SUBNAUTICA_STABLE
-        public override Pickupable RemoveItemFromContainer(TechType techType)
-        {
-            if (!_storage.ContainsKey(techType)) return null;
-            _storage[techType] -= 1;
-            if (_storage[techType] <= 0)
-            {
-                _storage.Remove(techType);
-            }
-            _inventoryGrid.DrawPage();
-
-            return techType.ToPickupable();
-        }
-#else
         private IEnumerator RemoveAndGivePlayerItem(TechType techType)
         {
             var pickupableTask = new TaskResult<Pickupable>();
@@ -212,7 +197,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Mono
 
             yield break;
         }
-#endif
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {

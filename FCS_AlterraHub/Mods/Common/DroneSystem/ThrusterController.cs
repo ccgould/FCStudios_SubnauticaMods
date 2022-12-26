@@ -33,12 +33,12 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
             {
                 if (isOn && !_audio.playing)
                 {
-                    if (QPatch.Configuration.AlterraTransportDroneFxAllowed)
+                    if (Main.Configuration.AlterraTransportDroneFxAllowed)
                     {
                         _audio.Play();
                     }
                 }
-                else if ((!QPatch.Configuration.AlterraTransportDroneFxAllowed || !isOn) && _audio.playing)
+                else if ((!Main.Configuration.AlterraTransportDroneFxAllowed || !isOn) && _audio.playing)
                 {
                     _audio.Stop();
                 }

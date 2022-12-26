@@ -52,13 +52,8 @@ namespace FCS_StorageSolutions.Patches
     }
 
 
-#if SUBNAUTICA_STABLE
-    [HarmonyPatch(typeof(StorageContainer))]
-    [HarmonyPatch(nameof(StorageContainer.OnConstructedChanged))]
-#else
     [HarmonyPatch(typeof(Constructable))]
     [HarmonyPatch(nameof(Constructable.OnConstructedChanged))]
-#endif
     internal class StorageContainerOnConstructedChangedPatcher
     {
 

@@ -61,7 +61,7 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
         {
             foreach (ParticleSystem system in _particles)
             {
-                var index = QPatch.Configuration.TelepowerPylonTrailBrightness;
+                var index = Main.Configuration.TelepowerPylonTrailBrightness;
                 var h = system.trails;
                 h.colorOverLifetime = new Color(index, index, index);
             }
@@ -247,7 +247,7 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
             base.OnHandHover(hand);
             var data = new string[]
             {
-                AlterraHub.PowerPerMinute((IsCharging() ? QPatch.Configuration.PowerStoragePowerDrainPerSecond : 0f) * 60f),
+                AlterraHub.PowerPerMinute((IsCharging() ? Main.Configuration.PowerStoragePowerDrainPerSecond : 0f) * 60f),
                 $"Is Charging: {IsCharging()}",
                 $"Storage: {Mathf.FloorToInt(PowerSource.power)} / {Mathf.FloorToInt(PowerSource.maxPower)} | Percentage: {PowerSource.power / PowerSource.maxPower:P0}"
             };
@@ -267,7 +267,7 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
         {
             if (!IsCharging()) return;
 
-            _amountRemain = QPatch.Configuration.PowerStoragePowerDrainPerSecond;
+            _amountRemain = Main.Configuration.PowerStoragePowerDrainPerSecond;
 
             foreach (var iPowerInterface in Manager.GetPowerRelay().inboundPowerSources)
             {

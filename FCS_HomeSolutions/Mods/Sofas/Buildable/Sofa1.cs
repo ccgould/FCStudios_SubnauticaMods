@@ -49,27 +49,7 @@ namespace FCS_HomeSolutions.Mods.Sofas.Buildable
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
             };
         }
-
-        #if SUBNAUTICA_STABLE
-        public override GameObject GetGameObject()
-        {
-            try
-            {
-                var prefab = AddChair(CraftData.GetPrefabForTechType(TechType.Bench, false));
-                var mesh = GameObject.Instantiate(_prefab);
-                mesh.SetActive(false);
-
-                ProcessBench(prefab, mesh);
-                return prefab;
-            }
-            catch (Exception e)
-            {
-                QuickLogger.Error(e.Message);
-                return null;
-            }
-        }
-        #endif
-
+        
         public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
         {
             var task = new TaskResult<GameObject>();

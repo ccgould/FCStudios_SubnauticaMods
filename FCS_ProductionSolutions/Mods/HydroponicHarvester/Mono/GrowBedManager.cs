@@ -40,11 +40,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
         public void AddItemToItemsContainer(TechType techType)
         {
             Mod.IsHydroponicKnownTech(techType, out var data);
-#if SUBNAUTICA_STABLE
-            ItemsContainer.UnsafeAdd(data.PickType.ToInventoryItemLegacy());
-#else
             StartCoroutine(data.PickType.AddTechTypeToContainerUnSafe(ItemsContainer));
-#endif
         }
 
         internal void AddSample(TechType type, int slotID)
@@ -245,13 +241,9 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
 
         public IEnumerator AddItemToContainer(TechType techType, int slotId)
         {
-#if SUBNAUTICA_STABLE
-            var item = techType.ToInventoryItemLegacy();
-#else
             var itemTask = new TaskResult<InventoryItem>();
             yield return techType.ToInventoryItem(itemTask);
             var item = itemTask.Get();
-#endif
             if (item != null)
             {
                 Plantable component = item.item.GetComponent<Plantable>();

@@ -332,9 +332,9 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
                 {
                     AuxPatchers.ClickToRotate(),
                     AuxPatchers.PressToToggleLightFormat(GameInput.GetBindingName(GameInput.Button.AltTool, GameInput.BindingSet.Primary),
-                        QPatch.Configuration.LEDLightBackwardKeyCode.ToString(),
-                        QPatch.Configuration.LEDLightForwardKeyCode.ToString(),
-                        QPatch.Configuration.LEDLightNightSensorToggleKeyCode.ToString(),
+                        Main.Configuration.LEDLightBackwardKeyCode.ToString(),
+                        Main.Configuration.LEDLightForwardKeyCode.ToString(),
+                        Main.Configuration.LEDLightNightSensorToggleKeyCode.ToString(),
                         _light[0].intensity,
                         _nightSensor ? "Enabled":"Disabled")
                 }; 
@@ -345,9 +345,9 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
                 var data = new[]
                 {
                     AuxPatchers.PressToToggleLightFormat(GameInput.GetBindingName(GameInput.Button.AltTool, GameInput.BindingSet.Primary),
-                        QPatch.Configuration.LEDLightBackwardKeyCode.ToString(),
-                        QPatch.Configuration.LEDLightForwardKeyCode.ToString(),
-                        QPatch.Configuration.LEDLightNightSensorToggleKeyCode.ToString(),
+                        Main.Configuration.LEDLightBackwardKeyCode.ToString(),
+                        Main.Configuration.LEDLightForwardKeyCode.ToString(),
+                        Main.Configuration.LEDLightNightSensorToggleKeyCode.ToString(),
                         _light[0].intensity,
                         _nightSensor ? "Enabled" : "Disabled"),
                     "CTRL + Arrow Keys to adjust light",
@@ -361,9 +361,9 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
                 var data = new[]
                 {
                     AuxPatchers.PressToToggleLightFormat(GameInput.GetBindingName(GameInput.Button.AltTool, GameInput.BindingSet.Primary),
-                        QPatch.Configuration.LEDLightBackwardKeyCode.ToString(),
-                        QPatch.Configuration.LEDLightForwardKeyCode.ToString(),
-                        QPatch.Configuration.LEDLightNightSensorToggleKeyCode.ToString(),
+                        Main.Configuration.LEDLightBackwardKeyCode.ToString(),
+                        Main.Configuration.LEDLightForwardKeyCode.ToString(),
+                        Main.Configuration.LEDLightNightSensorToggleKeyCode.ToString(),
                         _light[0].intensity,
                         _nightSensor ? "Enabled" : "Disabled")
                 };
@@ -421,7 +421,7 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
             }
             else
             {
-                if (Input.GetKeyDown(QPatch.Configuration.LEDLightBackwardKeyCode))
+                if (Input.GetKeyDown(Main.Configuration.LEDLightBackwardKeyCode))
                 {
                     if (Mathf.Approximately(_light[0].intensity, 0.5f)) return;
 
@@ -433,7 +433,7 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
                     ChangeIntensity(_light[0].intensity - 0.1f);
                 }
 
-                if (Input.GetKeyDown(QPatch.Configuration.LEDLightForwardKeyCode))
+                if (Input.GetKeyDown(Main.Configuration.LEDLightForwardKeyCode))
                 {
                     if (Mathf.Approximately(_light[0].intensity, 1.5f)) return;
 
@@ -446,7 +446,7 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
                 }
             }
 
-            if (Input.GetKeyDown(QPatch.Configuration.LEDLightNightSensorToggleKeyCode))
+            if (Input.GetKeyDown(Main.Configuration.LEDLightNightSensorToggleKeyCode))
             {
                 _nightSensor ^= true;
             }

@@ -63,7 +63,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Patchers
             }
 
             _batteryMeter = InterfaceHelpers.FindGameObject(gameObject, "BatteryMeter")?.AddComponent<BatteryMeterController>();
-            _batteryMeter?.Initialize(QPatch.Configuration.DDInternalBatteryCapacity);
+            _batteryMeter?.Initialize(FCS_ProductionSolutions.Main.Configuration.DDInternalBatteryCapacity);
 
             _biomeLbl = InterfaceHelpers.FindGameObject(gameObject, "Biome").GetComponent<Text>();
 

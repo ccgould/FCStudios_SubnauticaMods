@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using BepInEx;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Mods.Replicator.Buildables;
@@ -17,21 +18,28 @@ using FCS_ProductionSolutions.Mods.IonCubeGenerator.Buildable;
 using FCS_ProductionSolutions.Mods.MatterAnalyzer.Buildable;
 using FCSCommon.Utilities;
 using HarmonyLib;
-using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 
 namespace FCS_ProductionSolutions
 {
-    [QModCore]
-    public class QPatch
+    [BepInPlugin(GUID, MODNAME, VERSION)]
+    public class Main : BaseUnityPlugin
     {
+        #region [Declarations]
+
+        public const string
+            MODNAME = "FCS_ProductionSolutions",
+            AUTHOR = "FieldCreatorsStudios",
+            GUID = AUTHOR + "_" + MODNAME,
+            VERSION = "1.0.0.0";
         internal static Config Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<Config>();
 
-        [QModPatch]
-        public void Patch()
+        #endregion
+        private void Awake()
         {
-            FCSAlterraHubService.PublicAPI.RegisterModPack(Mod.ModPackID, Mod.ModBundleName, Assembly.GetExecutingAssembly());
+            
+        FCSAlterraHubService.PublicAPI.RegisterModPack(Mod.ModPackID, Mod.ModBundleName, Assembly.GetExecutingAssembly());
             FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(Mod.ModPackID);
             FCSAlterraHubService.PublicAPI.OnPurge += Mod.Purge;
             ModelPrefab.Initialize();
@@ -124,7 +132,8 @@ namespace FCS_ProductionSolutions
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
 
-            QuickLogger.Info($"Finished Patching");
+            QuickLogger.Info($"Finished patching. Version: {QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly())}");
+
         }
 
         private bool AddROTAOre(string oreName, out TechType techType, List<TechType> techTypes = null)

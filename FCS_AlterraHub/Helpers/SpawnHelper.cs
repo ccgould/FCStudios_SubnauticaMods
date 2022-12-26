@@ -34,35 +34,7 @@ namespace FCS_AlterraHub.Helpers
             return PlantResourceDictionary.ContainsKey(plantKey);
         }
 
-#if SUBNAUTICA_STABLE
-        public static IEnumerator SpawnPrefabByClassID(string classId,Transform transform)
-        {
-            IPrefabRequest request = PrefabDatabase.GetPrefabAsync(classId);
-            yield return request;
-            GameObject prefab;
 
-            if (!request.TryGetPrefab(out prefab))
-            {
-                Debug.LogErrorFormat("FindPrefab", "Failed to request prefab for '{0}'", new object[]
-                {
-                    classId
-                });
-                //Destroy(base.gameObject);
-                yield break;
-            }
-
-            DeferredSpawner.Task deferredTask =
- DeferredSpawner.instance.InstantiateAsync(prefab, transform.localPosition, transform.localRotation, true);
-            yield return deferredTask;
-            GameObject result = deferredTask.result;
-            DeferredSpawner.instance.ReturnTask(deferredTask);
-            result.transform.SetParent(transform.parent, false);
-            result.transform.localScale = transform.localScale;
-            result.SetActive(true);
-            //Destroy(base.gameObject);
-            yield break;
-        }
-#endif
 
         public static IEnumerator SpawnUWEPrefab(UWEPrefabID uwePrefab, Transform transform,
             Action<GameObject> callBack = null, bool removeComponents = true)
@@ -81,97 +53,29 @@ namespace FCS_AlterraHub.Helpers
                 yield break;
             }
 
-#if SUBNAUTICA_STABLE
-            DeferredSpawner.Task deferredTask =
- DeferredSpawner.instance.InstantiateAsync(prefab, transform.localPosition, transform.localRotation, true);
-            yield return deferredTask;
-            GameObject result = deferredTask.result;
-            DeferredSpawner.instance.ReturnTask(deferredTask);
-            result.transform.SetParent(transform.parent, false);
-            result.transform.localScale = transform.localScale;
-            result.SetActive(true);
-            if(removeComponents)
-            {
-                GameObject.DestroyImmediate(result.GetComponent<PrefabIdentifier>());
-                GameObject.DestroyImmediate(result.GetComponent<LargeWorldEntity>());
-            }
 
-            callBack?.Invoke(result);
-#endif
+            //TODO V2 Find A Fix
+            //#if SUBNAUTICA_STABLE
+            //            DeferredSpawner.Task deferredTask =
+            // DeferredSpawner.instance.InstantiateAsync(prefab, transform.localPosition, transform.localRotation, true);
+            //            yield return deferredTask;
+            //            GameObject result = deferredTask.result;
+            //            DeferredSpawner.instance.ReturnTask(deferredTask);
+            //            result.transform.SetParent(transform.parent, false);
+            //            result.transform.localScale = transform.localScale;
+            //            result.SetActive(true);
+            //            if(removeComponents)
+            //            {
+            //                GameObject.DestroyImmediate(result.GetComponent<PrefabIdentifier>());
+            //                GameObject.DestroyImmediate(result.GetComponent<LargeWorldEntity>());
+            //            }
+
+            //            callBack?.Invoke(result);
+            //#endif
             yield break;
         }
 
-#if SUBNAUTICA_STABLE
-        public static IEnumerator SpawnUWEPrefab(UWEPrefabID uwePrefab, Vector3 position, Quaternion rotation, bool removeComponents
- = true)
-        {
-            IPrefabRequest request = PrefabDatabase.GetPrefabAsync(UWEClassIDDictionary[uwePrefab]);
-            yield return request;
-            GameObject prefab;
 
-            if (!request.TryGetPrefab(out prefab))
-            {
-                Debug.LogErrorFormat("FindPrefab", "Failed to request prefab for '{0}'", new object[]
-                {
-                    UWEClassIDDictionary[uwePrefab]
-                });
-                //Destroy(base.gameObject);
-                yield break;
-            }
-
-            DeferredSpawner.Task deferredTask =
- DeferredSpawner.instance.InstantiateAsync(prefab, position, rotation, true);
-            yield return deferredTask;
-            GameObject result = deferredTask.result;
-            DeferredSpawner.instance.ReturnTask(deferredTask);
-            result.SetActive(true);
-            if (removeComponents)
-            {
-                GameObject.DestroyImmediate(result.GetComponent<PrefabIdentifier>());
-                GameObject.DestroyImmediate(result.GetComponent<LargeWorldEntity>());
-            }
-            yield break;
-        }
-#endif
-
-#if SUBNAUTICA_STABLE
-        public static GameObject SpawnTechType(TechType techType, Vector3 position, Quaternion rotation, bool spawnGlobal
- = false)
-        {
-            QuickLogger.Debug($"Spawning: {Language.main.Get(techType)}");
-            if (CraftData.IsAllowed(techType))
-            {
-
-                GameObject prefabForTechType = CraftData.GetPrefabForTechType(techType);
-                if (SpawnTechType(techType, position, rotation, spawnGlobal, prefabForTechType, out var o)) return o;
-            }
-
-            return null;
-        }
-
-                private static bool SpawnTechType(TechType techType, Vector3 position, Quaternion rotation, bool spawnGlobal,
-            GameObject prefabForTechType, out GameObject o)
-        {
-            if (prefabForTechType != null)
-            {
-                GameObject gameObject = Utils.CreatePrefab(prefabForTechType);
-                LargeWorldEntity.Register(gameObject);
-                CrafterLogic.NotifyCraftEnd(gameObject, techType);
-                gameObject.SendMessage("StartConstruction", SendMessageOptions.DontRequireReceiver);
-                gameObject.transform.position = position;
-                gameObject.transform.localRotation = rotation;
-                if (spawnGlobal) gameObject.transform.parent = null;
-                {
-                    o = gameObject;
-                    return true;
-                }
-            }
-
-            ErrorMessage.AddDebug("Could not find prefab for TechType = " + techType);
-            o = null;
-            return false;
-        }
-#else
         public static IEnumerator SpawnTechTypeAsync(TechType techType, Vector3 position, Quaternion rotation,
             bool spawnGlobal, IOut<GameObject> gameObject)
         {
@@ -195,8 +99,6 @@ namespace FCS_AlterraHub.Helpers
             ErrorMessage.AddDebug("Could not find prefab for TechType = " + techType);
             gameObject.Set(null);
         }
-#endif
-
 
         public static GameObject SpawnPrefab(GameObject prefab, Vector3 position, Quaternion rotation,
             bool spawnGlobal = false)

@@ -134,46 +134,29 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
                 case OpenMethodEnum.Manual:
                     if (!doorLocked)
                     {
-#if SUBNAUTICA
-                        HandReticle.main.SetInteractText(doorOpen ? closeText : openText);
-#else
-                        HandReticle.main.SetText(HandReticle.TextType.Hand, doorOpen ? closeText : openText,false);
-#endif
+                        HandReticle.main.SetText(HandReticle.TextType.Hand, doorOpen ? closeText : openText, false);
                         HandReticle.main.SetIcon(HandReticle.IconType.Hand, 1f);
                         return;
                     }
                     else
                     {
-#if SUBNAUTICA
-                        HandReticle.main.SetInteractText(ManualHoverText1, ManualHoverText2);
-#else
-                        HandReticle.main.SetText(HandReticle.TextType.Hand, $"{ManualHoverText1}\n{ManualHoverText2}",true);
-#endif
+                        HandReticle.main.SetText(HandReticle.TextType.Hand, $"{ManualHoverText1}\n{ManualHoverText2}", true);
                     }
                     break;
                 case OpenMethodEnum.Sealed:
-#if SUBNAUTICA
-                    HandReticle.main.SetInteractText("Sealed_Door", "SealedInstructions");
-#else 
                     HandReticle.main.SetText(HandReticle.TextType.Hand, $"{Language.main.Get("Sealed_Door")}\n{Language.main.Get("SealedInstructions")}", true);
-#endif
+
                     HandReticle.main.SetProgress(sealedComponent.GetSealedPercentNormalized());
                     HandReticle.main.SetIcon(HandReticle.IconType.Progress, 1f);
                     return;
                 case OpenMethodEnum.Keycard:
-#if SUBNAUTICA
-                    HandReticle.main.SetInteractText("Locked_Door", "DoorInstructions_Keycard");
-#else
-                    HandReticle.main.SetText(HandReticle.TextType.Hand,$"{Language.main.Get("Locked_Door")}\n{Language.main.Get("DoorInstructions_Keycard")}", true);
-#endif
+                    HandReticle.main.SetText(HandReticle.TextType.Hand, $"{Language.main.Get("Locked_Door")}\n{Language.main.Get("DoorInstructions_Keycard")}", true);
+
                     HandReticle.main.SetIcon(HandReticle.IconType.Hand, 1f);
                     return;
                 case OpenMethodEnum.Powercell:
-#if SUBNAUTICA
-                    HandReticle.main.SetInteractText("Locked_Door", "DoorInstructions_Powercell");
-#else
                     HandReticle.main.SetText(HandReticle.TextType.Hand, $"{Language.main.Get("Locked_Door")}\n{Language.main.Get("DoorInstructions_Powercell")}", true);
-#endif
+
                     HandReticle.main.SetIcon(HandReticle.IconType.Hand, 1f);
                     break;
                 default:
@@ -300,6 +283,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
 
         public void LoadSave(Tuple<bool,bool> settings)
         {
+            if (settings is null) return;
             QuickLogger.Debug($"DoorController: {settings.Item1} | {settings.Item2}");
             _saveData = settings;
         }

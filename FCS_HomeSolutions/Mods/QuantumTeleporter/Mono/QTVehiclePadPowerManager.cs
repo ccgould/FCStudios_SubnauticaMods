@@ -9,7 +9,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
     internal class QTVehiclePadPowerManager : MonoBehaviour, IQTPower
     {
         private PowerRelay _connectedRelay;
-        private readonly float _interPowerUsage = QPatch.Configuration.QuantumTeleporterGlobalTeleportPowerUsage;
+        private readonly float _interPowerUsage = Main.Configuration.QuantumTeleporterGlobalTeleportPowerUsage;
 
         public void Initialize()
         {

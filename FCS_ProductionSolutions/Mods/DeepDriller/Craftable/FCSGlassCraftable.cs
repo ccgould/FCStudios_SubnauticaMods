@@ -26,13 +26,6 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Craftable
         {
 
         }
-
-#if SUBNAUTICA_STABLE
-        public override GameObject GetGameObject()
-        {
-            return CraftData.InstantiateFromPrefab(TechType.Glass);
-        }
-#endif
         
         public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
         {

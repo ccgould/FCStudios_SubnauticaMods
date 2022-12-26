@@ -15,39 +15,12 @@ namespace FCS_AlterraHub.Model
         public bool Description { get; set; } = false;
         void Awake() => Destroy(GetComponent<LayoutElement>());
 
-#if BELOWZERO
         public bool showTooltipOnDrag => true;
 
         public void GetTooltip(TooltipData tooltip)
         {
             tooltip.prefix.Append(Tooltip);
         }
-#else
-        public void GetTooltip(out string tooltipText, List<TooltipIcon> tooltipIcons)
-        {
-            var result = RequestPermission?.Invoke() ?? false;
-            
-            if (ToolTipStringDelegate != null)
-            {
-                Tooltip = ToolTipStringDelegate?.Invoke();
-            }
-
-            if(TechType != TechType.None)
-            {
-                if (Description)
-                {
-                    Tooltip = InventoryItemView(TechType);
-                }
-                else
-                {
-                    bool locked = !CrafterLogic.IsCraftRecipeUnlocked(TechType);
-                    TooltipFactory.BuildTech(TechType, locked, out Tooltip, tooltipIcons);
-                }
-            }
-
-            tooltipText = result ? Tooltip : string.Empty;
-        }
-#endif
 
         public static string InventoryItemView(TechType techType)
         {

@@ -35,11 +35,7 @@ namespace FCS_AlterraHub.Mono
         {
             if (!hover) return;
             HandReticle.main.SetIcon(HandReticle.IconType.Rename);
-#if SUBNAUTICA
-            HandReticle.main.SetInteractTextRaw(HoverMessage, "");
-#elif BELOWZERO
             HandReticle.main.SetTextRaw(HandReticle.TextType.Hand, HoverMessage);
-#endif
         }
 
         private void Awake()

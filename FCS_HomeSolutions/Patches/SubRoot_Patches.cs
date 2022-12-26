@@ -13,7 +13,7 @@ namespace FCS_HomeSolutions.Patches
         {
             if (__instance.gameObject.activeSelf && __instance.gameObject.transform.position != Vector3.zero)
             {
-                if (QPatch.Configuration.IsJukeBoxEnabled)
+                if (Main.Configuration.IsJukeBoxEnabled)
                     __instance.gameObject.EnsureComponent<BaseJukeBox>();
             }
         }

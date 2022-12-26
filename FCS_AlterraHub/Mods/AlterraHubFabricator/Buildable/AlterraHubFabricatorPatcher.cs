@@ -9,6 +9,7 @@ using FCS_AlterraHub.Mods.AlterraHubFabricator.Mono;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Utility;
 using UnityEngine;
+using System.Collections.Generic;
 
 #if SUBNAUTICA
 using RecipeData = SMLHelper.V2.Crafting.TechData;
@@ -32,13 +33,24 @@ namespace FCS_AlterraHub.Mods.AlterraHubConstructor.Buildable
         internal const string AlterraHubConstructorDescription = "N/A";
         internal const string AlterraHubConstructorPrefabName = "FCS_AlterraHubFabricator";
 
+        public override string DiscoverMessage => $"{FriendlyName} Unlocked!";
+        public override List<TechType> CompoundTechsForUnlock => GetUnlocks();
+
+        private List<TechType> GetUnlocks()
+        {
+            var list = new List<TechType>();
+
+            foreach (var ingredient in this.GetBlueprintRecipe().Ingredients)
+            {
+                list.Add(ingredient.techType);
+            }
+
+            return list;
+        }
+
         public AlterraHubFabricatorPatcher() : base(AlterraHubConstructorClassID, AlterraHubConstructorFriendly, AlterraHubConstructorDescription)
         {
             _prefab = AlterraHub.GetPrefab(AlterraHubConstructorPrefabName);
-            OnFinishedPatching += () =>
-            {
-               
-            };
         }
 
 #if SUBNAUTICA_STABLE

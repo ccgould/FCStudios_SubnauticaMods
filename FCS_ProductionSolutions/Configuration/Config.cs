@@ -6,11 +6,7 @@ using SMLHelper.V2.Json;
 using SMLHelper.V2.Options.Attributes;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Options;
-#if SUBNAUTICA_STABLE
-using Oculus.Newtonsoft.Json;
-#else
 using Newtonsoft.Json;
-#endif
 
 namespace FCS_ProductionSolutions.Configuration
 {

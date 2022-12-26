@@ -38,7 +38,7 @@ namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono
         /// </summary>
         internal void PlayMachineAudio()
         {
-            if (!_soundPlaying && QPatch.Configuration.MatterAnalyzerPlaySFX)
+            if (!_soundPlaying && Main.Configuration.MatterAnalyzerPlaySFX)
             {
                 _loopingEmitter.Play();
                 _soundPlaying = true;
@@ -51,7 +51,7 @@ namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono
         /// </summary>
         internal void StopMachineAudio()
         {
-            if (_soundPlaying && QPatch.Configuration.MatterAnalyzerPlaySFX)
+            if (_soundPlaying && Main.Configuration.MatterAnalyzerPlaySFX)
             {
                 _loopingEmitter.Stop();
                 _soundPlaying = false;

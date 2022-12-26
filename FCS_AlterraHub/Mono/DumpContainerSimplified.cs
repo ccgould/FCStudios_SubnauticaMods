@@ -56,11 +56,7 @@ namespace FCS_AlterraHub.Mono
             if (_dumpContainer != null && pda != null)
             {
                 Inventory.main.SetUsedStorage(_dumpContainer);
-#if SUBNAUTICA_STABLE
-                pda.Open(PDATab.Inventory, null, OnDumpClose, 4f);
-#else
                 pda.Open(PDATab.Inventory, null, OnDumpClose);
-#endif
             }
             else
             {

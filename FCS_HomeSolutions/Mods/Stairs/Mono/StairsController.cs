@@ -333,7 +333,7 @@ namespace FCS_HomeSolutions.Mods.Stairs.Mono
 				RaycastHit raycastHit = UWE.Utils.sharedHitBuffer[i];
 				if (raycastHit.collider.gameObject.layer != LayerID.Player && !IsBaseGhost(raycastHit.collider.gameObject) && !IsDestroyed(raycastHit.collider.gameObject))
 				{
-					if (IsOtherBasePiece(raycastHit.collider.gameObject, ignoreObject) && QPatch.Configuration.StairsLimitLengthOverBasePieces)
+					if (IsOtherBasePiece(raycastHit.collider.gameObject, ignoreObject) && Main.Configuration.StairsLimitLengthOverBasePieces)
 					{
 						if (num == -1f || num > raycastHit.distance)
 						{

@@ -409,7 +409,7 @@ namespace FCS_AlterraHub.Buildables
 
         public static string ViewInPDA()
         {
-            return string.Format(GetLanguage("PDAButtonPressFormat"), QPatch.Configuration.PDAInfoKeyCode.ToString());
+            return string.Format(GetLanguage("PDAButtonPressFormat"), Main.Configuration.PDAInfoKeyCode.ToString());
         }
 
         public static string IsDeviceOn(bool value)

@@ -137,7 +137,6 @@
     <Compile Include="Model\BaseOperationObject.cs" />
     <Compile Include="Model\Converters\Converters.cs" />
     <Compile Include="Model\Converters\TimeConverters.cs" />
-    <Compile Include="Model\Converters\UpgradeFunctionConverter.cs" />
     <Compile Include="Model\CustomLiveMixinData.cs" />
     <Compile Include="Model\EatableEntities.cs" />
     <Compile Include="Model\EffectsBuilder.cs" />
@@ -248,7 +247,7 @@
     <Compile Include="Mono\FcsCard.cs" />
     <Compile Include="Mono\FCSDevice.cs" />
     <Compile Include="Mods\OreConsumer\Mono\OreConsumerController.cs" />
-    <Compile Include="QPatch.cs" />
+    <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Registration\FCSAlterraHubService.cs" />
     <Compile Include="Mods\Global\Spawnables\DebitCardSpawnable.cs" />

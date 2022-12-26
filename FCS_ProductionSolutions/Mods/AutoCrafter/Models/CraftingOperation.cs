@@ -6,11 +6,7 @@ using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Mono;
 using SMLHelper.V2.Handlers;
-#if SUBNAUTICA_STABLE
-using Oculus.Newtonsoft.Json;
-#else
 using Newtonsoft.Json;
-#endif
 
 namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models
 {

@@ -88,7 +88,7 @@ namespace FCS_HomeSolutions.Mods.PartitionWalls.Patches
         [HarmonyPrefix]
         public static bool SetPlaceOnSurface_Prefix(RaycastHit hit, ref Vector3 position, ref Quaternion rotation)
         {
-            if (!QPatch.Configuration.IsWallPartitionsEnabled) return true;
+            if (!Main.Configuration.IsWallPartitionsEnabled) return true;
             GameObject ghostModel = (GameObject) _ghostModel.GetValue(null);
             if (ghostModel?.name != null && ghostModel.name.StartsWith(ModelName))
             {
@@ -119,7 +119,7 @@ namespace FCS_HomeSolutions.Mods.PartitionWalls.Patches
         [HarmonyPrefix]
         public static bool UpdateAllowed_Postfix(ref bool __result)
         {
-            if (!QPatch.Configuration.IsWallPartitionsEnabled) return true;
+            if (!Main.Configuration.IsWallPartitionsEnabled) return true;
 
             GameObject ghostModel = (GameObject) _ghostModel.GetValue(null);
             if (ghostModel?.name != null && ghostModel.name.StartsWith(ModelName))
@@ -134,9 +134,7 @@ namespace FCS_HomeSolutions.Mods.PartitionWalls.Patches
                         (hit.collider.gameObject.name.StartsWith(DrillTargetObjectName)))
                     {
                         var result = Builder.CheckAsSubModule(
-#if !SUBNAUTICA_STABLE
                             out _
-#endif
                         );
                         if (!result)
                         {
@@ -156,7 +154,7 @@ namespace FCS_HomeSolutions.Mods.PartitionWalls.Patches
         [HarmonyPostfix]
         public static void CheckSurfaceType_Postfix(ref bool __result, SurfaceType surfaceType)
         {
-            if (!QPatch.Configuration.IsWallPartitionsEnabled) return;
+            if (!Main.Configuration.IsWallPartitionsEnabled) return;
 
             GameObject ghostModel = (GameObject) _ghostModel.GetValue(null);
 

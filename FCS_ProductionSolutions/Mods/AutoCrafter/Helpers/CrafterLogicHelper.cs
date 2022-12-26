@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using FCS_AlterraHub.Helpers;
-using QModManager.API;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
 #if SUBNAUTICA
@@ -25,7 +25,8 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Helpers
 
             if (UWEHelpers.RequiresIngredients())
             {
-                if (!QModServices.Main.ModPresent("UITweaks"))
+                
+                if (!BepInEx.Bootstrap.Chainloader.PluginInfos.Values.Any(x => x.Metadata.Name.Equals("UITweaks")))
                 {
                     RecipeData data = GetData(techType);
                     int ingredientCount = data?.ingredientCount ?? 0;

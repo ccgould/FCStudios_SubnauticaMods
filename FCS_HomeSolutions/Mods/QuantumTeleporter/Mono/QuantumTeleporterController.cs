@@ -60,7 +60,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
 
         internal void ChangeTrailColor()
         {
-            var index = QPatch.Configuration.QuantumTeleporterPortalTrailBrightness;
+            var index = Main.Configuration.QuantumTeleporterPortalTrailBrightness;
             _trails.colorOverLifetime =  new Color(index, index, index);
         }
 

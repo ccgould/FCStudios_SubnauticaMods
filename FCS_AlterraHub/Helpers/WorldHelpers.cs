@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCSCommon.Utilities;
-using QModManager.API;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
 using UnityEngine;
@@ -414,17 +414,10 @@ namespace FCS_AlterraHub.Helpers
         }
 #endif
 
-#if SUBNAUTICA
-        public static float GetDepth(GameObject gameObject)
-        {
-            return gameObject == null ? 0f : Ocean.main.GetDepthOf(gameObject);
-        }
-#elif BELOWZERO
         public static float GetDepth(GameObject gameObject)
         {
             return gameObject == null ? 0f : Ocean.GetDepthOf(gameObject);
         }
-#endif
 
         public static PingInstance CreateBeacon(GameObject gameObject, PingType pingType, string label, bool isEnable = true)
         {
@@ -530,7 +523,7 @@ namespace FCS_AlterraHub.Helpers
 
             if (UWEHelpers.RequiresIngredients())
             {
-                if (!QModServices.Main.ModPresent("UITweaks"))
+                if (!BepInEx.Bootstrap.Chainloader.PluginInfos.Values.Any(x => x.Metadata.Name.Equals("UITweaks")))
                 {
                     RecipeData data = GetData(techType);
                     int ingredientCount = data?.ingredientCount ?? 0;
@@ -606,11 +599,7 @@ namespace FCS_AlterraHub.Helpers
 
         public static float GetOceanDepth()
         {
-#if SUBNAUTICA_STABLE
-            return Ocean.main.GetOceanLevel();
-#else
             return Ocean.GetOceanLevel();
-#endif
         }
     }
 

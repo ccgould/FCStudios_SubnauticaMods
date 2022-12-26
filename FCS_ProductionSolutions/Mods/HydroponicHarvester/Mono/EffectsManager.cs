@@ -49,14 +49,14 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
 
         internal void ToggleLightsByDistance()
         {
-            if (!QPatch.Configuration.HHIsLightTriggerEnabled)
+            if (!Main.Configuration.HHIsLightTriggerEnabled)
             {
                 TurnOnLights();
                 return;
             }
 
             float distance = Vector3.Distance(_controller.transform.position, Player.main.camRoot.transform.position);
-            if (distance <= QPatch.Configuration.HHLightTriggerRange)
+            if (distance <= Main.Configuration.HHLightTriggerRange)
             {
                 if (!_isBreakerSwitched)
                 {

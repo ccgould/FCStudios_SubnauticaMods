@@ -35,7 +35,7 @@ namespace FCS_AlterraHub.Mono
 
         public virtual void OnHandHover(GUIHand hand)
         {
-            if (Input.GetKeyDown(QPatch.Configuration.PDAInfoKeyCode))
+            if (Input.GetKeyDown(Main.Configuration.PDAInfoKeyCode))
             {
                 FCSPDAController.Main.Screen.OpenEncyclopedia(GetTechType());
             }
@@ -43,7 +43,7 @@ namespace FCS_AlterraHub.Mono
 
         protected void OnHandHover(GUIHand hand, string techType)
         {
-            if (Input.GetKeyDown(QPatch.Configuration.PDAInfoKeyCode))
+            if (Input.GetKeyDown(Main.Configuration.PDAInfoKeyCode))
             {
                 FCSPDAController.Main.Screen.OpenEncyclopedia(techType);
             }

@@ -386,11 +386,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
                 return;
             }
 
-#if SUBNAUTICA
-            main.SetInteractText(AuxPatchers.OpenAlterraStorage());
-#else
             main.SetTextRaw(HandReticle.TextType.Hand, AuxPatchers.OpenAlterraStorage());
-#endif
 
             main.SetIcon(HandReticle.IconType.Hand);
         }

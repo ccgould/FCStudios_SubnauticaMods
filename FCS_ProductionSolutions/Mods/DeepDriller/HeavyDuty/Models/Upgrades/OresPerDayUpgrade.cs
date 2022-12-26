@@ -31,12 +31,12 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Models.Upgrades
         private float CalculatePowerUsage()
         {
             ;
-            if (OreCount <= QPatch.Configuration.DDDefaultOrePerDay)
+            if (OreCount <= Main.Configuration.DDDefaultOrePerDay)
             {
-                return QPatch.Configuration.DDDefaultOperationalPowerUsage + OreCount * QPatch.Configuration.DDOrePowerUsageBelowDefault;
+                return Main.Configuration.DDDefaultOperationalPowerUsage + OreCount * Main.Configuration.DDOrePowerUsageBelowDefault;
             }
             
-            return Mathf.Pow((QPatch.Configuration.DDDefaultOperationalPowerUsage + QPatch.Configuration.DDOrePowerUsage) * (OreCount / QPatch.Configuration.DDDefaultOrePerDay), 1.2f);
+            return Mathf.Pow((Main.Configuration.DDDefaultOperationalPowerUsage + Main.Configuration.DDOrePowerUsage) * (OreCount / Main.Configuration.DDDefaultOrePerDay), 1.2f);
         }
 
         public override float Damage { get; }

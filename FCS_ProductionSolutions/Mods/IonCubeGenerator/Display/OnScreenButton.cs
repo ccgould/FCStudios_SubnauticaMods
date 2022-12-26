@@ -26,12 +26,8 @@ namespace FCS_ProductionSolutions.Mods.IonCubeGenerator.Display
 
             if (this.IsHovered && inInteractionRange)
             {
-#if SUBNAUTICA
-                HandReticle.main.SetInteractTextRaw(this.TextLineOne, this.TextLineTwo);
-#elif BELOWZERO
                 HandReticle.main.SetTextRaw(HandReticle.TextType.Hand, this.TextLineOne);
                 HandReticle.main.SetTextRaw(HandReticle.TextType.HandSubscript, this.TextLineTwo);
-#endif
             }
 
             if (this.IsHovered && inInteractionRange == false)

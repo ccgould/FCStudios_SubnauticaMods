@@ -12,11 +12,7 @@ using FCS_ProductionSolutions.Mods.HydroponicHarvester.Enumerators;
 using FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono;
 using FCS_ProductionSolutions.Mods.IonCubeGenerator.Interfaces;
 using FCS_ProductionSolutions.Structs;
-#if SUBNAUTICA_STABLE
-using Oculus.Newtonsoft.Json;
-#else
 using Newtonsoft.Json;
-#endif
 
 namespace FCS_ProductionSolutions.Configuration
 {

@@ -21,6 +21,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
         private GameObject _spark;
         private GameObject _damageMesh;
         private PowerSource _powerSource;
+        private RegeneratePowerSource _regenerate;
         public bool IsRepaired => _liveMixin?.health >= 100;
 
         internal void Initialize(int id)
@@ -30,8 +31,9 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
             _powerSource.maxPower = 37.5f;
             gameObject.SetActive(false);
 
-            var regenerate = gameObject.AddComponent<RegeneratePowerSource>();
-            regenerate.powerSource = _powerSource;
+            _regenerate = gameObject.AddComponent<RegeneratePowerSource>();
+            _regenerate.powerSource = _powerSource;
+
 
             gameObject.SetActive(true);
 
@@ -44,7 +46,13 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
             _fixMesh = GameObjectHelpers.FindGameObject(gameObject, "fix_mesh");
             _damageMesh = GameObjectHelpers.FindGameObject(gameObject, "damage_mesh");
             AddSpark();
+            InvokeRepeating(nameof(TryRegenerate),1f,1f);
             StartCoroutine(CheckHealth());
+        }
+
+        private void TryRegenerate()
+        {
+            _regenerate.enabled = _liveMixin.IsFullHealth();
         }
 
         internal PowerSource GetPowerSource()
@@ -97,11 +105,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
             _spark?.SetActive(false);
             if (forceFullHealth)
             {
-#if SUBNAUTICA_STABLE
-                _liveMixin.initialHealth = 1;
-#else
                 _liveMixin.defaultHealth = 1;
-#endif
                 _liveMixin.health = 100;
             }
         }
@@ -110,11 +114,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
         {
             if (_liveMixin.health < _liveMixin.maxHealth)
             {
-#if SUBNAUTICA
-                HandReticle.main.SetInteractTextRaw(Language.main.Get("DamagedWires"), Language.main.Get("WeldToFix"));
-#else
                 HandReticle.main.SetText(HandReticle.TextType.Hand, $"{Language.main.Get("DamagedWires")}\n{Language.main.Get("WeldToFix")}", false);
-#endif
+
             }
         }
 
@@ -127,11 +128,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
             _fixMesh.SetActive(false);
             _damageMesh.SetActive(true);
             _spark?.SetActive(true);
-#if SUBNAUTICA_STABLE
-            _liveMixin.initialHealth = 0;
-#else
             _liveMixin.defaultHealth = 0;
-#endif
             _liveMixin.health = 0;
         }
     }

@@ -320,7 +320,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
                 var batteryMeter = InterfaceHelpers.FindGameObject(homePage, "BatteryMeter");
                 _batteryFill = batteryMeter?.FindChild("Fill")?.GetComponent<Image>();
                 _batteryStatus = batteryMeter?.FindChild("BatteryStatus")?.GetComponent<Text>();
-                _batteryStatus.text = $"0/{QPatch.Configuration.DDInternalBatteryCapacity}";
+                _batteryStatus.text = $"0/{Main.Configuration.DDInternalBatteryCapacity}";
 
                 if (_batteryFill != null)
                 {
@@ -1003,7 +1003,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
         internal void RefreshStorageAmount()
         {
             if (_itemCounter == null || _mono?.DeepDrillerContainer == null) return;
-            _itemCounter.text = FCSDeepDrillerBuildable.InventoryStorageFormat(_mono.DeepDrillerContainer.GetContainerTotal(), QPatch.Configuration.DDStorageSize);
+            _itemCounter.text = FCSDeepDrillerBuildable.InventoryStorageFormat(_mono.DeepDrillerContainer.GetContainerTotal(), Main.Configuration.DDStorageSize);
         }
 
         internal void UpdateStatus()

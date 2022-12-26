@@ -86,14 +86,10 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
                 Mathf.RoundToInt(this._powerSource.GetPower()), Mathf.RoundToInt(this._powerSource.GetMaxPower()),
                 (_energyPerSec * 60).ToString("N1"));
 
-            var subString = $"For more information press {FCS_AlterraHub.QPatch.Configuration.PDAInfoKeyCode}";
+            var subString = $"For more information press {FCS_AlterraHub.Main.Configuration.PDAInfoKeyCode}";
 
-#if SUBNAUTICA
-            main.SetInteractTextRaw(mainString, subString);
-#else
             main.SetTextRaw(HandReticle.TextType.Use, mainString);
             main.SetTextRaw(HandReticle.TextType.UseSubscript, subString);
-#endif
             main.SetIcon(HandReticle.IconType.Info);
         }
 

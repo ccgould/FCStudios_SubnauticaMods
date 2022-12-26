@@ -26,13 +26,7 @@ namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
 
         private float GetDepthScalar()
         {
-            float time = Mathf.Clamp01((MaxDepth -
-#if SUBNAUTICA
-                                        Ocean.main.GetDepthOf(gameObject)
-#else
-                                        Ocean.GetDepthOf(gameObject)
-#endif
-                ) / MaxDepth);
+            float time = Mathf.Clamp01((MaxDepth - Ocean.GetDepthOf(gameObject)) / MaxDepth);
             return _depthCurve.Evaluate(time);
         }
 
@@ -68,9 +62,10 @@ namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
                 };
                 data.HandHoverPDAHelperEx(_mono.GetTechType());
 
-                if (Input.GetKeyDown(FCS_AlterraHub.QPatch.Configuration.PDAInfoKeyCode))
+                if (Input.GetKeyDown(FCS_AlterraHub.Main.Configuration.PDAInfoKeyCode))
                 {
-                    FCSPDAController.Main.OpenEncyclopedia(_mono.GetTechType());
+                    //TODO V2 Fix
+                    //FCSPDAController.Main.OpenEncyclopedia(_mono.GetTechType());
                 }
             }
         }

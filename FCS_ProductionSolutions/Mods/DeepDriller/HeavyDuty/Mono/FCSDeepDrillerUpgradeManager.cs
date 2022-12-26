@@ -115,9 +115,9 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 
             if (connectToBaseValid)
             {
-                QuickLogger.Debug($"Trying to connect drill {_mono?.UnitID} with built status {_mono?.IsConstructed} to base {connectToBase?.BaseFriendlyID} with a setting range of {QPatch.Configuration.DDDrillAlterraStorageRange}",true);
+                QuickLogger.Debug($"Trying to connect drill {_mono?.UnitID} with built status {_mono?.IsConstructed} to base {connectToBase?.BaseFriendlyID} with a setting range of {Main.Configuration.DDDrillAlterraStorageRange}",true);
 
-                if (WorldHelpers.CheckIfInRange(_mono, connectToBase, QPatch.Configuration.DDDrillAlterraStorageRange))
+                if (WorldHelpers.CheckIfInRange(_mono, connectToBase, Main.Configuration.DDDrillAlterraStorageRange))
                 {
                     QuickLogger.Debug($"Function  Valid: {functionString}", true);
                     var connectToBaseUpgrade = new ConnectToBaseUpgrade { IsEnabled = true, Mono = _mono, BaseName = connectToBase.BaseFriendlyID };

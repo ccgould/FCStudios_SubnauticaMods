@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using BepInEx;
 using FCS_AlterraHub.API;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
@@ -20,7 +21,6 @@ using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
 using FMOD;
 using HarmonyLib;
-using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
@@ -31,17 +31,30 @@ namespace FCS_AlterraHub
      * AlterraHub is a mod that allows you to purchase or craft FCStudios object in the Subnautica world.
      * This mod acts as a hub for the base and also allows other mods to connect to one another
      */
-    [QModCore]
-    public class QPatch
+    [BepInPlugin(GUID,MODNAME, VERSION)]
+    public class Main : BaseUnityPlugin
     {
+        #region [Declarations]
+
+        public const string
+            MODNAME = "AlterraHub",
+            AUTHOR = "FieldCreatorsStudios",
+            GUID = AUTHOR + "_" + MODNAME,
+            VERSION = "1.0.0.0";
+
         internal static FMODAsset BoxOpenSoundAsset;
         private static string PdaEntryMessage => $"Please open your AlterraHub PDA to read this data entry ({Configuration.FCSPDAKeyCode}). Make sure you have completed the Alterra Hub Station mission to do so.";
-        public static Config Configuration { get;} = OptionsPanelHandler.Main.RegisterModOptions<Config>();
+        public static Config Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<Config>();
         public static AssetBundle GlobalBundle { get; set; }
 
-        [QModPatch]
-        public static void Patch()
+        #endregion
+
+
+
+        private void Awake()
         {
+            QuickLogger.Info($"Started patching. Version: {QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly())}");
+
             FCSAlterraHubService.PublicAPI.RegisterModPack(Mod.ModPackID, Mod.AssetBundleName, Assembly.GetExecutingAssembly());
             FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(Mod.ModPackID);
 
@@ -50,33 +63,45 @@ namespace FCS_AlterraHub
             LanguageHandler.SetLanguageLine($"Ency_{OreConsumerPatcher.OreConsumerClassID}", OreConsumerPatcher.OreConsumerFriendly);
             LanguageHandler.SetLanguageLine($"EncyDesc_{OreConsumerPatcher.OreConsumerClassID}", PdaEntryMessage);
 
-            //QModServices.Main.AddCriticalMessage($"Power Loss Over Distance Result: {MathHelpers.PowerLossOverDistance(379)}");
 
-            Mod.CollectKnownDevices();
+           Mod.CollectKnownDevices();
 
-            QuickLogger.Info($"Started patching. Version: {QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly())}");
+            
+
             GlobalBundle = FCSAssetBundlesService.PublicAPI.GetAssetBundleByName(Mod.AssetBundleName);
+            //Mod.LoadAudioFiles();
 
-            Mod.LoadAudioFiles();
 
-            
-            QuickLogger.DebugLogsEnabled = Configuration.EnableDebugLogs;
-            
+            //QuickLogger.InfoLogsEnabled = Configuration.EnableInfoLogs;
             //Load Prefabs
             AlterraHub.GetPrefabs();
-            
             //Patch all spawnables
             PatchSpawnables();
-
             //Patch all the buildables
             PatchBuildables();
-
             //Patch all Additional Store Items
             PatchAdditionalStoreItems();
-
             //Run Harmony Patches
             var harmony = Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), "com.alterrahub.fcstudios");
+            CreatePingType(harmony);
+            //BoosterSound = AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "booster.mp3"));
+            FCSAlterraHubService.PublicAPI.FcsUnlockTechType = TechTypeHandler.Main.AddTechType("FCSUnlocker", "FCS Access Key", "TechType to unlock FCSItems", false);
+            RegisterCommands();
+            AlterraHub.AdditionalPatching();
+            Mod.RegisterVoices();
 
+            QuickLogger.Info($"Finished patching. Version: {QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly())}");
+
+        }
+
+        private static void RegisterCommands()
+        {
+            //Register Info commands
+            ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
+        }
+
+        private static void CreatePingType(Harmony harmony)
+        {
             //Create AlterraHubStation PingType
             var type = Type.GetType("SubnauticaMap.PingMapIcon, SubnauticaMap", false, false);
             if (type != null)
@@ -86,15 +111,13 @@ namespace FCS_AlterraHub
                 harmony.Patch(pingOriginal, pingPrefix);
             }
 
-            BoosterSound = AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "booster.mp3"));
-
             Mod.AlterraHubStationPingType = WorldHelpers.CreatePingType("Station", "Station",
                 ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "AlterraHubPing.png")));
 
             Mod.AlterraTransportDronePingType = WorldHelpers.CreatePingType("AlterraTransportDrone",
                 "AlterraTransportDrone", ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "TransportDronePing.png")));
 
-            
+
             var pingMapIconType = Type.GetType("SubnauticaMap.PingMapIcon, SubnauticaMap", false, false);
             if (pingMapIconType != null)
             {
@@ -102,17 +125,7 @@ namespace FCS_AlterraHub
                 var pingPrefix = new HarmonyMethod(AccessTools.Method(typeof(PingMapIcon_Patch), "Prefix"));
                 harmony.Patch(pingOriginal, pingPrefix);
             }
-
-            FCSAlterraHubService.PublicAPI.FcsUnlockTechType = TechTypeHandler.Main.AddTechType("FCSUnlocker", "FCS Access Key", "TechType to unlock FCSItems", false);
-            //Register debug commands
-            ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
-
-            AlterraHub.AdditionalPatching();
-
-            Mod.RegisterVoices();
         }
-        public static Sound BoosterSound { get; set; }
-
 
         private static void PatchAdditionalStoreItems()
         {
@@ -147,8 +160,6 @@ namespace FCS_AlterraHub
             StoreInventorySystem.AddInvalidReturnItem(TechType.HydrochloricAcid);
         }
 
-        public static FCSHUD HUD { get; set; }
-        public static bool IsDockedVehicleStorageAccessInstalled { get; set; }
         private static void PatchSpawnables()
         {
             //Data Box
@@ -168,7 +179,7 @@ namespace FCS_AlterraHub
             var sropPod = new AlterraHubPatch();
             sropPod.Patch();
         }
-        
+
         private static void PatchBuildables()
         {
             //Patch OreConsumer

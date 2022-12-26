@@ -44,143 +44,69 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Buildable
             };
         }
 
-
-
-#if SUBNAUTICA_STABLE
-        public override GameObject GetGameObject()
-        {
-            try
-            {
-                var prefab = GameObject.Instantiate(ModelPrefab.PowerStoragePrefab);
-
-                var center = new Vector3(0f, 4.330446f, 0f);
-                var size = new Vector3(7.856985f, 7.846021f, 7.994404f);
-
-                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
-
-                var model = prefab.FindChild("model");
-
-                //========== Allows the building animation and material colors ==========// 
-                Shader shader = Shader.Find("MarmosetUBER");
-                Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
-                SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
-                skyApplier.renderers = renderers;
-                skyApplier.anchorSky = Skies.Auto;
-                //========== Allows the building animation and material colors ==========// 
-
-                // Add constructible
-                var constructable = prefab.AddComponent<Constructable>();
-                constructable.allowedOutside = true;
-                constructable.allowedInBase = false;
-                constructable.allowedOnGround = true;
-                constructable.allowedOnWall = false;
-                constructable.rotationEnabled = true;
-                constructable.allowedOnCeiling = false;
-                constructable.allowedInSub = false;
-                constructable.allowedOnConstructables = false;
-                constructable.model = model;
-                constructable.techType = TechType;
-                constructable.placeDefaultDistance = 5;
-                constructable.placeMinDistance = 5;
-                constructable.placeMaxDistance = 10;
-                constructable.forceUpright = true;
-
-                PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
-                prefabID.ClassId = ClassID;
-                prefab.AddComponent<TechTag>().type = TechType;
-
-                PowerRelay solarPowerRelay = CraftData.GetPrefabForTechType(TechType.SolarPanel).GetComponent<PowerRelay>();
-                
-                var ps = prefab.AddComponent<PowerSource>();
-                ps.maxPower = 10000f;
-
-                var pFX = prefab.AddComponent<PowerFX>();
-                pFX.vfxPrefab = solarPowerRelay.powerFX.vfxPrefab;
-                pFX.attachPoint = GameObjectHelpers.FindGameObject(prefab,"connection_port").transform;
-
-                var pr = prefab.AddComponent<PowerRelay>();
-                pr.powerFX = pFX;
-                pr.maxOutboundDistance = 20;
-                pr.internalPowerSource = ps;
-
-                prefab.AddComponent<PowerStorageController>();
-
-                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
-
-                return prefab;
-            }
-            catch (Exception e)
-            {
-                QuickLogger.Error(e.Message);
-            }
-
-            return null;
-        }
-#else
         public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
         {
-                var prefab = GameObject.Instantiate(ModelPrefab.PowerStoragePrefab);
+            var prefab = GameObject.Instantiate(ModelPrefab.PowerStoragePrefab);
 
-                var center = new Vector3(0f, 4.330446f, 0f);
-                var size = new Vector3(7.856985f, 7.846021f, 7.994404f);
+            var center = new Vector3(0f, 4.330446f, 0f);
+            var size = new Vector3(7.856985f, 7.846021f, 7.994404f);
 
-                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
+            GameObjectHelpers.AddConstructableBounds(prefab, size, center);
 
-                var model = prefab.FindChild("model");
+            var model = prefab.FindChild("model");
 
-                //========== Allows the building animation and material colors ==========// 
-                Shader shader = Shader.Find("MarmosetUBER");
-                Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
-                SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
-                skyApplier.renderers = renderers;
-                skyApplier.anchorSky = Skies.Auto;
-                //========== Allows the building animation and material colors ==========// 
+            //========== Allows the building animation and material colors ==========// 
+            Shader shader = Shader.Find("MarmosetUBER");
+            Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
+            SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
+            skyApplier.renderers = renderers;
+            skyApplier.anchorSky = Skies.Auto;
+            //========== Allows the building animation and material colors ==========// 
 
-                // Add constructible
-                var constructable = prefab.AddComponent<Constructable>();
-                constructable.allowedOutside = true;
-                constructable.allowedInBase = false;
-                constructable.allowedOnGround = true;
-                constructable.allowedOnWall = false;
-                constructable.rotationEnabled = true;
-                constructable.allowedOnCeiling = false;
-                constructable.allowedInSub = false;
-                constructable.allowedOnConstructables = false;
-                constructable.model = model;
-                constructable.techType = TechType;
-                constructable.placeDefaultDistance = 5;
-                constructable.placeMinDistance = 5;
-                constructable.placeMaxDistance = 10;
-                constructable.forceUpright = true;
+            // Add constructible
+            var constructable = prefab.AddComponent<Constructable>();
+            constructable.allowedOutside = true;
+            constructable.allowedInBase = false;
+            constructable.allowedOnGround = true;
+            constructable.allowedOnWall = false;
+            constructable.rotationEnabled = true;
+            constructable.allowedOnCeiling = false;
+            constructable.allowedInSub = false;
+            constructable.allowedOnConstructables = false;
+            constructable.model = model;
+            constructable.techType = TechType;
+            constructable.placeDefaultDistance = 5;
+            constructable.placeMinDistance = 5;
+            constructable.placeMaxDistance = 10;
+            constructable.forceUpright = true;
 
-                PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
-                prefabID.ClassId = ClassID;
-                prefab.AddComponent<TechTag>().type = TechType;
+            PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
+            prefabID.ClassId = ClassID;
+            prefab.AddComponent<TechTag>().type = TechType;
 
-                var result = new TaskResult<GameObject>();
-                yield return CraftData.GetPrefabForTechTypeAsync(TechType.SolarPanel, false, result);
-                PowerRelay solarPowerRelay = result.Get().GetComponent<PowerRelay>();
-                
-                var ps = prefab.AddComponent<PowerSource>();
-                ps.maxPower = 10000f;
+            var result = new TaskResult<GameObject>();
+            yield return CraftData.GetPrefabForTechTypeAsync(TechType.SolarPanel, false, result);
+            PowerRelay solarPowerRelay = result.Get().GetComponent<PowerRelay>();
 
-                var pFX = prefab.AddComponent<PowerFX>();
-                pFX.vfxPrefab = solarPowerRelay.powerFX.vfxPrefab;
-                pFX.attachPoint = GameObjectHelpers.FindGameObject(prefab,"connection_port").transform;
+            var ps = prefab.AddComponent<PowerSource>();
+            ps.maxPower = 10000f;
 
-                var pr = prefab.AddComponent<PowerRelay>();
-                pr.powerFX = pFX;
-                pr.maxOutboundDistance = 20;
-                pr.internalPowerSource = ps;
+            var pFX = prefab.AddComponent<PowerFX>();
+            pFX.vfxPrefab = solarPowerRelay.powerFX.vfxPrefab;
+            pFX.attachPoint = GameObjectHelpers.FindGameObject(prefab, "connection_port").transform;
 
-                prefab.AddComponent<PowerStorageController>();
+            var pr = prefab.AddComponent<PowerRelay>();
+            pr.powerFX = pFX;
+            pr.maxOutboundDistance = 20;
+            pr.internalPowerSource = ps;
 
-                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
+            prefab.AddComponent<PowerStorageController>();
+
+            MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
 
             gameObject.Set(prefab);
             yield break;
         }
-#endif
 
 
         protected override RecipeData GetBlueprintRecipe()

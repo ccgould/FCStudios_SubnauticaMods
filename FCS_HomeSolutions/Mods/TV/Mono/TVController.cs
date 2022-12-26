@@ -295,15 +295,15 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
 
             var data = new string[]
             {
-                AuxPatchers.TVFormat(QPatch.Configuration.SmartTelevisionsToggleTv.ToString()),
+                AuxPatchers.TVFormat(Main.Configuration.SmartTelevisionsToggleTv.ToString()),
                 AuxPatchers.TVFormatContinued(
-                    QPatch.Configuration.SmartTelevisionsVolumeUp.ToString(),
-                    QPatch.Configuration.SmartTelevisionsVolumeDown.ToString())
+                    Main.Configuration.SmartTelevisionsVolumeUp.ToString(),
+                    Main.Configuration.SmartTelevisionsVolumeDown.ToString())
             };
 
             data.HandHoverPDAHelperEx("SmartTVs");
 
-            if (Input.GetKeyDown(QPatch.Configuration.SmartTelevisionsToggleTv))
+            if (Input.GetKeyDown(Main.Configuration.SmartTelevisionsToggleTv))
             {
                 if (_isOn)
                 {
@@ -315,12 +315,12 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
                 }
             }
 
-            if (Input.GetKeyDown(QPatch.Configuration.SmartTelevisionsVolumeUp))
+            if (Input.GetKeyDown(Main.Configuration.SmartTelevisionsVolumeUp))
             {
                 _videoSection.VolumeUp();
             }
 
-            if (Input.GetKeyDown(QPatch.Configuration.SmartTelevisionsVolumeDown))
+            if (Input.GetKeyDown(Main.Configuration.SmartTelevisionsVolumeDown))
             {
                 _videoSection.VolumeDown();
             }

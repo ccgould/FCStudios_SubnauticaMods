@@ -68,11 +68,7 @@ namespace FCS_HomeSolutions.Mods.Cabinets.Mono
                 return;
 
             HandReticle.main.SetIcon(HandReticle.IconType.Hand, 1f);
-#if BELOWZERO
             HandReticle.main.SetTextRaw(HandReticle.TextType.Hand, "OpenLocker");
-#else
-            HandReticle.main.SetInteractText("OpenLocker");
-#endif
         }
         
         public void OnHandClick(GUIHand hand)

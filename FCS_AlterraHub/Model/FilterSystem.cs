@@ -3,11 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using FCS_AlterraHub.Configuration;
-#if SUBNAUTICA_STABLE
-using Oculus.Newtonsoft.Json;
-#else
 using Newtonsoft.Json;
-#endif
 
 namespace FCS_AlterraHub.Model
 {
@@ -178,9 +174,7 @@ namespace FCS_AlterraHub.Model
             TechType.Coffee,
             TechType.DisinfectedWater,
             TechType.FilteredWater,
-#if SUBNAUTICA_STABLE
-                  TechType.StillsuitWater,      
-#endif
+            TechType.WaterFiltrationSuitWater,
         };
 
         public static List<TechType> ScannerRoomUpgrades = new List<TechType> {
@@ -243,9 +237,7 @@ namespace FCS_AlterraHub.Model
             TechType.RadiationSuit,
             TechType.ReinforcedDiveSuit,
             TechType.ReinforcedGloves,
-#if SUBNAUTICA_STABLE
-                  TechType.Stillsuit,      
-#endif
+            TechType.WaterFiltrationSuit,
             TechType.SwimChargeFins,
             TechType.Tank,
             TechType.UltraGlideFins,

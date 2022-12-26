@@ -12,7 +12,7 @@ namespace FCS_HomeSolutions.Patches
         [HarmonyPrefix]
         public static void Postfix(ref Player __instance)
         {
-            if (QPatch.Configuration.IsQuantumTeleporterEnabled)
+            if (Main.Configuration.IsQuantumTeleporterEnabled)
             {
                 TeleportManager.Update();
             }

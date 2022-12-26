@@ -1,10 +1,5 @@
-﻿#if SUBNAUTICA_STABLE
-using Oculus.Newtonsoft.Json;
-using ErrorEventArgs = Oculus.Newtonsoft.Json.Serialization.ErrorEventArgs;
-#else
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
-#endif
 
 using UnityEngine;
 using System;

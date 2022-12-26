@@ -18,21 +18,7 @@ namespace FCS_AlterraHub.Patches
         }
     }
 
-#if SUBNAUTICA_STABLE
     [HarmonyPatch(typeof(Constructable))]
-    [HarmonyPatch("Deconstruct")]
-    internal static class Constructable_Deconstruct_Patch
-    {
-        private static void Postfix(Constructable __instance)
-        {
-            if (__instance.constructedAmount <= 0f)
-            {
-                FCSAlterraHubService.PublicAPI.RemoveBuiltTech(__instance.techType);
-            }
-        }
-    }
-#else
-[HarmonyPatch(typeof(Constructable))]
     [HarmonyPatch("DeconstructAsync")]
     internal static class Constructable_Deconstruct_Patch
     {
@@ -44,5 +30,4 @@ namespace FCS_AlterraHub.Patches
             }
         }
     }
-#endif
 }

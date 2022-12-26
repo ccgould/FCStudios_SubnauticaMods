@@ -15,12 +15,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             Player main = Player.main;
             PDA pda = main.GetPDA();
             Inventory.main.SetUsedStorage(_itemContainer);
-#if SUBNAUTICA_STABLE
-            pda.Open(PDATab.Inventory, null, null, 4f);
-#else
             pda.Open(PDATab.Inventory);
-
-#endif
         }
 
         public override void Update()

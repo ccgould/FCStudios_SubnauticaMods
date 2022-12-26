@@ -99,7 +99,7 @@ namespace FCS_AlterraHub.Systems
             try
             {
                 _accountDetails.Balance += amount;
-                if (QPatch.Configuration.CreditMessageDelay == 0f)
+                if (Main.Configuration.CreditMessageDelay == 0f)
                 {
                     QuickLogger.CreditMessage(AlterraHub.CreditMessage(amount));
                 }
@@ -330,12 +330,12 @@ namespace FCS_AlterraHub.Systems
             MessageBoxHandler.ShowMessage(AlterraHub.AccountSetupError(sb.ToString()),sender);
 
             return false;
-            //QPatch.MissionManagerGM.NotifyDeviceAction(Mod.AlterraHubTechType,Mod.DebitCardTechType,DeviceActionType.CREATEITEM);
+            //Main.MissionManagerGM.NotifyDeviceAction(Mod.AlterraHubTechType,Mod.DebitCardTechType,DeviceActionType.CREATEITEM);
         }
 
         public void CalculateBalance()
         {
-            //if (QPatch.Configuration.GameModeOption == FCSGameMode.HardCore)
+            //if (Main.Configuration.GameModeOption == FCSGameMode.HardCore)
             //{
             //    if (!IsAlterraRepaid())
             //    {
@@ -344,7 +344,7 @@ namespace FCS_AlterraHub.Systems
             //    }
 
             //}
-            //else if (QPatch.Configuration.GameModeOption == FCSGameMode.Normal)
+            //else if (Main.Configuration.GameModeOption == FCSGameMode.Normal)
             //{
             //    if (AccountDetails.Balance <= AlterraDebit)
             //    {

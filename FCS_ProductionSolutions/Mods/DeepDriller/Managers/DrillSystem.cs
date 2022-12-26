@@ -135,9 +135,9 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
             if (_audio != null && _audio.isPlaying)
             {
 
-                _audio.volume = QPatch.Configuration.MasterDeepDrillerVolume;
+                _audio.volume = Main.Configuration.MasterDeepDrillerVolume;
 
-                if (!QPatch.Configuration.DDMK3FxAllowed)
+                if (!Main.Configuration.DDMK3FxAllowed)
                 {
                     _audio.Stop();
                     return;
@@ -238,7 +238,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
             }
 
 
-            _ping = WorldHelpers.CreateBeacon(gameObject, QPatch.DeepDrillerPingType, "");
+            _ping = WorldHelpers.CreateBeacon(gameObject, Main.DeepDrillerPingType, "");
 
             IsInitialized = true;
         }
@@ -309,11 +309,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
 
         internal float GetDepth()
         {
-#if SUBNAUTICA
-            return gameObject == null ? 0f : Ocean.main.GetDepthOf(gameObject);
-#elif BELOWZERO
             return gameObject == null ? 0f : Ocean.GetDepthOf(gameObject);
-#endif
         }
 
         public override bool ChangeBodyColor(ColorTemplate template)
@@ -395,12 +391,8 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
                 _sb.Clear();
                 _sb.Append(AlterraHub.PleaseClearHands());
 
-#if SUBNAUTICA
-                HandReticle.main.SetInteractText(_sb.ToString(), AlterraHub.ViewInPDA(), false, false, HandReticle.Hand.None);
-#else
                 _sb.Append(AlterraHub.ViewInPDA());
-                HandReticle.main.SetTextRaw(HandReticle.TextType.Hand ,_sb.ToString());
-#endif
+                HandReticle.main.SetTextRaw(HandReticle.TextType.Hand, _sb.ToString());
                 HandReticle.main.SetIcon(HandReticle.IconType.HandDeny);
                 return;
             }
@@ -426,12 +418,8 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
                 }
                 _sb.Append(Environment.NewLine);
 
-#if SUBNAUTICA
-                HandReticle.main.SetInteractText(_sb.ToString(), AlterraHub.ViewInPDA(), false, false, HandReticle.Hand.None);
-#else
                 _sb.Append(AlterraHub.ViewInPDA());
-                HandReticle.main.SetTextRaw(HandReticle.TextType.Hand,_sb.ToString());
-#endif
+                HandReticle.main.SetTextRaw(HandReticle.TextType.Hand, _sb.ToString());
                 HandReticle.main.SetIcon(HandReticle.IconType.Info, 1f);
 
                 if (GameInput.GetButtonDown(GameInput.Button.Exit))

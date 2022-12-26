@@ -231,7 +231,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
                 ui.Select(false);
             }
 
-            if (IsOpen && this.isFocused && (GameInput.GetButtonDown(GameInput.Button.PDA) || Input.GetKeyDown(QPatch.Configuration.FCSPDAKeyCode)))
+            if (IsOpen && this.isFocused && (GameInput.GetButtonDown(GameInput.Button.PDA) || Input.GetKeyDown(FCS_AlterraHub.Main.Configuration.FCSPDAKeyCode)))
             {
                 this.Close();
                 return;
@@ -263,14 +263,14 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             UwePostProcessingManager.OpenPDA();
             SafeAnimator.SetBool(Player.main.armsController.animator, "using_pda", true);
 
-#if SUBNAUTICA
-            _pda.ui.soundQueue.PlayImmediately(_pda.ui.soundOpen);
-            if (_pda.screen.activeSelf)
-            {
-                _pda.screen.SetActive(false);
-            }
-#else
-#endif
+//#if SUBNAUTICA
+//            _pda.ui.soundQueue.PlayImmediately(_pda.ui.soundOpen);
+//            if (_pda.screen.activeSelf)
+//            {
+//                _pda.screen.SetActive(false);
+//            }
+//#else
+//#endif
         }
 
         private bool DetemineIfInCinematicMode(Player main)
@@ -359,7 +359,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             if (PdaCanvas == null)
             {
 #if SUBNAUTICA
-                PdaCanvas = PDAObj?.GetComponent<PDA>()?.screen?.gameObject?.GetComponent<Canvas>();
+                PdaCanvas = PDAObj?.GetComponent<PDA>()?._ui?.gameObject?.GetComponent<Canvas>();
 #else
 #endif
                 Player main = Player.main;

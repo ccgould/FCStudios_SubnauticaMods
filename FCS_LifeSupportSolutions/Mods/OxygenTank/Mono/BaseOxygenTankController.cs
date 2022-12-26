@@ -171,7 +171,7 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
 
             main.SetIcon(HandReticle.IconType.Info);
 
-            var requiredTankCount = Manager.GetRequiredTankCount(QPatch.Configuration.SmallBaseOxygenHardcore);
+            var requiredTankCount = Manager.GetRequiredTankCount(Main.Configuration.SmallBaseOxygenHardcore);
             _sb.Clear();
             if (_oxygenAttachPoint.allowConnection && _oxygenAttachPoint.parentPipeUID != null)
                 _sb.Append($"Pipe Connected");
@@ -181,12 +181,8 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
                 _sb.Append($"Pipe Connection Disabled.");
             _sb.Append(Environment.NewLine);
             _sb.Append($"Active Tanks: {Manager.ActiveBaseOxygenTankCount}, Required Tank Count: {requiredTankCount}");
-#if SUBNAUTICA
-            main.SetInteractTextRaw($"{Mod.BaseOxygenTankFriendly} - {UnitID}", _sb.ToString());
-#else
             main.SetTextRaw(HandReticle.TextType.Use, $"{Mod.BaseOxygenTankFriendly} - {UnitID}");
             main.SetTextRaw(HandReticle.TextType.UseSubscript, _sb.ToString());
-#endif
         }
 
         public void OnHandClick(GUIHand hand)

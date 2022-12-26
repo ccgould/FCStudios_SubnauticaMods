@@ -1,7 +1,8 @@
-﻿namespace FCSCommon.Utilities
+﻿
+namespace FCSCommon.Utilities
 {
     using BepInEx.Logging;
-    using QModManager.API;
+
     using FCS_AlterraHub;
     using System;
     using System.Diagnostics;
@@ -20,32 +21,32 @@
         {
             if (_logger == null)
             {
-                _logger = Logger.CreateLogSource(QModServices.Main.GetMyMod().DisplayName);
+                _logger = Logger.CreateLogSource(Main.MODNAME);
             }
         }
 
         internal static void Info(string msg, bool showOnScreen = false)
         {
-            if (QPatch.Configuration.HideAllFCSOnScreenMessages) return;
+            if (Main.Configuration.HideAllFCSOnScreenMessages) return;
             Initialize();
             string name = Assembly.GetCallingAssembly().GetName().Name;
 
             _logger.LogInfo($"[{name}:INFO] {msg}");
 
             if (showOnScreen)
-                ErrorMessage.AddMessage(msg);
+                AddMessage(msg);
         }
 
         internal static void Message(string msg, bool showOnScreen = false)
         {
-            if (QPatch.Configuration.HideAllFCSOnScreenMessages) return;
+            if (Main.Configuration.HideAllFCSOnScreenMessages) return;
             Initialize();
             string name = Assembly.GetCallingAssembly().GetName().Name;
 
             _logger.LogMessage($"[{name}] : {msg}");
 
-            if (showOnScreen)
-                ErrorMessage.AddMessage(msg);
+            if (showOnScreen) 
+                AddMessage(msg);
         }
 
         internal static void Debug(string msg, bool showOnScreen = false)
@@ -59,7 +60,7 @@
             _logger.LogInfo($"[{name}:DEBUG] {msg}");
 
             if (showOnScreen)
-                ErrorMessage.AddDebug(msg);
+                AddDebug(msg);
 
         }
 
@@ -71,7 +72,7 @@
             _logger.LogError( $"[{name}:ERROR] {msg}");
 
             if (showOnScreen)
-                ErrorMessage.AddError(msg);
+                AddError(msg);
         }
 
         internal static void Error<T>(string msg, bool showOnScreen = false)
@@ -82,7 +83,7 @@
             _logger.LogError($"[{name}:ERROR] {typeof(T).FullName}: {msg}");
 
             if (showOnScreen)
-                ErrorMessage.AddError(msg);
+                AddError(msg);
         }
 
         internal static void Error(string msg, Exception ex)
@@ -100,15 +101,17 @@
 
         internal static void Warning(string msg, bool showOnScreen = false)
         {
-            if (QPatch.Configuration.HideAllFCSOnScreenMessages) return;
+            if (Main.Configuration.HideAllFCSOnScreenMessages) return;
             Initialize();
             string name = Assembly.GetCallingAssembly().GetName().Name;
 
             _logger.LogWarning($"[{name}:WARN] {msg}");
 
             if (showOnScreen)
-                ErrorMessage.AddWarning(msg);
+                AddWarning(msg);
         }
+
+        
 
         internal static string GetAssemblyVersion() => GetAssemblyVersion(Assembly.GetExecutingAssembly());
 
@@ -122,21 +125,22 @@
 
         public static void CreditMessage(string msg)
         {
-            if (!QPatch.Configuration.ShowCreditMessages) return;
+            if (!Main.Configuration.ShowCreditMessages) return;
             Initialize();
             string name = Assembly.GetCallingAssembly().GetName().Name;
             _logger.LogMessage($"[{name}] {msg}");
-            ErrorMessage.AddMessage($"[{name}] {msg}");
+            AddMessage($"[{name}] {msg}");
         }        
         
         public static void ModMessage(string msg)
         {
-            if (QPatch.Configuration.HideAllFCSOnScreenMessages) return;
+            if (Main.Configuration.HideAllFCSOnScreenMessages) return;
             Initialize();
             string name = Assembly.GetCallingAssembly().GetName().Name;
             _logger.LogMessage($"[{name}] {msg}");
-            ErrorMessage.AddMessage($"[{name}] {msg}");
         }
+
+
 
         public static void DebugError(string msg, bool showOnScreen = false)
         {
@@ -148,7 +152,27 @@
             _logger.LogError($"[{name}:DEBUG_ERROR] {msg}");
 
             if (showOnScreen)
-                ErrorMessage.AddError($"[{name}:DEBUG_ERROR] {msg}");
+                AddError($"[{name}:DEBUG_ERROR] {msg}");
+        }
+
+        private static void AddError(string message)
+        {
+            ErrorMessage.AddError(message);
+        }
+
+        private static void AddMessage(string message)
+        {
+            ErrorMessage.AddMessage(message);
+        }
+
+        private static void AddWarning(string message)
+        {
+            ErrorMessage.AddWarning(message);
+        }
+
+        private static void AddDebug(string message)
+        {
+            ErrorMessage.AddDebug(message);
         }
     }
 }

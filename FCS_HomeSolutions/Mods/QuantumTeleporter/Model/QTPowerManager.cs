@@ -9,8 +9,8 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Model
 {
     internal class QTPowerManager : IQTPower
     {
-        private readonly float _interPowerUsage = QPatch.Configuration.QuantumTeleporterGlobalTeleportPowerUsage;
-        private readonly float _intraPowerUsage = QPatch.Configuration.QuantumTeleporterInternalTeleportPowerUsage;
+        private readonly float _interPowerUsage = Main.Configuration.QuantumTeleporterGlobalTeleportPowerUsage;
+        private readonly float _intraPowerUsage = Main.Configuration.QuantumTeleporterInternalTeleportPowerUsage;
         private PowerRelay _connectedRelay;
         private readonly QuantumTeleporterController _mono;
 

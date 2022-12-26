@@ -101,21 +101,13 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
 
             if (!_controller.IsOperational || !_controller.Manager.HasEnoughPower(FCSElevatorController.POWERUSAGE))
             {
-#if SUBNAUTICA
-                main.SetInteractText(
-#else
                 main.SetTextRaw(HandReticle.TextType.Use,
-#endif
                     Language.main.Get("NoPower"));
                 main.SetIcon(HandReticle.IconType.HandDeny);
             }
             else
             {
-#if SUBNAUTICA
-                main.SetInteractText(
-#else
                 main.SetTextRaw(HandReticle.TextType.Use,
-#endif
                     "Open Control Panel");
                 main.SetIcon(HandReticle.IconType.Hand);
             }

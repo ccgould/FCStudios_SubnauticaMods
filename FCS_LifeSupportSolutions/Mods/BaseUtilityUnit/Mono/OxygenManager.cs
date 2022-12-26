@@ -119,7 +119,7 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
 
             float playerO2Request;
 
-            if (QPatch.IsRefillableOxygenTanksInstalled && Player.main.oxygenMgr.HasOxygenTank())
+            if (Main.IsRefillableOxygenTanksInstalled && Player.main.oxygenMgr.HasOxygenTank())
             {
                 playerO2Request = Player_CanBreathe.DefaultO2Level - o2Manager.GetOxygenAvailable();
             }

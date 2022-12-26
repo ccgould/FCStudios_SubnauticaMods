@@ -46,157 +46,77 @@ namespace FCS_EnergySolutions.Mods.AlterraGen.Buildables
             };
         }
 
-#if SUBNAUTICA_STABLE
-        public override GameObject GetGameObject()
-        {
-            try
-            {
-                var prefab = GameObject.Instantiate(_prefab);
-
-                //Scale the object
-                prefab.transform.localScale += new Vector3(0.24f, 0.24f, 0.24f);
-
-                var size = new Vector3(2.493512f, 1.875936f, 1.439421f);
-                var center = new Vector3(0.07963049f, 1.088284f, 0f);
-
-                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
-
-                var model = prefab.FindChild("model");
-
-                //========== Allows the building animation and material colors ==========// 
-                Shader shader = Shader.Find("MarmosetUBER");
-                Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
-                SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
-                skyApplier.renderers = renderers;
-                skyApplier.anchorSky = Skies.Auto;
-                //========== Allows the building animation and material colors ==========// 
-
-                // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
-                var lwe = prefab.AddComponent<LargeWorldEntity>();
-                lwe.cellLevel = LargeWorldEntity.CellLevel.Far;
-
-                // Add constructible
-                var constructable = prefab.AddComponent<Constructable>();
-
-                constructable.allowedOutside = true;
-                constructable.allowedInBase = true;
-                constructable.allowedOnGround = true;
-                constructable.allowedOnWall = false;
-                constructable.rotationEnabled = true;
-                constructable.allowedOnCeiling = false;
-                constructable.allowedInSub = false;
-                constructable.allowedOnConstructables = false;
-                constructable.model = model;
-                constructable.techType = TechType;
-                
-                PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
-                prefabID.ClassId = ClassID;
-
-                PowerRelay solarPowerRelay = CraftData.GetPrefabForTechType(TechType.SolarPanel).GetComponent<PowerRelay>();
-
-                var ps = prefab.AddComponent<PowerSource>();
-                ps.maxPower = 1000f; //500f Old Value
-
-                var pFX = prefab.AddComponent<PowerFX>();
-                pFX.vfxPrefab = solarPowerRelay.powerFX.vfxPrefab;
-                pFX.attachPoint = prefab.transform;
-
-                var pr = prefab.AddComponent<PowerRelay>();
-                pr.powerFX = pFX;
-                pr.maxOutboundDistance = 15;
-                pr.internalPowerSource = ps;
-
-                prefab.AddComponent<TechTag>().type = TechType;
-                prefab.AddComponent<AlterraGenController>();
-
-
-                //Disabled due to unity Error
-                //Resources.UnloadAsset(solarPowerRelay);
-
-                //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
-                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
-                return prefab;
-            }
-            catch (Exception e)
-            {
-                QuickLogger.Error(e.Message);
-            }
-
-            return null;
-        }
-#else
         public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
         {
-                var prefab = GameObject.Instantiate(_prefab);
+            var prefab = GameObject.Instantiate(_prefab);
 
-                //Scale the object
-                prefab.transform.localScale += new Vector3(0.24f, 0.24f, 0.24f);
+            //Scale the object
+            prefab.transform.localScale += new Vector3(0.24f, 0.24f, 0.24f);
 
-                var size = new Vector3(2.493512f, 1.875936f, 1.439421f);
-                var center = new Vector3(0.07963049f, 1.088284f, 0f);
+            var size = new Vector3(2.493512f, 1.875936f, 1.439421f);
+            var center = new Vector3(0.07963049f, 1.088284f, 0f);
 
-                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
+            GameObjectHelpers.AddConstructableBounds(prefab, size, center);
 
-                var model = prefab.FindChild("model");
+            var model = prefab.FindChild("model");
 
-                //========== Allows the building animation and material colors ==========// 
-                Shader shader = Shader.Find("MarmosetUBER");
-                Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
-                SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
-                skyApplier.renderers = renderers;
-                skyApplier.anchorSky = Skies.Auto;
-                //========== Allows the building animation and material colors ==========// 
+            //========== Allows the building animation and material colors ==========// 
+            Shader shader = Shader.Find("MarmosetUBER");
+            Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
+            SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
+            skyApplier.renderers = renderers;
+            skyApplier.anchorSky = Skies.Auto;
+            //========== Allows the building animation and material colors ==========// 
 
-                // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
-                var lwe = prefab.AddComponent<LargeWorldEntity>();
-                lwe.cellLevel = LargeWorldEntity.CellLevel.Far;
+            // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
+            var lwe = prefab.AddComponent<LargeWorldEntity>();
+            lwe.cellLevel = LargeWorldEntity.CellLevel.Far;
 
-                // Add constructible
-                var constructable = prefab.AddComponent<Constructable>();
+            // Add constructible
+            var constructable = prefab.AddComponent<Constructable>();
 
-                constructable.allowedOutside = true;
-                constructable.allowedInBase = true;
-                constructable.allowedOnGround = true;
-                constructable.allowedOnWall = false;
-                constructable.rotationEnabled = true;
-                constructable.allowedOnCeiling = false;
-                constructable.allowedInSub = false;
-                constructable.allowedOnConstructables = false;
-                constructable.model = model;
-                constructable.techType = TechType;
+            constructable.allowedOutside = true;
+            constructable.allowedInBase = true;
+            constructable.allowedOnGround = true;
+            constructable.allowedOnWall = false;
+            constructable.rotationEnabled = true;
+            constructable.allowedOnCeiling = false;
+            constructable.allowedInSub = false;
+            constructable.allowedOnConstructables = false;
+            constructable.model = model;
+            constructable.techType = TechType;
 
-                PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
-                prefabID.ClassId = ClassID;
+            PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
+            prefabID.ClassId = ClassID;
 
-                var taskResult = CraftData.GetPrefabForTechTypeAsync(TechType.SolarPanel);
-                yield return taskResult;
+            var taskResult = CraftData.GetPrefabForTechTypeAsync(TechType.SolarPanel);
+            yield return taskResult;
 
-                PowerRelay solarPowerRelay = taskResult.GetResult().GetComponent<PowerRelay>();
+            PowerRelay solarPowerRelay = taskResult.GetResult().GetComponent<PowerRelay>();
 
             var ps = prefab.AddComponent<PowerSource>();
-                ps.maxPower = 500f;
+            ps.maxPower = 500f;
 
-                var pFX = prefab.AddComponent<PowerFX>();
-                pFX.vfxPrefab = solarPowerRelay.powerFX.vfxPrefab;
-                pFX.attachPoint = prefab.transform;
+            var pFX = prefab.AddComponent<PowerFX>();
+            pFX.vfxPrefab = solarPowerRelay.powerFX.vfxPrefab;
+            pFX.attachPoint = prefab.transform;
 
-                var pr = prefab.AddComponent<PowerRelay>();
-                pr.powerFX = pFX;
-                pr.maxOutboundDistance = 15;
-                pr.internalPowerSource = ps;
+            var pr = prefab.AddComponent<PowerRelay>();
+            pr.powerFX = pFX;
+            pr.maxOutboundDistance = 15;
+            pr.internalPowerSource = ps;
 
-                prefab.AddComponent<TechTag>().type = TechType;
-                prefab.AddComponent<AlterraGenController>();
+            prefab.AddComponent<TechTag>().type = TechType;
+            prefab.AddComponent<AlterraGenController>();
 
 
-                Resources.UnloadAsset(solarPowerRelay);
+            Resources.UnloadAsset(solarPowerRelay);
 
-                //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
-                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
-                gameObject.Set(prefab);
-                yield break;
+            //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
+            MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
+            gameObject.Set(prefab);
+            yield break;
         }
-#endif
 
         protected override RecipeData GetBlueprintRecipe()
         {

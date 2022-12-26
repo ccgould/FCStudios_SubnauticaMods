@@ -71,39 +71,6 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
             _isSorting = false;
         }
 
-#if SUBNAUTICA_STABLE
-        private IEnumerator SortAnyTargets()
-        {
-            int callsToCanAddItem = 0;
-            const int CanAddItemCallThreshold = 10;
-            foreach (var item in _mono.DeepDrillerContainer.GetItemsWithin())
-            {
-                foreach (FcsDevice target in _storagesList)
-                {
-
-                    for (int i = 0; i < item.Value; i++)
-                    {
-                        callsToCanAddItem++;
-                        if (target.CanBeStored(1, item.Key))
-                        {
-                            SortItem(item.Key, target);
-                            _unsortableItems--;
-                            _sortedItem = true;
-                            yield break;
-                        }
-
-                        if (callsToCanAddItem > CanAddItemCallThreshold)
-                        {
-                            callsToCanAddItem = 0;
-                            goto skip;
-                        }
-                    }
-
-                    skip:;
-                }
-            }
-        }
-#else
         private IEnumerator SortAnyTargets()
         {
             int callsToCanAddItem = 0;
@@ -131,19 +98,11 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
                         }
                     }
 
-                    skip:;
+                skip:;
                 }
             }
         }
-#endif
 
-#if SUBNAUTICA_STABLE
-        private void SortItem(TechType techType, FcsDevice target)
-        {
-            _mono.DeepDrillerContainer.OnlyRemoveItemFromContainer(techType);
-            target.AddItemToContainer(techType.ToInventoryItemLegacy());
-        }
-#else
         private IEnumerator SortItem(TechType techType, FcsDevice target)
         {
             _mono.DeepDrillerContainer.OnlyRemoveItemFromContainer(techType);
@@ -152,7 +111,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 
             yield return CraftData.InstantiateFromPrefabAsync(techType, result, false);
             GameObject gameObject = result.Get();
-            
+
             if (gameObject != null)
             {
                 CrafterLogic.NotifyCraftEnd(gameObject, techType);
@@ -164,7 +123,6 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
             }
             yield break;
         }
-#endif
 
         private void FindAlterraStorage()
         {
@@ -174,7 +132,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 
             for (int i = foundDevices.Count- 1; i > -1; i--)
             {
-                if (WorldHelpers.CheckIfInRange(_mono, foundDevices.ElementAt(i).Value, QPatch.Configuration.DDDrillAlterraStorageRange))
+                if (WorldHelpers.CheckIfInRange(_mono, foundDevices.ElementAt(i).Value, Main.Configuration.DDDrillAlterraStorageRange))
                 {
                     _storagesList.Add(foundDevices.ElementAt(i).Value);
                 }

@@ -6,7 +6,7 @@ using FCS_AlterraHub.Interfaces;
 using FCSCommon.Utilities;
 using UnityEngine;
 #if SUBNAUTICA_STABLE
-using Oculus.Newtonsoft.Json;
+using Newtonsoft.Json;
 #else
 using Newtonsoft.Json;
 #endif
@@ -43,10 +43,6 @@ namespace FCS_AlterraHub.Model
 
             growingTransform = growingPlant.growingTransform;
 
-#if SUBNAUTICA
-            grownModelPrefab = growingPlant.grownModelPrefab;
-#else
-#endif
 
             _minScale = Mod.HeightRestrictions.ContainsKey(seed.plantTechType) ? Mod.HeightRestrictions[seed.plantTechType] : 1f;
 

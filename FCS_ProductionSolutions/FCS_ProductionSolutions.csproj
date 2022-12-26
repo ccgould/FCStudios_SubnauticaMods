@@ -154,7 +154,7 @@
     <Compile Include="Mods\Replicator\Mono\ReplicatorSpeedButton.cs" />
     <Compile Include="Mods\Replicator\Mono\ReplicatorSlot.cs" />
     <Compile Include="Mods\Replicator\Mono\ReplicatorController.cs" />
-    <Compile Include="QPatch.cs" />
+    <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

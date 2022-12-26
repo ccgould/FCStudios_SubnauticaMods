@@ -40,11 +40,7 @@ namespace FCS_HomeSolutions.Mods.Shower.Mono
         {
             HandReticle main = HandReticle.main;
 
-#if SUBNAUTICA
-                main.SetInteractText(
-#else
             main.SetTextRaw(HandReticle.TextType.Use,
-#endif
                 _isOn ? TurnOffText : TurnOnText);
             main.SetIcon(HandReticle.IconType.Hand);
         }

@@ -9,6 +9,7 @@ using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 using UnityEngine;
+using System.Collections.Generic;
 #if SUBNAUTICA
 using RecipeData = SMLHelper.V2.Crafting.TechData;
 using Sprite = Atlas.Sprite;
@@ -33,30 +34,28 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Buildable
             };
         }
 
-#if SUBNAUTICA_STABLE
-        public override GameObject GetGameObject()
+        public override string DiscoverMessage => $"{FriendlyName} Unlocked!";
+        public override List<TechType> CompoundTechsForUnlock => GetUnlocks();
+
+        private List<TechType> GetUnlocks()
         {
-            try
-            {
-                var prefab = Register();
-                return prefab;
+            var list = new List<TechType>();
 
-            }
-            catch (Exception e)
+            foreach (var ingredient in this.GetBlueprintRecipe().Ingredients)
             {
-                QuickLogger.Error(e.Message);
+                list.Add(ingredient.techType);
             }
 
-            return null;
+            return list;
         }
-#else
+
         public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
         {
             var prefab = Register();
             gameObject.Set(prefab);
             yield break;
         }
-#endif
+
         private GameObject Register()
         {
             var prefab = GameObject.Instantiate(Buildables.AlterraHub.AlterraHubDepotPrefab);

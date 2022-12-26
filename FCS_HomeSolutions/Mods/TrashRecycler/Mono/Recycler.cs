@@ -125,11 +125,7 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Mono
                 if (component)
                 {
                     GameObject battery = component
-#if SUBNAUTICA
-                        .GetBattery();
-#else
                         .GetBatteryGameObject();
-#endif
                     if (battery)
                     {
                         QuickLogger.Debug($"Removing Battery from {Language.main.Get(techType)}", true);

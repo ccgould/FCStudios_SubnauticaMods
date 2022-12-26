@@ -185,11 +185,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
 
         private void AddItemToInventory()
         {
-#if SUBNAUTICA_STABLE
-            ItemsContainer.UnsafeAdd(_targetItem.ToInventoryItemLegacy());
-#else
             StartCoroutine(_targetItem.AddTechTypeToContainerUnSafe(ItemsContainer));
-#endif
         }
 
         public int GetMaxCount()

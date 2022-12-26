@@ -27,7 +27,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 
         public bool IsFull => IsContainerFull();
         private Dictionary<TechType, int> _container = new Dictionary<TechType, int>();
-        private int _storageSize = QPatch.Configuration.DDStorageSize;
+        private int _storageSize = Main.Configuration.DDStorageSize;
 
         internal void OverrideContainerSize(int newSize)
         {
@@ -67,12 +67,8 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
                     var canBeStored = deviceStorage.CanBeStored(1, techType);
                     if (canBeStored)
                     {
-#if SUBNAUTICA_STABLE
-                        deviceStorage.AddItemToContainer(techType.ToInventoryItemLegacy());
-#else
                         CoroutineHost.StartCoroutine(
                             techType.AddTechTypeToContainerUnSafe(deviceStorage.ItemsContainer));
-#endif
                     }
                 }
             }

@@ -9,11 +9,7 @@ using FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono;
 using FCS_HomeSolutions.Spawnables;
 using FCS_HomeSolutions.Structs;
 using FCSCommon.Utilities;
-#if SUBNAUTICA_STABLE
-using Oculus.Newtonsoft.Json;
-#else
 using Newtonsoft.Json;
-#endif
 using SMLHelper.V2.Utility;
 using UnityEngine;
 #if SUBNAUTICA

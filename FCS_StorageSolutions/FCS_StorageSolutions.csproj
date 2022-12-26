@@ -85,7 +85,7 @@
     <Compile Include="Patches\StorageContainerPatches.cs" />
     <Compile Include="Patches\ToolTipFactory_Patch.cs" />
     <Compile Include="Patches\VehicleDockingBayPatcher.cs" />
-    <Compile Include="QPatch.cs" />
+    <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

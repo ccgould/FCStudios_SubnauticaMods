@@ -244,7 +244,10 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
 
         private void UpdateVisibleElements()
         {
-            if (!IsOperational && _antenna.IsRunning)
+            
+            if(!IsOperational) return;
+
+            if (_antenna.IsRunning)
             {
                 _antenna.StopMotor();
             }
@@ -316,7 +319,7 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
                 EffectsManager.Initialize(IsUnderWater());
             }
             
-            QPatch.Configuration.OnPlaySoundToggleEvent += value => { OnUpdateSound?.Invoke(value); };
+            Main.Configuration.OnPlaySoundToggleEvent += value => { OnUpdateSound?.Invoke(value); };
 
             if (_colorManager == null)
             {
@@ -353,11 +356,7 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
 
         internal float GetDepth()
         {
-#if SUBNAUTICA
-            return gameObject == null ? 0f : Ocean.main.GetDepthOf(gameObject);
-#elif BELOWZERO
             return gameObject == null ? 0f : Ocean.GetDepthOf(gameObject);
-#endif
         }
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)

@@ -55,84 +55,6 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Buildable
             };
         }
 
-#if SUBNAUTICA_STABLE
-        public override GameObject GetGameObject()
-        {
-            try
-            {
-                var prefab = GameObject.Instantiate(_prefab);
-
-                var size = new Vector3(2.534196f, 10.11668f, 2.51761f);
-                var center = new Vector3(-4.768372e-07f, 5.354942f, -0.01068687f);
-
-                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
-
-                var model = prefab.FindChild("model");
-
-                //========== Allows the building animation and material colors ==========// 
-                Shader shader = Shader.Find("MarmosetUBER");
-                Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
-                SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
-                skyApplier.renderers = renderers;
-                skyApplier.anchorSky = Skies.Auto;
-                //========== Allows the building animation and material colors ==========// 
-
-                // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
-                var lwe = prefab.AddComponent<LargeWorldEntity>();
-                lwe.cellLevel = LargeWorldEntity.CellLevel.Far;
-
-                // Add constructible
-                var constructable = prefab.AddComponent<Constructable>(); 
-
-                constructable.allowedOutside = true;
-                constructable.allowedInBase = false;
-                constructable.allowedOnGround = true;
-                constructable.allowedOnWall = false;
-                constructable.rotationEnabled = true;
-                constructable.allowedOnCeiling = false;
-                constructable.allowedInSub = false;
-                constructable.allowedOnConstructables = false;
-                constructable.model = model;
-                constructable.placeDefaultDistance = 5;
-                constructable.placeMinDistance = 5;
-                constructable.placeMaxDistance = 10;
-                constructable.techType = TechType;
-                constructable.forceUpright = true;
-                
-                PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
-                prefabID.ClassId = ClassID;
-
-                PowerRelay solarPowerRelay = CraftData.GetPrefabForTechType(TechType.SolarPanel).GetComponent<PowerRelay>();
-                
-                var pFX = prefab.AddComponent<PowerFX>();
-                pFX.vfxPrefab = solarPowerRelay.powerFX.vfxPrefab;
-                pFX.attachPoint = prefab.transform;
-
-                var pr = prefab.AddComponent<PowerRelay>();
-                pr.powerFX = pFX;
-                pr.dontConnectToRelays = true;
-                pr.maxOutboundDistance = 15;
-
-                //var powerSource = prefab.EnsureComponent<PowerSource>();
-
-                prefab.AddComponent<TechTag>().type = TechType;
-                prefab.AddComponent<TelepowerPylonController>();
-
-
-                Resources.UnloadAsset(solarPowerRelay);
-
-                //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
-                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
-                return prefab;
-            }
-            catch (Exception e)
-            {
-                QuickLogger.Error(e.Message);
-            }
-
-            return null;
-        }
-#else
         public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
         {
             var prefab = GameObject.Instantiate(_prefab);
@@ -201,7 +123,6 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Buildable
             gameObject.Set(prefab);
             yield break;
         }
-#endif
 
         protected override RecipeData GetBlueprintRecipe()
         {

@@ -15,11 +15,7 @@ namespace FCS_AlterraHub.Model
 
         public void OnHandHover(GUIHand hand)
         {
-#if SUBNAUTICA
-            HandReticle.main.SetInteractText(Language.main.Get("UseLadder"));
-#else
-            HandReticle.main.SetText(HandReticle.TextType.Hand,Language.main.Get("UseLadder"),true);
-#endif
+            HandReticle.main.SetText(HandReticle.TextType.Hand, Language.main.Get("UseLadder"), true);
             HandReticle.main.SetIcon(HandReticle.IconType.Interact);
         }
 
@@ -48,11 +44,7 @@ namespace FCS_AlterraHub.Model
 
         public void OnHandHover(GUIHand hand)
         {
-#if SUBNAUTICA
-            HandReticle.main.SetInteractText(Language.main.Get("UseLadder"));
-#else
             HandReticle.main.SetText(HandReticle.TextType.Hand, Language.main.Get("UseLadder"), true);
-#endif
             HandReticle.main.SetIcon(HandReticle.IconType.Interact);
         }
 

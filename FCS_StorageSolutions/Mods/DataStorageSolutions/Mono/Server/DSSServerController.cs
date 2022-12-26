@@ -223,11 +223,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
                 return;
             }
 
-#if SUBNAUTICA
-            main.SetInteractText(AuxPatchers.OpenAlterraStorage());
-#else
-            main.SetTextRaw(HandReticle.TextType.Hand,AuxPatchers.OpenAlterraStorage());
-#endif
+            main.SetTextRaw(HandReticle.TextType.Hand, AuxPatchers.OpenAlterraStorage());
             main.SetIcon(HandReticle.IconType.Hand);
         }
 

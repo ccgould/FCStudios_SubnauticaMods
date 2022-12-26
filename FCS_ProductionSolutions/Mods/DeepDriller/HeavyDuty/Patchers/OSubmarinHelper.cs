@@ -159,7 +159,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Patchers
         [HarmonyPrefix]
         public static bool SetPlaceOnSurface_Prefix(RaycastHit hit, ref Vector3 position, ref Quaternion rotation)
         {
-            if (!QPatch.Configuration.IsDeepDrillerEnabled) return true;
+            if (!Main.Configuration.IsDeepDrillerEnabled) return true;
 
             GameObject ghostModel = (GameObject) _ghostModel.GetValue(null);
             QuickLogger.Debug($"SetPlaceOnbSurface : {hit.collider?.gameObject?.name} | {ghostModel.name}", true);
@@ -208,11 +208,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Patchers
                         (hit.collider.gameObject.name.StartsWith(DrillTargetObjectName) ||
                          hit.collider.gameObject.name.StartsWith(PlatformTargetObjectName)))
                     {
-                        var result = Builder.CheckAsSubModule(
-#if !SUBNAUTICA_STABLE
-                            out _
-#endif
-                        );
+                        var result = Builder.CheckAsSubModule(out _);
                         if (!result)
                         {
                             //List<GameObject> list = new List<GameObject>();
@@ -264,7 +260,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Patchers
         [HarmonyPostfix]
         public static void CheckSurfaceType_Postfix(ref bool __result, SurfaceType surfaceType)
         {
-            if (!QPatch.Configuration.IsDeepDrillerEnabled) return;
+            if (!Main.Configuration.IsDeepDrillerEnabled) return;
 
             QuickLogger.Debug($"CheckSurfaceType_Postfix : {__result}", true);
             GameObject ghostModel = (GameObject) _ghostModel.GetValue(null);

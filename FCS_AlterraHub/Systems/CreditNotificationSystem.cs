@@ -24,7 +24,7 @@ namespace FCS_AlterraHub.Systems
 
             targetTime += Time.deltaTime;
 
-            if (targetTime >= QPatch.Configuration.CreditMessageDelay)
+            if (targetTime >= Main.Configuration.CreditMessageDelay)
             {
                 timerEnded();
             }

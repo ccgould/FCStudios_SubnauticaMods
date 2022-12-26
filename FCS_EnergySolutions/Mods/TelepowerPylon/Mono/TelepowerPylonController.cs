@@ -416,7 +416,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         {
             foreach (ParticleSystem system in _particles)
             {
-                var index = QPatch.Configuration.TelepowerPylonTrailBrightness;
+                var index = Main.Configuration.TelepowerPylonTrailBrightness;
                 var h = system.trails;
                 h.colorOverLifetime = new Color(index, index, index);
             }
@@ -618,7 +618,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
                     if (manager.GetIsConnected(_baseTelepowerPylonManager.GetBaseID()))
                     {
                         var distance = WorldHelpers.GetDistance(this, manager.GetRoot());
-                        amount += distance * QPatch.Configuration.TelepowerPylonPowerUsagePerMeter;
+                        amount += distance * Main.Configuration.TelepowerPylonPowerUsagePerMeter;
                     }
                 }
             }

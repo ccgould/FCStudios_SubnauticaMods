@@ -66,12 +66,7 @@ namespace FCS_HomeSolutions.Mods.TrashReceptacle.Mono
             var main = HandReticle.main;
             main.SetIcon(HandReticle.IconType.Info);
 
-#if SUBNAUTICA
-                main.SetInteractText(
-#else
             main.SetTextRaw(HandReticle.TextType.Use,
-#endif
-
                 Manager.IsDeviceBuilt(TrashReceptaclePatch.TrashReceptacleTabID)
                     ? AuxPatchers.ClickToOpenRecycle(TrashReceptaclePatch.TrashReceptacleFriendly)
                     : AuxPatchers.NoRecyclerConnected());

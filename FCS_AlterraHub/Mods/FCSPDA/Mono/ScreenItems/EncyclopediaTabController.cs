@@ -336,7 +336,12 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
             entry.Initialize(this, srcNode.id, spriteData);
             entry.SetIcon(icon);
             entry.SetIndent(indent);
-            entry.SetText(srcNode.string1);
+            if (!string.IsNullOrEmpty(srcNode.string1))
+            {
+                if (entry.text?.text == null) return; //TODO V2 Check THis
+                entry.SetText(srcNode.string1);
+            }
+
 
             srcNode.monoBehaviour0 = entry;
             SetNodeExpanded(srcNode, false);
@@ -400,11 +405,8 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
                 entry.timeCapsuleId = null;
             }
 
-#if SUBNAUTICA
-            if (entryData == null || entryData.timeCapsule) return null;
-#else
             if (entryData == null) return null;
-#endif
+
             CraftNode parent = PDAEncyclopedia.GetParent(entryData, true);
             if (parent[entryData.key] is not null) return null;
             

@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Reflection;
+using BepInEx;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Model.GUI;
 using FCS_AlterraHub.Registration;
@@ -14,8 +15,8 @@ using FCS_EnergySolutions.Mods.TelepowerPylon.Buildable;
 using FCS_EnergySolutions.Mods.UniversalCharger.Buildable;
 using FCS_EnergySolutions.Mods.WindSurfer.Buildables;
 using FCS_EnergySolutions.Spawnables;
+using FCSCommon.Utilities;
 using HarmonyLib;
-using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
@@ -28,14 +29,24 @@ namespace FCS_EnergySolutions
      * make sure all build settings line up with the correct engine.
      */
 
-    [QModCore]
-    public class QPatch
+
+
+    [BepInPlugin(GUID, MODNAME, VERSION)]
+    public class Main : BaseUnityPlugin
     {
+        #region [Declarations]
+
+        public const string
+            MODNAME = "FCS_EnergySolutions",
+            AUTHOR = "FieldCreatorsStudios",
+            GUID = AUTHOR + "_" + MODNAME,
+            VERSION = "1.0.0.0";
+        #endregion
+
         internal string Version { get; private set; }
         internal static Config Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<Config>();
 
-        [QModPatch]
-        public void Patch()
+        private void Awake()
         {
             FCSAlterraHubService.PublicAPI.RegisterModPack(Mod.ModPackID, Mod.ModBundleName, Assembly.GetExecutingAssembly());
             FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(Mod.ModPackID);
@@ -137,7 +148,7 @@ namespace FCS_EnergySolutions
             var constructorOriginal = AccessTools.Method(typeof(ConstructorInput), "OnCraftingBegin");
             var constructorPrefix = new HarmonyMethod(AccessTools.Method(typeof(ConstructorInput_Patch), "Prefix"));
             harmony.Patch(constructorOriginal, constructorPrefix);
-
+            QuickLogger.Info($"Finished patching. Version: {QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly())}");
         }
 
         public static class ConstructorInput_Patch

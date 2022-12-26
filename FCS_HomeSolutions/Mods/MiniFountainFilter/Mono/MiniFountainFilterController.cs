@@ -283,7 +283,7 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Mono
             }
             else
             {
-                _powerUsage = Mathf.Round(QPatch.Configuration.MiniFountainFilterEnergyPerSec * 60) / 10f;
+                _powerUsage = Mathf.Round(Main.Configuration.MiniFountainFilterEnergyPerSec * 60) / 10f;
             }
             return  _powerUsage;
         }

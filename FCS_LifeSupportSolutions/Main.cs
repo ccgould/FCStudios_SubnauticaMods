@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using BepInEx;
 using FCS_AlterraHub.Registration;
 using FCS_LifeSupportSolutions.Buildable;
 using FCS_LifeSupportSolutions.Configuration;
@@ -7,8 +8,8 @@ using FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Buildable;
 using FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.Buildable;
 using FCS_LifeSupportSolutions.Mods.MiniMedBay.Buildable;
 using FCS_LifeSupportSolutions.Spawnables;
+using FCSCommon.Utilities;
 using HarmonyLib;
-using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
 
 namespace FCS_LifeSupportSolutions
@@ -19,16 +20,26 @@ namespace FCS_LifeSupportSolutions
      * make sure all build settings line up with the correct engine.
      */
 
-    [QModCore]
-    public class QPatch
+    [BepInPlugin(GUID, MODNAME, VERSION)]
+    public class Main : BaseUnityPlugin
     {
+
+        #region [Declarations]
+
+        public const string
+            MODNAME = "FCS_LifeSupportSolutions",
+            AUTHOR = "FieldCreatorsStudios",
+            GUID = AUTHOR + "_" + MODNAME,
+            VERSION = "1.0.0.0";
+
         public static bool IsRefillableOxygenTanksInstalled { get; } =
             TechTypeHandler.ModdedTechTypeExists("HighCapacityTankRefill");
         internal string Version { get; private set; } 
         internal static Config Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<Config>();
 
-        [QModPatch]
-        public void Patch()
+        #endregion
+
+        private void Awake()
         {
             FCSAlterraHubService.PublicAPI.RegisterModPack(Mod.ModPackID, Mod.ModBundleName, Assembly.GetExecutingAssembly());
             FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(Mod.ModPackID);
@@ -82,6 +93,9 @@ namespace FCS_LifeSupportSolutions
 
             var harmony = new Harmony("com.lifesupportsolutions.fstudios");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
+
+            QuickLogger.Info($"Finished patching. Version: {QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly())}");
+
         }
     }
 }

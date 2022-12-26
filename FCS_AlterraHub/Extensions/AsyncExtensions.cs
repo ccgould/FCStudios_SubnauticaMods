@@ -18,32 +18,6 @@ namespace FCS_AlterraHub.Extensions
 
             return item;
         }
-#if SUBNAUTICA_STABLE
-        public static Pickupable ToPickupable(this TechType techType)
-        {
-            GameObject gameObject = CraftData.InstantiateFromPrefab(techType);
-            if (gameObject != null)
-            {
-                CrafterLogic.NotifyCraftEnd(gameObject, techType);
-                Pickupable component = gameObject.GetComponent<Pickupable>();
-                if(component !=null) return component;
-            }
-
-            return null;
-        }
-        
-        public static InventoryItem ToInventoryItemLegacy(this TechType techType)
-        {
-            GameObject prefabForTechType = CraftData.GetPrefabForTechType(techType, false);
-            GameObject gameObject =
- (prefabForTechType != null) ? Utils.SpawnFromPrefab(prefabForTechType, null) : Utils.CreateGenericLoot(techType);
-            gameObject.transform.position = gameObject.transform.position;
-            var pickupable = gameObject.GetComponent<Pickupable>();
-            return new InventoryItem(pickupable.Pickup(false));
-        }
-
-#else
-
         public static IEnumerator AddTechTypeToContainerUnSafe(this TechType techType, ItemsContainer container)
         {
             if (techType != TechType.None)
@@ -53,7 +27,7 @@ namespace FCS_AlterraHub.Extensions
                 container.UnsafeAdd(itemResult.Get());
             }
         }
-        
+
         public static IEnumerator ToInventoryItem(this TechType techType, TaskResult<InventoryItem> item)
         {
             if (techType != TechType.None)
@@ -66,14 +40,13 @@ namespace FCS_AlterraHub.Extensions
 
                 if (!go.TryGetComponent(out Pickupable pickupable))
                     pickupable = go.AddComponent<Pickupable>();
-                
+
                 PickupReplacement(pickupable);
                 item.Set(new InventoryItem(pickupable));
             }
 
             yield break;
         }
-#endif
 
 
 
@@ -117,8 +90,6 @@ namespace FCS_AlterraHub.Extensions
             }
         }
 
-
-#if !SUBNAUTICA_STABLE
         public static IEnumerator ToInventoryItemAsync(TechType techType, IOut<InventoryItem> result2)
         {
             TaskResult<GameObject> result = new TaskResult<GameObject>();
@@ -136,6 +107,5 @@ namespace FCS_AlterraHub.Extensions
                 yield break;
             }
         }
-#endif
     }
 }

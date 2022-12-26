@@ -9,11 +9,7 @@ using FCS_HomeSolutions.Mods.NeonPlanter.Mono;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Enumerators;
 using FCS_HomeSolutions.Mods.Stove.Mono;
 using FCS_HomeSolutions.Mods.TrashRecycler.Model;
-#if SUBNAUTICA_STABLE
-using Oculus.Newtonsoft.Json;
-#else
 using Newtonsoft.Json;
-#endif
 
 namespace FCS_HomeSolutions.Configuration
 {

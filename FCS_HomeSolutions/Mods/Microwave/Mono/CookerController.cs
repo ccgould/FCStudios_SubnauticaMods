@@ -115,11 +115,8 @@ namespace FCS_HomeSolutions.Mods.Microwave.Mono
                 if (_cookingTime <= 0 && _pendingItem.ReturnItem != TechType.None &&
                     _pendingItem.TechType != TechType.None)
                 {
-#if SUBNAUTICA_STABLE
-                    _storageContainer.container.UnsafeAdd(_pendingItem.ReturnItem.ToInventoryItemLegacy());
-#else
-                        StartCoroutine(_pendingItem.ReturnItem.AddTechTypeToContainerUnSafe(_storageContainer.container));
-#endif
+                    StartCoroutine(_pendingItem.ReturnItem.AddTechTypeToContainerUnSafe(_storageContainer.container));
+
                     _pendingItem = new CookingItem();
                     _storageContainer.container.DestroyItem(TechType.Salt);
                     if (_pendingItems.Any())

@@ -27,7 +27,7 @@ namespace CyclopsUpgradeConsole.Configuration
                 QuickLogger.DebugLogsEnabled = false;
                 QuickLogger.Info("Debug logs disabled");
             }
-            //QPatch.Configuration.Save();
+            //Main.Configuration.Save();
         }
     }
 }

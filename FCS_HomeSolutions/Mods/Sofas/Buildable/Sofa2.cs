@@ -18,20 +18,7 @@ namespace FCS_HomeSolutions.Mods.Sofas.Buildable
         {
         }
 
-#if SUBNAUTICA_STABLE
-        public override GameObject GetGameObject()
-        {
-            try
-            {
-                return CreateGameObject();
-            }
-            catch (Exception e)
-            {
-                QuickLogger.Error(e.Message);
-                return null;
-            }
-        }
-#endif
+
         public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
         {
             yield return CreateGameObjectAsync(gameObject);

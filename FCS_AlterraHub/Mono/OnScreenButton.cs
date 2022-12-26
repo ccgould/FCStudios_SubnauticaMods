@@ -45,61 +45,6 @@ namespace FCS_AlterraHub.Mono
                 this.IsHovered = true;
             }
 
-#if SUBNAUTICA
-            if (this.IsHovered && inInteractionRange)
-            {
-                if(string.IsNullOrEmpty(TextLineOne) && string.IsNullOrEmpty(TextLineTwo) && !GetAdditionalDataFromString) return;
-
-                if (ShowMouseClick)
-                {
-                    if (GetAdditionalDataFromString)
-                    {
-                        main.SetIcon(IconType);
-                        if (!string.IsNullOrWhiteSpace(TextLineOne))
-                        {
-                            main.SetInteractText(TextLineOne ?? string.Empty, GetAdditionalString?.Invoke(Tag) ?? string.Empty);
-                        }
-                        else
-                        {
-                            main.SetInteractText(GetAdditionalString?.Invoke(Tag) ?? string.Empty);
-                        }
-                    }
-                    else
-                    {
-                        main.SetIcon(IconType);
-                        main.SetInteractText(this.TextLineOne ?? String.Empty,this.TextLineTwo ?? string.Empty);
-                    }
-                }
-                else
-                {
-                    if (UseSetUseTextRaw)
-                    {
-                        if (GetAdditionalDataFromString)
-                        {
-                            main.SetIcon(IconType);
-                            main.SetUseTextRaw(this.TextLineOne ?? string.Empty, GetAdditionalString?.Invoke(Tag) ?? string.Empty);
-                        }
-                        else
-                        {
-                            main.SetUseTextRaw(this.TextLineOne ?? string.Empty, this.TextLineTwo ?? string.Empty);
-                        }
-                    }
-                    else
-                    {
-                        if (GetAdditionalDataFromString)
-                        {
-                            main.SetIcon(IconType);
-                            main.SetInteractTextRaw(this.TextLineOne ?? string.Empty, GetAdditionalString?.Invoke(Tag) ?? string.Empty);
-                        }
-                        else
-                        {
-                            main.SetInteractTextRaw(this.TextLineOne ?? string.Empty, this.TextLineTwo ?? string.Empty);
-                        }
-                    }
-                }
-
-            }
-#elif BELOWZERO
             if (this.IsHovered && inInteractionRange)
             {
                 if (string.IsNullOrEmpty(TextLineOne) && string.IsNullOrEmpty(TextLineTwo)) return;
@@ -107,7 +52,6 @@ namespace FCS_AlterraHub.Mono
                 HandReticle.main.SetTextRaw(HandReticle.TextType.HandSubscript, this.TextLineTwo);
             }
 
-#endif
         }
 
         public bool ShowMouseClick { get; set; } = false;

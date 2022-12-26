@@ -46,9 +46,9 @@ namespace FCS_HomeSolutions.Mods.Rug.Mono
 
                     _colorManager.LoadTemplate(_savedData.ColorTemplate);
 
-                    if (_savedData.SelectedTexturePath != null && QPatch.Patterns.ContainsKey(_savedData.SelectedTexturePath))
+                    if (_savedData.SelectedTexturePath != null && Main.Patterns.ContainsKey(_savedData.SelectedTexturePath))
                     {
-                        LoadImage(QPatch.Patterns[_savedData.SelectedTexturePath]);
+                        LoadImage(Main.Patterns[_savedData.SelectedTexturePath]);
                     }
                 }
 
@@ -58,7 +58,7 @@ namespace FCS_HomeSolutions.Mods.Rug.Mono
 
         internal void LoadImage(Texture2D texture2D)
         {
-            var path = QPatch.Patterns.FirstOrDefault(x => x.Value == texture2D).Key;
+            var path = Main.Patterns.FirstOrDefault(x => x.Value == texture2D).Key;
             MaterialHelpers.SetTexture(ModelPrefab.CurtainDecalMaterial, gameObject, texture2D);
             _selectedImagePath = path;
             _selectedImage = texture2D;
@@ -158,7 +158,7 @@ namespace FCS_HomeSolutions.Mods.Rug.Mono
             {
                 if (GameInput.GetButtonDown(GameInput.Button.AltTool))
                 {
-                    ImageSelectorHUD.Main.Show(QPatch.PatternsIcon, _selectedImage, ((texture2D, sprite) =>
+                    ImageSelectorHUD.Main.Show(Main.PatternsIcon, _selectedImage, ((texture2D, sprite) =>
                     {
                         LoadImage(texture2D);
                     }));

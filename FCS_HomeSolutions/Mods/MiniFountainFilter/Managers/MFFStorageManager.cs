@@ -18,8 +18,8 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Managers
         private Func<bool> _isConstructed;
         private ChildObjectIdentifier _containerRoot;
         private ItemsContainer _container;
-        private readonly int _containerWidth = QPatch.Configuration.MiniFountainFilterStorageWidth;
-        private readonly int _containerHeight = QPatch.Configuration.MiniFountainFilterStorageHeight;
+        private readonly int _containerWidth = Main.Configuration.MiniFountainFilterStorageWidth;
+        private readonly int _containerHeight = Main.Configuration.MiniFountainFilterStorageHeight;
         private int MaxContainerSlots => _containerHeight * _containerWidth;
         private float _passedTime;
 
@@ -77,7 +77,7 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Managers
 
         internal void AttemptSpawnBottle()
         {
-            if (!_mono.IsOperational || !QPatch.Configuration.MiniFountainFilterAutoGenerateMode) return;
+            if (!_mono.IsOperational || !Main.Configuration.MiniFountainFilterAutoGenerateMode) return;
 
             if (IsFull() || !_mono.TankManager.HasEnoughWater(50)) return;
 
@@ -110,7 +110,7 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Managers
 #if !SUBNAUTICA_STABLE
         internal IEnumerator LoadContainer(int waterBottleCount)
         {
-            if (QPatch.Configuration.MiniFountainFilterAutoGenerateMode) yield break;
+            if (Main.Configuration.MiniFountainFilterAutoGenerateMode) yield break;
 
             for (int i = 0; i < waterBottleCount; i++)
             {
@@ -134,9 +134,6 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Managers
             PDA pda = main.GetPDA();
             Inventory.main.SetUsedStorage(_container, false);
             pda.Open(PDATab.Inventory, null, null
-#if SUBNAUTICA_STABLE
-                , 4f
-#endif
             );
         }
 
@@ -149,12 +146,7 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Managers
 
         private void SpawnBottle()
         {
-#if SUBNAUTICA_STABLE
-            var newInventoryItem = TechType.BigFilteredWater.ToInventoryItemLegacy();
-            _container.UnsafeAdd(newInventoryItem);
-#else
             CoroutineHost.StartCoroutine(TechType.BigFilteredWater.AddTechTypeToContainerUnSafe(_container));
-#endif
             OnWaterAdded?.Invoke();
         }
 

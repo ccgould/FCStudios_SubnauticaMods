@@ -39,7 +39,7 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
         /// </summary>
         internal void PlayMachineAudio()
         {
-            if (!_soundPlaying && QPatch.Configuration.BaseUtilityUnitPlaySFX)
+            if (!_soundPlaying && Main.Configuration.BaseUtilityUnitPlaySFX)
             {
                 _loopingEmitter.Play();
                 _soundPlaying = true;
