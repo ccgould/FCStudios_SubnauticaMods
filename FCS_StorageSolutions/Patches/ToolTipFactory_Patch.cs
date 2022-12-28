@@ -2,21 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using FCS_StorageSolutions;
 using FCS_StorageSolutions.Configuration;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server;
 
-namespace DataStorageSolutions.Patches
+namespace FCS_StorageSolutions.Patches
 {
     internal class TooltipFactory_Patch
     {
         private static TechType _serverTechType;
 
-#if SUBNAUTICA
-        public static void GetToolTip(InventoryItem item, ref string __result)
-#else
         public static void GetToolTip(InventoryItem item, TooltipData data)
-#endif
         {
             if (!Main.Configuration.ShowServerCustomToolTip) return;
 
@@ -37,12 +32,8 @@ namespace DataStorageSolutions.Patches
             GetFilters(sb, isFormatted, controller);
             GetItems(controller, sb);
 
-#if SUBNAUTICA
-            __result = sb.ToString();
-#else
             data.prefix.Clear();
             data.prefix.AppendFormat(sb.ToString());
-#endif
         }
 
 

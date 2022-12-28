@@ -12,6 +12,9 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using Button = UnityEngine.UI.Button;
+#if SUBNAUTICA
+    using TechData = CraftData;
+#endif
 
 namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
 {
@@ -86,11 +89,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
             {
                 for (int i = 0; i < cartItem.ReturnAmount; i++)
                 {
-#if SUBNAUTICA
-                    totalSize.Add(CraftData.GetItemSize(cartItem.TechType));
-#else
                     totalSize.Add(TechData.GetItemSize(cartItem.TechType));
-#endif
                 }
             }
 

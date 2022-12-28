@@ -63,7 +63,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
         private void AddSpark()
         {
             var sparkPnt = GameObjectHelpers.FindGameObject(gameObject, "xElecSource");
-            StartCoroutine(SpawnHelper.SpawnUWEPrefab(UWEPrefabID.UnderwaterElecSourceMedium, sparkPnt.transform,
+            StartCoroutine(SpawnHelper.SpawnUWEPrefab(UWEPrefabID.UnderwaterElecSourceMedium,this,sparkPnt.transform,
                 OnEmissionAdded));
         }
 

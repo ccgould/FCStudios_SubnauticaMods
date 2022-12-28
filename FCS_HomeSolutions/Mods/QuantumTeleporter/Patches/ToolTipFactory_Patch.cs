@@ -8,26 +8,6 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Patches
     {
         private static TechType _powerBankTechType;
 
-#if SUBNAUTICA
-        public static void GetToolTip(InventoryItem item, ref string __result)
-        {
-
-            if (_powerBankTechType == TechType.None)
-            {
-                _powerBankTechType = QuantumPowerBankSpawnable.PatchedTechType;
-            }
-
-            if (item?.item.GetTechType() != _powerBankTechType) return;
-
-            var controller = item?.item.gameObject.GetComponent<QuantumPowerBankController>();
-            var sb = new StringBuilder();
-            var text = Language.main.Get(_powerBankTechType);
-
-            GetTitle(sb, text);
-            GetDescription(sb,controller);
-            __result = sb.ToString();
-        }
-#else
         public static void GetToolTip(InventoryItem item, TooltipData data)
         {
             if (_powerBankTechType == TechType.None)
@@ -46,7 +26,6 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Patches
             data.prefix.Clear();
             data.prefix.Append(sb.ToString());
         }
-#endif
 
         private static void GetDescription(StringBuilder sb, QuantumPowerBankController controller)
         {

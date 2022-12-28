@@ -138,7 +138,7 @@ namespace FCS_AlterraHub.Configuration
         {
             if (Enum.IsDefined(typeof(UWEPrefabID), prefabIndex))
             {
-                CoroutineHost.StartCoroutine(SpawnHelper.SpawnUWEPrefab((UWEPrefabID)prefabIndex, Player.main.transform));
+                CoroutineHost.StartCoroutine(SpawnHelper.SpawnUWEPrefab((UWEPrefabID)prefabIndex,Player.main, Player.main.transform));
             }
             else
             {

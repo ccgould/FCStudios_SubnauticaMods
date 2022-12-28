@@ -1,4 +1,5 @@
-﻿using FCS_AlterraHub.Helpers;
+﻿using System.Security.Cryptography;
+using FCS_AlterraHub.Helpers;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Mods.FCSDataBox.Mono
@@ -15,7 +16,7 @@ namespace FCS_AlterraHub.Mods.FCSDataBox.Mono
         {
             _bluePrintDataBox = gameObject.GetComponent<BlueprintHandTarget>();
             UnlockTechType = _bluePrintDataBox.unlockTechType;
-            StartCoroutine(SpawnHelper.SpawnUWEPrefab(UWEPrefabID.DataBoxLight, transform));
+            StartCoroutine(SpawnHelper.SpawnUWEPrefab(UWEPrefabID.DataBoxLight,this, transform));
             InvokeRepeating(nameof(CheckIfUnlocked),1f,1f);
         }
 

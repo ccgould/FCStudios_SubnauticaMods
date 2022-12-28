@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Configuration;
@@ -134,14 +135,17 @@ namespace FCS_AlterraHub.Managers
             return _baseManager.BaseID;
         }
 
-        public DroneController SpawnDrone()
+        public IEnumerator SpawnDrone(TaskResult<DroneController> itemResult)
         {
             foreach (KeyValuePair<string, IDroneDestination> destination in _dronePorts)
             {
-                return destination.Value.SpawnDrone();
+                yield return destination.Value.SpawnDrone((controller =>
+                {
+                    itemResult.Set(controller);
+                }));
             }
 
-            return null;
+            itemResult.Set(null);
         }
 
         public bool ContainsPort(IDroneDestination port)

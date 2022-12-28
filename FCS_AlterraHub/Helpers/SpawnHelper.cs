@@ -36,42 +36,41 @@ namespace FCS_AlterraHub.Helpers
 
 
 
-        public static IEnumerator SpawnUWEPrefab(UWEPrefabID uwePrefab, Transform transform,
-            Action<GameObject> callBack = null, bool removeComponents = true)
+        public static IEnumerator SpawnUWEPrefab(UWEPrefabID uwePrefab,MonoBehaviour owner, Transform transform, Action<GameObject> callBack = null, bool removeComponents = true)
         {
-            IPrefabRequest request = PrefabDatabase.GetPrefabAsync(UWEClassIDDictionary[uwePrefab]);
-            yield return request;
-            GameObject prefab;
-
-            if (!request.TryGetPrefab(out prefab))
+            string key;
+            if (!PrefabDatabase.TryGetPrefabFilename(UWEClassIDDictionary[uwePrefab], out key))
             {
-                Debug.LogErrorFormat("FindPrefab", "Failed to request prefab for '{0}'", new object[]
+                Debug.LogErrorFormat("Failed to request prefab for '{0}'", new object[]
                 {
                     UWEClassIDDictionary[uwePrefab]
                 });
-                //Destroy(base.gameObject);
+                //UnityEngine.Object.Destroy(base.gameObject);
                 yield break;
             }
+            Transform parent = transform.parent;
+            DeferredSpawner.Task task = DeferredSpawner.instance.InstantiateAsync(key, owner, parent, transform.localPosition, transform.localRotation, false, false);
+            yield return task;
+            GameObject result = task.GetResult();
+            if (result != null)
+            {
+                result.transform.localScale = transform.localScale;
+                result.SetActive(true);
+                if (removeComponents)
+                {
+                    GameObject.DestroyImmediate(result.GetComponent<PrefabIdentifier>());
+                    GameObject.DestroyImmediate(result.GetComponent<LargeWorldEntity>());
+                }
 
-
-            //TODO V2 Find A Fix
-            //#if SUBNAUTICA_STABLE
-            //            DeferredSpawner.Task deferredTask =
-            // DeferredSpawner.instance.InstantiateAsync(prefab, transform.localPosition, transform.localRotation, true);
-            //            yield return deferredTask;
-            //            GameObject result = deferredTask.result;
-            //            DeferredSpawner.instance.ReturnTask(deferredTask);
-            //            result.transform.SetParent(transform.parent, false);
-            //            result.transform.localScale = transform.localScale;
-            //            result.SetActive(true);
-            //            if(removeComponents)
-            //            {
-            //                GameObject.DestroyImmediate(result.GetComponent<PrefabIdentifier>());
-            //                GameObject.DestroyImmediate(result.GetComponent<LargeWorldEntity>());
-            //            }
-
-            //            callBack?.Invoke(result);
-            //#endif
+                callBack?.Invoke(result);
+                //Action onInstantiate = this.OnInstantiate;
+                //if (onInstantiate != null)
+                //{
+                //    onInstantiate();
+                //}
+            }
+            //UnityEngine.Object.Destroy(base.gameObject);
+            //this.spawnCoroutine = null;
             yield break;
         }
 

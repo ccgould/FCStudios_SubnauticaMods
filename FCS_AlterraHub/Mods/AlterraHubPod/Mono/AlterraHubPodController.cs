@@ -222,7 +222,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
 
                 yield return new WaitForSeconds(3);
 
-                Player.main.SetCurrentSub(this);
+                Player.main.SetCurrentSub(this,true);
                 _slideUpDoor01.UnlockDoor();
                 _slideUpDoor01.Open();
                 _keyPadModuleRing.color = buttonNColorFlood;

@@ -21,9 +21,6 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem.Interfaces
         void Dock(DroneController droneController);
         int GetPortID();
         string GetPrefabID();
-#if SUBNAUTICA_STABLE
-        DroneController SpawnDrone();
-#endif
         IEnumerator SpawnDrone(Action<DroneController> callback);
         Transform GetEntryPoint();
         string GetBaseID();

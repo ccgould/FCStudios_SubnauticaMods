@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Buildables;
@@ -15,6 +16,7 @@ using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
 using UnityEngine;
+using static HandReticle;
 
 namespace FCS_AlterraHub.Mods.Common.DroneSystem
 {
@@ -144,13 +146,26 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
         public void ShipOrder(IShippingDestination destination, string orderNumber, Action<bool> callback)
         {
             QuickLogger.Debug("Delivery Initiated",true);
+            
+            //Call Coroutine to spawn a drone
+            StartCoroutine(SpawnDrone(destination,callback));
+        }
+
+        private IEnumerator SpawnDrone(IShippingDestination destination, Action<bool> callback)
+        {
             var portManager = AlterraHubLifePodDronePortController.main.GetDronePortController();
 
-            var drone = portManager.SpawnDrone();
+
+            var itemResult = new TaskResult<DroneController>();
+            yield return portManager.SpawnDrone(itemResult);
+
+            var drone = itemResult.Get();
 
             drone?.ShipOrder(destination);
 
             callback?.Invoke(true);
+
+            yield break;
         }
 
         public bool IsCurrentOrder(string shipmentOrderNumber)
