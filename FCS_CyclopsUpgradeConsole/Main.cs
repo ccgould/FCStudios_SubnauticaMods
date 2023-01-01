@@ -1,23 +1,31 @@
 ﻿using System;
 using System.Reflection;
+using BepInEx;
 using CyclopsUpgradeConsole.Buildables;
 using CyclopsUpgradeConsole.Configuration;
 using FCSCommon.Utilities;
-using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
+using static OVRPlugin;
 
 namespace CyclopsUpgradeConsole
 {
-    [QModCore]
-    public class QPatch
+    [BepInPlugin(GUID, MODNAME, VERSION)]
+    public class Main
     {
+        #region [Declarations]
+
+        public const string
+            MODNAME = "FCS_StorageSolutions",
+            AUTHOR = "FieldCreatorsStudios",
+            GUID = AUTHOR + "_" + MODNAME,
+            VERSION = "1.0.0.0";
         internal static Config Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<Config>();
 
         internal static string Version { get; set; }
+        #endregion
 
 
-        [QModPatch]
-        public static void Patch()
+        private  void Awake()
         {
             Version = QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly());
             QuickLogger.Info($"Started patching. Version: {Version}");
