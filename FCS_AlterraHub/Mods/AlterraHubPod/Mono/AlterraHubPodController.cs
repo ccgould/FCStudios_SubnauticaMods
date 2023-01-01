@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
@@ -9,16 +8,14 @@ using FCS_AlterraHub.Managers;
 using FCS_AlterraHub.Managers.FCSAlterraHub;
 using FCS_AlterraHub.Mods.AlterraHubConstructor.Buildable;
 using FCS_AlterraHub.Mods.AlterraHubFabricator.Mono;
-using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
-using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
 {
-    internal class AlterraHubPodController : SubRoot
+    internal class AlterraHubPodController : MonoBehaviour
     {
         private Image _keyPadModuleRing;
         private Button _keyPadModuleButton;
@@ -39,7 +36,9 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
         public static AlterraHubPodController main;
         public PortManager PortManager;
 
-        public override void Awake()
+        public LightingController lightingController;
+
+        public void Awake()
         {
             main = this;
 
@@ -53,23 +52,21 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
             
             PortManager.RegisterConstructor(constructorController);
 
-            this.LOD = GetComponent<BehaviourLOD>();
-            this.rb = GetComponent<Rigidbody>();
-            this.isBase = true;
-            this.lightControl = GetComponentInChildren<LightingController>();
+            //this.LOD = GetComponent<BehaviourLOD>();
+            //this.rb = GetComponent<Rigidbody>();
+            //this.isBase = true;
+            lightingController = GetComponentInChildren<LightingController>();
             
 
-            this.modulesRoot = gameObject.transform;
-            this.powerRelay = GetComponent<BasePowerRelay>();
-            BaseManager.FindManager(this);
-
+            powerRelay = GetComponent<PowerRelay>();
+       
             //StartCoroutine(TryApplyMaterial());
         }
 
 
         private void test()
         {
-            lightControl.RegisterSkyApplier(skyappl);
+            lightingController.RegisterSkyApplier(skyappl);
         }
 
         private int _isFlashingHash;
@@ -79,12 +76,13 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
         private FCSGamePlaySettings _settings;
         private List<PodSolarClusterController> _clusters = new ();
         private Transform _warpTrans;
+        private PowerRelay powerRelay;
+
         public SkyApplier skyappl;
 
-        public override void Start()
+        public void Start()
         {
-            base.Start();
-            
+           
             try
             {
                 _screenAnimator = GameObjectHelpers.FindGameObject(gameObject, "ScreenStatus").GetComponent<Animator>();
@@ -154,7 +152,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
             _keyPadModuleButton.onClick.AddListener((() =>
             {
                 if(!WorldHelpers.CheckIfInRange(Player.mainObject,_keyPadModuleButton.gameObject,2)) return;
-                if (Player.main.currentSub is null)
+                if (!Player.main.escapePod.value)
                 {
                     StartCoroutine(WaterPumpSystem());
                 }
@@ -222,7 +220,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
 
                 yield return new WaitForSeconds(3);
 
-                Player.main.SetCurrentSub(this,true);
                 _slideUpDoor01.UnlockDoor();
                 _slideUpDoor01.Open();
                 _keyPadModuleRing.color = buttonNColorFlood;
@@ -233,6 +230,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
                 colors.selectedColor = buttonSColorFlood;
                 _keyPadModuleButton.colors = colors;
                 _keyPadModuleText.text = "FLOOD";
+                Player.main.escapePod.Update(true);
             }
             else
             {
@@ -254,6 +252,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Mono
                 colors.selectedColor = buttonSColorDrain;
                 _keyPadModuleButton.colors = colors;
                 _keyPadModuleText.text = "DRAIN";
+                Player.main.escapePod.Update(false);
             }
 
             _screenAnimator.SetBool(_isFlashingHash, false);

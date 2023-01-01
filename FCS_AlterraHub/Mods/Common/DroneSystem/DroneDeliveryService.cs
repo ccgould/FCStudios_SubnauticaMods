@@ -148,10 +148,11 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
             QuickLogger.Debug("Delivery Initiated",true);
             
             //Call Coroutine to spawn a drone
-            StartCoroutine(SpawnDrone(destination,callback));
+            StartCoroutine(SpawnDrone(destination));
+            callback?.Invoke(true);
         }
 
-        private IEnumerator SpawnDrone(IShippingDestination destination, Action<bool> callback)
+        private IEnumerator SpawnDrone(IShippingDestination destination)
         {
             var portManager = AlterraHubLifePodDronePortController.main.GetDronePortController();
 
@@ -162,9 +163,7 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
             var drone = itemResult.Get();
 
             drone?.ShipOrder(destination);
-
-            callback?.Invoke(true);
-
+            
             yield break;
         }
 

@@ -278,7 +278,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
                 _volumePercentage.text = CalculateVolumePercentage();
             }));
 
-            _canvas = gameObject.GetComponentInChildren<Canvas>();
+            _canvas = gameObject.GetComponentInChildren<Canvas>(true);
 
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseLightsEmissiveController, gameObject, Color.cyan);

@@ -98,7 +98,7 @@ namespace FCS_AlterraHub.Managers
 
         public bool HasAccessPoint()
         {
-            return _dronePorts.Any();
+            return _dronePorts.Any() || HasContructor;
         }
 
         public string GetStatus()
@@ -145,7 +145,7 @@ namespace FCS_AlterraHub.Managers
                 }));
             }
 
-            itemResult.Set(null);
+            yield break;
         }
 
         public bool ContainsPort(IDroneDestination port)

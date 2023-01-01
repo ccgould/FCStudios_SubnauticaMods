@@ -1,4 +1,5 @@
-﻿using FCS_AlterraHub.Buildables;
+﻿using System.Collections;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Managers;
@@ -33,7 +34,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Spawnable
             techType = this.TechType
         };
 
-        public override GameObject GetGameObject()
+        public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
         {
             var prefab = GameObject.Instantiate(AlterraHub.AlterraHubFabricatorPrefab);
 
@@ -110,9 +111,19 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Spawnable
             //Necessary for SubRoot class Update behaviour so it doesn't return an error every frame.
             var lod = prefab.AddComponent<BehaviourLOD>();
 
-            var pr = prefab.AddComponent<BasePowerRelay>();
+            var taskResult = CraftData.GetPrefabForTechTypeAsync(TechType.SolarPanel);
+            yield return taskResult;
+
+            PowerRelay solarPowerRelay = taskResult.GetResult().GetComponent<PowerRelay>();
+
+
+            var pFX = prefab.AddComponent<PowerFX>();
+            pFX.vfxPrefab = solarPowerRelay.powerFX.vfxPrefab;
+            pFX.attachPoint = prefab.transform;
+
+            var pr = prefab.AddComponent<PowerRelay>();
             pr.maxOutboundDistance = 0;
-            pr.subRoot = sr;
+
 
             var portManager = prefab.AddComponent<PortManager>();
 
@@ -125,7 +136,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Spawnable
             var dronePortController = prefab.AddComponent<AlterraHubLifePodDronePortController>();
             dronePortController.PortManager = portManager;
 
-            return prefab;
+            gameObject.Set(prefab);
+            yield break;
         }
     }
 }
