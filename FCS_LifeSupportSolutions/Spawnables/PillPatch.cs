@@ -1,7 +1,7 @@
 ﻿using System;
 using FCS_LifeSupportSolutions.Configuration;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Assets;
+using SMLHelper.Assets;
 using UnityEngine;
 
 namespace FCS_LifeSupportSolutions.Spawnables

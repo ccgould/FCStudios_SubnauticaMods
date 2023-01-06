@@ -7,8 +7,8 @@ using FCS_AlterraHub.Mono;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Mods.TrashRecycler.Model;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Handlers;
+using SMLHelper.Crafting;
+using SMLHelper.Handlers;
 using UnityEngine;
 
 namespace FCS_HomeSolutions.Mods.TrashRecycler.Mono

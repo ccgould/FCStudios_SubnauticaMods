@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Handlers;
+using SMLHelper.Crafting;
+using SMLHelper.Handlers;
 
 
 namespace FCS_AlterraHub.Helpers
@@ -56,7 +56,7 @@ namespace FCS_AlterraHub.Helpers
 
         public static bool ContainsValidCraftData(TechType techType)
         {
-            var data = CraftDataHandler.Main.GetTechData(techType);
+            var data = CraftDataHandler.GetTechData(techType);
             if (data == null || data.craftAmount > 1)
             {
                 QuickLogger.Debug($"TechType '{techType}' has no valid recipe for recycling.");

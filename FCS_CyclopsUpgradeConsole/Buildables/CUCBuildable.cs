@@ -3,16 +3,16 @@ using CyclopsUpgradeConsole.Mono;
 
 namespace CyclopsUpgradeConsole.Buildables
 {
-    using SMLHelper.V2.Assets;
+    using SMLHelper.Assets;
     using System;
-    using SMLHelper.V2.Crafting;
+    using SMLHelper.Crafting;
     using UnityEngine;
     using System.IO;
     using Configuration;
     using FCSCommon.Utilities;
-    using SMLHelper.V2.Utility;
+    using SMLHelper.Utility;
 #if SUBNAUTICA
-    using RecipeData = SMLHelper.V2.Crafting.TechData;
+    using RecipeData = SMLHelper.Crafting.TechData;
     using Sprite = Atlas.Sprite;
 #endif
 

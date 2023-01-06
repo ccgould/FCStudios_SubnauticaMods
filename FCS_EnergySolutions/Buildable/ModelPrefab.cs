@@ -75,6 +75,7 @@ namespace FCS_EnergySolutions.Buildable
                 {
                     QuickLogger.Debug($"Getting Prefab: {prefabName}");
                     if (!LoadAsset(prefabName, ModBundle, out var prefabGo)) return null;
+                    prefabGo.AddComponent<Constructable>();
                     return prefabGo;
                 }
             }

@@ -6,7 +6,7 @@ using FCS_AlterraHub.Mono;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Helpers;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Patches;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Handlers;
+using SMLHelper.Handlers;
 using FCS_AlterraHub.Helpers;
 using Newtonsoft.Json;
 using UWE;
@@ -140,7 +140,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
                 foreach (var dataLinkedItem in _operation.LinkedItems)
                 {
                     QuickLogger.Debug("Crafting Linked Item", true);
-                    Craft(dataLinkedItem);
+                    Craft(dataLinkedItem, null);
                 }
             }
         }
@@ -177,22 +177,26 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
 
             for (int i = 0; i < _operation.ReturnAmount; i++)
             {
-                result = Craft(techType);
-            }
-
-            if (result)
-            {
-                OnItemComplete();
+                CoroutineHost.StartCoroutine(Craft(techType, (result =>
+                {
+                    if (result)
+                    {
+                        OnItemComplete();
+                    }
+                })));
             }
         }
 
-        private bool Craft(TechType techType)
+        private IEnumerator Craft(TechType techType, Action<bool> callback)
         {
-            bool result;
+            bool result = false;
             if (_manager.Crafter.Manager.IsAllowedToAdd(techType, 1, true))
             {
                 QuickLogger.Debug("Item was allowed trying to add network", true);
-                result = AttemptToAddToNetwork(techType);
+
+                var pickupableTask = new TaskResult<bool>();
+                yield return AttemptToAddToNetwork(techType, pickupableTask);
+                result = pickupableTask.Get();
                 QuickLogger.Debug($"Result : {result}", true);
             }
             else
@@ -203,8 +207,9 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
 
             _manager.Crafter.CraftMachine.AppendItemToBelt(techType);
 
-            return result;
+            callback?.Invoke(result);
         }
+
 
         private void OnItemComplete()
         {
@@ -266,12 +271,14 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
 
             yield break;
         }
-        private bool AttemptToAddToNetwork(TechType techType)
+        private IEnumerator AttemptToAddToNetwork(TechType techType, IOut<bool> boolResult)
         {
-            var itemTask = new TaskResult<InventoryItem>();
-            CouroutineManager.WaitCoroutine(techType.ToInventoryItem(itemTask));
-            var inventoryItem = itemTask.Get();
+            QuickLogger.Debug($"Attempting to add {techType} to network", true);
 
+            var itemTask = new TaskResult<InventoryItem>();
+            yield return techType.ToInventoryItem(itemTask);
+
+            var inventoryItem = itemTask.Get();
             QuickLogger.Debug($"InventoryItemLegacy returned: {Language.main.Get(inventoryItem.item.GetTechType())}");
 
             var result = BaseManager.AddItemToNetwork(_manager.Crafter.Manager, inventoryItem, true);
@@ -284,7 +291,8 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
                 GameObject.Destroy(inventoryItem.item.gameObject);
             }
 
-            return result;
+            boolResult.Set(true);
+            yield break;
         }
 
         #region EasyCraft Code

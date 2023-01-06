@@ -5,8 +5,8 @@ using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Assets;
-using SMLHelper.V2.Utility;
+using SMLHelper.Assets;
+using SMLHelper.Utility;
 using UnityEngine;
 #if SUBNAUTICA
 using Sprite = Atlas.Sprite;

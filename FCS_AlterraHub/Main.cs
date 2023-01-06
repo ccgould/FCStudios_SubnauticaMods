@@ -21,8 +21,8 @@ using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
 using FMOD;
 using HarmonyLib;
-using SMLHelper.V2.Handlers;
-using SMLHelper.V2.Utility;
+using SMLHelper.Handlers;
+using SMLHelper.Utility;
 using UnityEngine;
 
 namespace FCS_AlterraHub
@@ -44,7 +44,7 @@ namespace FCS_AlterraHub
 
         internal static FMODAsset BoxOpenSoundAsset;
         private static string PdaEntryMessage => $"Please open your AlterraHub PDA to read this data entry ({Configuration.FCSPDAKeyCode}). Make sure you have completed the Alterra Hub Station mission to do so.";
-        public static Config Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<Config>();
+        public static Config Configuration { get; } = OptionsPanelHandler.RegisterModOptions<Config>();
         public static AssetBundle GlobalBundle { get; set; }
 
         #endregion
@@ -73,6 +73,8 @@ namespace FCS_AlterraHub
 
 
             //QuickLogger.InfoLogsEnabled = Configuration.EnableInfoLogs;
+
+
             //Load Prefabs
             AlterraHub.GetPrefabs();
             //Patch all spawnables
@@ -85,7 +87,7 @@ namespace FCS_AlterraHub
             var harmony = Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), "com.alterrahub.fcstudios");
             CreatePingType(harmony);
             //BoosterSound = AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "booster.mp3"));
-            FCSAlterraHubService.PublicAPI.FcsUnlockTechType = TechTypeHandler.Main.AddTechType("FCSUnlocker", "FCS Access Key", "TechType to unlock FCSItems", false);
+            FCSAlterraHubService.PublicAPI.FcsUnlockTechType = TechTypeHandler.AddTechType("FCSUnlocker", "FCS Access Key", "TechType to unlock FCSItems", false);
             RegisterCommands();
             AlterraHub.AdditionalPatching();
             Mod.RegisterVoices();
@@ -97,7 +99,7 @@ namespace FCS_AlterraHub
         private static void RegisterCommands()
         {
             //Register Info commands
-            ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
+            ConsoleCommandsHandler.RegisterConsoleCommands(typeof(DebugCommands));
         }
 
         private static void CreatePingType(Harmony harmony)

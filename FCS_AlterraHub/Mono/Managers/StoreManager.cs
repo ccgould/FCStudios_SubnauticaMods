@@ -17,7 +17,7 @@ using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
 using Newtonsoft.Json;
-using SMLHelper.V2.Json.ExtensionMethods;
+using SMLHelper.Json.ExtensionMethods;
 using UnityEngine;
 
 

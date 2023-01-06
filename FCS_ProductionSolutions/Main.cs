@@ -4,7 +4,6 @@ using System.Reflection;
 using BepInEx;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Registration;
-using FCS_HomeSolutions.Mods.Replicator.Buildables;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Buildable;
@@ -16,10 +15,11 @@ using FCS_ProductionSolutions.Mods.DeepDriller.Managers;
 using FCS_ProductionSolutions.Mods.HydroponicHarvester.Buildable;
 using FCS_ProductionSolutions.Mods.IonCubeGenerator.Buildable;
 using FCS_ProductionSolutions.Mods.MatterAnalyzer.Buildable;
+using FCS_ProductionSolutions.Mods.Replicator.Buildable;
 using FCSCommon.Utilities;
 using HarmonyLib;
-using SMLHelper.V2.Handlers;
-using SMLHelper.V2.Utility;
+using SMLHelper.Handlers;
+using SMLHelper.Utility;
 
 namespace FCS_ProductionSolutions
 {
@@ -33,7 +33,7 @@ namespace FCS_ProductionSolutions
             AUTHOR = "FieldCreatorsStudios",
             GUID = AUTHOR + "_" + MODNAME,
             VERSION = "1.0.0.0";
-        internal static Config Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<Config>();
+        internal static Config Configuration { get; } = OptionsPanelHandler.RegisterModOptions<Config>();
 
         #endregion
         private void Awake()
@@ -42,6 +42,9 @@ namespace FCS_ProductionSolutions
         FCSAlterraHubService.PublicAPI.RegisterModPack(Mod.ModPackID, Mod.ModBundleName, Assembly.GetExecutingAssembly());
             FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(Mod.ModPackID);
             FCSAlterraHubService.PublicAPI.OnPurge += Mod.Purge;
+
+            CreatePingTypes();
+
             ModelPrefab.Initialize();
 
             AuxPatchers.AdditionalPatching();
@@ -75,9 +78,6 @@ namespace FCS_ProductionSolutions
 
                 var glass = new FcsGlassCraftable();
                 glass.Patch();
-
-                var pingSprite = ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), "DeepDriller_ping.png"));
-                DeepDrillerPingType = WorldHelpers.CreatePingType("Deep Driller","Deep Driller",pingSprite);
                 
                 var deepDriller = new FCSDeepDrillerBuildable();
                 deepDriller.Patch();
@@ -130,11 +130,24 @@ namespace FCS_ProductionSolutions
             CubeGeneratorBuildable.PatchSMLHelper();
 
             //Register debug commands
-            ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
+            ConsoleCommandsHandler.RegisterConsoleCommands(typeof(DebugCommands));
 
             QuickLogger.Info($"Finished patching. Version: {QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly())}");
 
         }
+
+        /// <summary>
+        /// Must be created before Model Prefabs are loaded
+        /// </summary>
+        private static void CreatePingTypes()
+        {
+            if (Configuration.IsDeepDrillerEnabled)
+            {
+                var pingSprite = ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), "DeepDriller_ping.png"));
+                DeepDrillerPingType = WorldHelpers.CreatePingType("Deep Driller", "Deep Driller", pingSprite);
+            }
+        }
+
 
         private bool AddROTAOre(string oreName, out TechType techType, List<TechType> techTypes = null)
         {

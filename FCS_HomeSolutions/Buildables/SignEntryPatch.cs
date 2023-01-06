@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.Buildables;
@@ -12,14 +13,14 @@ using FCS_AlterraHub.Mono.Controllers;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Configuration;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Assets;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Utility;
+using SMLHelper.Assets;
+using SMLHelper.Crafting;
+using SMLHelper.Utility;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 #if SUBNAUTICA
-using RecipeData = SMLHelper.V2.Crafting.TechData;
+using RecipeData = SMLHelper.Crafting.TechData;
 using Sprite = Atlas.Sprite;
 #endif
 
@@ -84,6 +85,13 @@ namespace FCS_HomeSolutions.Buildables
                 constructable.model = model;
                 constructable.techType = TechType;
 
+                if (_settings.AllowedOutside)
+                {
+                    // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
+                    var lwe = prefab.AddComponent<LargeWorldEntity>();
+                    lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
+                }
+
                 prefab.AddComponent<PrefabIdentifier>().ClassId = ClassID;
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<SignController>();
@@ -98,6 +106,12 @@ namespace FCS_HomeSolutions.Buildables
             }
 
             return null;
+        }
+
+        public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
+        {
+            gameObject.Set(GetGameObject());
+            yield break;
         }
 
         protected override RecipeData GetBlueprintRecipe()

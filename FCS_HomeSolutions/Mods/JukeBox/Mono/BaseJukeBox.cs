@@ -10,16 +10,15 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
 {
     internal class BaseJukeBox : MonoBehaviour
     {
-        public float TrackSliderValue { get; set; }
-        public float Volume => _trackedDevice?.GetAudioSource()?.volume ?? 0f;
+
+        public float Volume;
         public bool Loop { get; set; }
         public TrackData CurrentTrack { get; set; }
         public JukeBoxState State = JukeBoxState.Stop;
         private float _audioClipLength;
         private int _currentTrack;
         private bool _wasPlaying;
-        private readonly HashSet<IJukeBoxDevice> _devices = new();
-        private IJukeBoxDevice _trackedDevice;
+        private readonly List<IJukeBoxDevice> _devices = new();
         private float _outsideAudioFilter = 100f;
         private const float DEFAULT_AUDIO_FILTER = 22000f;
 
@@ -27,24 +26,20 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
         {
             if (CheckIfPaused())
             {
-                Pause(_trackedDevice);
+                Pause();
                 return;
             }
 
             if (!CheckIfBaseHasPower())
             {
-                Stop(_trackedDevice);
+                Stop();
                 IsPowered = false;
                 return;
             }
 
             IsPowered = true;
-            
-            if (TrackedDeviceIsNullCheck()) return;
 
-            TrackedDeviceOperationalCheck();
-
-            UpdateTrackSlider();
+            if (_devices.Count <= 0) Reset();
 
             ResumePlayingCheck();
             
@@ -55,21 +50,13 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
 
         private bool CheckIfBaseHasPower()
         {
-            if (_trackedDevice?.GetBaseManager() == null) return false;
-
-            if (_trackedDevice.GetBaseManager().GetPowerState() == PowerSystem.Status.Offline ||
-                !_trackedDevice.GetBaseManager().HasEnoughPower(_trackedDevice.GetPowerUsage())) return false;
+            if (BaseManager == null) return false;
+            if (BaseManager.GetPowerState() == PowerSystem.Status.Offline ||
+                !BaseManager.HasEnoughPower(Time.deltaTime * 0.1f * Volume)) return false;
 
             return true;
         }
 
-        private void TrackedDeviceOperationalCheck()
-        {
-            if (!_trackedDevice.IsOperational)
-            {
-                _trackedDevice = null;
-            }
-        }
 
         private void ResumePlayingCheck()
         {
@@ -84,13 +71,10 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
 
         private void TrackEndCheck()
         {
-            if(_trackedDevice?.GetAudioSource()== null) return; 
-            if (!IsPlaying && !Loop && State == JukeBoxState.Play)
+            //automatically go to the next music clip ,when the current music clip is fnished
+            if (_audioClipLength - 0.1f <= GetFirstJukeBox().GetSliderValue() && !Loop)
             {
-                QuickLogger.Debug($"End of track{CurrentTrack.Path}",true);
-                SetTrack(JukeBox.Main.GetNextTrack(_currentTrack));
-                OnPlay?.Invoke(CurrentTrack);
-                QuickLogger.Debug($"Now playing {CurrentTrack.Path}", true);
+                NextTrack();
             }
         }
 
@@ -99,29 +83,20 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
             return Player.main.IsSwimming() || Player.main.IsUnderwaterForSwimming();
         }
 
-        private bool TrackedDeviceIsNullCheck()
+        internal bool HasJukeBox()
         {
-            if (_trackedDevice != null) return false;
-
-            _trackedDevice = _devices.FirstOrDefault(x => x.IsJukeBox && x.IsOperational);
-
-            if(_devices.Count <= 0) Reset();
-
-            return true;
-        }
-
-        private void UpdateTrackSlider()
-        {
-            if (_trackedDevice.IsOperational)
-            {
-                TrackSliderValue = _trackedDevice.GetAudioTime();
-            }
+            return GetFirstJukeBox != null;
         }
 
         private bool CheckIfPaused()
         {
             var gamePaused = WorldHelpers.CheckIfPaused();
-            var audioSource = _trackedDevice?.GetAudioSource();
+            var jukeBox = GetFirstJukeBox();
+
+            if (jukeBox == null) return true;
+
+            var audioSource = jukeBox.GetAudioSource();
+
 
             if (audioSource != null && audioSource.isPlaying && gamePaused)
             {
@@ -131,28 +106,36 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
             return gamePaused;
         }
 
+        internal bool IsPairing()
+        {
+            return GetFirstJukeBox().IsPairing();
+        }
+
+        private IJukeBoxDevice GetFirstJukeBox()
+        {
+            return _devices.FirstOrDefault(x => x.IsOperational);
+        }
+
+
         private void Reset()
         {
-            if(TrackSliderValue == 0 && _audioClipLength == 0 && !_wasPlaying && State == JukeBoxState.Stop) return;
+            if (_audioClipLength == 0 && !_wasPlaying && State == JukeBoxState.Stop) return;
 
             QuickLogger.Debug("Resetting Base JukeBox",true);
-            TrackSliderValue = 0f;
             _audioClipLength = 0f;
             _wasPlaying = false;
             State = JukeBoxState.Stop;
         }
 
-        private void SetTrack(TrackData trackData)
+        internal void SetTrack(TrackData trackData)
         {
             CurrentTrack = trackData;
             _currentTrack = trackData.Index;
             _audioClipLength = trackData.AudioClip.length;
         }
 
-        internal void Play(IJukeBoxDevice device)
+        internal void Play()
         {
-            QuickLogger.Debug($"Play command from {device}",true);
-
             if (CurrentTrack.AudioClip == null)
             {
                 var trackData = JukeBox.Main.GetFirstTrack();
@@ -161,58 +144,56 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
 
             OnPlay?.Invoke(CurrentTrack);
             State = JukeBoxState.Play;
-            _trackedDevice = device;
         }
 
 
-        internal void Pause(IJukeBoxDevice device)
+        internal void Pause()
         {
             if (State == JukeBoxState.Pause) return;
             State = JukeBoxState.Pause;
-            _trackedDevice = device;
             OnPause?.Invoke();
         }
 
-        internal void Stop(IJukeBoxDevice device)
+        internal void Stop()
         {
             State = JukeBoxState.Stop;
-            _trackedDevice = device;
-            TrackSliderValue = 0f;
             OnStop?.Invoke();
         }
         
-        internal void SetVolume(IJukeBoxDevice device,float value)
+        internal void SetVolume(float value)
         {
             OnVolumeChanged?.Invoke(value);
-            _trackedDevice = device;
         }
 
-        public void SetTrackSlider(IJukeBoxDevice device, float amount)
+        public void ForceTimeChange(float amount, AudioClip clip)
         {
             QuickLogger.Debug($"Set track slider {amount}");
-            TrackSliderValue = amount;
-            _trackedDevice = device;
+            foreach (IJukeBoxDevice jukeBoxDevice in _devices)
+            {
+                jukeBoxDevice.ForceTimeChange(amount, clip);
+            }
         }
 
-        public void PreviousTrack(IJukeBoxDevice device)
+        public void PreviousTrack()
         {
-            _trackedDevice = device;
+            var wasPlaying = IsPlaying;
+            Stop();
             SetTrack(JukeBox.Main.GetPreviousTrack(_currentTrack));
-            OnTrackChanged?.Invoke(CurrentTrack,IsPlaying);
+            OnTrackChanged?.Invoke(CurrentTrack, wasPlaying);
         }
 
-        public void NextTrack(IJukeBoxDevice device)
+        public void NextTrack()
         {
-            _trackedDevice = device;
+            var wasPlaying = IsPlaying;
+            Stop();
             SetTrack(JukeBox.Main.GetNextTrack(_currentTrack));
-            OnTrackChanged?.Invoke(CurrentTrack,IsPlaying);
+            OnTrackChanged?.Invoke(CurrentTrack, wasPlaying);
         }
 
         public Action<TrackData,bool> OnTrackChanged { get; set; }
 
         public void SetLoop(JukeBoxController device, bool value)
         {
-            _trackedDevice = device;
             Loop = value;
             OnLoopChanged?.Invoke(value);
         }
@@ -223,8 +204,8 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
         public Action OnResume { get; set; }
         public Action<TrackData> OnPlay { get; set; }
         public Action<float> OnVolumeChanged { get; set; }
-        public int TimeSamples => _trackedDevice?.GetAudioSource()?.timeSamples ?? 0;
-        public bool IsPlaying => _trackedDevice?.GetAudioSource()?.isPlaying ?? false;
+        public int TimeSamples => GetFirstJukeBox()?.GetAudioSource()?.timeSamples ?? 0;
+        public bool IsPlaying => GetFirstJukeBox()?.GetAudioSource()?.isPlaying ?? false;
 
         public JukeBoxState GetState()
         {
@@ -234,31 +215,13 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
         public void RegisterDevice(IJukeBoxDevice device)
         {
             _devices.Add(device);
-            if (_trackedDevice == null)
-            {
-                _trackedDevice = device;
-            }
         }
 
         public void UnRegisterDevice(IJukeBoxDevice device)
         {
             _devices.Remove(device);
-
-            if (device == _trackedDevice)
-            {
-                _trackedDevice = null;
-            }
         }
 
-        public AudioSource GetTrackedPlayerAudioSource()
-        {
-            return _trackedDevice?.GetAudioSource();
-        }
-
-        public bool HasTrackedJukeBox(IJukeBoxDevice checkIfNotDevice)
-        {
-            return _trackedDevice != null && _trackedDevice != checkIfNotDevice;
-        }
 
         public string GetCurrentTrackName()
         {
@@ -270,14 +233,14 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
             var wasPlaying = IsPlaying;
             JukeBox.Main.Refresh((() =>
             {
-                Stop(null);
+                Stop();
                 OnRefresh?.Invoke(CurrentTrack);
             }));
 
         }
 
         public Action<TrackData> OnRefresh { get; set; }
-
+        public BaseManager BaseManager;
         public float GetCutOffFrequency(Constructable constructable)
         {
             if (!constructable.IsInside() && !IsPlayerSwimming() && !Player.main.IsInSub())
@@ -296,6 +259,13 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
             }
 
             return  DEFAULT_AUDIO_FILTER;
+        }
+        public void PlayTrack(TrackData data)
+        {
+            var wasPlaying = IsPlaying;
+            Stop();
+            SetTrack(data);
+            OnTrackChanged?.Invoke(CurrentTrack, wasPlaying);
         }
     }
 
@@ -320,5 +290,9 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
         void OnTrackChanged(TrackData value, bool isPlaying);
         BaseManager GetBaseManager();
         float GetPowerUsage();
+        void ForceTimeChange(float amount, AudioClip clip);
+        float GetSliderValue();
+        bool IsPairing();
+
     }
 }

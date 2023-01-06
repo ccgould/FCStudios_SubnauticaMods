@@ -4,7 +4,7 @@ using BepInEx;
 using CyclopsUpgradeConsole.Buildables;
 using CyclopsUpgradeConsole.Configuration;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Handlers;
+using SMLHelper.Handlers;
 using static OVRPlugin;
 
 namespace CyclopsUpgradeConsole
@@ -19,7 +19,7 @@ namespace CyclopsUpgradeConsole
             AUTHOR = "FieldCreatorsStudios",
             GUID = AUTHOR + "_" + MODNAME,
             VERSION = "1.0.0.0";
-        internal static Config Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<Config>();
+        internal static Config Configuration { get; } = OptionsPanelHandler.RegisterModOptions<Config>();
 
         internal static string Version { get; set; }
         #endregion

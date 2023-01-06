@@ -10,7 +10,7 @@ using UWE;
 
 namespace FCS_AlterraHub.Mods.AlterraHubDepot.Spawnable
 {
-    internal class FCSDataBoxSpawnable : SMLHelper.V2.Assets.Spawnable
+    internal class FCSDataBoxSpawnable : SMLHelper.Assets.Spawnable
     {
         public FCSDataBoxSpawnable() : base("FCSDataBox", "FCS Data Box", "")
         {

@@ -9,7 +9,7 @@
     <Import_RootNamespace>FCSCommon</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)Utilities\CouroutineManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utilities\CoroutineManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utilities\QuickLogger.cs" />
   </ItemGroup>
 </Project>

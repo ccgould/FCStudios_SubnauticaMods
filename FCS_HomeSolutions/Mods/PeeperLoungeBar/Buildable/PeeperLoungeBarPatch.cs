@@ -10,7 +10,7 @@ using FCS_HomeSolutions.Spawnables;
 using FCS_HomeSolutions.Structs;
 using FCSCommon.Utilities;
 using Newtonsoft.Json;
-using SMLHelper.V2.Utility;
+using SMLHelper.Utility;
 using UnityEngine;
 #if SUBNAUTICA
 using Sprite = Atlas.Sprite;
@@ -84,6 +84,10 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
                 constructable.allowedOnConstructables = Settings.AllowedOnConstructables;
                 constructable.model = model;
                 constructable.techType = TechType;
+
+                // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
+                var lwe = prefab.AddComponent<LargeWorldEntity>();
+                lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
 
                 prefab.AddComponent<PrefabIdentifier>().ClassId = ClassID;
                 prefab.AddComponent<TechTag>().type = TechType;

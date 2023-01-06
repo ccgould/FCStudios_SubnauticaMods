@@ -10,18 +10,18 @@ using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Mods.Cabinets.Mono;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Utility;
+using SMLHelper.Crafting;
+using SMLHelper.Utility;
 using UnityEngine;
 #if SUBNAUTICA
-using RecipeData = SMLHelper.V2.Crafting.TechData;
+using RecipeData = SMLHelper.Crafting.TechData;
 using Sprite = Atlas.Sprite;
 
 #endif
 
 namespace FCS_HomeSolutions.Mods.Cabinets.Buildable
 {
-    internal class Cabinet3Buildable : SMLHelper.V2.Assets.Buildable
+    internal class Cabinet3Buildable : SMLHelper.Assets.Buildable
     {
         private readonly GameObject _prefab;
         internal const string Cabinet3ClassID = "CabinetTall";

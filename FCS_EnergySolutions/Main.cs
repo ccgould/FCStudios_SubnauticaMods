@@ -17,8 +17,8 @@ using FCS_EnergySolutions.Mods.WindSurfer.Buildables;
 using FCS_EnergySolutions.Spawnables;
 using FCSCommon.Utilities;
 using HarmonyLib;
-using SMLHelper.V2.Handlers;
-using SMLHelper.V2.Utility;
+using SMLHelper.Handlers;
+using SMLHelper.Utility;
 using UnityEngine;
 
 namespace FCS_EnergySolutions
@@ -44,7 +44,7 @@ namespace FCS_EnergySolutions
         #endregion
 
         internal string Version { get; private set; }
-        internal static Config Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<Config>();
+        internal static Config Configuration { get; } = OptionsPanelHandler.RegisterModOptions<Config>();
 
         private void Awake()
         {
@@ -139,7 +139,7 @@ namespace FCS_EnergySolutions
             }
 
             //Register debug commands
-            ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
+            ConsoleCommandsHandler.RegisterConsoleCommands(typeof(DebugCommands));
 
             //Harmony
             var harmony = new Harmony("com.energrysolutions.fcstudios");

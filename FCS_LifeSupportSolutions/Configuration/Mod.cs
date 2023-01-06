@@ -7,8 +7,8 @@ using FCS_AlterraHub.Model.Utilities;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Utility;
+using SMLHelper.Crafting;
+using SMLHelper.Utility;
 using UnityEngine;
 
 namespace FCS_LifeSupportSolutions.Configuration

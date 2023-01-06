@@ -10,17 +10,17 @@ using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Utility;
+using SMLHelper.Crafting;
+using SMLHelper.Utility;
 using UnityEngine;
 #if SUBNAUTICA
-using RecipeData = SMLHelper.V2.Crafting.TechData;
+using RecipeData = SMLHelper.Crafting.TechData;
 using Sprite = Atlas.Sprite;
 #endif
 
 namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Buildable
 {
-    internal class MatterAnalyzerPatch : SMLHelper.V2.Assets.Buildable
+    internal class MatterAnalyzerPatch : SMLHelper.Assets.Buildable
     {
         private TechType kitTechType;
         public MatterAnalyzerPatch() : base(Mod.MatterAnalyzerClassName, Mod.MatterAnalyzerFriendlyName, Mod.MatterAnalyzerDescription)
@@ -52,6 +52,10 @@ namespace FCS_ProductionSolutions.Mods.MatterAnalyzer.Buildable
                 var size = new Vector3(0.8288832f, 2.071783f, 0.8687233f);
 
                 GameObjectHelpers.AddConstructableBounds(prefab, size, center);
+
+                // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
+                var lwe = prefab.AddComponent<LargeWorldEntity>();
+                lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
 
                 var model = prefab.FindChild("model");
 

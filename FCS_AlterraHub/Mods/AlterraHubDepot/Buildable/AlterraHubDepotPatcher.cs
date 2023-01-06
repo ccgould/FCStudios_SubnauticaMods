@@ -6,19 +6,19 @@ using System.IO;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Mods.AlterraHubDepot.Mono;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Utility;
+using SMLHelper.Crafting;
+using SMLHelper.Utility;
 using UnityEngine;
 using System.Collections.Generic;
 #if SUBNAUTICA
-using RecipeData = SMLHelper.V2.Crafting.TechData;
+using RecipeData = SMLHelper.Crafting.TechData;
 using Sprite = Atlas.Sprite;
 #endif
 
 
 namespace FCS_AlterraHub.Mods.AlterraHubDepot.Buildable
 {
-    internal class AlterraHubDepotPatcher : SMLHelper.V2.Assets.Buildable
+    internal class AlterraHubDepotPatcher : SMLHelper.Assets.Buildable
     {
         public override TechGroup GroupForPDA => TechGroup.InteriorModules;
         public override TechCategory CategoryForPDA => TechCategory.InteriorModule;

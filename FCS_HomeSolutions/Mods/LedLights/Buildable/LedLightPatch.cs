@@ -8,17 +8,17 @@ using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Mods.LedLights.Mono;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Utility;
+using SMLHelper.Crafting;
+using SMLHelper.Utility;
 using UnityEngine;
 #if SUBNAUTICA
-using RecipeData = SMLHelper.V2.Crafting.TechData;
+using RecipeData = SMLHelper.Crafting.TechData;
 using Sprite = Atlas.Sprite;
 
 #endif
 namespace FCS_HomeSolutions.Mods.LedLights.Buildable
 {
-    internal class LedLightPatch : SMLHelper.V2.Assets.Buildable
+    internal class LedLightPatch : SMLHelper.Assets.Buildable
     {
         private LedLightData _data;
         public override TechGroup GroupForPDA { get; }

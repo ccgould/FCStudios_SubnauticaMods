@@ -2,9 +2,9 @@
 using FCS_AlterraHub.Mono;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Buildable;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Json;
-using SMLHelper.V2.Options;
-using SMLHelper.V2.Options.Attributes;
+using SMLHelper.Json;
+using SMLHelper.Options;
+using SMLHelper.Options.Attributes;
 
 
 namespace FCS_EnergySolutions.Configuration

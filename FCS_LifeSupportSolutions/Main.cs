@@ -10,7 +10,7 @@ using FCS_LifeSupportSolutions.Mods.MiniMedBay.Buildable;
 using FCS_LifeSupportSolutions.Spawnables;
 using FCSCommon.Utilities;
 using HarmonyLib;
-using SMLHelper.V2.Handlers;
+using SMLHelper.Handlers;
 
 namespace FCS_LifeSupportSolutions
 {
@@ -35,7 +35,7 @@ namespace FCS_LifeSupportSolutions
         public static bool IsRefillableOxygenTanksInstalled { get; } =
             TechTypeHandler.ModdedTechTypeExists("HighCapacityTankRefill");
         internal string Version { get; private set; } 
-        internal static Config Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<Config>();
+        internal static Config Configuration { get; } = OptionsPanelHandler.RegisterModOptions<Config>();
 
         #endregion
 
@@ -89,7 +89,7 @@ namespace FCS_LifeSupportSolutions
             }
             
             //Register debug commands
-            ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
+            ConsoleCommandsHandler.RegisterConsoleCommands(typeof(DebugCommands));
 
             var harmony = new Harmony("com.lifesupportsolutions.fstudios");
             harmony.PatchAll(Assembly.GetExecutingAssembly());

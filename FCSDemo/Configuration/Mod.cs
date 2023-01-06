@@ -7,12 +7,12 @@ using FCS_AlterraHub.Objects;
 using FCSCommon.Utilities;
 using FCSDemo.Model;
 using FCSDemo.Mono;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Json;
-using SMLHelper.V2.Utility;
+using SMLHelper.Crafting;
+using SMLHelper.Json;
+using SMLHelper.Utility;
 using UnityEngine;
 #if SUBNAUTICA
-using RecipeData = SMLHelper.V2.Crafting.TechData;
+using RecipeData = SMLHelper.Crafting.TechData;
 #endif
 
 namespace FCSDemo.Configuration
@@ -27,7 +27,7 @@ namespace FCSDemo.Configuration
 # endregion
 
         #region Internal Properties
-        internal static string ModName => QPatch.Configuration.ModName;
+        internal static string ModName => Main.Configuration.ModName;
         internal const string BundleName = "fcsdemo";
         internal const string FriendlyName = "FCS Demo";
         internal const string Description = "A demo mod for FCStudios";

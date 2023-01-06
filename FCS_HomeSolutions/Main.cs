@@ -41,8 +41,8 @@ using FCS_HomeSolutions.Mods.TrashRecycler.Buildable;
 using FCS_HomeSolutions.Mods.TV.Buildable;
 using FCSCommon.Utilities;
 using HarmonyLib;
-using SMLHelper.V2.Handlers;
-using SMLHelper.V2.Utility;
+using SMLHelper.Handlers;
+using SMLHelper.Utility;
 using UnityEngine;
 using Settings = FCS_HomeSolutions.Buildables.Settings;
 
@@ -68,7 +68,7 @@ namespace FCS_HomeSolutions
             AUTHOR = "FieldCreatorsStudios",
             GUID = AUTHOR + "_" + MODNAME,
             VERSION = "1.0.0.0";
-        internal static Config Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<Config>();
+        internal static Config Configuration { get; } = OptionsPanelHandler.RegisterModOptions<Config>();
 
         internal static Dictionary<string, Texture2D> Patterns = new();
 
@@ -198,14 +198,19 @@ namespace FCS_HomeSolutions
             var sink = new SinkBuildable();
             sink.Patch();
 
-            var jukeBox = new JukeBoxBuildable();
-            jukeBox.Patch();
+            if(Configuration.IsJukeBoxEnabled)
+            {
+                var jukeBox = new JukeBoxBuildable();
+                jukeBox.Patch();
 
-            var jukeboxSpeaker = new JukeBoxSpeakerBuildable();
-            jukeboxSpeaker.Patch();
+                var jukeboxSpeaker = new JukeBoxSpeakerBuildable();
+                jukeboxSpeaker.Patch();
 
-            var JukeBoxSubWoofer = new JukeBoxSubWooferBuildable();
-            JukeBoxSubWoofer.Patch();
+                var JukeBoxSubWoofer = new JukeBoxSubWooferBuildable();
+                JukeBoxSubWoofer.Patch();
+            }
+
+            ModelPrefab.LoadJukeBoxAudioClips();
 
             if (Configuration.IsHatchStairwayEnabled)
             {
@@ -248,7 +253,7 @@ namespace FCS_HomeSolutions
             PatchToolTipFactory(harmony);
 
             //Register debug commands
-            ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
+            ConsoleCommandsHandler.RegisterConsoleCommands(typeof(DebugCommands));
 
             QuickLogger.Info($"Finished patching. Version: {QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly())}");
         }

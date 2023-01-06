@@ -15,6 +15,7 @@ using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Models;
 using FCS_ProductionSolutions.Mods.DeepDriller.Managers;
 using FCSCommon.Utilities;
 using UnityEngine;
+using UWE;
 
 namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 {
@@ -457,7 +458,8 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono
 
             if (!result) return null;
             var itemTask = new TaskResult<InventoryItem>();
-            CouroutineManager.WaitCoroutine(techType.ToInventoryItem(itemTask));
+            CoroutineManager.WaitCoroutine(techType.ToInventoryItem(itemTask));
+
             return itemTask.Get().item;
         }
 

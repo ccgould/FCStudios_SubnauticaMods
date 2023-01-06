@@ -12,9 +12,9 @@ using FCS_HomeSolutions.Mods.PaintTool.Mono;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Spawnables;
 using FCS_HomeSolutions.Structs;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Handlers;
-using SMLHelper.V2.Utility;
+using SMLHelper.Crafting;
+using SMLHelper.Handlers;
+using SMLHelper.Utility;
 using UnityEngine;
 
 namespace FCS_HomeSolutions.Configuration
@@ -260,7 +260,7 @@ namespace FCS_HomeSolutions.Configuration
 
             if (CustomFoods.Any()) return;
 
-            var smlCTPatcher = typeof(CraftTreeHandler).Assembly.GetType("SMLHelper.V2.Patchers.CraftTreePatcher");
+            var smlCTPatcher = typeof(CraftTreeHandler).Assembly.GetType("SMLHelper.Patchers.CraftTreePatcher");
             var customTrees = (Dictionary<CraftTree.Type, ModCraftTreeRoot>) smlCTPatcher
                 .GetField("CustomTrees", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
             foreach (KeyValuePair<CraftTree.Type, ModCraftTreeRoot> entry in customTrees)

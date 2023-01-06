@@ -20,6 +20,7 @@ namespace FCS_LifeSupportSolutions.Patches
                 return;
             }
 
+                if (ModelPrefab.PillHudPrefab is null) return;
             var prefab = GameObject.Instantiate(ModelPrefab.PillHudPrefab);
             var hudTransform = GameObject.Find("ScreenCanvas").transform.Find("HUD").Find("Content").Find("BarsPanel");
             prefab.transform.SetParent(hudTransform, false);

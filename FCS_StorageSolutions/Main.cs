@@ -10,7 +10,7 @@ using FCS_StorageSolutions.Mods.DataStorageSolutions.Spawnable;
 using FCS_StorageSolutions.Patches;
 using FCSCommon.Utilities;
 using HarmonyLib;
-using SMLHelper.V2.Handlers;
+using SMLHelper.Handlers;
 
 namespace FCS_StorageSolutions
 {
@@ -28,7 +28,7 @@ namespace FCS_StorageSolutions
             AUTHOR = "FieldCreatorsStudios",
             GUID = AUTHOR + "_" + MODNAME,
             VERSION = "1.0.0.0";
-        internal static Config Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<Config>();
+        internal static Config Configuration { get; } = OptionsPanelHandler.RegisterModOptions<Config>();
         public static bool IsDockedVehicleStorageAccessInstalled { get; set; }
         #endregion
 
@@ -76,7 +76,7 @@ namespace FCS_StorageSolutions
             }
 
             //Register debug commands
-            ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
+            ConsoleCommandsHandler.RegisterConsoleCommands(typeof(DebugCommands));
 
             //Harmony
             var harmony = new Harmony("com.storagesolutions.fcstudios");

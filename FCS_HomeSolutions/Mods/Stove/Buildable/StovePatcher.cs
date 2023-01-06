@@ -11,18 +11,18 @@ using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Mods.Stove.Mono;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Utility;
+using SMLHelper.Crafting;
+using SMLHelper.Utility;
 using UnityEngine;
 #if SUBNAUTICA
-using RecipeData = SMLHelper.V2.Crafting.TechData;
+using RecipeData = SMLHelper.Crafting.TechData;
 using Sprite = Atlas.Sprite;
 #endif
 
 
 namespace FCS_HomeSolutions.Mods.Stove.Buildable
 {
-    internal partial class StoveBuildable : SMLHelper.V2.Assets.Buildable
+    internal partial class StoveBuildable : SMLHelper.Assets.Buildable
     {
         internal const string StoveClassID = "FCSStove";
         internal const string StoveFriendly = "Stove";

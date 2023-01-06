@@ -1,10 +1,10 @@
 ﻿using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Handlers;
+using SMLHelper.Crafting;
+using SMLHelper.Handlers;
 using System;
 using UnityEngine;
 #if SUBNAUTICA
-using RecipeData = SMLHelper.V2.Crafting.TechData;
+using RecipeData = SMLHelper.Crafting.TechData;
 #endif
 
 namespace FCS_AlterraHub.Helpers

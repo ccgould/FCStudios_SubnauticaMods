@@ -238,7 +238,8 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
             }
 
 
-            _ping = WorldHelpers.CreateBeacon(gameObject, Main.DeepDrillerPingType, "");
+            _ping = gameObject.GetComponent<PingInstance>();
+
 
             IsInitialized = true;
         }

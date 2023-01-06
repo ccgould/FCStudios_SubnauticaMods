@@ -5,17 +5,16 @@ using FCSDemo.Buildables;
 using FCSDemo.Configuration;
 using FCSDemo.Model;
 using HarmonyLib;
-using QModManager.API.ModLoading;
-using SMLHelper.V2.Handlers;
+using SMLHelper.Handlers;
 
 namespace FCSDemo
 {
-    [QModCore]
-    public class QPatch
-    {
-        internal static Config Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<Config>();
 
-        [QModPatch]
+    public class Main
+    {
+        internal static Config Configuration { get; } = OptionsPanelHandler.RegisterModOptions<Config>();
+
+  
         public static void Patch()
         {
             QuickLogger.Info($"Started patching. Version: {QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly())}");

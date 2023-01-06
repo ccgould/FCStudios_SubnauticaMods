@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
@@ -10,18 +11,17 @@ using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.Mods.Replicator.Mono;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Assets;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Utility;
+using SMLHelper.Crafting;
+using SMLHelper.Utility;
 using UnityEngine;
 #if SUBNAUTICA
-using RecipeData = SMLHelper.V2.Crafting.TechData;
+using RecipeData = SMLHelper.Crafting.TechData;
 using Sprite = Atlas.Sprite;
 #endif
 
-namespace FCS_HomeSolutions.Mods.Replicator.Buildables
+namespace FCS_ProductionSolutions.Mods.Replicator.Buildable
 {
-    internal partial class ReplicatorBuildable : Buildable
+    internal partial class ReplicatorBuildable : SMLHelper.Assets.Buildable
     {
         public override TechGroup GroupForPDA { get; } = TechGroup.Miscellaneous;
         public override TechCategory CategoryForPDA { get; } = TechCategory.Misc;
@@ -50,18 +50,19 @@ namespace FCS_HomeSolutions.Mods.Replicator.Buildables
             };
         }
 
-        public override GameObject GetGameObject()
+        public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
         {
+            GameObject prefab = null;
             try
             {
-                var prefab = GameObject.Instantiate(ModelPrefab.ReplicatorPrefab);
+                prefab = GameObject.Instantiate(ModelPrefab.ReplicatorPrefab);
 
                 prefab.name = this.PrefabFileName;
-                
+
                 var center = new Vector3(0f, 1.219271f, 0f);
                 var size = new Vector3(0.7963083f, 2.037489f, 0.8331643f);
 
-                GameObjectHelpers.AddConstructableBounds(prefab,size,center);
+                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
 
                 var model = prefab.FindChild("model");
 
@@ -70,6 +71,15 @@ namespace FCS_HomeSolutions.Mods.Replicator.Buildables
                 skyApplier.anchorSky = Skies.Auto;
 
                 //========== Allows the building animation and material colors ==========// 
+
+
+                SubRoot subRoot = prefab.GetComponentInParent<SubRoot>();
+                if (subRoot == null)
+                {
+                    // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
+                    var lwe = prefab.AddComponent<LargeWorldEntity>();
+                    lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
+                }
 
                 QuickLogger.Debug("Adding Constructible");
 
@@ -89,25 +99,23 @@ namespace FCS_HomeSolutions.Mods.Replicator.Buildables
                 prefabID.ClassId = ClassID;
 
 
-                prefab.SetActive(false);
-                var storageContainer = prefab.AddComponent<ReplicatorSlot>();
-                storageContainer.Initialize(25, 1, 1, FriendlyName, ClassID);
-                storageContainer.enabled = false;
-                prefab.SetActive(true);
-                
+                prefab.AddComponent<ReplicatorSlot>();
+
+                UWEHelpers.CreateStorageContainer(prefab, prefab.FindChild("StorageRoot"), ClassID, FriendlyName, 1, 30);
+
+
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<ReplicatorController>();
 
                 //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
-
-                return prefab;
             }
             catch (Exception e)
             {
                 QuickLogger.Error(e.Message);
-                return null;
             }
+            gameObject.Set(prefab);
+            yield break;
         }
 
         public override string AssetsFolder { get; } = Mod.GetAssetPath();

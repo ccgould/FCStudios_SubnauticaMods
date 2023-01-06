@@ -8,14 +8,14 @@ using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model.Utilities;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
-using FCS_HomeSolutions.Mods.Replicator.Buildables;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Models;
 using FCS_ProductionSolutions.Mods.HydroponicHarvester.Buildable;
 using FCS_ProductionSolutions.Mods.IonCubeGenerator.Interfaces;
+using FCS_ProductionSolutions.Mods.Replicator.Buildable;
 using FCS_ProductionSolutions.Structs;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Utility;
+using SMLHelper.Crafting;
+using SMLHelper.Utility;
 using UnityEngine;
 
 namespace FCS_ProductionSolutions.Configuration

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace FCSCommon.Utilities
 {
-    public class CouroutineManager
+    public class CoroutineManager
     {
         public static void WaitCoroutine(IEnumerator func)
         {

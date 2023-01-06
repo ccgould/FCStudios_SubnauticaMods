@@ -13,7 +13,7 @@ using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
 using RadicalLibrary;
-using SMLHelper.V2.Commands;
+using SMLHelper.Commands;
 using UWE;
 
 namespace FCS_AlterraHub.Configuration

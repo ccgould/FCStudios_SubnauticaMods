@@ -11,11 +11,11 @@ using FCS_EnergySolutions.Buildable;
 using FCS_EnergySolutions.Configuration;
 using FCS_EnergySolutions.Mods.JetStreamT242.Mono;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Utility;
+using SMLHelper.Crafting;
+using SMLHelper.Utility;
 using UnityEngine;
 #if SUBNAUTICA
-using RecipeData = SMLHelper.V2.Crafting.TechData;
+using RecipeData = SMLHelper.Crafting.TechData;
 using Sprite = Atlas.Sprite;
 
 #endif
@@ -23,7 +23,7 @@ using Sprite = Atlas.Sprite;
 namespace FCS_EnergySolutions.Mods.JetStreamT242.Buildables
 {
 
-    internal class JetStreamT242Patcher : SMLHelper.V2.Assets.Buildable
+    internal class JetStreamT242Patcher : SMLHelper.Assets.Buildable
     {
         private readonly GameObject _prefab;
         public override TechGroup GroupForPDA => TechGroup.ExteriorModules;
@@ -69,10 +69,10 @@ namespace FCS_EnergySolutions.Mods.JetStreamT242.Buildables
 
             // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
             var lwe = prefab.AddComponent<LargeWorldEntity>();
-            lwe.cellLevel = LargeWorldEntity.CellLevel.Far;
+            lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
 
             // Add constructible
-            var constructable = prefab.AddComponent<Constructable>();
+            var constructable = prefab.EnsureComponent<Constructable>();
 
             constructable.allowedOutside = true;
             constructable.allowedInBase = true;
@@ -88,10 +88,9 @@ namespace FCS_EnergySolutions.Mods.JetStreamT242.Buildables
             PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
             prefabID.ClassId = ClassID;
 
-            var taskResult = CraftData.GetPrefabForTechTypeAsync(TechType.SolarPanel);
-            yield return taskResult;
-
-            PowerRelay solarPowerRelay = taskResult.GetResult().GetComponent<PowerRelay>();
+            var result = new TaskResult<GameObject>();
+            yield return CraftData.GetPrefabForTechTypeAsync(TechType.SolarPanel, false, result);
+            PowerRelay solarPowerRelay = result.Get().GetComponent<PowerRelay>();
 
             var ps = prefab.AddComponent<PowerSource>();
             ps.maxPower = 500f;

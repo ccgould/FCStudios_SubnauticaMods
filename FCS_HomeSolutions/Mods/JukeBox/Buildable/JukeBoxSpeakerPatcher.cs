@@ -10,22 +10,22 @@ using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Mods.JukeBox.Mono;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Utility;
+using SMLHelper.Crafting;
+using SMLHelper.Utility;
 using UnityEngine;
 #if SUBNAUTICA
-using RecipeData = SMLHelper.V2.Crafting.TechData;
+using RecipeData = SMLHelper.Crafting.TechData;
 using Sprite = Atlas.Sprite;
 #endif
 
 namespace FCS_HomeSolutions.Mods.JukeBox.Buildable
 {
-    internal class JukeBoxSpeakerBuildable : SMLHelper.V2.Assets.Buildable
+    internal class JukeBoxSpeakerBuildable : SMLHelper.Assets.Buildable
     {
         private readonly GameObject _prefab;
         internal const string JukeBoxSpeakerClassID = "FCSJukeboxSpeaker";
         internal const string JukeBoxSpeakerFriendly = "Jukebox Speaker";
-        internal const string JukeBoxSpeakerDescription = "N/A";
+        internal const string JukeBoxSpeakerDescription = "Wall-mounted satellite speaker for the Alterra Jukebox so you can take your relaxed attitude toward danger anywhere inside your base.";
         internal const string JukeBoxSpeakerPrefabName = "JukeBoxSpeaker";
         internal const string JukeBoxSpeakerKitClassID = "JukeboxSpeaker_Kit";
         internal const string JukeBoxSpeakerTabID = "JBS";

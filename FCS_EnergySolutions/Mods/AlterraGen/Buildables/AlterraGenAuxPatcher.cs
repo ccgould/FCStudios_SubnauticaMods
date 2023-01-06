@@ -1,5 +1,5 @@
 ﻿using FCSCommon.Utilities;
-using SMLHelper.V2.Handlers;
+using SMLHelper.Handlers;
 
 namespace FCS_EnergySolutions.Mods.AlterraGen.Buildables
 {

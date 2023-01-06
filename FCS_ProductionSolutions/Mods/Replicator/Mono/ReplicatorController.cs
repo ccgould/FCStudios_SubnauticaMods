@@ -8,11 +8,11 @@ using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
-using FCS_HomeSolutions.Mods.Replicator.Buildables;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.HydroponicHarvester.Mono;
 using FCS_ProductionSolutions.Mods.HydroponicHarvester.Enumerators;
+using FCS_ProductionSolutions.Mods.Replicator.Buildable;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
@@ -33,6 +33,8 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
         private Text _powerUsagePerSecond;
         private Text _containerAmount;
         private GameObject _spawnPoint;
+        private StorageContainer _storageContainer;
+
         private ReplicatorSpeedButton _speedBTN;
         private GameObject _canvas;
         private InterfaceInteraction _interactionHelper;
@@ -98,9 +100,19 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             }
         }
 
-        public override IFCSStorage GetStorage()
+        public override ItemsContainer GetItemsContainer()
         {
-            return _replicatorSlot;
+            if (_storageContainer == null)
+            {
+                _storageContainer = GetComponent<StorageContainer>();
+            }
+
+            if (_storageContainer)
+            {
+                return _storageContainer.container;
+            }
+
+            return null;
         }
 
         internal void LoadKnownSamples()
@@ -184,6 +196,13 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
 
             var prxy = _canvas.EnsureComponent<ProximityActivate>();
             prxy.Initialize(_canvas, gameObject, 2);
+            prxy.OnVisible += () =>
+            {
+                LoadKnownSamples();
+                UpdateUI();
+            };
+
+
 
             _samplesGrid = GameObjectHelpers.FindGameObject(gameObject, "Grid");
             _techTypeIcon = GameObjectHelpers.FindGameObject(gameObject, "CurrentTechTypeIcon")

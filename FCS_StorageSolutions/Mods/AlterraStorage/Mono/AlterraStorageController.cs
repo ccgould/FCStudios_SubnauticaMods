@@ -237,6 +237,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
 
         private void UpdateStorageCount()
         {
+            if (_storageAmount == null || _storageContainer?.container == null) return;
             _storageAmount.text = AuxPatchers.AlterraStorageAmountFormat(_storageContainer?.container?.count ?? 0, MAXSTORAGE);
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
@@ -9,17 +10,17 @@ using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Mono;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Utility;
+using SMLHelper.Crafting;
+using SMLHelper.Utility;
 using UnityEngine;
 #if SUBNAUTICA
-using RecipeData = SMLHelper.V2.Crafting.TechData;
+using RecipeData = SMLHelper.Crafting.TechData;
 using Sprite = Atlas.Sprite;
 #endif
 
 namespace FCS_ProductionSolutions.Mods.AutoCrafter.Buildable
 {
-    internal class AutoCrafterPatch : SMLHelper.V2.Assets.Buildable
+    internal class AutoCrafterPatch : SMLHelper.Assets.Buildable
     {
         private readonly GameObject _prefab;
 
@@ -51,7 +52,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Buildable
             };
         }
 
-        public override GameObject GetGameObject()
+        public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
         {
             try
             {
@@ -76,7 +77,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Buildable
                 // Add constructible
                 var constructable = prefab.AddComponent<Constructable>();
 
-                constructable.allowedOutside = false;
+                constructable.allowedOutside = true;
                 constructable.allowedInBase = true;
                 constructable.allowedOnGround = true;
                 constructable.allowedOnWall = false;
@@ -97,20 +98,22 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Buildable
                 var craftMachine = prefab.AddComponent<CraftMachine>();
                 var controller = prefab.AddComponent<AutoCrafterController>();
                 craftMachine.Crafter = controller;
-                controller.Storage =  UWEHelpers.CreateStorageContainer(prefab, null, ClassID, string.Empty, 4, 8);
+                controller.Storage = UWEHelpers.CreateStorageContainer(prefab, null, ClassID, string.Empty, 4, 8);
 
                 //Apply the glass shader here because of autosort lockers for some reason doesn't like it.
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
                 MaterialHelpers.ApplyShaderToMaterial(prefab, "_ConveyorBelt");
 
-                return prefab;
+                gameObject.Set(prefab);
+                yield break;
             }
             catch (Exception e)
             {
                 QuickLogger.Error(e.Message);
             }
 
-            return null;
+            gameObject.Set(null);
+            yield break;
         }
 
         protected override RecipeData GetBlueprintRecipe()

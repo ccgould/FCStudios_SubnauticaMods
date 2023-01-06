@@ -13,17 +13,17 @@ using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Configuration;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Utility;
+using SMLHelper.Crafting;
+using SMLHelper.Utility;
 using UnityEngine;
 #if SUBNAUTICA
-using RecipeData = SMLHelper.V2.Crafting.TechData;
+using RecipeData = SMLHelper.Crafting.TechData;
 using Sprite = Atlas.Sprite;
 #endif
 
 namespace FCS_HomeSolutions.Mods.Sofas.Buildable
 {
-    internal abstract class SofaBase : SMLHelper.V2.Assets.Buildable
+    internal abstract class SofaBase : SMLHelper.Assets.Buildable
     {
         private readonly string _kitClassID;
         private GameObject _gameObject;

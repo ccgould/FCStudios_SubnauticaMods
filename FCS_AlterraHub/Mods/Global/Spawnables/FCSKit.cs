@@ -2,8 +2,8 @@
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Helpers;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Assets;
-using SMLHelper.V2.Utility;
+using SMLHelper.Assets;
+using SMLHelper.Utility;
 using UnityEngine;
 using UnityEngine.UI;
 #if SUBNAUTICA

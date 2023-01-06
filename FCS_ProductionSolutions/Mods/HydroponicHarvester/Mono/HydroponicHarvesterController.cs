@@ -312,7 +312,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
 
             GrowBedManager.TakeItemFromContainer(techType,GrowBedManager.GetSlotByItem(techType),false);
             var itemTask = new TaskResult<InventoryItem>();
-            CouroutineManager.WaitCoroutine(techType.ToInventoryItem(itemTask));
+            CoroutineManager.WaitCoroutine(techType.ToInventoryItem(itemTask));
             return itemTask.Get().item;
         }
 

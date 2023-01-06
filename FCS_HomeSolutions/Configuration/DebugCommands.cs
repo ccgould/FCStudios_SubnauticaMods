@@ -16,7 +16,7 @@ using FCS_HomeSolutions.Mods.SeaBreeze.Buildable;
 using FCS_HomeSolutions.Mods.SeaBreeze.Mono;
 using FCSCommon.Utilities;
 using Newtonsoft.Json;
-using SMLHelper.V2.Commands;
+using SMLHelper.Commands;
 using UnityEngine;
 
 namespace FCS_HomeSolutions.Configuration

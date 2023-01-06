@@ -11,18 +11,18 @@ using FCS_EnergySolutions.Buildable;
 using FCS_EnergySolutions.Configuration;
 using FCS_EnergySolutions.Mods.UniversalCharger.Mono;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Utility;
+using SMLHelper.Crafting;
+using SMLHelper.Utility;
 using UnityEngine;
 #if SUBNAUTICA
-using RecipeData = SMLHelper.V2.Crafting.TechData;
+using RecipeData = SMLHelper.Crafting.TechData;
 using Sprite = Atlas.Sprite;
 
 #endif
 
 namespace FCS_EnergySolutions.Mods.UniversalCharger.Buildable
 {
-    internal class UniversalChargerPatcher : SMLHelper.V2.Assets.Buildable
+    internal class UniversalChargerPatcher : SMLHelper.Assets.Buildable
     {
         public override TechGroup GroupForPDA => TechGroup.InteriorModules;
         public override TechCategory CategoryForPDA => TechCategory.InteriorModule;

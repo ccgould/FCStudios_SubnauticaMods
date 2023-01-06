@@ -16,8 +16,8 @@ using FCS_HomeSolutions.Mods.QuantumTeleporter.Interface;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Model;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Mono;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Assets;
-using SMLHelper.V2.Utility;
+using SMLHelper.Assets;
+using SMLHelper.Utility;
 using UnityEngine;
 #if SUBNAUTICA
 using Sprite = Atlas.Sprite;
@@ -36,10 +36,10 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Spawnables
             OnFinishedPatching += () =>
             {
                 // Add the new TechType to Hand Equipment type.
-                SMLHelper.V2.Handlers.CraftDataHandler.SetEquipmentType(this.TechType, EquipmentType.Hand);
+                SMLHelper.Handlers.CraftDataHandler.SetEquipmentType(this.TechType, EquipmentType.Hand);
 
                 // Set quick slot type.
-                SMLHelper.V2.Handlers.CraftDataHandler.SetQuickSlotType(this.TechType, QuickSlotType.Selectable);
+                SMLHelper.Handlers.CraftDataHandler.SetQuickSlotType(this.TechType, QuickSlotType.Selectable);
                 
                 PatchedTechType = TechType;
 

@@ -11,8 +11,8 @@ using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Transceiver;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Spawnable;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Utility;
+using SMLHelper.Crafting;
+using SMLHelper.Utility;
 using UnityEngine;
 
 namespace FCS_StorageSolutions.Configuration

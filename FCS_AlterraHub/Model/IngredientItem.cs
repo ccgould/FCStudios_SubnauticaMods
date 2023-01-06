@@ -1,6 +1,6 @@
 ﻿using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mono;
-using SMLHelper.V2.Crafting;
+using SMLHelper.Crafting;
 using UnityEngine;
 using UnityEngine.UI;
 

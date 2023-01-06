@@ -4,17 +4,17 @@ using System.Collections.Generic;
 using FCS_AlterraHub.Extensions;
 using FCS_ProductionSolutions.Configuration;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
+using SMLHelper.Crafting;
 using UnityEngine;
 using UWE;
 #if SUBNAUTICA
-using RecipeData = SMLHelper.V2.Crafting.TechData;
+using RecipeData = SMLHelper.Crafting.TechData;
 using Sprite = Atlas.Sprite;
 #endif
 
 namespace FCS_ProductionSolutions.Mods.DeepDriller.Craftable
 {
-    internal class FcsGlassCraftable : SMLHelper.V2.Assets.Craftable
+    internal class FcsGlassCraftable : SMLHelper.Assets.Craftable
     {
 
         public override TechGroup GroupForPDA => TechGroup.Resources;

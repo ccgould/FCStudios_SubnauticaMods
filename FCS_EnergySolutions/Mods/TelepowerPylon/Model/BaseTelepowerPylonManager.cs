@@ -221,7 +221,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Model
         public string GetBaseID()
         {
             if(_manager == null) FindManager();
-            return _manager?.GetBaseFriendlyId();
+            return _manager?.GetBaseFriendlyId() ?? "N/A";
         }
 
         public string GetBaseName()

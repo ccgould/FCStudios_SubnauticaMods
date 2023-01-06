@@ -11,9 +11,9 @@ using FCS_EnergySolutions.Mods.AlterraGen.Enumerators;
  using FCS_EnergySolutions.Mods.TelepowerPylon.Model;
  using FCSCommon.Utilities;
 using HarmonyLib;
-using SMLHelper.V2.Crafting;
- using SMLHelper.V2.Json.ExtensionMethods;
- using SMLHelper.V2.Utility;
+using SMLHelper.Crafting;
+ using SMLHelper.Json.ExtensionMethods;
+ using SMLHelper.Utility;
 using UnityEngine;
 
 namespace FCS_EnergySolutions.Configuration

@@ -5,7 +5,7 @@ using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Registration;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Utility;
+using SMLHelper.Utility;
 using UnityEngine;
 
 namespace FCS_AlterraHub.API

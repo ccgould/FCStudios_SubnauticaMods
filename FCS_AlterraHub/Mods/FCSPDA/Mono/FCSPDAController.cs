@@ -20,7 +20,7 @@ using FCS_AlterraHub.Structs;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
 using FMOD;
-using SMLHelper.V2.Utility;
+using SMLHelper.Utility;
 using UnityEngine;
 using UnityEngine.UI;
 using PDAPages = FCS_AlterraHub.Mods.FCSPDA.Enums.PDAPages;

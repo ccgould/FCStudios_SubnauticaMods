@@ -1,8 +1,8 @@
 ﻿using System.IO;
 using System.Reflection;
 using FCS_ProductionSolutions.Mods.IonCubeGenerator.Mono;
-using SMLHelper.V2.Assets;
-using SMLHelper.V2.Crafting;
+using SMLHelper.Assets;
+using SMLHelper.Crafting;
 using UnityEngine;
 
 namespace FCS_ProductionSolutions.Mods.IonCubeGenerator.Craftables
@@ -10,7 +10,7 @@ namespace FCS_ProductionSolutions.Mods.IonCubeGenerator.Craftables
     // using Logger = QModManager.Utility.Logger;
 
 #if SUBNAUTICA
-    using RecipeData = SMLHelper.V2.Crafting.TechData;
+    using RecipeData = SMLHelper.Crafting.TechData;
 #endif
 
     internal partial class AlienEletronicsCase : Craftable

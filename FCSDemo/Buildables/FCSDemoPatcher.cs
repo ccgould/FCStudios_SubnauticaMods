@@ -7,9 +7,9 @@ using FCSCommon.Utilities;
 using FCSDemo.Configuration;
 using FCSDemo.Model;
 using FCSDemo.Mono;
-using SMLHelper.V2.Assets;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Utility;
+using SMLHelper.Assets;
+using SMLHelper.Crafting;
+using SMLHelper.Utility;
 using UnityEngine;
 
 namespace FCSDemo.Buildables
@@ -35,10 +35,10 @@ namespace FCSDemo.Buildables
             {
                 var prefab = GameObject.Instantiate(_prefab);
 
-                if (QPatch.Configuration.UseCustomBoundingBox)
+                if (Main.Configuration.UseCustomBoundingBox)
                 {
-                    var center = QPatch.Configuration.BoundingCenter;
-                    var size = QPatch.Configuration.BoundingSize;
+                    var center = Main.Configuration.BoundingCenter;
+                    var size = Main.Configuration.BoundingSize;
                     GameObjectHelpers.AddConstructableBounds(prefab, size.ToVector3(), center.ToVector3());
                 }
                 
@@ -62,18 +62,18 @@ namespace FCSDemo.Buildables
                 // Add constructible
                 var constructable = prefab.AddComponent<Constructable>();
 
-                constructable.allowedOutside = QPatch.Configuration.AllowedOutside;
-                constructable.allowedInBase = QPatch.Configuration.AllowedInBase;
-                constructable.allowedOnGround = QPatch.Configuration.AllowedOnGround;
-                constructable.allowedOnWall = QPatch.Configuration.AllowedOnWall;
-                constructable.rotationEnabled = QPatch.Configuration.RotationEnabled;
-                constructable.allowedOnCeiling = QPatch.Configuration.AllowedOnCeiling;
-                constructable.allowedInSub = QPatch.Configuration.AllowedInSub;
-                constructable.allowedOnConstructables = QPatch.Configuration.AllowedOnConstructables;
+                constructable.allowedOutside = Main.Configuration.AllowedOutside;
+                constructable.allowedInBase = Main.Configuration.AllowedInBase;
+                constructable.allowedOnGround = Main.Configuration.AllowedOnGround;
+                constructable.allowedOnWall = Main.Configuration.AllowedOnWall;
+                constructable.rotationEnabled = Main.Configuration.RotationEnabled;
+                constructable.allowedOnCeiling = Main.Configuration.AllowedOnCeiling;
+                constructable.allowedInSub = Main.Configuration.AllowedInSub;
+                constructable.allowedOnConstructables = Main.Configuration.AllowedOnConstructables;
 
-                constructable.placeMaxDistance = QPatch.Configuration.PlaceMaxDistance;//7f;
-                constructable.placeMinDistance = QPatch.Configuration.PlaceMinDistance; //5f;
-                constructable.placeDefaultDistance = QPatch.Configuration.PlaceDefaultDistance; //6f;
+                constructable.placeMaxDistance = Main.Configuration.PlaceMaxDistance;//7f;
+                constructable.placeMinDistance = Main.Configuration.PlaceMinDistance; //5f;
+                constructable.placeDefaultDistance = Main.Configuration.PlaceDefaultDistance; //6f;
                 constructable.model = model;
                 constructable.techType = TechType;
 

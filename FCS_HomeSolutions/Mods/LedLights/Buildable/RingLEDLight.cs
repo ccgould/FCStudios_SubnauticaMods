@@ -1,9 +1,9 @@
 ﻿using FCS_AlterraHub.Extensions;
 using FCS_HomeSolutions.Buildables;
-using SMLHelper.V2.Crafting;
+using SMLHelper.Crafting;
 using UnityEngine;
 #if SUBNAUTICA
-using RecipeData = SMLHelper.V2.Crafting.TechData;
+using RecipeData = SMLHelper.Crafting.TechData;
 #endif
 
 namespace FCS_HomeSolutions.Mods.LedLights.Buildable

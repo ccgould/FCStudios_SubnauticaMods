@@ -8,18 +8,18 @@ using FCS_AlterraHub.Registration;
 using FCS_StorageSolutions.Configuration;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Antenna;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Utility;
+using SMLHelper.Crafting;
+using SMLHelper.Utility;
 using UnityEngine;
 #if SUBNAUTICA
-using RecipeData = SMLHelper.V2.Crafting.TechData;
+using RecipeData = SMLHelper.Crafting.TechData;
 using Sprite = Atlas.Sprite;
 #endif
 
 
 namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
 {
-    internal class DSSAntennaPatch : SMLHelper.V2.Assets.Buildable
+    internal class DSSAntennaPatch : SMLHelper.Assets.Buildable
     {
         public override TechGroup GroupForPDA => TechGroup.ExteriorModules;
         public override TechCategory CategoryForPDA => TechCategory.ExteriorModule;

@@ -42,6 +42,7 @@
     <Compile Include="Mods\DisplayBoard\Mono\DisplayBoardController.cs" />
     <Compile Include="Mods\DisplayBoard\Mono\DisplayScreenController.cs" />
     <Compile Include="Mods\JukeBox\Buildable\JukeBoxSubWooferPatcher.cs" />
+    <Compile Include="Mods\JukeBox\Mono\JukeBoxSubwooferController.cs" />
     <Compile Include="Mods\LedLights\Buildable\RingLEDLight.cs" />
     <Compile Include="Mods\LedLights\Buildable\FloodLEDLight.cs" />
     <Compile Include="Mods\Microwave\Buildable\CookerPatch.cs" />

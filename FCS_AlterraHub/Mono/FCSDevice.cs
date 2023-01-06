@@ -74,6 +74,15 @@ namespace FCS_AlterraHub.Mono
             return null;
         }
 
+        /// <summary>
+        /// Gets the itemsContainer of a unit if it is accesable.
+        /// </summary>
+        /// <returns><see cref="FCSStorage"/></returns>
+        public virtual ItemsContainer GetItemsContainer()
+        {
+            return GetStorage()?.ItemsContainer;
+        }
+
         public virtual Vector3 GetPosition()
         {
             return transform.position;

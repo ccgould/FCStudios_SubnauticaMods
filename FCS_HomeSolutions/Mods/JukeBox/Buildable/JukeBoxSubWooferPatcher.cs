@@ -11,22 +11,22 @@ using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Mods.JukeBox.Mono;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Utility;
+using SMLHelper.Crafting;
+using SMLHelper.Utility;
 using UnityEngine;
 #if SUBNAUTICA
-using RecipeData = SMLHelper.V2.Crafting.TechData;
+using RecipeData = SMLHelper.Crafting.TechData;
 using Sprite = Atlas.Sprite;
 #endif
 
 namespace FCS_HomeSolutions.Mods.JukeBox.Buildable
 {
-    internal class JukeBoxSubWooferBuildable : SMLHelper.V2.Assets.Buildable
+    internal class JukeBoxSubWooferBuildable : SMLHelper.Assets.Buildable
     {
         private readonly GameObject _prefab;
         internal const string JukeBoxSpeakerClassID = "FCSJukeBoxSubWoofer";
         internal const string JukeBoxSpeakerFriendly = "Jukebox Sub Woofer";
-        internal const string JukeBoxSpeakerDescription = "N/A";
+        internal const string JukeBoxSpeakerDescription = "Floor-mounted satellite Subwoofer for the Alterra Jukebox so your relaxed attitude toward danger can vibrate the air in your lungs anywhere inside your base.";
         internal const string JukeBoxSpeakerPrefabName = "JukeBoxSubWoofer";
         internal const string JukeBoxSpeakerKitClassID = "JukeBoxSubWoofer_Kit";
         internal const string JukeBoxSpeakerTabID = "JBSW";
@@ -90,7 +90,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Buildable
                 prefabID.ClassId = ClassID;
 
                 prefab.AddComponent<TechTag>().type = TechType;
-                prefab.AddComponent<JukeBoxSpeakerController>();
+                prefab.AddComponent<JukeBoxSubwooferController>();
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
                 return prefab;
             }

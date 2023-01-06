@@ -5,7 +5,7 @@ using System.Text;
 using FCS_AlterraHub.Helpers;
 using FCSCommon.Utilities;
 using FMOD;
-using SMLHelper.V2.Utility;
+using SMLHelper.Utility;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Systems

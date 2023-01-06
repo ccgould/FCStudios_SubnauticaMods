@@ -10,22 +10,22 @@ using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Mods.JukeBox.Mono;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Utility;
+using SMLHelper.Crafting;
+using SMLHelper.Utility;
 using UnityEngine;
 #if SUBNAUTICA
-using RecipeData = SMLHelper.V2.Crafting.TechData;
+using RecipeData = SMLHelper.Crafting.TechData;
 using Sprite = Atlas.Sprite;
 #endif
 
 namespace FCS_HomeSolutions.Mods.JukeBox.Buildable
 {
-    internal class JukeBoxBuildable : SMLHelper.V2.Assets.Buildable
+    internal class JukeBoxBuildable : SMLHelper.Assets.Buildable
     {
         private readonly GameObject _prefab;
         internal const string JukeBoxClassID = "FCSJukebox";
         internal const string JukeBoxFriendly = "Jukebox";
-        internal const string JukeBoxDescription = "N/A";
+        internal const string JukeBoxDescription = "Wall-mounted Alterra Jukebox. Plays your favorite music to help you develop a relaxed attitude toward danger.";
         internal const string JukeBoxPrefabName = "Jukebox";
         internal const string JukeBoxKitClassID = "Jukebox_Kit";
         internal const string JukeBoxTabID = "JB";

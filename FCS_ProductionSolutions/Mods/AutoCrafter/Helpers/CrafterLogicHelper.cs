@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Helpers;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Handlers;
+using SMLHelper.Crafting;
+using SMLHelper.Handlers;
 #if SUBNAUTICA
-using RecipeData = SMLHelper.V2.Crafting.TechData;
+using RecipeData = SMLHelper.Crafting.TechData;
 #endif
 namespace FCS_ProductionSolutions.Mods.AutoCrafter.Helpers
 {

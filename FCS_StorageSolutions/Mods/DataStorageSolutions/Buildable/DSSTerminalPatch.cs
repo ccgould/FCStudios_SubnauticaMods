@@ -8,17 +8,17 @@ using FCS_AlterraHub.Registration;
 using FCS_StorageSolutions.Configuration;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Utility;
+using SMLHelper.Crafting;
+using SMLHelper.Utility;
 using UnityEngine;
 #if SUBNAUTICA
-using RecipeData = SMLHelper.V2.Crafting.TechData;
+using RecipeData = SMLHelper.Crafting.TechData;
 using Sprite = Atlas.Sprite;
 #endif
 
 namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
 {
-    internal class DSSTerminalPatch : SMLHelper.V2.Assets.Buildable
+    internal class DSSTerminalPatch : SMLHelper.Assets.Buildable
     {
         public override TechGroup GroupForPDA => TechGroup.InteriorModules;
         public override TechCategory CategoryForPDA => TechCategory.InteriorModule;

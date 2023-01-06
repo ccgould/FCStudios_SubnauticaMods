@@ -11,7 +11,7 @@ using FCS_ProductionSolutions.Mods.HydroponicHarvester.Enumerators;
 using FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono;
 using FCS_ProductionSolutions.Mods.MatterAnalyzer.Mono;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Commands;
+using SMLHelper.Commands;
 using UnityEngine;
 using UWE;
 

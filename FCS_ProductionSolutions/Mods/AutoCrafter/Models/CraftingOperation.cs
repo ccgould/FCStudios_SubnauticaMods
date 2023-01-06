@@ -5,7 +5,7 @@ using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_ProductionSolutions.Mods.AutoCrafter.Mono;
-using SMLHelper.V2.Handlers;
+using SMLHelper.Handlers;
 using Newtonsoft.Json;
 
 namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models
@@ -57,7 +57,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models
             ParentMachineUnitID = unitID;
             TechType = techType;
             Amount = amount;
-            var data = CraftDataHandler.Main.GetTechData(techType);
+            var data = CraftDataHandler.GetTechData(techType);
             var returnAmount = data?.craftAmount ?? 1;
             var linkedItems = data?.LinkedItems;
             if (linkedItems != null)

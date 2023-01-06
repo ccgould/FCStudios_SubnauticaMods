@@ -11,18 +11,18 @@ using FCS_EnergySolutions.Buildable;
 using FCS_EnergySolutions.Configuration;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Mono;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Utility;
+using SMLHelper.Crafting;
+using SMLHelper.Utility;
 using UnityEngine;
 #if SUBNAUTICA
-using RecipeData = SMLHelper.V2.Crafting.TechData;
+using RecipeData = SMLHelper.Crafting.TechData;
 using Sprite = Atlas.Sprite;
 
 #endif
 
 namespace FCS_EnergySolutions.Mods.TelepowerPylon.Buildable
 {
-    internal partial class TelepowerPylonBuildable : SMLHelper.V2.Assets.Buildable
+    internal partial class TelepowerPylonBuildable : SMLHelper.Assets.Buildable
     {
         private GameObject _prefab;
         public override TechGroup GroupForPDA => TechGroup.ExteriorModules;

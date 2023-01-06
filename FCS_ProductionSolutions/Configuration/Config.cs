@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Extensions;
-using SMLHelper.V2.Json;
-using SMLHelper.V2.Options.Attributes;
+using SMLHelper.Json;
+using SMLHelper.Options.Attributes;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Options;
+using SMLHelper.Options;
 using Newtonsoft.Json;
 
 namespace FCS_ProductionSolutions.Configuration

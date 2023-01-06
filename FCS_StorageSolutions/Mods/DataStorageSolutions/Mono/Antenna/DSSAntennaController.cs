@@ -30,7 +30,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Antenna
             Manager?.AlertNewAntennaPlaced(this);
             if (Manager == null)
             {
-                MotorHandler.StopMotor();
+                MotorHandler?.StopMotor();
             }
         }
 

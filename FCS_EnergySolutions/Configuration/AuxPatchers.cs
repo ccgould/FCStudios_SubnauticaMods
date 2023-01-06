@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using SMLHelper.V2.Handlers;
+using SMLHelper.Handlers;
 
 namespace FCS_EnergySolutions.Configuration
 {

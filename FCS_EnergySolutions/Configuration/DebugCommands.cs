@@ -6,7 +6,7 @@ using FCS_EnergySolutions.Mods.JetStreamT242.Mono;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Buildable;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Mono;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Commands;
+using SMLHelper.Commands;
 
 namespace FCS_EnergySolutions.Configuration
 {

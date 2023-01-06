@@ -4,17 +4,17 @@ using FCS_ProductionSolutions.Mods.IonCubeGenerator.Craftables;
 using FCS_ProductionSolutions.Mods.IonCubeGenerator.Display;
 using FCS_ProductionSolutions.Mods.IonCubeGenerator.Display.Patching;
 using FCS_ProductionSolutions.Mods.IonCubeGenerator.Mono;
-using SMLHelper.V2.Crafting;
+using SMLHelper.Crafting;
 using UnityEngine;
 
 namespace FCS_ProductionSolutions.Mods.IonCubeGenerator.Buildable
 {
     // using Logger = QModManager.Utility.Logger;
 #if SUBNAUTICA
-    using RecipeData = SMLHelper.V2.Crafting.TechData;
+    using RecipeData = SMLHelper.Crafting.TechData;
 #endif
 
-    internal partial class CubeGeneratorBuildable : SMLHelper.V2.Assets.Buildable
+    internal partial class CubeGeneratorBuildable : SMLHelper.Assets.Buildable
     {
         private static readonly CubeGeneratorBuildable singleton = new CubeGeneratorBuildable();
 

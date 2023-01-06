@@ -13,7 +13,7 @@ using FCS_AlterraHub.Structs;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
 using FMOD;
-using SMLHelper.V2.Handlers;
+using SMLHelper.Handlers;
 using Newtonsoft.Json;
 
 namespace FCS_AlterraHub.Registration
@@ -370,7 +370,7 @@ namespace FCS_AlterraHub.Registration
                                 {
                                     fModAsset = FModHelpers.CreateFmodAsset(string.Empty, audioPath);
 
-                                    CustomSoundHandler.Main.RegisterCustomSound(fModAsset.id, fModAsset.path);
+                                    CustomSoundHandler.RegisterCustomSound(fModAsset.id, fModAsset.path, string.Empty);
                                 }
                                 else
                                 {

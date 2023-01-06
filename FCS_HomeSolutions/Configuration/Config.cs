@@ -6,9 +6,9 @@ using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Objects;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Buildable;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Json;
-using SMLHelper.V2.Options;
-using SMLHelper.V2.Options.Attributes;
+using SMLHelper.Json;
+using SMLHelper.Options;
+using SMLHelper.Options.Attributes;
 using UnityEngine;
 using Newtonsoft.Json;
 
@@ -63,7 +63,7 @@ namespace FCS_HomeSolutions.Configuration
 
         private void ChangeGameModeEvent(ChoiceChangedEventArgs e)
         {
-            OnSeaBreezeGameModeChanged?.Invoke(e.Index);
+            OnSeaBreezeGameModeChanged?.Invoke(e.Value.Key);
         }
 
         internal Action<int> OnSeaBreezeGameModeChanged { get; set; }
@@ -253,6 +253,7 @@ namespace FCS_HomeSolutions.Configuration
 
 
         #region JukeBox
+        [Toggle("[Juke Box] Is Mod Enabled", Order = 19, Tooltip = "Enables/Disables Juke Box from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
 
         public bool IsJukeBoxEnabled = true;
 

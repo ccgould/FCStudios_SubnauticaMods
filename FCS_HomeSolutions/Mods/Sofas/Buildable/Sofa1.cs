@@ -11,17 +11,17 @@ using FCS_AlterraHub.Mods.Global.Spawnables;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Configuration;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Utility;
+using SMLHelper.Crafting;
+using SMLHelper.Utility;
 using UnityEngine;
 #if SUBNAUTICA
-using RecipeData = SMLHelper.V2.Crafting.TechData;
+using RecipeData = SMLHelper.Crafting.TechData;
 using Sprite = Atlas.Sprite;
 #endif
 
 namespace FCS_HomeSolutions.Mods.Sofas.Buildable
 {
-    internal class Sofa1Buildable : SMLHelper.V2.Assets.Buildable
+    internal class Sofa1Buildable : SMLHelper.Assets.Buildable
     {
         private readonly GameObject _prefab;
         public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;

@@ -3,10 +3,13 @@ using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
+using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Mods.JukeBox.Buildable;
 using FCS_HomeSolutions.Mods.JukeBox.Spectrum;
 using FCSCommon.Utilities;
+using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -27,6 +30,13 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
         private float _labelScrollStart;
         private Text _volumePercentage;
         private Canvas _canvas;
+        private GameObject _pairingScreen;
+        private GameObject _overlay;
+        private GameObject _musicList;
+        private GameObject _mainScreen;
+        private GameObject _boot;
+        private GameObject _musicListContent;
+        private bool _isPairing;
 
         public override bool IsOperational => IsConstructed && IsInitialized;
         public bool IsJukeBox => true;
@@ -40,6 +50,8 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
         {
             _audio.volume = value;
             _volumeSlider.SetValueWithoutNotify(value);
+            _volumePercentage.text = CalculateVolumePercentage();
+
         }
 
         private void Start()
@@ -47,6 +59,15 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, JukeBoxBuildable.JukeBoxTabID, Mod.ModPackID);
             _baseJukeBox = Manager.Habitat.GetComponent<BaseJukeBox>();
             RegisterDevice();
+            if (_isFromSave)
+            {
+                _baseJukeBox.Volume = _savedData.Volume;
+            }
+            else
+            {
+                _volumeSlider.value = _baseJukeBox.Volume;
+                _volumePercentage.text = CalculateVolumePercentage();
+            }
         }
 
         private void RegisterDevice()
@@ -64,11 +85,13 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
 
         private void Resume()
         {
+            if (_audio.clip == null) return;
             _audio.UnPause();
         }
 
         public void OnTrackChanged(TrackData trackData, bool isPlaying)
         {
+            if (_isPairing) return;
             QuickLogger.Debug($"OnTrackChanged {trackData.AudioClip.name} : {trackData.AudioClip.length}", true);
             
             RefreshUI(trackData);
@@ -86,11 +109,32 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
 
         private void RefreshUI(TrackData trackData)
         {
-            _audio.clip = trackData.AudioClip;
-            _trackSlider.value = 0;
+            _trackSlider.SetValueWithoutNotify(0);
             _trackSlider.maxValue = trackData.AudioClip?.length ?? 0f;
-            _trackName.text = trackData.Path ?? string.Empty;
+            SetLabel(trackData.Path ?? string.Empty);
             UpdatePositionLabel();
+        }
+
+        private void SetLabel(string text)
+        {
+            _trackName.text = text;
+            RectTransform rectTransform = _trackName.rectTransform;
+            RectTransform rectTransform2 = rectTransform.parent as RectTransform;
+            float preferredWidth = _trackName.preferredWidth;
+            float width = rectTransform2.rect.width;
+            rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, preferredWidth);
+            float num = preferredWidth - width;
+            if (num > 0f)
+            {
+                this._labelScrollStart = Time.time;
+                this.UpdatePositionLabel();
+            }
+            else
+            {
+                Vector2 anchoredPosition = rectTransform.anchoredPosition;
+                anchoredPosition.x = 0.5f * -num;
+                rectTransform.anchoredPosition = anchoredPosition;
+            }
         }
 
         private void OnLoopChanged(bool value)
@@ -108,6 +152,9 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
 
             UpdatePositionLabel();
 
+            _trackSlider.SetValueWithoutNotify(_audio.time);
+
+
             if (_baseJukeBox.IsPowered && !_canvas.gameObject.activeSelf)
             {
                 _canvas.gameObject.SetActive(true);
@@ -120,17 +167,16 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
 
         private void PlayUpdate()
         {
-            if (_baseJukeBox?.GetState() != JukeBoxState.Play) return;
-            
-            if (_baseJukeBox.HasTrackedJukeBox(this))
+            if (_baseJukeBox?.GetState() != JukeBoxState.Play || _isPairing) return;
+
+
+            if (!_audio.isPlaying)
             {
-                if (!_audio.isPlaying)
-                {
-                    Play(_baseJukeBox.CurrentTrack);
-                }
+                QuickLogger.Debug($"Time Samples: {_baseJukeBox.TimeSamples}", true);
+
+                Play(_baseJukeBox.CurrentTrack);
                 _audio.timeSamples = _baseJukeBox.TimeSamples;
             }
-            _trackSlider.SetValueWithoutNotify(_baseJukeBox.TrackSliderValue);
         }
 
         private void LowPassFilterCheck()
@@ -212,16 +258,16 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
             _lowPassFilter = gameObject.GetComponentInChildren<AudioLowPassFilter>();
 
             var playBTN = GameObjectHelpers.FindGameObject(gameObject, "PlayBTN").GetComponent<Button>();
-            playBTN.onClick.AddListener((() => _baseJukeBox.Play(this)));
+            playBTN.onClick.AddListener((() => _baseJukeBox.Play()));
             
             var stopBTN = GameObjectHelpers.FindGameObject(gameObject, "StopBTN").GetComponent<Button>();
-            stopBTN.onClick.AddListener((() => _baseJukeBox.Stop(this)));
+            stopBTN.onClick.AddListener((() => _baseJukeBox.Stop()));
             
             var previousBTN = GameObjectHelpers.FindGameObject(gameObject, "PreviousBTN").GetComponent<Button>();
-            previousBTN.onClick.AddListener(() => _baseJukeBox.PreviousTrack(this));
+            previousBTN.onClick.AddListener(() => _baseJukeBox.PreviousTrack());
             
             var nextBTN = GameObjectHelpers.FindGameObject(gameObject, "NextBTN").GetComponent<Button>();
-            nextBTN.onClick.AddListener(() => _baseJukeBox.NextTrack(this));
+            nextBTN.onClick.AddListener(() => _baseJukeBox.NextTrack());
 
             _repeatBTN = GameObjectHelpers.FindGameObject(gameObject, "Repeat").GetComponent<Toggle>();
             _repeatBTN.onValueChanged.AddListener((value =>
@@ -245,6 +291,19 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
                 _baseJukeBox.Refresh();
             }));
 
+            var playListBTN = GameObjectHelpers.FindGameObject(gameObject, "PlayListBTN").GetComponent<Button>();
+            playListBTN.onClick.AddListener((() =>
+            {
+                GotoPage(JukeboxPages.MusicList);
+            }));
+
+            var backBTN = GameObjectHelpers.FindGameObject(gameObject, "BackBTN").GetComponent<Button>();
+            backBTN.onClick.AddListener((() =>
+            {
+                GotoPage(JukeboxPages.Home);
+            }));
+
+
             _trackSlider = GameObjectHelpers.FindGameObject(gameObject, "Timeline").GetComponent<Slider>();
             _trackSlider.onValueChanged.AddListener((amount =>
             {
@@ -253,8 +312,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
                     _trackSlider.SetValueWithoutNotify(0);
                     return;
                 }
-                _audio.time = amount;
-                _baseJukeBox.SetTrackSlider(this, amount);
+                _baseJukeBox.ForceTimeChange(amount, _audio.clip);
             }));
 
             _trackName = GameObjectHelpers.FindGameObject(gameObject, "TrackName").GetComponent<Text>();
@@ -273,21 +331,101 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
                     QuickLogger.DebugError("Audio Controller is null",true);
                     return;
                 }
-                _baseJukeBox?.SetVolume(this,value);
+                _baseJukeBox?.SetVolume(value);
                 _audio.volume = value;
                 _volumePercentage.text = CalculateVolumePercentage();
             }));
 
             _canvas = gameObject.GetComponentInChildren<Canvas>(true);
 
+            _canvas = gameObject.GetComponentInChildren<Canvas>(true);
+
+            _pairingScreen = GameObjectHelpers.FindGameObject(_canvas.gameObject, "PairingScreen");
+            _overlay = GameObjectHelpers.FindGameObject(_canvas.gameObject, "Overlay");
+            _musicList = GameObjectHelpers.FindGameObject(_canvas.gameObject, "MusicList");
+            _mainScreen = GameObjectHelpers.FindGameObject(_canvas.gameObject, "MainScreen");
+            _boot = GameObjectHelpers.FindGameObject(_canvas.gameObject, "Boot");
+            _musicListContent = GameObjectHelpers.FindGameObject(_musicList, "Content");
+
+            LoadMusicListScreen();
+
+
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseLightsEmissiveController, gameObject, Color.cyan);
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseBeaconLightEmissiveController, gameObject, Color.red);
             MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseBeaconLightEmissiveController, gameObject, 3f);
 
+            StartCoroutine(PairJukeBox());
+
+
             IsInitialized = true;
         }
-        
+
+        private IEnumerator PairJukeBox()
+        {
+            _isPairing = true;
+            Play(ModelPrefab.PoweringOnClip);
+            GotoPage(JukeboxPages.PoweringOn);
+            yield return new WaitForSeconds(5);
+            Play(ModelPrefab.ReadyToPairClip);
+            GotoPage(JukeboxPages.Pairing);
+            yield return new WaitForSeconds(5);
+            Play(ModelPrefab.PairedClip);
+            yield return new WaitForSeconds(5);
+            GotoPage(JukeboxPages.Home);
+            _isPairing = false;
+            yield break;
+
+        }
+
+        private void GotoPage(JukeboxPages page)
+        {
+            _mainScreen.SetActive(false);
+            _overlay.SetActive(false);
+            _pairingScreen.SetActive(false);
+            _musicList.SetActive(false);
+
+
+            switch (page)
+            {
+                case JukeboxPages.PoweringOn:
+                    _canvas.gameObject.SetActive(true);
+                    break;
+                case JukeboxPages.Pairing:
+                    _pairingScreen.SetActive(true);
+                    _boot.SetActive(false);
+                    break;
+                case JukeboxPages.Home:
+                    _mainScreen.SetActive(true);
+                    _overlay.SetActive(true);
+                    break;
+                case JukeboxPages.MusicList:
+                    _musicList.SetActive(true);
+                    _overlay.SetActive(true);
+                    LoadMusicListScreen();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(page), page, null);
+            }
+        }
+
+        private void LoadMusicListScreen()
+        {
+            foreach (Transform childTransform in _musicListContent.transform)
+            {
+                Destroy(childTransform.gameObject);
+            }
+
+            foreach (TrackData data in JukeBox.Playlist)
+            {
+                var depotPrefab = GameObject.Instantiate(ModelPrefab.JukeboxMusicItemPrefab);
+                var controller = depotPrefab.AddComponent<MusicListItemController>();
+                controller.Set(data, _baseJukeBox, this);
+                controller.transform.SetParent(_musicListContent.transform, false);
+            }
+        }
+
+
         private string CalculateVolumePercentage()
         {
             return $"{Mathf.FloorToInt(_audio.volume / 1 * 100)}%";
@@ -295,14 +433,24 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
 
         public void Play(TrackData trackData)
         {
+            if (!IsOperational || _isPairing) return;
             _audio.clip = trackData.AudioClip;
+            _trackSlider.SetValueWithoutNotify(0);
             _audio.Play();
             RefreshUI(trackData);
+        }
+
+        public void Play(AudioClip clip)
+        {
+            if (_audio.isPlaying) return;
+            _audio.clip = clip;
+            _audio.Play();
         }
 
         public void Stop()
         {
             _audio.Stop();
+            _audio.time = 0;
         }
 
         public void Pause()
@@ -401,7 +549,17 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
 
             return Time.deltaTime * 0.1f * _audio?.volume ?? 0f;
         }
-        
+
+        public void ForceTimeChange(float amount, AudioClip clip)
+        {
+            _audio.time = Mathf.Min(amount, clip.length - 0.01f);
+        }
+
+        public float GetSliderValue()
+        {
+            return _trackSlider.value;
+        }
+
         private void UpdatePositionLabel()
         {
             RectTransform rectTransform = _trackName.rectTransform;
@@ -426,7 +584,49 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
             {
                 t %= num;
             }
-            return Mathf.Clamp01(Mathf.Min((b > 0f) ? ((t - a) / b) : 0f, (d > 0f) ? ((num - t) / d) : 0f));
+            return Mathf.Clamp01(Mathf.Min(b > 0f ? (t - a) / b : 0f, d > 0f ? (num - t) / d : 0f));
         }
+
+        public bool IsPairing()
+        {
+            return _isPairing;
+        }
+    }
+
+    internal class MusicListItemController : MonoBehaviour
+    {
+        private BaseJukeBox _baseJukeBox;
+        private Image _playingIcon;
+        private TrackData _data;
+
+        internal void Set(TrackData data, BaseJukeBox baseJuke, JukeBoxController controller)
+        {
+            _baseJukeBox = baseJuke;
+            _data = data;
+            var text = GetComponentInChildren<Text>();
+            text.text = data.Path;
+            _playingIcon = GameObjectHelpers.FindGameObject(gameObject, "NowPlayingIcon")?.GetComponent<Image>();
+
+            var button = GetComponentInChildren<Button>();
+            button.onClick.AddListener((() =>
+            {
+                baseJuke.PlayTrack(data);
+            }));
+            InvokeRepeating(nameof(CheckIsPlaying), 0.3f, 0.3f);
+        }
+
+        private void CheckIsPlaying()
+        {
+            var trackResult = _baseJukeBox?.CurrentTrack.AudioClip != null && _baseJukeBox.CurrentTrack.AudioClip == _data.AudioClip;
+            _playingIcon?.gameObject?.SetActive(trackResult);
+        }
+    }
+
+    internal enum JukeboxPages
+    {
+        PoweringOn,
+        Pairing,
+        Home,
+        MusicList
     }
 }

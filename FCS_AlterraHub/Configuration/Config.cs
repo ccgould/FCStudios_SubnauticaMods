@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using FCS_AlterraHub.Structs;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Json;
-using SMLHelper.V2.Options;
-using SMLHelper.V2.Options.Attributes;
 using UnityEngine;
 using UnityEngine.Events;
 using Newtonsoft.Json;
+using SMLHelper.Json;
+using SMLHelper.Options;
+using SMLHelper.Options.Attributes;
 
 namespace FCS_AlterraHub.Configuration
 {
@@ -72,10 +72,6 @@ namespace FCS_AlterraHub.Configuration
             //uGUI_PowerIndicator_Initialize_Patch.MissionHUD?.UpdateButtonPressLabel();
         }
 
-        private void ChangeGameModeEvent(ChoiceChangedEventArgs e)
-        {
-            onGameModeChanged?.Invoke(e.Index);
-        }
 
         private void EnableDebugsToggleEvent(ToggleChangedEventArgs e)
         {

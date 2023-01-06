@@ -2,7 +2,7 @@
 using System.IO;
 using System.Reflection;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Handlers;
+using SMLHelper.Handlers;
 using Newtonsoft.Json;
 
 namespace FCS_ProductionSolutions.Mods.IonCubeGenerator.Configuration

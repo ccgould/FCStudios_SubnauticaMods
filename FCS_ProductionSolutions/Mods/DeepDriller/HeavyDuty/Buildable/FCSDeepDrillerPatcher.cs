@@ -10,17 +10,17 @@ using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Mono;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Utility;
+using SMLHelper.Crafting;
+using SMLHelper.Utility;
 using UnityEngine;
 #if SUBNAUTICA
-using RecipeData = SMLHelper.V2.Crafting.TechData;
+using RecipeData = SMLHelper.Crafting.TechData;
 using Sprite = Atlas.Sprite;
 #endif
 
 namespace FCS_ProductionSolutions.Mods.DeepDriller.HeavyDuty.Buildable
 {
-    internal partial class FCSDeepDrillerBuildable : SMLHelper.V2.Assets.Buildable
+    internal partial class FCSDeepDrillerBuildable : SMLHelper.Assets.Buildable
     {
         public override TechGroup GroupForPDA { get; } = TechGroup.ExteriorModules;
         public override TechCategory CategoryForPDA { get; } = TechCategory.ExteriorModule;

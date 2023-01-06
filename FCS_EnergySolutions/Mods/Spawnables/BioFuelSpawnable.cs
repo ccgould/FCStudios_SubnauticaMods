@@ -6,8 +6,8 @@ using FCS_AlterraHub.Registration;
 using FCS_EnergySolutions.Buildable;
 using FCS_EnergySolutions.Configuration;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Assets;
-using SMLHelper.V2.Handlers;
+using SMLHelper.Assets;
+using SMLHelper.Handlers;
 using UnityEngine;
 
 namespace FCS_EnergySolutions.Mods.Spawnables
@@ -23,7 +23,7 @@ namespace FCS_EnergySolutions.Mods.Spawnables
 
             OnFinishedPatching += () =>
             {
-                BioReactorHandler.SetBioReactorCharge(TechType,840f);
+                BaseBioReactor.charge.Add(TechType,840f);
                 FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, TechType, 1,37500, StoreCategory.Misc,true);
                 CraftDataHandler.SetEquipmentType(TechType, EquipmentType.Hand);
             };
@@ -34,7 +34,7 @@ namespace FCS_EnergySolutions.Mods.Spawnables
             try
             {
                 var prefab = GameObject.Instantiate(_prefab);
-
+                
                 prefab.AddComponent<PrefabIdentifier>();
                 prefab.AddComponent<TechTag>().type = TechType;
 

@@ -14,12 +14,12 @@ using FCS_EnergySolutions.Configuration;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Model;
 using FCS_EnergySolutions.Mods.WindSurfer.Mono;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Assets;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Utility;
+using SMLHelper.Assets;
+using SMLHelper.Crafting;
+using SMLHelper.Utility;
 using UnityEngine;
 #if SUBNAUTICA
-using RecipeData = SMLHelper.V2.Crafting.TechData;
+using RecipeData = SMLHelper.Crafting.TechData;
 using Sprite = Atlas.Sprite;
 
 #endif
@@ -78,7 +78,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Buildables
 
             // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
             var lwe = prefab.AddComponent<LargeWorldEntity>();
-            lwe.cellLevel = LargeWorldEntity.CellLevel.Far;
+            lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
 
             // Add constructible
             var constructable = prefab.AddComponent<Constructable>();

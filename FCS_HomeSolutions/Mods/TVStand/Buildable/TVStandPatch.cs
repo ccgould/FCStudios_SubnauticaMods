@@ -10,17 +10,17 @@ using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Mods.Cabinets.Mono;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Utility;
+using SMLHelper.Crafting;
+using SMLHelper.Utility;
 using UnityEngine;
 #if SUBNAUTICA
-using RecipeData = SMLHelper.V2.Crafting.TechData;
+using RecipeData = SMLHelper.Crafting.TechData;
 using Sprite = Atlas.Sprite;
 #endif
 
 namespace FCS_HomeSolutions.Mods.Cabinets.Buildable
 {
-    internal class TVStandBuildable : SMLHelper.V2.Assets.Buildable
+    internal class TVStandBuildable : SMLHelper.Assets.Buildable
     {
         internal const string TVStandClassID = "CabinetTVStand";
         internal const string TVStandFriendly = "Cabinet T.V Stand";

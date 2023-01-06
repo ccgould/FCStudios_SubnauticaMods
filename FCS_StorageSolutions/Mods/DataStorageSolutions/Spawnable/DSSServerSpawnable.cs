@@ -6,7 +6,7 @@ using FCS_AlterraHub.Registration;
 using FCS_StorageSolutions.Configuration;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Utility;
+using SMLHelper.Utility;
 using UnityEngine;
 #if SUBNAUTICA
 using Sprite = Atlas.Sprite;
@@ -15,7 +15,7 @@ using Sprite = Atlas.Sprite;
 
 namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Spawnable
 {
-    internal class DSSServerSpawnable : SMLHelper.V2.Assets.Spawnable
+    internal class DSSServerSpawnable : SMLHelper.Assets.Spawnable
     {
         public override string AssetsFolder => Mod.GetAssetFolder();
 

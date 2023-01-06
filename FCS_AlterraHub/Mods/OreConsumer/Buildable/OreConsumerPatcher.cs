@@ -1,24 +1,24 @@
 ﻿using System;
 using System.Collections;
-using SMLHelper.V2.Crafting;
+using SMLHelper.Crafting;
 using System.IO;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mods.OreConsumer.Mono;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Utility;
+using SMLHelper.Utility;
 using UnityEngine;
 using System.Collections.Generic;
 
 #if SUBNAUTICA
-using RecipeData = SMLHelper.V2.Crafting.TechData;
+using RecipeData = SMLHelper.Crafting.TechData;
 using Sprite = Atlas.Sprite;
 #endif
 
 namespace FCS_AlterraHub.Mods.OreConsumer.Buildable
 {
-    internal class OreConsumerPatcher : SMLHelper.V2.Assets.Buildable
+    internal class OreConsumerPatcher : SMLHelper.Assets.Buildable
     {
         private readonly GameObject _prefab;
         public override TechGroup GroupForPDA => TechGroup.ExteriorModules;

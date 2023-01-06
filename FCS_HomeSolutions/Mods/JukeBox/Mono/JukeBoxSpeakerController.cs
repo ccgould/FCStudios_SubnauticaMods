@@ -12,13 +12,16 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
 {
     internal  class JukeBoxSpeakerController : FcsDevice, IFCSSave<SaveData>
     {
-        private AudioSource _audio;
+        protected AudioSource _audio;
         private bool _runStartUpOnEnable;
         private AudioLowPassFilter _lowPassFilter;
         private BaseJukeBox _baseJukeBox;
         private JukeBoxDataEntry _savedData;
         private bool _isFromSave;
         private Constructable _constructable;
+        protected bool BypassAudioVolumeSync;
+        protected bool GetVolumeFromSave;
+        protected bool _mutedByHand;
 
         private void OnEnable()
         {
@@ -37,6 +40,14 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
                     }
 
                     _colorManager.LoadTemplate(_savedData.ColorTemplate);
+
+                    if (GetVolumeFromSave)
+                    {
+                        _audio.volume = _savedData.Volume;
+                        _audio.mute = _savedData.IsMuted;
+                    }
+                    _mutedByHand = _savedData.IsMutedByHand;
+
                 }
 
                 _runStartUpOnEnable = false;
@@ -75,7 +86,12 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
                 _audio.Play();
             }
 
-            _audio.volume = _baseJukeBox.Volume;
+            if (!BypassAudioVolumeSync)
+            {
+                _audio.volume = _baseJukeBox.Volume;
+            }
+
+            //_audio.volume = _baseJukeBox.Volume;
         }
 
         private void Resume()
@@ -97,7 +113,9 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
 
         private void Play(TrackData obj)
         {
+            if (_audio == null || obj.AudioClip == null) return;
             _audio.clip = obj.AudioClip;
+            _audio.time = Mathf.Min(0, obj.AudioClip.length - 0.01f);
             _audio.Play();
         }
 
@@ -115,7 +133,10 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
 
         private void OnVolumeChanged(float value)
         {
-            _audio.volume = value;
+            if (!BypassAudioVolumeSync)
+            {
+                _audio.volume = value;
+            }
         }
 
         private void Stop()
@@ -130,9 +151,32 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
 
         private void Update()
         {
-            if (_audio == null) return;
+            if (_audio == null || _baseJukeBox == null) return;
+            CheckIfMuting();
             UpdateTimeSample();
             LowPassFilterCheck();
+        }
+
+        internal virtual void CheckIfMuting()
+        {
+            if (!_baseJukeBox.HasJukeBox() || _baseJukeBox.IsPairing())
+            {
+                Mute();
+            }
+            else
+            {
+                UnMute();
+            }
+        }
+
+        internal void Mute()
+        {
+            _audio.mute = true;
+        }
+
+        internal void UnMute()
+        {
+            _audio.mute = false;
         }
 
         private void UpdateTimeSample()
@@ -159,7 +203,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol, AlterraHub.BaseLightsEmissiveController);
             }
 
             _constructable = gameObject.GetComponentInChildren<Constructable>();
@@ -236,6 +280,9 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
 
             _savedData.Id = GetPrefabID();
             _savedData.ColorTemplate = _colorManager.SaveTemplate();
+            _savedData.Volume = _audio.volume;
+            _savedData.IsMuted = _audio.mute;
+            _savedData.IsMutedByHand = _mutedByHand;
             QuickLogger.Debug($"Saving ID {_savedData.Id}");
             newSaveData.JukeBoxDataEntries.Add(_savedData);
         }

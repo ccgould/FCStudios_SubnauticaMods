@@ -11,17 +11,17 @@ using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Mods.Stairs.Mono;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Utility;
+using SMLHelper.Crafting;
+using SMLHelper.Utility;
 using UnityEngine;
 #if SUBNAUTICA
-using RecipeData = SMLHelper.V2.Crafting.TechData;
+using RecipeData = SMLHelper.Crafting.TechData;
 using Sprite = Atlas.Sprite;
 #endif
 
 namespace FCS_HomeSolutions.Mods.Stairs.Buildable
 {
-    internal class StairsBuildable : SMLHelper.V2.Assets.Buildable
+    internal class StairsBuildable : SMLHelper.Assets.Buildable
     {
         private GameObject _prefab;
         internal const string StairsClassID = "FCSStairs";

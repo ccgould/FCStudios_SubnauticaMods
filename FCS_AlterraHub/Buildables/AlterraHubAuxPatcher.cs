@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Handlers;
+using SMLHelper.Handlers;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Buildables
@@ -70,6 +70,7 @@ namespace FCS_AlterraHub.Buildables
             { $"{ModKey}_NoSpaceAccountCreation","To complete your account creation, you need at least one slot to receive your debit card. Please try again once one inventory slot is available in your inventory."},
             { $"{ModKey}_NoDestinationFound","Please select a destination for your items to be transferred to. You must have an AlterraHub Depot at a base."},
             { $"{ModKey}_IsDeviceOn","Device On: {0}"},
+            { $"{ModKey}_PowerPerMinuteDistance", "Distance Related Power Loss: {0} epm" },
             { $"{ModKey}_PowerPerMinute", "Distance Related Power Loss: {0} epm" },
             { $"{ModKey}_Waiting","WAITING"},
             { $"{ModKey}_DoorInstructions","Put in the correct 4 digit pin to unlock the door"},
@@ -420,6 +421,11 @@ namespace FCS_AlterraHub.Buildables
         public static string PowerPerMinute(float value)
         {
             return string.Format(GetLanguage("PowerPerMinute"), value.ToString("F2"));
+        }
+
+        public static string PowerPerMinuteDistance(float value)
+        {
+            return string.Format(GetLanguage("PowerPerMinuteDistance"), value.ToString("F2"));
         }
 
         public static string Waiting()

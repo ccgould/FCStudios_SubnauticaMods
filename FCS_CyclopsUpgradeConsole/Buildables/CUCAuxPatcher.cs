@@ -1,6 +1,6 @@
 ﻿using CyclopsUpgradeConsole.Configuration;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Handlers;
+using SMLHelper.Handlers;
 
 namespace CyclopsUpgradeConsole.Buildables
 {

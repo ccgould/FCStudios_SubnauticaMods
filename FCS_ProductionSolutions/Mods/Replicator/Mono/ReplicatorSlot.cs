@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace FCS_ProductionSolutions.Mods.Replicator.Mono
 {
-    internal class ReplicatorSlot : FCSStorage
+    internal class ReplicatorSlot : MonoBehaviour
     {
         private readonly IList<float> _progress = new List<float>(new[] { -1f, -1f, -1f });
         private ReplicatorController _mono;
@@ -27,6 +27,8 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             get => _progress[(int)ClonePhases.Generating];
             set => _progress[(int)ClonePhases.Generating] = value;
         }
+        public bool IsFull => ItemsContainer?.count >= MAXCOUNT;
+        public ItemsContainer ItemsContainer => _mono?.GetItemsContainer();
         internal HarvesterSpeedModes CurrentHarvesterSpeedMode
         {
             get => _currentHarvesterMode;
@@ -137,7 +139,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
                 
                 TryStartingNextClone();
                 _mono.UpdateUI();
-                return ItemsContainer.RemoveItem(_targetItem); ;
+                return ItemsContainer.RemoveItem(_targetItem);
             }
 
             QuickLogger.ModMessage(AuxPatchers.InventoryFull());
@@ -163,14 +165,18 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             if (CurrentHarvesterSpeedMode == HarvesterSpeedModes.Off || _targetItem == TechType.None)
                 return;// Powered off, can't start a new clone
 
-            if (!IsFull && GenerationProgress == -1f)
+            if (!IsFull && Mathf.Approximately(GenerationProgress, -1f))
             {
                 QuickLogger.Debug("[Replicator] Generating", true);
                 GenerationProgress = 0f;
             }
-            else
+            if (IsFull)
             {
                 QuickLogger.Debug("Cannot start another clone, container is full", true);
+            }
+            if (!Mathf.Approximately(GenerationProgress, -1f))
+            {
+                QuickLogger.Debug("Cannot start another clone, Already generating clone", true);
             }
         }
 
@@ -196,6 +202,16 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
         public TechType GetTargetItem()
         {
             return _targetItem;
+        }
+
+        public Pickupable RemoveItemFromContainer(TechType techType)
+        {
+            return ItemsContainer.RemoveItem(techType);
+        }
+
+        public int GetCount()
+        {
+            return ItemsContainer?.count ?? 0;
         }
     }
 }

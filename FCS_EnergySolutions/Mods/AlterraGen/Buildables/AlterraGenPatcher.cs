@@ -11,18 +11,18 @@ using FCS_EnergySolutions.Buildable;
 using FCS_EnergySolutions.Configuration;
 using FCS_EnergySolutions.Mods.AlterraGen.Mono;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Utility;
+using SMLHelper.Crafting;
+using SMLHelper.Utility;
 using UnityEngine;
 #if SUBNAUTICA
-using RecipeData = SMLHelper.V2.Crafting.TechData;
+using RecipeData = SMLHelper.Crafting.TechData;
 using Sprite = Atlas.Sprite;
 
 #endif
 
 namespace FCS_EnergySolutions.Mods.AlterraGen.Buildables
 {
-    internal partial class AlterraGenBuildable : SMLHelper.V2.Assets.Buildable
+    internal partial class AlterraGenBuildable : SMLHelper.Assets.Buildable
     {
         private GameObject _prefab;
         public override TechType RequiredForUnlock => FCSAlterraHubService.PublicAPI.IsInOreBuildMode() ? Mod.AlterraGenKitClassID.ToTechType() : TechType.None;
@@ -70,7 +70,7 @@ namespace FCS_EnergySolutions.Mods.AlterraGen.Buildables
 
             // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
             var lwe = prefab.AddComponent<LargeWorldEntity>();
-            lwe.cellLevel = LargeWorldEntity.CellLevel.Far;
+            lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
 
             // Add constructible
             var constructable = prefab.AddComponent<Constructable>();

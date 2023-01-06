@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
@@ -9,17 +10,17 @@ using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Mods.TrashReceptacle.Mono;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Utility;
+using SMLHelper.Crafting;
+using SMLHelper.Utility;
 using UnityEngine;
 #if SUBNAUTICA
-using RecipeData = SMLHelper.V2.Crafting.TechData;
+using RecipeData = SMLHelper.Crafting.TechData;
 using Sprite = Atlas.Sprite;
 #endif
 
 namespace FCS_HomeSolutions.Mods.TrashReceptacle.Buildable
 {
-    internal class TrashReceptaclePatch : SMLHelper.V2.Assets.Buildable
+    internal class TrashReceptaclePatch : SMLHelper.Assets.Buildable
     {
         private readonly GameObject _prefab;
         public override TechGroup GroupForPDA => TechGroup.InteriorModules;
@@ -89,6 +90,10 @@ namespace FCS_HomeSolutions.Mods.TrashReceptacle.Buildable
                 constructable.model = model;
                 constructable.techType = TechType;
 
+                // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
+                var lwe = prefab.AddComponent<LargeWorldEntity>();
+                lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
+
                 PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = ClassID;
 
@@ -103,6 +108,12 @@ namespace FCS_HomeSolutions.Mods.TrashReceptacle.Buildable
             }
 
             return null;
+        }
+
+        public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
+        {
+            gameObject.Set(GetGameObject());
+            yield break;
         }
 
         protected override RecipeData GetBlueprintRecipe()

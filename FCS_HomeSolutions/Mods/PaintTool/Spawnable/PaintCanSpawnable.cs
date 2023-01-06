@@ -5,8 +5,8 @@ using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Handlers;
-using SMLHelper.V2.Utility;
+using SMLHelper.Handlers;
+using SMLHelper.Utility;
 using UnityEngine;
 #if SUBNAUTICA
 using Sprite = Atlas.Sprite;
@@ -14,7 +14,7 @@ using Sprite = Atlas.Sprite;
 
 namespace FCS_HomeSolutions.Mods.PaintTool.Spawnable
 {
-    internal class PaintCanSpawnable : SMLHelper.V2.Assets.Spawnable
+    internal class PaintCanSpawnable : SMLHelper.Assets.Spawnable
     {
         private readonly GameObject _prefab;
         public override string AssetsFolder => Mod.GetAssetPath();

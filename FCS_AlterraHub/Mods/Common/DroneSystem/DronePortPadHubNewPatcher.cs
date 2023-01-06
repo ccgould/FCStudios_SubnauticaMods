@@ -4,18 +4,18 @@ using System.IO;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Utility;
+using SMLHelper.Crafting;
+using SMLHelper.Utility;
 using UnityEngine;
 using System.Collections;
 #if SUBNAUTICA
 using Sprite = Atlas.Sprite;
-using RecipeData = SMLHelper.V2.Crafting.TechData;
+using RecipeData = SMLHelper.Crafting.TechData;
 #endif
 
 namespace FCS_AlterraHub.Mods.Common.DroneSystem
 {
-    internal class DronePortPadHubNewPatcher : SMLHelper.V2.Assets.Buildable
+    internal class DronePortPadHubNewPatcher : SMLHelper.Assets.Buildable
     {
         public override TechGroup GroupForPDA => TechGroup.ExteriorModules;
         public override TechCategory CategoryForPDA => TechCategory.ExteriorModule;

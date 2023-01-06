@@ -5,14 +5,14 @@ using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Managers;
 using FCS_AlterraHub.Mods.AlterraHubPod.Mono;
 using FCS_AlterraHub.Mods.Common.DroneSystem;
-using SMLHelper.V2.Handlers;
+using SMLHelper.Handlers;
 using UnityEngine;
 using UWE;
 using static Constructor;
 
 namespace FCS_AlterraHub.Mods.AlterraHubPod.Spawnable
 {
-    internal class AlterraHubPatch : SMLHelper.V2.Assets.Spawnable
+    internal class AlterraHubPatch : SMLHelper.Assets.Spawnable
     {
         public AlterraHubPatch() : base(Mod.AlterraHubStationClassID, Mod.AlterraHubStationFriendly, Mod.AlterraHubStationDescription)
         {

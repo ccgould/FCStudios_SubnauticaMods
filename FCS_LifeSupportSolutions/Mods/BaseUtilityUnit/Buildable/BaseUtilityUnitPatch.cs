@@ -9,17 +9,17 @@ using FCS_LifeSupportSolutions.Buildable;
 using FCS_LifeSupportSolutions.Configuration;
 using FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Utility;
+using SMLHelper.Crafting;
+using SMLHelper.Utility;
 using UnityEngine;
 #if SUBNAUTICA
-using RecipeData = SMLHelper.V2.Crafting.TechData;
+using RecipeData = SMLHelper.Crafting.TechData;
 using Sprite = Atlas.Sprite;
 #endif
 
 namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Buildable
 {
-    internal class BaseUtilityUnitPatch : SMLHelper.V2.Assets.Buildable
+    internal class BaseUtilityUnitPatch : SMLHelper.Assets.Buildable
     {
         public override TechGroup GroupForPDA => TechGroup.ExteriorModules;
         public override TechCategory CategoryForPDA => TechCategory.ExteriorModule;

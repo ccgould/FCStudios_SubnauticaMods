@@ -10,7 +10,7 @@ using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Structs;
 using FCSCommon.Utilities;
 using FMOD;
-using SMLHelper.V2.Utility;
+using SMLHelper.Utility;
 using UnityEngine;
 using UnityEngine.UI;
 using Random = System.Random;
