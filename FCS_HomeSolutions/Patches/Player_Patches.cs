@@ -26,7 +26,7 @@ namespace FCS_HomeSolutions.Patches
         [HarmonyPrefix]
         public static void Postfix(ref Player __instance)
         {
-            var main = JukeBox.Main;
+            var main = JukeboxV2.main;
         }
     }
 }

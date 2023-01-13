@@ -83,9 +83,12 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
 
             if (Manager == null)
             {
-                foreach (ParticleSystem particle in _particles)
+                if (_particles is not null)
                 {
-                    particle?.Stop();
+                    foreach (ParticleSystem particle in _particles)
+                    {
+                        particle?.Stop();
+                    }
                 }
             }
             else
@@ -147,6 +150,8 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
 
         private void Update()
         {
+            if ( !IsInitialized || _canvas is null) return;
+
             _canvas.gameObject.SetActive(Manager != null);
             
 

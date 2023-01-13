@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FCSCommon.Utilities;
+using System;
 using System.IO;
 using System.Reflection;
 using UnityEngine;
@@ -28,7 +29,11 @@ namespace FCS_AlterraHub.Helpers
                 throw new ArgumentException($"{result} is empty");
             }
 
-            return AssetBundle.LoadFromFile(Path.Combine(Path.Combine(Environment.CurrentDirectory, "QMods"), Path.Combine(modDirName, Path.Combine("Assets", modBundleName))));
+            var path = Path.Combine(modDirName, Path.Combine(modDirName, Path.Combine("Assets", modBundleName)));
+
+            QuickLogger.Info($"Attempting to load bundle {path}");
+
+            return AssetBundle.LoadFromFile(path);
         }
 
         public static AssetBundle Asset(string modBundleName)

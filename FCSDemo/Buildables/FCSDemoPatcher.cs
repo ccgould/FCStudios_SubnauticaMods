@@ -11,6 +11,11 @@ using SMLHelper.Assets;
 using SMLHelper.Crafting;
 using SMLHelper.Utility;
 using UnityEngine;
+#if SUBNAUTICA
+using RecipeData = SMLHelper.Crafting.TechData;
+using Sprite = Atlas.Sprite;
+
+#endif
 
 namespace FCSDemo.Buildables
 {
@@ -35,11 +40,11 @@ namespace FCSDemo.Buildables
             {
                 var prefab = GameObject.Instantiate(_prefab);
 
-                if (Main.Configuration.UseCustomBoundingBox)
+                if (Main.Configuration.UseCustomBoundingBox.Value)
                 {
                     var center = Main.Configuration.BoundingCenter;
                     var size = Main.Configuration.BoundingSize;
-                    GameObjectHelpers.AddConstructableBounds(prefab, size.ToVector3(), center.ToVector3());
+                    GameObjectHelpers.AddConstructableBounds(prefab, size.Value, center.Value);
                 }
                 
                 var model = prefab.FindChild("model");
@@ -62,18 +67,18 @@ namespace FCSDemo.Buildables
                 // Add constructible
                 var constructable = prefab.AddComponent<Constructable>();
 
-                constructable.allowedOutside = Main.Configuration.AllowedOutside;
-                constructable.allowedInBase = Main.Configuration.AllowedInBase;
-                constructable.allowedOnGround = Main.Configuration.AllowedOnGround;
-                constructable.allowedOnWall = Main.Configuration.AllowedOnWall;
-                constructable.rotationEnabled = Main.Configuration.RotationEnabled;
-                constructable.allowedOnCeiling = Main.Configuration.AllowedOnCeiling;
-                constructable.allowedInSub = Main.Configuration.AllowedInSub;
-                constructable.allowedOnConstructables = Main.Configuration.AllowedOnConstructables;
+                constructable.allowedOutside = Main.Configuration.AllowedOutside.Value;
+                constructable.allowedInBase = Main.Configuration.AllowedInBase.Value;
+                constructable.allowedOnGround = Main.Configuration.AllowedOnGround.Value;
+                constructable.allowedOnWall = Main.Configuration.AllowedOnWall.Value;
+                constructable.rotationEnabled = Main.Configuration.RotationEnabled.Value;
+                constructable.allowedOnCeiling = Main.Configuration.AllowedOnCeiling.Value;
+                constructable.allowedInSub = Main.Configuration.AllowedInSub.Value;
+                constructable.allowedOnConstructables = Main.Configuration.AllowedOnConstructables.Value;
 
-                constructable.placeMaxDistance = Main.Configuration.PlaceMaxDistance;//7f;
-                constructable.placeMinDistance = Main.Configuration.PlaceMinDistance; //5f;
-                constructable.placeDefaultDistance = Main.Configuration.PlaceDefaultDistance; //6f;
+                constructable.placeMaxDistance = Main.Configuration.PlaceMaxDistance.Value;//7f;
+                constructable.placeMinDistance = Main.Configuration.PlaceMinDistance.Value; //5f;
+                constructable.placeDefaultDistance = Main.Configuration.PlaceDefaultDistance.Value; //6f;
                 constructable.model = model;
                 constructable.techType = TechType;
 
@@ -94,27 +99,6 @@ namespace FCSDemo.Buildables
             }
         }
 
-#if SUBNAUTICA
-        protected override TechData GetBlueprintRecipe()
-        {
-            QuickLogger.Debug($"Creating recipe...");
-            // Create and associate recipe to the new TechType
-            var customFabRecipe = new TechData()
-            {
-                craftAmount = 1,
-                Ingredients = new List<Ingredient>()
-                {
-                    new Ingredient(TechType.Titanium, 1)
-                }
-            };
-            return customFabRecipe;
-        }
-
-        protected override Atlas.Sprite GetItemSprite()
-        {
-            return new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(_assetFolder, $"{IconFileName}")));
-        }
-#elif BELOWZERO
         protected override RecipeData GetBlueprintRecipe()
         {
             QuickLogger.Debug($"Creating recipe...");
@@ -132,9 +116,9 @@ namespace FCSDemo.Buildables
 
         protected override Sprite GetItemSprite()
         {
-            return ImageUtils.LoadSpriteFromFile(Path.Combine(_assetFolder, $"{IconFileName}"));
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(_assetFolder, $"{ClassID}.png"));
         }
-#endif
+
         internal static void Register()
         {
             

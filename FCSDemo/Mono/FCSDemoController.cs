@@ -39,9 +39,9 @@ namespace FCSDemo.Mono
                 _colorManager = gameObject.AddComponent<ColorManager>();
                 _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol, AlterraHub.TBaseEmission);
 
-                if (Main.Configuration.ControlEmissionStrength)
+                if (Main.Configuration.ControlEmissionStrength.Value)
                 {
-                    MaterialHelpers.ChangeEmissionStrength(AlterraHub.TBaseEmission, gameObject, Main.Configuration.EmissionStrength);
+                    MaterialHelpers.ChangeEmissionStrength(AlterraHub.TBaseEmission, gameObject, Main.Configuration.EmissionStrength.Value);
                 }
             }
             QuickLogger.Info("Initialized", true);
@@ -88,14 +88,10 @@ namespace FCSDemo.Mono
            return true;
         }
 
-        public void OnHandHover(GUIHand hand)
+        public override void OnHandHover(GUIHand hand)
         {
             HandReticle main = HandReticle.main;
-#if SUBNAUTICA
-            main.SetInteractTextRaw($"Item PrefabID: {GetPrefabID()}","");
-#else
-            main.SetTextRaw(HandReticle.TextType.Hand,$"Item PrefabID: {GetPrefabID()}");
-#endif
+            main.SetTextRaw(HandReticle.TextType.Hand, $"Item PrefabID: {GetPrefabID()}");
         }
 
         public void OnHandClick(GUIHand hand)

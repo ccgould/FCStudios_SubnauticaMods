@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace FCS_HomeSolutions.Mods.JukeBox.Mono
 {
-    internal class BaseJukeBox : MonoBehaviour
+    internal class BaseJukeBox : MonoBehaviour, ISpeakerHost
     {
 
         public float Volume;

@@ -2,13 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using BepInEx.Configuration;
 using FCS_AlterraHub.Model.Utilities;
 using FCS_AlterraHub.Objects;
 using FCSCommon.Utilities;
 using FCSDemo.Model;
 using FCSDemo.Mono;
 using SMLHelper.Crafting;
-using SMLHelper.Json;
 using SMLHelper.Utility;
 using UnityEngine;
 #if SUBNAUTICA
@@ -27,7 +27,7 @@ namespace FCSDemo.Configuration
 # endregion
 
         #region Internal Properties
-        internal static string ModName => Main.Configuration.ModName;
+        internal static string ModName => Main.MODNAME;
         internal const string BundleName = "fcsdemo";
         internal const string FriendlyName = "FCS Demo";
         internal const string Description = "A demo mod for FCStudios";
@@ -52,7 +52,7 @@ namespace FCSDemo.Configuration
                     }
         };
 
-        internal static bool ProtectPlayer { get; set; }
+        internal static  ConfigEntry<bool> ProtectPlayer { get; set; }
 
 
         internal static event Action<SaveData> OnDataLoaded;
@@ -81,7 +81,7 @@ namespace FCSDemo.Configuration
             }
         }
 
-        internal static bool IsSaving()
+        internal static  bool IsSaving()
         {
             return _saveObject != null;
         }
@@ -159,28 +159,28 @@ namespace FCSDemo.Configuration
         #endregion
     }
 
-    internal class Config : ConfigFile
+    internal class Config
     {
-        public bool AddPlants { get; set; } = false;
-        public bool HasAquarium { get; set; } = false;
-        public float PowerUsage { get; set; } = 0.1f;
-        public float PlaceMaxDistance { get; set; } = 5f;
-        public float PlaceMinDistance { get; set; } = 1.2f;
-        public float PlaceDefaultDistance { get; set; } = 2f;
-        public bool AllowedOutside { get; set; } = false;
-        public bool AllowedInBase { get; set; } = true;
-        public bool AllowedOnGround { get; set; } = true;
-        public bool AllowedOnWall { get; set; } = false;
-        public bool RotationEnabled { get; set; } = true;
-        public bool AllowedOnCeiling { get; set; } = false;
-        public bool AllowedInSub { get; set; } = false;
-        public bool AllowedOnConstructables { get; set; } = false;
-        public bool UseCustomBoundingBox { get; set; } = false;
-        public Vec3 BoundingCenter { get; set; } = new Vec3(0f, 0, 0f);
-        public Vec3 BoundingSize { get; set; } = new Vec3(0, 0, 0);
-        public string ModName { get; set; } = "FCSDemo";
-        public IEnumerable<ModEntry> Prefabs { get; set; }
-        public bool ControlEmissionStrength { get; set; } = false;
-        public float EmissionStrength { get; set; } = 5f;
+        public ConfigEntry<bool> AddPlants { get; } = Main.BepInExConfigFile?.Bind(Mod.ModName, nameof(AddPlants), false, "Adds plant");
+        public ConfigEntry<bool> HasAquarium { get; } = Main.BepInExConfigFile?.Bind(Mod.ModName, nameof(HasAquarium), false, "");
+        public ConfigEntry<float> PowerUsage { get; } = Main.BepInExConfigFile?.Bind(Mod.ModName, nameof(PowerUsage), 0.1f, "");
+        public ConfigEntry<float> PlaceMaxDistance { get; } = Main.BepInExConfigFile?.Bind(Mod.ModName, nameof(PlaceMaxDistance), 5f, "");
+        public ConfigEntry<float> PlaceMinDistance { get; } = Main.BepInExConfigFile?.Bind(Mod.ModName, nameof(PlaceMinDistance), 1.2f, "");
+        public ConfigEntry<float> PlaceDefaultDistance { get; } = Main.BepInExConfigFile?.Bind(Mod.ModName, nameof(PlaceDefaultDistance), 2f, "");
+        public ConfigEntry<bool> AllowedOutside { get; } = Main.BepInExConfigFile?.Bind(Mod.ModName, nameof(AllowedOutside), false, "");
+        public ConfigEntry<bool> AllowedInBase { get; } = Main.BepInExConfigFile?.Bind(Mod.ModName, nameof(AllowedInBase), true, "");
+        public  ConfigEntry<bool> AllowedOnGround { get; } = Main.BepInExConfigFile?.Bind(Mod.ModName, nameof(AllowedOnGround), true, "");
+        public  ConfigEntry<bool> AllowedOnWall { get; } = Main.BepInExConfigFile?.Bind(Mod.ModName, nameof(AllowedOnWall), false, "");
+        public  ConfigEntry<bool> RotationEnabled { get; } = Main.BepInExConfigFile?.Bind(Mod.ModName, nameof(RotationEnabled), true, "");
+        public  ConfigEntry<bool> AllowedOnCeiling { get; } = Main.BepInExConfigFile?.Bind(Mod.ModName, nameof(AllowedOnCeiling), false, "");
+        public  ConfigEntry<bool> AllowedInSub { get; } = Main.BepInExConfigFile?.Bind(Mod.ModName, nameof(AllowedInSub), false, "");
+        public  ConfigEntry<bool> AllowedOnConstructables { get; } = Main.BepInExConfigFile?.Bind(Mod.ModName, nameof(AllowedOnConstructables), false, "");
+        public  ConfigEntry<bool> UseCustomBoundingBox { get; } = Main.BepInExConfigFile?.Bind(Mod.ModName, nameof(UseCustomBoundingBox), false, "");
+        public ConfigEntry<Vector3> BoundingCenter { get; } = Main.BepInExConfigFile?.Bind(Mod.ModName, nameof(BoundingCenter), new Vector3(0f, 0, 0f), "");
+        public ConfigEntry<Vector3> BoundingSize { get; } = Main.BepInExConfigFile?.Bind(Mod.ModName, nameof(BoundingSize), new Vector3(0, 0, 0), "");
+        public ConfigEntry<string> ModName { get; } = Main.BepInExConfigFile?.Bind(Mod.ModName, nameof(ModName), "FCSDemo", "");
+        public ConfigEntry<List<ModEntry>> Prefabs { get; } = Main.BepInExConfigFile?.Bind(Mod.ModName, nameof(Prefabs), new List<ModEntry>(), "");
+        public  ConfigEntry<bool> ControlEmissionStrength { get; } = Main.BepInExConfigFile?.Bind(Mod.ModName, nameof(ControlEmissionStrength), false,"");
+        public ConfigEntry<float> EmissionStrength { get; } = Main.BepInExConfigFile?.Bind(Mod.ModName, nameof(EmissionStrength), 5f,"");
     }
 }

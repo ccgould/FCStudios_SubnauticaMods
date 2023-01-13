@@ -1,8 +1,4 @@
-﻿#if SUBNAUTICA_STABLE
-using Oculus.Newtonsoft.Json;
-#else
-using Newtonsoft.Json;
-#endif
+﻿using Newtonsoft.Json;
 using UnityEngine;
 
 namespace FCSDemo.Model

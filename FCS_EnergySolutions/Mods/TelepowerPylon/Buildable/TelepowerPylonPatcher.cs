@@ -98,11 +98,11 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Buildable
             PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
             prefabID.ClassId = ClassID;
 
-            var taskResult = CraftData.GetPrefabForTechTypeAsync(TechType.SolarPanel);
-            yield return taskResult;
-            var solarpanel = taskResult.GetResult();
-            PowerRelay solarPowerRelay = solarpanel.GetComponent<PowerRelay>();
-            solarPowerRelay.enabled = false;
+            var result = new TaskResult<GameObject>();
+            yield return CraftData.GetPrefabForTechTypeAsync(TechType.SolarPanel, false, result);
+            PowerRelay solarPowerRelay = result.Get().GetComponent<PowerRelay>();
+
+            var ps = prefab.AddComponent<PowerSource>();
 
             var pFX = prefab.AddComponent<PowerFX>();
             pFX.vfxPrefab = solarPowerRelay.powerFX.vfxPrefab;
@@ -111,12 +111,12 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Buildable
             var pr = prefab.AddComponent<PowerRelay>();
             pr.powerFX = pFX;
             pr.maxOutboundDistance = 15;
+            pr.internalPowerSource = ps;
+
 
             prefab.AddComponent<TechTag>().type = TechType;
             prefab.AddComponent<TelepowerPylonController>();
 
-
-            Resources.UnloadAsset(solarPowerRelay);
 
             //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
             MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);

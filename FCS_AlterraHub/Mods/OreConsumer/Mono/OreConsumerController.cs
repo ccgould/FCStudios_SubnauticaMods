@@ -520,7 +520,9 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
         public override void OnHandHover(GUIHand hand)
         {
             base.OnHandHover(hand);
+
             var techType = GetTechType();
+
             if (_isBreakerTripped)
             {
                 var data = new[]
@@ -529,6 +531,7 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
                     AlterraHub.PressToTurnDeviceOnOff(KeyCode.F.ToString()),
                     AlterraHub.DeviceOff()
                 };
+
                 data.HandHoverPDAHelperEx(techType);
             }
 

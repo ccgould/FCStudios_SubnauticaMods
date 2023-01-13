@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Reflection;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Helpers;
 using FCSCommon.Utilities;
@@ -13,7 +15,8 @@ namespace FCSDemo.Buildables
         {
             try
             {
-                LoadAssetV2(prefabName, AssetHelper.Asset(Mod.BundleName), out GameObject go);
+                QuickLogger.Info($"Loading Prefab : {prefabName}");
+                LoadAssetV2(prefabName, AssetHelper.Asset(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),Mod.BundleName), out GameObject go);
                 return go;
             }
             catch (Exception e)
@@ -25,23 +28,25 @@ namespace FCSDemo.Buildables
 
         private static bool LoadAssetV2(string prefabName, AssetBundle assetBundle, out GameObject go, bool applyShaders = true)
         {
-            QuickLogger.Debug("Loading Asset");
+            QuickLogger.Info("Loading Asset");
             //We have found the asset bundle and now we are going to continue by looking for the model.
             GameObject prefab = assetBundle.LoadAsset<GameObject>(prefabName);
-            QuickLogger.Debug($"Loaded Prefab {prefabName}");
+
 
             //If the prefab isn't null lets add the shader to the materials
             if (prefab != null)
             {
+                QuickLogger.Info($"Loaded Prefab {prefabName}");
+
                 if (applyShaders)
                 {
                     //Lets apply the material shader
                     AlterraHub.ReplaceShadersV2(prefab);
-                    QuickLogger.Debug($"Applied shaderes to prefab {prefabName}");
+                    QuickLogger.Info($"Applied shaderes to prefab {prefabName}");
                 }
 
                 go = prefab;
-                QuickLogger.Debug($"{prefabName} Prefab Found!");
+                QuickLogger.Info($"{prefabName} Prefab Found!");
                 return true;
             }
 

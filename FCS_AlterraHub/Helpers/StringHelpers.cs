@@ -3,6 +3,7 @@ using System.Text;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Mods.FCSPDA.Mono;
 using FCSCommon.Utilities;
+using UnityEngine;
 
 namespace FCS_AlterraHub.Helpers
 {
@@ -55,17 +56,14 @@ namespace FCS_AlterraHub.Helpers
             
             if (strings == null || main == null) return;
 
-            main.SetIcon(icon);
-    
-            Sb.Clear();
-
-            Sb.Append($"{Language.main.Get(techType)}: ");
-
+            var text = pda?.Screen.CheckIfPDAHasEntry(techType) ?? false ? AlterraHub.ViewInPDA() : string.Empty;
             CreateText(strings);
 
-            var text = pda?.Screen.CheckIfPDAHasEntry(techType) ?? false ? AlterraHub.ViewInPDA() : string.Empty;
-            main.SetTextRaw(HandReticle.TextType.Count, $"{Sb}/n {text}");
+            HandReticle.main.SetText(HandReticle.TextType.Hand, Sb.ToString() , false, GameInput.Button.None);
+            HandReticle.main.SetText(HandReticle.TextType.HandSubscript,text, false, GameInput.Button.None);
+            HandReticle.main.SetIcon(icon, 1f);
 
+            Sb.Clear();
 
             if (icon == HandReticle.IconType.Progress)
             {

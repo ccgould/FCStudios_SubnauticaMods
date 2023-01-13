@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
@@ -12,7 +13,9 @@ using FCS_HomeSolutions.Mods.JukeBox.Mono;
 using FCSCommon.Utilities;
 using SMLHelper.Crafting;
 using SMLHelper.Utility;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 #if SUBNAUTICA
 using RecipeData = SMLHelper.Crafting.TechData;
 using Sprite = Atlas.Sprite;
@@ -89,7 +92,71 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Buildable
                 prefabID.ClassId = ClassID;
 
                 prefab.AddComponent<TechTag>().type = TechType;
-                prefab.AddComponent<JukeBoxController>();
+
+                var lod = prefab.AddComponent<BehaviourLOD>();
+                lod.veryCloseThreshold= 20f;
+                lod.closeThreshold = 20f;
+                lod.farThreshold = 20f;
+                lod.veryCloseThresholdSq = 400f;
+                lod.closeThresholdSq = 400f;
+                lod.farThresholdSq = 400f;
+                lod.visibilityRendererRoot= prefab;
+
+
+                prefab.AddComponent<Speaker>();
+
+                prefab.SetActive(false);
+
+                var instance = prefab.AddComponent<JukeboxInstance>();
+
+                instance.LOD = lod;
+
+                var file = GameObjectHelpers.FindGameObject(prefab, "Overlay")?.GetComponent<Canvas>();
+
+                var canvas = GameObjectHelpers.FindGameObject(prefab, "Canvas")?.GetComponent<Canvas>();
+                
+                var renderer = model.GetComponentInChildren<Renderer>();
+                //var canvasLink = model.AddComponent<CanvasLink>();
+                //canvasLink.canvases = new Canvas[] { file, canvas };
+                //canvasLink.rectMasks = new RectMask2D[] { };
+                //canvasLink.renderer = renderer;
+
+                //instance.canvasLink = canvasLink;
+
+                instance.imagePlayPause = GameObjectHelpers.FindGameObject(prefab, "PlayBTN").GetComponentInChildren<Image>();
+
+                instance.imageRepeat = GameObjectHelpers.FindGameObject(prefab, "RepeatBTN").GetComponentInChildren<Image>();
+
+                instance.imageShuffle = GameObjectHelpers.FindGameObject(prefab, "ShuffleBTN").GetComponentInChildren<Image>();
+
+                instance.rectMask = file.gameObject.GetComponent<RectMask2D>();
+
+                instance.textFile = GameObjectHelpers.FindGameObject(prefab, "TrackName").GetComponent<TextMeshProUGUI>();
+
+                instance.textPosition = GameObjectHelpers.FindGameObject(prefab, "TextPosition").GetComponent<TextMeshProUGUI>();
+
+                instance.textLength = GameObjectHelpers.FindGameObject(prefab, "TextLength").GetComponent<TextMeshProUGUI>();
+
+                instance.textVolume = GameObjectHelpers.FindGameObject(prefab, "TextVolume").GetComponent<TextMeshProUGUI>();
+
+                instance.imagePosition = GameObjectHelpers.FindGameObject(prefab, "TimelinePostionFill").GetComponent<Image>();
+
+                instance.imagePositionKnob = GameObjectHelpers.FindGameObject(prefab, "TimeLineHandle").GetComponent<Image>();
+
+                instance.imageVolume = GameObjectHelpers.FindGameObject(prefab, "VolumeFill").GetComponent<Image>();
+
+                instance.imageVolumeKnob = GameObjectHelpers.FindGameObject(prefab, "VolumeHandle").GetComponent<Image>();
+                
+                instance.volumeSlider = GameObjectHelpers.FindGameObject(prefab, "Volume").GetComponent<Slider>();
+
+                instance.timSlider = GameObjectHelpers.FindGameObject(prefab, "Timeline").GetComponent<Slider>();
+
+                instance.flashRenderer = renderer;
+
+                prefab.SetActive(true);
+
+                MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController,prefab, 7f);
+
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
 
                 return prefab;

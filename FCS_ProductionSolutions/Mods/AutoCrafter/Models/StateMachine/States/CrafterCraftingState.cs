@@ -173,8 +173,6 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Models.StateMachine.States
 
             QuickLogger.Debug("Attempting to add item", true);
 
-            bool result = false;
-
             for (int i = 0; i < _operation.ReturnAmount; i++)
             {
                 CoroutineHost.StartCoroutine(Craft(techType, (result =>

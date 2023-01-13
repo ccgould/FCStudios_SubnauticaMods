@@ -87,8 +87,10 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Buildable
                 PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = ClassID;
 
+               
                 prefab.AddComponent<TechTag>().type = TechType;
-                prefab.AddComponent<JukeBoxSpeakerController>();
+                prefab.AddComponent<Speaker>();
+
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
                 return prefab;
             }

@@ -303,7 +303,7 @@ namespace FCS_AlterraHub.Buildables
                 if (applyShaders)
                 {
                     //Lets apply the material shader
-                    ApplyShadersV2(prefab, assetBundle);
+                    ReplaceShadersV2(prefab);
                 }
 
                 go = prefab;
@@ -356,6 +356,7 @@ namespace FCS_AlterraHub.Buildables
             MaterialHelpers.ApplyNormalShader(BaseLightsEmissiveController, TBaseNormal, prefab, bundle);
             MaterialHelpers.ApplyAlphaShader(BaseLightsEmissiveController, prefab);
             MaterialHelpers.ApplyEmissionShader(BaseLightsEmissiveController, TBaseEmission, prefab, bundle, Color.white);
+            MaterialHelpers.ApplySpecShader(BaseLightsEmissiveController, TBaseSpec, prefab, 1, 3, bundle);
             #endregion
 
             #region BaseDecalsEmissiveController
@@ -363,7 +364,7 @@ namespace FCS_AlterraHub.Buildables
             MaterialHelpers.ApplyNormalShader(BaseDecalsEmissiveController, TBaseNormal, prefab, bundle);
             MaterialHelpers.ApplyAlphaShader(BaseDecalsEmissiveController, prefab);
             MaterialHelpers.ApplyEmissionShader(BaseDecalsEmissiveController, TBaseEmission, prefab, bundle, Color.white);
-
+            MaterialHelpers.ApplySpecShader(BaseDecalsEmissiveController, TBaseSpec, prefab, 1, 3, bundle);
             #endregion
 
             #region BaseFloor01Interior
@@ -447,7 +448,7 @@ namespace FCS_AlterraHub.Buildables
 
             _v2Materials.Add(BaseSecondaryCol, baseSecondaryCol);
             #endregion
-            
+
             #region BaseTexDecals
             Material baseTexDecals = Main.GlobalBundle.LoadAsset<Material>(BaseTexDecals);
             MaterialHelpers.CreateV2NormalMaterial(baseTexDecals, TBaseNormal, Main.GlobalBundle);
@@ -461,6 +462,7 @@ namespace FCS_AlterraHub.Buildables
             MaterialHelpers.CreateV2NormalMaterial(baseLightsEmissiveController, TBaseNormal, Main.GlobalBundle);
             MaterialHelpers.CreateV2ApplyAlphaMaterial(baseLightsEmissiveController, Main.GlobalBundle);
             MaterialHelpers.CreateV2EmissionMaterial(baseLightsEmissiveController, TBaseEmission, Main.GlobalBundle, Color.white);
+            MaterialHelpers.CreateV2Specular(baseLightsEmissiveController, TBaseColorSpec, 1, 3, Main.GlobalBundle);
             _v2Materials.Add(BaseLightsEmissiveController, baseLightsEmissiveController);
             #endregion
 
@@ -469,9 +471,10 @@ namespace FCS_AlterraHub.Buildables
             MaterialHelpers.CreateV2NormalMaterial(baseDecalsEmissiveController, TBaseNormal, Main.GlobalBundle);
             MaterialHelpers.CreateV2ApplyAlphaMaterial(baseDecalsEmissiveController, Main.GlobalBundle);
             MaterialHelpers.CreateV2EmissionMaterial(baseDecalsEmissiveController, TBaseEmission, Main.GlobalBundle, Color.white);
+            MaterialHelpers.CreateV2Specular(baseDecalsEmissiveController, TBaseColorSpec, 1, 3, Main.GlobalBundle);
             _v2Materials.Add(BaseDecalsEmissiveController, baseDecalsEmissiveController);
             #endregion
-            
+
             #region BaseFloor01Interior
             Material baseFloor01Interior = Main.GlobalBundle.LoadAsset<Material>(BaseFloor01Interior);
             MaterialHelpers.CreateV2NormalMaterial(baseFloor01Interior, TFloorNormal, Main.GlobalBundle);

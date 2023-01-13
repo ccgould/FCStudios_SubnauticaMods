@@ -640,6 +640,9 @@ namespace FCS_AlterraHub.Helpers
             {
                 mat.shader = shader;
                 mat.EnableKeyword("MARMO_ALPHA_CLIP");
+                mat.SetFloat("_EnableCutOff", 1f);
+                mat.SetFloat("_Cutoff", 0.5f);
+
             }
 
             return mat;
