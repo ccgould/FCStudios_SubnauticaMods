@@ -119,8 +119,8 @@ namespace FCS_EnergySolutions.Mods.JetStreamT242.Mono
 
             _unitID = GameObjectHelpers.FindGameObject(gameObject, "UNITID").GetComponent<Text>();
             DeActivateTurbine();
-            MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseBeaconLightEmissiveController, gameObject,5);
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseBeaconLightEmissiveController, gameObject, Color.red);
+            MaterialHelpers.ChangeEmissionStrength(string.Empty, gameObject,5);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.red);
             IsInitialized = true;
         }
         
@@ -247,13 +247,13 @@ namespace FCS_EnergySolutions.Mods.JetStreamT242.Mono
             if (isOperational)
             {
 
-                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseLightsEmissiveController, gameObject, Color.cyan);
-                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
+                MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
+                MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
             }
             else
             {
-                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseLightsEmissiveController, gameObject, Color.red);
-                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.red);
+                MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.red);
+                MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.red);
             }
         }
 

@@ -54,7 +54,7 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Mono
             if (Manager == null)
             {
                 TurnOffDevice();
-                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.red);
+                MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.red);
             }
             else
             {
@@ -200,7 +200,7 @@ namespace FCS_HomeSolutions.Mods.TrashRecycler.Mono
                 "AddBTN", InterfaceButtonMode.Background, OnButtonClicked, Color.gray, Color.white, 5,
                 "Add to item to recycler");
 
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
 
 
             IsInitialized = true;

@@ -62,7 +62,7 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
             var lodGroup = gameObject.GetComponentInChildren<LODGroup>();
             lodGroup.size = 4f;
             _beacon = WorldHelpers.CreateBeacon(gameObject, Mod.AlterraTransportDronePingType, $"Transport Drone", false);
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
             IsInitialize = true;
         }
         

@@ -41,7 +41,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
             _pole1AnimationCurve = new AnimationCurve(new Keyframe(0, 4.42813f), new Keyframe(1, _pole1Max));
             _pole2AnimationCurve = new AnimationCurve(new Keyframe(0, 1.841746f), new Keyframe(1, _pole2Max));
             _pole3AnimationCurve = new AnimationCurve(new Keyframe(0, 1.397793f), new Keyframe(1, _pole3Max));
-            MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, gameObject, 4f);
+            MaterialHelpers.ChangeEmissionStrength(string.Empty, gameObject, 4f);
 
             //TODO Manager seems to be always null remove in future if not needed
 

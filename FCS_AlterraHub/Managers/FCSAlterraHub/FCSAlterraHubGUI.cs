@@ -125,7 +125,7 @@ namespace FCS_AlterraHub.Managers.FCSAlterraHub
             MaterialHelpers.ApplyEmissionShader(AlterraHub.BasePrimaryCol, gameObject, Color.white, 0, 0.01f, 0.01f);
             MaterialHelpers.ApplySpecShader(AlterraHub.BasePrimaryCol, gameObject, 1, 6.15f);
             _messageBox.ObjectRoot = gameObject;
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
             InvokeRepeating(nameof(UpdateDisplay), .5f, .5f);
             _isInitialized = true;
         }

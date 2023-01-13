@@ -155,7 +155,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Buildable
 
                 prefab.SetActive(true);
 
-                MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController,prefab, 7f);
+                MaterialHelpers.ChangeEmissionStrength(string.Empty,prefab, 7f);
 
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
 

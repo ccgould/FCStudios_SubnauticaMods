@@ -247,7 +247,7 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
 
             if (Manager == null)
             {
-                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.red);
+                MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.red);
                 _status = OreConsumerStatus.None;
                 return;
             }
@@ -265,21 +265,21 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
 
             if (!isPowered && _status != OreConsumerStatus.Tripped)
             {
-                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.red);
+                MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.red);
                 _status = OreConsumerStatus.Tripped;
                 return;
             }
 
             if(_oreQueue.Any() && isPowered && IsOperational && _status != OreConsumerStatus.Running)
             {
-                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
+                MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
                 _status = OreConsumerStatus.Running;
                 return;
             }
 
             if (!_oreQueue.Any() && _status != OreConsumerStatus.Idle && isPowered)
             {
-                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.yellow);
+                MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.yellow);
                 _status = OreConsumerStatus.Idle;
             }
         }
@@ -345,7 +345,7 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
                 _drillSound = gameObject.GetComponent<AudioSource>();
             }
 
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.yellow);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.yellow);
 
             CalculateTimeLeft();
 

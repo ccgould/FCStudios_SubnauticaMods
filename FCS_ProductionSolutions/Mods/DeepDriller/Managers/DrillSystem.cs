@@ -174,7 +174,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
 
         protected void UpdateEmission()
         {
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject,
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject,
                 _isBreakSet ? Color.red : Color.cyan);
         }
 

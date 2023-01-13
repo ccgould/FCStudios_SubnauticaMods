@@ -95,7 +95,7 @@ namespace FCS_HomeSolutions.Mods.CrewLocker.Buildable
 
                 //Apply the glass shader here because of autosort lockers for some reason doesn't like it.
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
-                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, prefab, Color.cyan);
+                MaterialHelpers.ChangeEmissionColor(string.Empty, prefab, Color.cyan);
 
                 return prefab;
             }

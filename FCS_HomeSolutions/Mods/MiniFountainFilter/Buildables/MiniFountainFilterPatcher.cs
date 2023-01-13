@@ -103,7 +103,7 @@ namespace FCS_HomeSolutions.Mods.MiniFountainFilter.Buildables
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
                 MaterialHelpers.ApplyParticlesUber(prefab, "bubble_01_sheet_premul_underwaterCamera", 1f, 0f, 1f, 10f, 3f, false, Vector4.zero, new Vector4(1f, 1f, 1f, .5f));
                 MaterialHelpers.ApplyParticlesUber(prefab, "bubble_02_sheet_add_underwaterLit", 1f, 0f, 1f, 10f, 3f, false, Vector4.zero, new Vector4(1f, 1f, 1f, 10f));
-                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, prefab, Color.cyan);
+                MaterialHelpers.ChangeEmissionColor(string.Empty, prefab, Color.cyan);
                 return prefab;
             }
             catch (Exception e)

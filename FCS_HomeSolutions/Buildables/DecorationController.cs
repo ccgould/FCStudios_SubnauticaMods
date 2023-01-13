@@ -52,12 +52,12 @@ namespace FCS_HomeSolutions.Buildables
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol,AlterraHub.BaseLightsEmissiveController);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol,string.Empty);
 
             }
 
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
-            MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, gameObject,3f); 
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
+            MaterialHelpers.ChangeEmissionStrength(string.Empty, gameObject,3f); 
             IsInitialized = true;
         }
 

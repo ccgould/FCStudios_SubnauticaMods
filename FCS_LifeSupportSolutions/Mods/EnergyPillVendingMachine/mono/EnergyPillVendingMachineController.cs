@@ -81,7 +81,7 @@ namespace FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.mono
             var canvas = gameObject.GetComponentInChildren<Canvas>();
             _interactionHelper = canvas.gameObject.AddComponent<InterfaceInteraction>();
 
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
 
             IsInitialized = true;
         }

@@ -105,8 +105,8 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
                 QuickLogger.Info($"Creating Color Component", true);
                 _colorManager = gameObject.AddComponent<ColorManager>();
                 _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol);
-                MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, gameObject, 2.5f);
-                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseLightsEmissiveController, gameObject,
+                MaterialHelpers.ChangeEmissionStrength(string.Empty, gameObject, 2.5f);
+                MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject,
                     new Color(0, 1, 1, 1));
             }
 
@@ -332,7 +332,7 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
             if (_fireEx == null)
             {
                 _bar.fillAmount = 0f;
-                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseLightsEmissiveController, gameObject, _colorDefault);
+                MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, _colorDefault);
                 return;
             }
 
@@ -345,7 +345,7 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
                     : Color.Lerp(_colorHalf, _colorFull, 2f * percentage - 1f);
                 _bar.fillAmount = percentage;
                 _bar.color = value;
-                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseLightsEmissiveController, gameObject, value);
+                MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, value);
             }
         }
 

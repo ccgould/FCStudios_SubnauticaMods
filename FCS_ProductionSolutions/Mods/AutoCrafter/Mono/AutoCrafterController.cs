@@ -73,7 +73,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter.Mono
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, AutoCrafterPatch.AutoCrafterTabID, Mod.ModPackID);
-            _materials = MaterialHelpers.GetMaterials(GameObjectHelpers.FindGameObject(gameObject, "ConveyorBelts"), AlterraHub.BaseOpaqueInterior);
+            _materials = MaterialHelpers.GetMaterials(GameObjectHelpers.FindGameObject(gameObject, "ConveyorBelts"), string.Empty);
 
             if (Manager != null)
             {

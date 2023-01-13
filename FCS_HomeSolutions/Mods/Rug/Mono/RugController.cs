@@ -80,7 +80,7 @@ namespace FCS_HomeSolutions.Mods.Rug.Mono
                 _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol);
             }
 
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseLightsEmissiveController, gameObject, Color.cyan);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
 
 
             IsInitialized = true;

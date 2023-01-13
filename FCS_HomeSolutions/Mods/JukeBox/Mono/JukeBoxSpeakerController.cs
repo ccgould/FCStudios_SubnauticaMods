@@ -203,7 +203,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol, AlterraHub.BaseLightsEmissiveController);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol, string.Empty);
             }
 
             _constructable = gameObject.GetComponentInChildren<Constructable>();
@@ -211,8 +211,8 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
             _lowPassFilter = gameObject.GetComponentInChildren<AudioLowPassFilter>();
 
 
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseLightsEmissiveController, gameObject, Color.cyan);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
 
             IsInitialized = true;
         }

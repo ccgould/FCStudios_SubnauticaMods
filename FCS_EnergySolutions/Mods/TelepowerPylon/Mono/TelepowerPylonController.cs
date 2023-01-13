@@ -202,8 +202,8 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
 
             InitializeUpgradeButton();
             
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
-            MaterialHelpers.ChangeSpecSettings(AlterraHub.BaseDecalsExterior, AlterraHub.TBaseSpec, gameObject, 2.61f, 8f);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
+            MaterialHelpers.ChangeSpecSettings(string.Empty, AlterraHub.TBaseSpec, gameObject, 2.61f, 8f);
 
             InitializeToggles();
 

@@ -95,7 +95,7 @@ namespace FCS_EnergySolutions.Mods.UniversalCharger.Mono
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol, AlterraHub.BaseLightsEmissiveController);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol, string.Empty);
             }
 
             _handTarget = GameObjectHelpers.FindGameObject(gameObject, "HandTarget");

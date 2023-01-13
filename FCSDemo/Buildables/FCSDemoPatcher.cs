@@ -50,11 +50,11 @@ namespace FCSDemo.Buildables
                 var model = prefab.FindChild("model");
                 
                 //========== Allows the building animation and material colors ==========// 
-                Shader shader = Shader.Find("MarmosetUBER");
-                Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
-                SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
-                skyApplier.renderers = renderers;
-                skyApplier.anchorSky = Skies.Auto;
+                //Shader shader = Shader.Find("MarmosetUBER");
+                //Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
+                //SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
+                //skyApplier.renderers = renderers;
+                //skyApplier.anchorSky = Skies.Auto;
                 
                 // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
                 var lwe = prefab.AddComponent<LargeWorldEntity>();
@@ -88,7 +88,7 @@ namespace FCSDemo.Buildables
                 prefabID.ClassId = ClassID;
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<FCSDemoController>();
-                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
+                //MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
 
                 return prefab;
             }

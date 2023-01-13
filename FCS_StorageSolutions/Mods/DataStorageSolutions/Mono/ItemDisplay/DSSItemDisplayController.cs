@@ -168,7 +168,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
             _amountCounter = GameObjectHelpers.FindGameObject(gameObject, "Text").EnsureComponent<Text>();
             _icon = GameObjectHelpers.FindGameObject(gameObject, "Icon").EnsureComponent<uGUI_Icon>();
             _icon.sprite = SpriteManager.defaultSprite;
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
 
             InvokeRepeating(nameof(Refresh), 1, 1);
             InvokeRepeating(nameof(UpdateScreenState), 1, 1);

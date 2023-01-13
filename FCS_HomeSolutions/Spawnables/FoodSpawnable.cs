@@ -102,7 +102,7 @@ namespace FCS_HomeSolutions.Spawnables
                 var lwe = prefab.AddComponent<LargeWorldEntity>();
                 lwe.cellLevel = LargeWorldEntity.CellLevel.Near;
 
-                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, prefab, Color.cyan);
+                MaterialHelpers.ChangeEmissionColor(string.Empty, prefab, Color.cyan);
 
                 return prefab;
             }

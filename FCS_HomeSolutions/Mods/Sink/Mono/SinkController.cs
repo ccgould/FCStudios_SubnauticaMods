@@ -65,12 +65,12 @@ namespace FCS_HomeSolutions.Mods.Sink.Mono
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol,AlterraHub.BaseLightsEmissiveController);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol,string.Empty);
             }
 
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, new Color(0, 1, 1, 1));
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, new Color(0, 1, 1, 1));
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseSecondaryCol, gameObject, new Color(0.8f, 0.4933333f, 0f));
-            MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseDecalsEmissiveController, gameObject, 2.5f);
+            MaterialHelpers.ChangeEmissionStrength(string.Empty, gameObject, 2.5f);
 
             IsInitialized = true;
 

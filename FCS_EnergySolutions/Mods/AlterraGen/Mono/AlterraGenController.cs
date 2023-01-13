@@ -109,7 +109,7 @@ namespace FCS_EnergySolutions.Mods.AlterraGen.Mono
             var canvas = gameObject.GetComponentInChildren<Canvas>();
             _interactionHelper = canvas.gameObject.AddComponent<InterfaceInteraction>();
 
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
             _xBubbles = GameObjectHelpers.FindGameObject(gameObject, "xBubbles");
             
             IsInitialized = true;

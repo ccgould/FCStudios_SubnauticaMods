@@ -113,7 +113,7 @@ namespace FCS_HomeSolutions.Mods.BunkBed.Buildable
             prefab.EnsureComponent<TechTag>().type = TechType;
 
             prefab.AddComponent<BunkBedController>();
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, mesh, Color.cyan);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, mesh, Color.cyan);
             MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
         }
 
@@ -222,7 +222,7 @@ namespace FCS_HomeSolutions.Mods.BunkBed.Buildable
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
                 _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol,
-                    AlterraHub.BaseLightsEmissiveController);
+                    string.Empty);
                 _colorManager.ChangeColor(new ColorTemplate {SecondaryColor = Color.gray});
             }
 

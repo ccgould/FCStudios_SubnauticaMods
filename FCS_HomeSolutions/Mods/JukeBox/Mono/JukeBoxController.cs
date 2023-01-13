@@ -247,7 +247,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol,AlterraHub.BaseLightsEmissiveController);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol,string.Empty);
             }
 
             if (_audio == null)
@@ -350,10 +350,10 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
             LoadMusicListScreen();
 
 
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseLightsEmissiveController, gameObject, Color.cyan);
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseBeaconLightEmissiveController, gameObject, Color.red);
-            MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseBeaconLightEmissiveController, gameObject, 3f);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.red);
+            MaterialHelpers.ChangeEmissionStrength(string.Empty, gameObject, 3f);
 
             StartCoroutine(PairJukeBox());
 

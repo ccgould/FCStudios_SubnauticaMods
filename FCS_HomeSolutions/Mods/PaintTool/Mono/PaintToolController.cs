@@ -99,7 +99,7 @@ namespace FCS_HomeSolutions.Mods.PaintTool.Mono
             _totalColorsLBL = GameObjectHelpers.FindGameObject(gameObject, "TotalColors").GetComponent<Text>();
             _mode = GameObjectHelpers.FindGameObject(gameObject, "Mode").GetComponent<Text>();
 
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
 
             Mod.RegisterPaintTool(this);
             ChangeColor(new ColorTemplate());

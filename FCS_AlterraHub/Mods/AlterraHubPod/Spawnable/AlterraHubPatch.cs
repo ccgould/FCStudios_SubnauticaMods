@@ -76,11 +76,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubPod.Spawnable
             skyApplierInterior.anchorSky = Skies.BaseInterior;
             skyApplierInterior.SetSky(Skies.BaseInterior);
 
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, prefab, Color.cyan);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, prefab, Color.cyan);
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseSecondaryCol, prefab, Color.black);
-            //MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, prefab, 0f);
+            //MaterialHelpers.ChangeEmissionStrength(string.Empty, prefab, 0f);
             //MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseFloor01Interior, prefab, 0f);
-            //MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseOpaqueInterior, prefab, 0f);
+            //MaterialHelpers.ChangeEmissionStrength(string.Empty, prefab, 0f);
 
 
 

@@ -69,8 +69,8 @@ namespace FCS_EnergySolutions.Spawnables
                     GameObjectHelpers.FindGameObject(prefab,"Port_4"),
                 };
 
-                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, prefab, Color.cyan);
-                MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, prefab, 4f);
+                MaterialHelpers.ChangeEmissionColor(string.Empty, prefab, Color.cyan);
+                MaterialHelpers.ChangeEmissionStrength(string.Empty, prefab, 4f);
                 MaterialHelpers.ApplyEmissionShader("fcs_WS_BP", "fcs_WS_E",prefab,ModelPrefab.ModBundle,Color.white);
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
 

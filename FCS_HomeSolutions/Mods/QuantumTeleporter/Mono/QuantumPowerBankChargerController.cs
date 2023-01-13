@@ -176,9 +176,9 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
                 }
             }));
 
-            MaterialHelpers.ChangeMaterialColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseLightsEmissiveController, gameObject, Color.green);
-            MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, gameObject, 3f);
+            MaterialHelpers.ChangeMaterialColor(string.Empty, gameObject, Color.cyan);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.green);
+            MaterialHelpers.ChangeEmissionStrength(string.Empty, gameObject, 3f);
             IsInitialized = true;
 
             QuickLogger.Debug($"Initialized");

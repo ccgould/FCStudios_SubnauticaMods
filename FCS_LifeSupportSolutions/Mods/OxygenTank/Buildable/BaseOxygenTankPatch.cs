@@ -96,7 +96,7 @@ namespace FCS_LifeSupportSolutions.Mods.BaseOxygenTank.Buildable
                 prefabID.ClassId = ClassID;
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<BaseOxygenTankController>();
-                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, prefab, Color.cyan);
+                MaterialHelpers.ChangeEmissionColor(string.Empty, prefab, Color.cyan);
 
 
                 return prefab;

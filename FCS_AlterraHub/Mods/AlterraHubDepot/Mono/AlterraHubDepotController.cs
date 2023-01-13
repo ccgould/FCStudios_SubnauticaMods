@@ -106,7 +106,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Mono
             _paginatorController = GameObjectHelpers.FindGameObject(gameObject, "Paginator").AddComponent<PaginatorController>();
             _paginatorController.Initialize(this);
 
-            MaterialHelpers.ChangeEmissionColor(Buildables.AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
             IsInitialized = true;
         }
 

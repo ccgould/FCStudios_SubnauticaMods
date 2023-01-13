@@ -141,7 +141,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 //    _display.RefreshCraftingGrid();
                 //}
             };
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
 
             InvokeRepeating(nameof(UpdateScreenState), 1, 1);
             IsInitialized = true;

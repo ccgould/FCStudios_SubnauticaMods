@@ -95,8 +95,8 @@ namespace FCS_HomeSolutions.Mods.Cabinets.Mono
             _labelController?.Initialize();
             _labelController?.SetText("Locker");
 
-            MaterialHelpers.ChangeMaterialColor(AlterraHub.BaseDecalsEmissiveController,gameObject,Color.cyan);
-            MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, gameObject,2f);
+            MaterialHelpers.ChangeMaterialColor(string.Empty,gameObject,Color.cyan);
+            MaterialHelpers.ChangeEmissionStrength(string.Empty, gameObject,2f);
             IsInitialized = true;
 
             QuickLogger.Debug($"Initialized");

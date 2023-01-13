@@ -33,7 +33,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Spectrum
 
         private void FindMaterial()
         {
-            m_img = MaterialHelpers.GetMaterial(GameObjectHelpers.FindGameObject(gameObject, "mesh"), AlterraHub.BaseLightsEmissiveController);
+            m_img = MaterialHelpers.GetMaterial(GameObjectHelpers.FindGameObject(gameObject, "mesh"), string.Empty);
         }
         
         public Color restColor;

@@ -132,7 +132,7 @@ namespace FCS_HomeSolutions.Mods.Sofas.Buildable
             prefab.EnsureComponent<TechTag>().type = TechType;
 
             prefab.AddComponent<SofaController>();
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, mesh, Color.cyan);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, mesh, Color.cyan);
             MaterialHelpers.ChangeMaterialColor(AlterraHub.BaseSecondaryCol, mesh, Color.gray);
         }
 

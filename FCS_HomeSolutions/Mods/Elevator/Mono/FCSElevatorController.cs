@@ -381,7 +381,7 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
                 GameObjectHelpers.FindGameObject(floorPrefab, "TriggerBox").AddComponent<FloorTriggerBox>();
                 GameObjectHelpers.FindGameObject(floorPrefab, "TriggerBox_1").AddComponent<FloorTriggerBox>();
 
-                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, floorPrefab, Color.cyan);
+                MaterialHelpers.ChangeEmissionColor(string.Empty, floorPrefab, Color.cyan);
             }
             else
             {

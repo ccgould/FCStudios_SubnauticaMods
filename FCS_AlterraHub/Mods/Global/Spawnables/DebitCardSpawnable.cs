@@ -28,7 +28,7 @@ namespace FCS_AlterraHub.Mods.Global.Spawnables
             try
             {
                 var prefab = GameObject.Instantiate(AlterraHub.DebitCardPrefab);
-                AlterraHub.ApplyShaders(prefab, Main.GlobalBundle);
+                //AlterraHub.ApplyShaders(prefab, Main.GlobalBundle);
 
                 prefab.AddComponent<PrefabIdentifier>();
                 prefab.AddComponent<TechTag>().type = TechType;

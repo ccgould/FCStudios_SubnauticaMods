@@ -112,7 +112,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Spawnables
                 
                 prefab.AddComponent<QuantumPowerBankController>();
 
-                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, prefab, Color.red);
+                MaterialHelpers.ChangeEmissionColor(string.Empty, prefab, Color.red);
 
                 return prefab;
             }
@@ -452,7 +452,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Spawnables
                 value = _colorEmpty;
             }
 
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseLightsEmissiveController, _controller.gameObject, value);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, _controller.gameObject, value);
         }
     }
 }

@@ -101,8 +101,8 @@ namespace FCS_LifeSupportSolutions.Mods.MiniMedBay.mono
                 _medKitDispenser.Initialize(this);
             }
 
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
-            MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController,gameObject,5f);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
+            MaterialHelpers.ChangeEmissionStrength(string.Empty,gameObject,5f);
 
             var canvas = gameObject.GetComponentInChildren<Canvas>();
             _interactionHelper = canvas.gameObject.AddComponent<InterfaceInteraction>();

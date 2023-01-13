@@ -76,8 +76,8 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
             {
                 spotLights.enabled = true;
             }
-            MaterialHelpers.ToggleEmission(AlterraHub.BaseLightsEmissiveController, _controller.gameObject, true);
-            MaterialHelpers.ToggleEmission(AlterraHub.BaseOpaqueInterior, _controller.gameObject, true);
+            MaterialHelpers.ToggleEmission(string.Empty, _controller.gameObject, true);
+            MaterialHelpers.ToggleEmission(string.Empty, _controller.gameObject, true);
 
             _lightState = FCSLightState.On;
         }
@@ -90,8 +90,8 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
                 spotLights.enabled = false;
             }
 
-            MaterialHelpers.ToggleEmission(AlterraHub.BaseLightsEmissiveController, _controller.gameObject, false);
-            MaterialHelpers.ToggleEmission(AlterraHub.BaseOpaqueInterior, _controller.gameObject, false);
+            MaterialHelpers.ToggleEmission(string.Empty, _controller.gameObject, false);
+            MaterialHelpers.ToggleEmission(string.Empty, _controller.gameObject, false);
 
             _lightState = FCSLightState.Off;
         }

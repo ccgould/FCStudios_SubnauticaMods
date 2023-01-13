@@ -173,14 +173,14 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
                 PlayAudioTrack("PLB_ThankYou");
                 FCSAlterraHubService.PublicAPI.AccountSystem.RemoveFinances(_food.Value);
                 PlayerInteractionHelper.GivePlayerItem(_food.Key);
-                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
+                MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
             });
 
             _icon = GameObjectHelpers.FindGameObject(gameObject, "icon").AddComponent<uGUI_Icon>();
             _cost = GameObjectHelpers.FindGameObject(gameObject, "Cost").GetComponent<Text>();
             _name = GameObjectHelpers.FindGameObject(gameObject, "Text").GetComponent<Text>();
 
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
             MaterialHelpers.ChangeEmissionStrength(ModelPrefab.EmissionControllerMaterial, gameObject, 4f);
 
             var canvas = gameObject.GetComponentInChildren<Canvas>();

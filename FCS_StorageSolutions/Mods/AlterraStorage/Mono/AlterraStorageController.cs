@@ -136,7 +136,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, AlterraHub.BaseOpaqueExterior);
+                _colorManager.Initialize(gameObject, string.Empty);
             }
 
             if (_storageContainer == null)
@@ -171,7 +171,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
             _paginatorController = GameObjectHelpers.FindGameObject(gameObject, "Paginator").AddComponent<PaginatorController>();
             _paginatorController.Initialize(this);
 
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
 
             UpdateStorageCount();
 

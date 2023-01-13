@@ -178,7 +178,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
 
             DisplayManager.Setup(this);
 
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseLightsEmissiveController, gameObject, Color.green);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.green);
 
             NameController.Initialize(AuxPatchers.Submit(), QuantumTeleporterBuildable.QuantumTeleporterFriendly);
             NameController.OnLabelChanged += OnLabelChanged;

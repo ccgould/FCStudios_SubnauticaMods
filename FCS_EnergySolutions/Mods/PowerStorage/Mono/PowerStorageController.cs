@@ -140,7 +140,7 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
             _bar = GameObjectHelpers.FindGameObject(gameObject, "BarFill").GetComponent<Image>();
             _audio = FModHelpers.CreateCustomLoopingEmitter(gameObject, "water_filter_loop", "event:/sub/base/water_filter_loop");
 
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
 
             InvokeRepeating(nameof(UpdateVisuals),1f,1f);
             InvokeRepeating(nameof(TakePower),1f,1f);

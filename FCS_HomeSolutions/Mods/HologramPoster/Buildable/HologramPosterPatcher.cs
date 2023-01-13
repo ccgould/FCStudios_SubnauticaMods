@@ -89,8 +89,8 @@ namespace FCS_HomeSolutions.Mods.HologramPoster.Buildable
 
 
                 prefab.AddComponent<TechTag>().type = TechType;
-                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, prefab, Color.cyan);
-                MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, prefab, 4f);
+                MaterialHelpers.ChangeEmissionColor(string.Empty, prefab, Color.cyan);
+                MaterialHelpers.ChangeEmissionStrength(string.Empty, prefab, 4f);
                 prefab.AddComponent<HologramPosterController>();
                 return prefab;
             }

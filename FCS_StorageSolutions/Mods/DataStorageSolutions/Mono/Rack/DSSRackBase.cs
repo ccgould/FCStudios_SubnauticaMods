@@ -196,9 +196,9 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
             _interfaceInteraction = _canvas.AddComponent<InterfaceInteraction>();
 
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseLightsEmissiveController, gameObject, Color.cyan);
-            MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, gameObject, 2f);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
+            MaterialHelpers.ChangeEmissionStrength(string.Empty, gameObject, 2f);
 
             _messageBox = GameObjectHelpers.FindGameObject(_canvas, "MessageBox").AddComponent<FCSMessageBox>();
             InvokeRepeating(nameof(RegisterServers), 1f, 1f);
@@ -226,7 +226,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             {
                 _colorManager = gameObject.EnsureComponent<ColorManager>();
                 _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol,
-                    AlterraHub.BaseLightsEmissiveController);
+                    string.Empty);
             }
         }
 

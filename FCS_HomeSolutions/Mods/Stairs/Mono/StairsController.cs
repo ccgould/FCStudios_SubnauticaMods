@@ -55,12 +55,12 @@ namespace FCS_HomeSolutions.Mods.Stairs.Mono
 			if (_colorManager == null)
 			{
 				_colorManager = gameObject.AddComponent<ColorManager>();
-				_colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol, AlterraHub.BaseLightsEmissiveController);
+				_colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol, string.Empty);
 
 			}
 
-			MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
-			MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, gameObject, 3f);
+			MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
+			MaterialHelpers.ChangeEmissionStrength(string.Empty, gameObject, 3f);
 			IsInitialized = true;
 		}
 
@@ -265,7 +265,7 @@ namespace FCS_HomeSolutions.Mods.Stairs.Mono
 				step.transform.position = traceStart.position + (float)i * stepLength * traceStart.forward;
 				step.transform.rotation = transform.rotation;
                 step.SetActive(true);
-                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, step, Color.cyan);
+                MaterialHelpers.ChangeEmissionColor(string.Empty, step, Color.cyan);
                 MaterialHelpers.ChangeMaterialColor(AlterraHub.BasePrimaryCol, step, _colorManager.GetColor(ColorTargetMode.Primary));
                 _childCount++;
 			}

@@ -205,7 +205,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             _canvas.sortingLayerID = 1479780821;
             MaterialHelpers.ApplyEmissionShader(AlterraHub.BasePrimaryCol,gameObject,Color.white,0,0.01f,0.01f);
             MaterialHelpers.ApplySpecShader(AlterraHub.BasePrimaryCol,gameObject,1, 6.15f);
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject,Color.cyan);    
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject,Color.cyan);    
             InGameMenuQuitPatcher.AddEventHandlerIfMissing(OnQuit);
             Screen.gameObject.SetActive(false);
             _isInitialized = true;

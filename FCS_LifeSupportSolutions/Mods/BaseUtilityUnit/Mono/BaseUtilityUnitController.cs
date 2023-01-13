@@ -123,8 +123,8 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
             
             _percent = InterfaceHelpers.FindGameObject(gameObject, "percentage").GetComponent<Text>();
             _percentBar = InterfaceHelpers.FindGameObject(gameObject, "PreLoader_Bar_Front").GetComponent<Image>();
-            MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, gameObject, 5f);
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
+            MaterialHelpers.ChangeEmissionStrength(string.Empty, gameObject, 5f);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
 
             IsInitialized = true;
         }

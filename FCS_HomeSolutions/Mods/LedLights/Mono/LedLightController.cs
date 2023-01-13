@@ -108,9 +108,9 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
             {
                 QuickLogger.Info($"Creating Color Component", true);
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol, AlterraHub.BaseLightsEmissiveController);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol, string.Empty);
                 _colorManager.ChangeColor(new ColorTemplate {PrimaryColor = Color.white, SecondaryColor = Color.white, EmissionColor = Color.white});
-                MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, gameObject, _buildable.isInside ? 2.5f : 1.8f );
+                MaterialHelpers.ChangeEmissionStrength(string.Empty, gameObject, _buildable.isInside ? 2.5f : 1.8f );
             }
 
             if (!_light.Any())
@@ -149,7 +149,7 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
             _mainRotor = GameObjectHelpers.FindGameObject(gameObject, "MainRotor")?.transform;
             _tiler = GameObjectHelpers.FindGameObject(gameObject, "tiller")?.transform;
 
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
 
             IsInitialized = true;
             QuickLogger.Info("Initialized", true);
@@ -462,7 +462,7 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
                     light.enabled = true;
                 }
                 //_fogCone?.SetActive(true);
-                MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, gameObject, _buildable.isInside ? 2.5f : 1.8f);
+                MaterialHelpers.ChangeEmissionStrength(string.Empty, gameObject, _buildable.isInside ? 2.5f : 1.8f);
             }
         }
 
@@ -476,7 +476,7 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
                     light.enabled = false;
                 }
                 //_fogCone?.SetActive(false);
-                MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, gameObject, 0f);
+                MaterialHelpers.ChangeEmissionStrength(string.Empty, gameObject, 0f);
             }
         }
 

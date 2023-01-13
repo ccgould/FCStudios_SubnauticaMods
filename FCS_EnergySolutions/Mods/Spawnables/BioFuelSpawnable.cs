@@ -83,7 +83,7 @@ namespace FCS_EnergySolutions.Mods.Spawnables
                     applier = prefab.AddComponent<SkyApplier>();
                 applier.renderers = new Renderer[] { renderer };
                 applier.anchorSky = Skies.Auto;
-                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, prefab, Color.cyan);
+                MaterialHelpers.ChangeEmissionColor(string.Empty, prefab, Color.cyan);
 
                 return prefab;
             }

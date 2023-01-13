@@ -74,9 +74,9 @@ namespace FCS_HomeSolutions.Mods.Shower.Mono
                 _colorManager.Initialize(gameObject,AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol);
             }
             
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, new Color(0, 1, 1, 1));
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, new Color(0, 1, 1, 1));
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseSecondaryCol, gameObject, new Color(0.8f, 0.4933333f, 0f));
-            MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseDecalsEmissiveController, gameObject,  2.5f);
+            MaterialHelpers.ChangeEmissionStrength(string.Empty, gameObject,  2.5f);
 
             _colorManager.ChangeColor(new ColorTemplate{SecondaryColor = new Color(0.8f, 0.4933333f, 0f) });
             

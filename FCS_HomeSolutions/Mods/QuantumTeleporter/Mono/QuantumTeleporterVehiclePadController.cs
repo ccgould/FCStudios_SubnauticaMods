@@ -91,7 +91,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
             _seamothPoint = GameObjectHelpers.FindGameObject(gameObject, "Seamoth_Point");
             _prawnsuitPoint = GameObjectHelpers.FindGameObject(gameObject, "PrawnSuit_Point");
 
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseLightsEmissiveController, gameObject, Color.green);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.green);
             IsInitialized = true;
 
             QuickLogger.Debug($"Initialized");

@@ -29,17 +29,17 @@ namespace FCS_AlterraHub.Helpers
             {
                 var objects = new List<object>(assetBundle.LoadAllAssets(typeof(object)));
 
-                //QuickLogger.Debug($"[FindTexture2D] Object Count: {objects.Count}");
+                //QuickLogger.Info($"[FindTexture2D] Object Count: {objects.Count}");
 
                 for (int i = 0; i < objects.Count; i++)
                 {
                     if (objects[i] is Texture2D)
                     {
-                        //QuickLogger.Debug($"[FindTexture2D] Object Name: {((Texture2D)objects[i]).name.ToLower()}");
+                        //QuickLogger.Info($"[FindTexture2D] Object Name: {((Texture2D)objects[i]).name.ToLower()}");
 
                         if (((Texture2D)objects[i]).name.Equals(textureName, StringComparison.OrdinalIgnoreCase))
                         {
-                            //QuickLogger.Debug($"Found Texture: {textureName}");
+                            //QuickLogger.Info($"Found Texture: {textureName}");
                             return ((Texture2D)objects[i]);
                         }
                     }
@@ -565,6 +565,35 @@ namespace FCS_AlterraHub.Helpers
                 }
             }
         }
+
+        public static void CreateV2ColorMaskShader(Material mat, string maskTexture, Color color, Color color2, Color color3, AssetBundle assetBundle)
+        {
+
+            QuickLogger.Info($"[CreateV2ColorMaskShader] processing");
+
+            var shader = Shader.Find("MarmosetUBER");
+
+            mat.shader = shader;
+            QuickLogger.Info("Setting Color Mask Shader", true);
+
+            mat.EnableKeyword("UWE_3COLOR");
+            QuickLogger.Info("Setting Color Mask UWE_3COLOR", true);
+
+            mat.SetTexture("_MultiColorMask", FindTexture2D(maskTexture, assetBundle));
+            QuickLogger.Info("Setting Color Mask _MultiColorMask", true);
+
+            mat.SetFloat("_Enable3Color", 1);
+
+            mat.SetColor("_Color", color);
+            QuickLogger.Info("Setting Color Mask _Color", true);
+
+            mat.SetColor("_Color2", color2);
+            QuickLogger.Info("Setting Color Mask _Color2", true);
+
+            mat.SetColor("_Color3", color3);
+            QuickLogger.Info("Setting Color Mask _Color3", true);
+        }
+
 
         public static void ApplyColorMaskShader(string materialName, string maskTexture, Color color, Color color2, Color color3, GameObject gameObject, AssetBundle assetBundle)
         {

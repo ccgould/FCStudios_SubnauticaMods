@@ -74,7 +74,7 @@ namespace FCS_AlterraHub.Mods.PatreonStatue.Mono
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol,string.Empty, AlterraHub.BaseLightsEmissiveController);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol,string.Empty, string.Empty);
             }
 
             if (nameSlot == null)
@@ -119,8 +119,8 @@ namespace FCS_AlterraHub.Mods.PatreonStatue.Mono
             var rgL = gameObject.AddComponent<RegistredLightSource>();
             rgL.hostLight = _light;
 
-            MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, gameObject, 4f);
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
+            MaterialHelpers.ChangeEmissionStrength(string.Empty, gameObject, 4f);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
             IsInitialized = true;
         }
 

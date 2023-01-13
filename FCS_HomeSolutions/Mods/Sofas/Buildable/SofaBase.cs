@@ -111,7 +111,7 @@ namespace FCS_HomeSolutions.Mods.Sofas.Buildable
             prefab.EnsureComponent<TechTag>().type = TechType;
 
             prefab.AddComponent<SofaController>();
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, mesh, Color.cyan);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, mesh, Color.cyan);
         }
 
         public override string AssetsFolder { get; } = Mod.GetAssetPath();
@@ -208,7 +208,7 @@ namespace FCS_HomeSolutions.Mods.Sofas.Buildable
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol,AlterraHub.BaseSecondaryCol,AlterraHub.BaseLightsEmissiveController);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol,AlterraHub.BaseSecondaryCol,string.Empty);
                 _colorManager.ChangeColor(new ColorTemplate{SecondaryColor = Color.gray});
             }
             

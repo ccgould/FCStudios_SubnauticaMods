@@ -71,8 +71,8 @@ namespace FCS_HomeSolutions.Mods.NeonPlanter.Mono
         public override void Initialize()
         {
             _colorManager = gameObject.AddComponent<ColorManager>();
-            _colorManager.Initialize(gameObject,AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol, AlterraHub.BaseLightsEmissiveController);
-            MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, gameObject, 2);
+            _colorManager.Initialize(gameObject,AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol, string.Empty);
+            MaterialHelpers.ChangeEmissionStrength(string.Empty, gameObject, 2);
 
             IsInitialized = true;
         }

@@ -108,7 +108,7 @@ namespace FCS_HomeSolutions.Mods.Stairs.Buildable
 
 
                 prefab.AddComponent<TechTag>().type = TechType;
-                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, prefab, Color.cyan);
+                MaterialHelpers.ChangeEmissionColor(string.Empty, prefab, Color.cyan);
                 prefab.AddComponent<StairsController>();
                 return prefab;
             }

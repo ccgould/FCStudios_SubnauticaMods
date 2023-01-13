@@ -168,8 +168,8 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
             QuickLogger.Debug($"Initialized Harvester {GetPrefabID()}");
 #endif
 
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
-            MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, gameObject, 4f);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
+            MaterialHelpers.ChangeEmissionStrength(string.Empty, gameObject, 4f);
             
             IPCMessage += OnIpcMessage;
 

@@ -96,7 +96,7 @@ namespace FCS_HomeSolutions.Mods.Elevator.Buildable
 
 
                 prefab.AddComponent<TechTag>().type = TechType;
-                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, prefab, Color.cyan);
+                MaterialHelpers.ChangeEmissionColor(string.Empty, prefab, Color.cyan);
                 prefab.AddComponent<FCSElevatorController>();
                 return prefab;
             }

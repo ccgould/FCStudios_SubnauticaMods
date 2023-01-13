@@ -93,7 +93,7 @@ namespace FCS_HomeSolutions.Mods.DisplayBoard.Buildable
                 prefab.AddComponent<TechTag>().type = TechType;
                 
                 prefab.AddComponent<DisplayBoardController>();
-                MaterialHelpers.ChangeEmissionColor(FCS_AlterraHub.Buildables.AlterraHub.BaseDecalsEmissiveController, prefab, Color.cyan);
+                MaterialHelpers.ChangeEmissionColor(string.Empty, prefab, Color.cyan);
 
                 return prefab;
             }

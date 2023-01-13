@@ -292,13 +292,13 @@ namespace FCS_AlterraHub.Mods.Common.DroneSystem
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol, AlterraHub.BaseDecalsEmissiveController);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol, string.Empty);
             }
 
             var antenna = GameObjectHelpers.FindGameObject(gameObject, "AntennaMeshController")?.AddComponent<MotorHandler>();
             antenna?.Initialize(30);
 
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
+            MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseSecondaryCol, gameObject, ColorList.GetColor(14));
             IsInitialized = true;
         }
