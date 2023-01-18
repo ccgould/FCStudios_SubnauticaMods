@@ -175,7 +175,7 @@ public class JukeboxInstance : MonoBehaviour, IConstructable
         //this.imageRepeat.sprite = this.spritesRepeat[(int)this.repeat];
         //this.imageShuffle.sprite = (this.shuffle ? this.spriteShuffleOn : this.spriteShuffleOff);
         this.UpdateVolumeSlider();
-        this.textVolume.text = $"{Mathf.FloorToInt(volume)}%";
+        this.textVolume.text = $"{Mathf.FloorToInt(volume * 100)}%";
         this.OnRelease();
     }
 
@@ -274,15 +274,18 @@ public class JukeboxInstance : MonoBehaviour, IConstructable
         {
             uint length = JukeboxV2.length;
             this.SetLength(length);
+
+
             if (Time.unscaledTime > this._positionDirty + 0.5f)
             {
-                uint num = this._positionDrag ? ((uint)(this._position * length)) : JukeboxV2.position;
-                if (JukeboxV2.ToSeconds(num, ref this._cachedPosition))
+                float num = this._positionDrag ? ((float)(this._position * (float)length)) : (float)JukeboxV2.position;
+                if (JukeboxV2.ToSeconds((uint)num, ref this._cachedPosition))
                 {
                     this._stringPosition = JukeboxV2.FormatTime(this._cachedPosition);
                     this.textPosition.text = this._stringPosition;
                 }
-                this._position = ((length > 0U) ? (num / length) : 0f);
+
+                this._position = (((float)length > 0f) ? (num / (float)length) : 0f);
                 this.UpdatePositionSlider();
             }
             //this.UpdateSpectrum(false);
@@ -404,7 +407,6 @@ public class JukeboxInstance : MonoBehaviour, IConstructable
     private void UpdatePositionSlider()
     {
         float num = this.isControlling ? this._position : 0f;
-        QuickLogger.Info($"JukeBox Position Update: {num}",true);
         timSlider.SetValueWithoutNotify(num);
         //this._materialPosition.SetFloat(ShaderPropertyID._Amount, num);
         //RectTransform rectTransform = this.imagePositionKnob.rectTransform;
@@ -662,7 +664,7 @@ public class JukeboxInstance : MonoBehaviour, IConstructable
     public void OnVolume(float amount)
     {
         this.volume = amount;
-        this.textVolume.text = $"{Mathf.FloorToInt(amount)}%";
+        this.textVolume.text = $"{Mathf.FloorToInt(amount * 100)}%";
         if (this.isControlling)
         {
             JukeboxV2.volume = this.volume;

@@ -77,6 +77,8 @@ namespace FCS_HomeSolutions
 
         private void Awake()
         {
+            QuickLogger.DebugLogsEnabled = Configuration.EnableDebugLogs;
+
             FCSAlterraHubService.PublicAPI.RegisterModPack(Mod.ModPackID,Mod.ModBundleName, Assembly.GetExecutingAssembly());
             FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(Mod.ModPackID);
 

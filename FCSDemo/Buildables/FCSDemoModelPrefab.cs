@@ -41,7 +41,7 @@ namespace FCSDemo.Buildables
                 if (applyShaders)
                 {
                     //Lets apply the material shader
-                    //AlterraHub.ReplaceShadersV2(prefab);
+                    AlterraHub.ReplaceShadersV2(prefab);
                     QuickLogger.Info($"Applied shaderes to prefab {prefabName}");
                 }
 

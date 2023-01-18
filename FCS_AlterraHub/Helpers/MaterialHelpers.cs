@@ -150,14 +150,10 @@ namespace FCS_AlterraHub.Helpers
         /// <param name="gameObject">The game object to process.</param>
         /// <param name="assetBundle">The assetBundle to search in.</param>
         /// <param name="emissionColor">The color to use on the emission material.</param>
-        public static Material CreateV2EmissionMaterial(Material mat, string textureName, AssetBundle assetBundle, Color emissionColor, float emissionMuli = 1.0f)
+        public static Material CreateV2EmissionMaterial(Material mat, string textureName, AssetBundle assetBundle, Shader shader, Color emissionColor, float emissionMuli = 1.0f)
         {
-            var shader = Shader.Find("MarmosetUBER");
-
             if (mat != null)
             {
-
-                mat.shader = shader;
                 mat.EnableKeyword("MARMO_EMISSION");
                 mat.SetTexture("_Illum", FindTexture2D(textureName, assetBundle));
                 mat.SetFloat("_EnableGlow", 1);
@@ -204,14 +200,10 @@ namespace FCS_AlterraHub.Helpers
         /// <param name="textureName">The name of the texture to look for in the assetBundle.</param>
         /// <param name="gameObject">The game object to process.</param>
         /// <param name="assetBundle">The assetBundle to search in.</param>
-        public static Material CreateV2NormalMaterial(Material mat, string textureName, AssetBundle assetBundle)
+        public static Material CreateV2NormalMaterial(Material mat, string textureName, AssetBundle assetBundle, Shader shader)
         {
-            var shader = Shader.Find("MarmosetUBER");
-
             if (mat != null)
             {
-                mat.shader = shader;
-
                 mat.EnableKeyword("_NORMALMAP");
 
                 mat.SetTexture("_BumpMap", FindTexture2D(textureName, assetBundle));
@@ -396,13 +388,10 @@ namespace FCS_AlterraHub.Helpers
 
 
 
-        public static Material CreateV2Specular(Material mat, string textureName, float specInt, float shininess, AssetBundle assetBundle)
+        public static Material CreateV2Specular(Material mat, string textureName, float specInt, float shininess, AssetBundle assetBundle,Shader shader)
         {
-            var shader = Shader.Find("MarmosetUBER");
             if (mat != null)
             {
-                mat.shader = shader;
-
                 mat.EnableKeyword("MARMO_SPECMAP");
                   
                 mat.SetColor("_SpecColor", new Color(0.796875f, 0.796875f, 0.796875f, 0.796875f));
@@ -416,7 +405,7 @@ namespace FCS_AlterraHub.Helpers
                 }
 
                 mat.SetFloat("_Fresnel", 0f);
-                mat.SetVector("_SpecTex_ST", new Vector4(1.0f, 1.0f, 0.0f, 0.0f));
+                //mat.SetVector("_SpecTex_ST", new Vector4(1.0f, 1.0f, 0.0f, 0.0f));
             }
 
             return mat;
@@ -530,8 +519,6 @@ namespace FCS_AlterraHub.Helpers
             }
         }
 
-
-
         public static void ApplyPrecursorShader(string materialName, string normalMap, string metalicmap, GameObject gameObject, AssetBundle assetBundle, float glossiness)
         {
             var shader = Shader.Find("UWE/Marmoset/IonCrystal");
@@ -566,23 +553,18 @@ namespace FCS_AlterraHub.Helpers
             }
         }
 
-        public static void CreateV2ColorMaskShader(Material mat, string maskTexture, Color color, Color color2, Color color3, AssetBundle assetBundle)
+        public static void CreateV2ColorMaskShader(Material mat, string maskTexture, Color color, Color color2, Color color3, AssetBundle assetBundle, Shader shader)
         {
 
-            QuickLogger.Info($"[CreateV2ColorMaskShader] processing");
-
-            var shader = Shader.Find("MarmosetUBER");
-
-            mat.shader = shader;
             QuickLogger.Info("Setting Color Mask Shader", true);
 
             mat.EnableKeyword("UWE_3COLOR");
             QuickLogger.Info("Setting Color Mask UWE_3COLOR", true);
 
+            mat.SetFloat("_Enable3Color", 1);
+
             mat.SetTexture("_MultiColorMask", FindTexture2D(maskTexture, assetBundle));
             QuickLogger.Info("Setting Color Mask _MultiColorMask", true);
-
-            mat.SetFloat("_Enable3Color", 1);
 
             mat.SetColor("_Color", color);
             QuickLogger.Info("Setting Color Mask _Color", true);
@@ -592,6 +574,8 @@ namespace FCS_AlterraHub.Helpers
 
             mat.SetColor("_Color3", color3);
             QuickLogger.Info("Setting Color Mask _Color3", true);
+
+
         }
 
 

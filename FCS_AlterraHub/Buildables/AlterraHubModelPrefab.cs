@@ -36,7 +36,7 @@ namespace FCS_AlterraHub.Buildables
         public const string TBaseNormal = "fcsCoreBaseTexture_N";
         public const string TBaseSpec = "fcsCoreBaseTexture_S";
         public const string TBaseEmission = "fcsCoreBaseTexture_LM";
-        public const string TBaseID = "fcsCoreBaseTexture_ID";
+        public const string TBaseID = "fcsCoreBaseTexture_colorMask";
 
         internal static GameObject DebitCardPrefab { get; set; }
         internal static GameObject KitPrefab { get; set; }
@@ -278,7 +278,6 @@ namespace FCS_AlterraHub.Buildables
 
         public static void LoadV2Materials()
         {
-            return;
             QuickLogger.Info($"[LoadV2Materials] processing");
 
             if (_v2MaterialsLoaded) return;
@@ -294,21 +293,25 @@ namespace FCS_AlterraHub.Buildables
                 return;
             }
 
+            var shader = Shader.Find("MarmosetUBER");
+
             #region BasePrimaryCol
             Material basePrimaryCol = Main.GlobalBundle.LoadAsset<Material>(BasePrimaryCol);
-            MaterialHelpers.CreateV2NormalMaterial(basePrimaryCol, TBaseNormal, Main.GlobalBundle);
-            MaterialHelpers.CreateV2Specular(basePrimaryCol, TBaseSpec, 1, 3, Main.GlobalBundle);
-            MaterialHelpers.CreateV2EmissionMaterial(basePrimaryCol, TBaseEmission, Main.GlobalBundle, Color.white);
-            MaterialHelpers.CreateV2ColorMaskShader(basePrimaryCol,TBaseID,Color.white,Color.white,Color.white,Main.GlobalBundle);
+            basePrimaryCol.shader = shader;
+            MaterialHelpers.CreateV2NormalMaterial(basePrimaryCol, TBaseNormal, Main.GlobalBundle, shader);
+            MaterialHelpers.CreateV2Specular(basePrimaryCol, TBaseSpec, 1, 3, Main.GlobalBundle, shader);
+            MaterialHelpers.CreateV2EmissionMaterial(basePrimaryCol, TBaseEmission, Main.GlobalBundle, shader, Color.white);
+            MaterialHelpers.CreateV2ColorMaskShader(basePrimaryCol,TBaseID,Color.white,Color.white,Color.white,Main.GlobalBundle, shader);
             _v2Materials.Add(BasePrimaryCol, basePrimaryCol);
             #endregion
 
             #region BaseSecondaryCol
             Material baseSecondaryCol = Main.GlobalBundle.LoadAsset<Material>(BaseSecondaryCol);
-            MaterialHelpers.CreateV2NormalMaterial(baseSecondaryCol, TBaseNormal, Main.GlobalBundle);
-            MaterialHelpers.CreateV2Specular(baseSecondaryCol, TBaseSpec, 1, 3, Main.GlobalBundle);
-            MaterialHelpers.CreateV2EmissionMaterial(baseSecondaryCol, TBaseEmission, Main.GlobalBundle, Color.white);
-            MaterialHelpers.CreateV2ColorMaskShader(baseSecondaryCol, TBaseID, Color.white, Color.white, Color.white, Main.GlobalBundle);
+            baseSecondaryCol.shader = shader;
+            MaterialHelpers.CreateV2NormalMaterial(baseSecondaryCol, TBaseNormal, Main.GlobalBundle, shader);
+            MaterialHelpers.CreateV2Specular(baseSecondaryCol, TBaseSpec, 1, 3, Main.GlobalBundle, shader);
+            MaterialHelpers.CreateV2EmissionMaterial(baseSecondaryCol, TBaseEmission, Main.GlobalBundle, shader, Color.white);
+            MaterialHelpers.CreateV2ColorMaskShader(baseSecondaryCol, TBaseID, Color.white, Color.white, Color.white, Main.GlobalBundle,shader);
             _v2Materials.Add(BaseSecondaryCol, baseSecondaryCol);
             #endregion
 

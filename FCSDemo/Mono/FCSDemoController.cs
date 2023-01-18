@@ -3,6 +3,7 @@ using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
+using FCS_AlterraHub.Registration;
 using FCSCommon.Utilities;
 using FCSDemo.Model;
 using UnityEngine;
@@ -12,7 +13,8 @@ namespace FCSDemo.Mono
     internal class FCSDemoController : FcsDevice,IHandTarget
     {
         private bool _runStartUpOnEnable;
-
+        private Material _material;
+        private Texture _texture;
 
         public string Name => gameObject.name;
         public override bool IsInitialized { get; set; }
@@ -41,9 +43,27 @@ namespace FCSDemo.Mono
 
                 if (Main.Configuration.ControlEmissionStrength.Value)
                 {
-                    MaterialHelpers.ChangeEmissionStrength(AlterraHub.TBaseEmission, gameObject, Main.Configuration.EmissionStrength.Value);
+                    //MaterialHelpers.ChangeEmissionStrength(AlterraHub.TBaseEmission, gameObject, Main.Configuration.EmissionStrength.Value);
                 }
+
+
+                
+                _material = MaterialHelpers.GetMaterial(GameObjectHelpers.FindGameObject(gameObject,"mesh"), AlterraHub.BasePrimaryCol);
+
+                _material.DisableKeyword("_SPECGLOSSMAP");
+                _material.DisableKeyword("_EMISSION");
+
+                _material.DisableKeyword("_METALLICGLOSSMAP");
+
+                _material.DisableKeyword("_NORMALMAP");
+
+                _texture = _material?.GetTexture("_MultiColorMask");
+
+
             }
+
+            MaterialHelpers.ApplyColorMaskShader(AlterraHub.BasePrimaryCol, AlterraHub.TBaseID, Color.red, Color.green, Color.blue,gameObject, FCS_AlterraHub.Main.GlobalBundle);
+
             QuickLogger.Info("Initialized", true);
         }
 
