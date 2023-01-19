@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using SMLHelper.Handlers;
 using UnityEngine;
 
@@ -71,8 +72,11 @@ namespace FCS_HomeSolutions.Configuration
             { $"{ModKey}_MovingTo","MOVING TO"},
             { $"{ModKey}_FloorLevel","FLOOR LEVEL"},
             { $"{ModKey}_QuantumPowerBankFull","Quantum Power Bank is already full"},
+            { $"{ModKey}_JukeBoxVolumePercent","{0:P0}"},
+            { $"{ModKey}_JukeboxNoMusicFound","No music files found at path '{0}'"},
+            { $"{ModKey}_JukeboxNoPower","Unpowered"},
         };
-
+        
         internal static void AdditionalPatching()
         {
             foreach (KeyValuePair<string, string> languageEntry in LanguageDictionary)
@@ -389,6 +393,21 @@ namespace FCS_HomeSolutions.Configuration
         public static string QuantumPowerBankFull()
         {
             return GetLanguage($"{ModKey}_QuantumPowerBankFull");
+        }
+
+        internal static string JukeBoxVolumeFormat(float arg)
+        {
+            return string.Format(GetLanguage($"{ModKey}_JukeBoxVolumePercent"),arg);
+        }
+
+        internal static string JukeBoxNoMusicFound(string fullMusicPath)
+        {
+            return string.Format(GetLanguage($"{ModKey}_JukeboxNoMusicFound"), fullMusicPath);
+        }
+
+        public static string JukeboxNoPower()
+        {
+            return GetLanguage($"{ModKey}_JukeboxNoPower");
         }
     }
 }

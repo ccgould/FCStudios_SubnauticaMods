@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Helpers;
+using FCS_HomeSolutions.Buildables;
+using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Mods.JukeBox.Mono;
 using FCSCommon.Utilities;
 using FMOD;
@@ -17,9 +20,6 @@ using static uGUI_Overlays;
 [ProtoContract]
 public class JukeboxInstance : MonoBehaviour, IConstructable
 {
-    // Token: 0x170001CD RID: 461
-    // (get) Token: 0x06002581 RID: 9601 RVA: 0x000B4CC3 File Offset: 0x000B2EC3
-    // (set) Token: 0x06002582 RID: 9602 RVA: 0x000B4CCC File Offset: 0x000B2ECC
     public string file
     {
         get
@@ -38,9 +38,6 @@ public class JukeboxInstance : MonoBehaviour, IConstructable
             }
         }
     }
-
-    // Token: 0x170001CE RID: 462
-    // (get) Token: 0x06002583 RID: 9603 RVA: 0x000B4D20 File Offset: 0x000B2F20
     private bool isControlling
     {
         get
@@ -73,10 +70,9 @@ public class JukeboxInstance : MonoBehaviour, IConstructable
         repeatBTN.onClick.AddListener(OnButtonRepeat);
 
         var shuffleBTN = GameObjectHelpers.FindGameObject(gameObject, "ShuffleBTN").GetComponent<Button>();
-        repeatBTN.onClick.AddListener(OnButtonRepeat);
+        shuffleBTN.onClick.AddListener(OnButtonShuffle);
     }
 
-    // Token: 0x06002584 RID: 9604 RVA: 0x000B4D45 File Offset: 0x000B2F45
     private void OnEnable()
     {
         if (!_runStartUpOnEnable) return;
@@ -147,36 +143,58 @@ public class JukeboxInstance : MonoBehaviour, IConstructable
     private void Start()
     {
         this._baseComp = base.gameObject.GetComponentInParent<Base>();
-        this._powerRelay = base.gameObject.GetComponentInParent<PowerRelay>();
-
-        volumeSlider.onValueChanged.AddListener(OnVolume);
-
-        timSlider.onValueChanged.AddListener(OnPositionDown);
+        this._powerRelay = base.gameObject.GetComponentInParent<PowerRelay>();               
+        
         if (this.flashRenderer != null)
         {
             this._materials = this.flashRenderer.materials;
         }
-        this._materialPosition = new Material(this.imagePosition.material);
+
+        for (int i = 0; i < imagesSpectrum.Length; i++)
+        {
+            var image = imagesSpectrum[i];
+            
+            var mat = MaterialHelpers.CreateUIBarShader(image.material, "Specturm", "JukeboxSpectrumOn", ModelPrefab.ModBundle,false);
+            image.material = mat;
+        }
+
+        this._materialPosition = MaterialHelpers.CreateUIBarShader(this.imagePosition.material, "JukeboxVolume", "JukeboxVolumeOn", ModelPrefab.ModBundle);
         this.imagePosition.material = this._materialPosition;
-        this._materialVolume = new Material(this.imageVolume.material);
+        
+        this._materialVolume = MaterialHelpers.CreateUIBarShader(this.imageVolume.material, "JukeboxVolume", "JukeboxVolumeOn", ModelPrefab.ModBundle);
         this.imageVolume.material = this._materialVolume;
-        //Material material = this.imagesSpectrum[0].material;
-        //this._materialsSpectrum = new Material[this.imagesSpectrum.Length];
-        //for (int i = 0; i < this.imagesSpectrum.Length; i++)
-        //{
-        //    Material material2 = new Material(material);
-        //    this.imagesSpectrum[i].material = material2;
-        //    this._materialsSpectrum[i] = material2;
-        //}
+
+        Material material = this.imagesSpectrum[0].material;
+        this._materialsSpectrum = new Material[this.imagesSpectrum.Length];
+        for (int i = 0; i < this.imagesSpectrum.Length; i++)
+        {
+            Material material2 = new Material(material);
+            this.imagesSpectrum[i].material = material2;
+            this._materialsSpectrum[i] = material2;
+        }
         JukeboxV2.TrackInfo info = JukeboxV2.GetInfo(this._file);
         this.SetLabel(info.label);
         this.SetLength(info.length);
         this.textPosition.text = JukeboxV2.FormatTime(0U, 0U, 0U);
-        //this.imageRepeat.sprite = this.spritesRepeat[(int)this.repeat];
-        //this.imageShuffle.sprite = (this.shuffle ? this.spriteShuffleOn : this.spriteShuffleOff);
+        this.imageRepeat.sprite = this.spritesRepeat[(int)this.repeat];
+        this.imageShuffle.sprite = (this.shuffle ? this.spriteShuffleOn : this.spriteShuffleOff);
         this.UpdateVolumeSlider();
-        this.textVolume.text = $"{Mathf.FloorToInt(volume * 100)}%";
+        this.textVolume.text = AuxPatchers.JukeBoxVolumeFormat(volume);
         this.OnRelease();
+
+        volumePointEventTrigger.onDrag.AddListener(OnVolume);
+        volumePointEventTrigger.onPointerUp.AddListener(OnVolume);
+        volumePointEventTrigger.onInitializePotentialDrag.AddListener(OnVolumeInitDrag);
+        volumePointEventTrigger.onPointerHover.AddListener(OnVolumeHover);
+
+
+        timelinePointEventTrigger.onBeginDrag.AddListener(OnPositionBeginDrag);
+        timelinePointEventTrigger.onDrag.AddListener(OnPositionDrag);
+        timelinePointEventTrigger.onEndDrag.AddListener(OnPositionEndDrag);
+        timelinePointEventTrigger.onPointerUp.AddListener(OnPositionUp);
+        timelinePointEventTrigger.onPointerDown.AddListener(OnPositionDown);
+        timelinePointEventTrigger.onInitializePotentialDrag.AddListener(OnPositionInitDrag);
+        timelinePointEventTrigger.onPointerHover.AddListener(OnPositionHover);
     }
 
     // Token: 0x06002587 RID: 9607 RVA: 0x000B4F5E File Offset: 0x000B315E
@@ -221,7 +239,7 @@ public class JukeboxInstance : MonoBehaviour, IConstructable
             this._stringPosition = "-:--";
             this.textPosition.text = this._stringPosition;
             this._position = 0f;
-            //this.UpdateSpectrum(true);
+            this.UpdateSpectrum(true);
             this.UpdatePositionSlider();
         }
     }
@@ -250,7 +268,7 @@ public class JukeboxInstance : MonoBehaviour, IConstructable
         if (!this.ConsumePower())
         {
             JukeboxV2.Stop();
-            this.SetLabel(Language.main.Get("JukeboxNoPower"));
+            this.SetLabel(AuxPatchers.JukeboxNoPower());
         }
     }
 
@@ -288,14 +306,14 @@ public class JukeboxInstance : MonoBehaviour, IConstructable
                 this._position = (((float)length > 0f) ? (num / (float)length) : 0f);
                 this.UpdatePositionSlider();
             }
-            //this.UpdateSpectrum(false);
+            this.UpdateSpectrum(false);
         }
         this.UpdatePositionLabel();
-        //this.imagePositionKnob.sprite = (this._positionHover ? this.spriteKnobHover : this.spriteKnobNormal);
+        this.imagePositionKnob.sprite = (this._positionHover ? this.spriteKnobHover : this.spriteKnobNormal);
         this._positionHover = false;
-        //this.imageVolumeKnob.sprite = (this._volumeHover ? this.spriteKnobHover : this.spriteKnobNormal);
+        this.imageVolumeKnob.sprite = (this._volumeHover ? this.spriteKnobHover : this.spriteKnobNormal);
         this._volumeHover = false;
-        //this.imagePlayPause.sprite = ((this.isControlling && JukeboxV2.isStartingOrPlaying && !JukeboxV2.paused) ? this.spritePause : this.spritePlay);
+        this.imagePlayPause.sprite = ((this.isControlling && JukeboxV2.isStartingOrPlaying && !JukeboxV2.paused) ? this.spritePause : this.spritePlay);
     }
 
     // Token: 0x0600258F RID: 9615 RVA: 0x000B5264 File Offset: 0x000B3464
@@ -407,21 +425,19 @@ public class JukeboxInstance : MonoBehaviour, IConstructable
     private void UpdatePositionSlider()
     {
         float num = this.isControlling ? this._position : 0f;
-        timSlider.SetValueWithoutNotify(num);
-        //this._materialPosition.SetFloat(ShaderPropertyID._Amount, num);
-        //RectTransform rectTransform = this.imagePositionKnob.rectTransform;
-        //RectTransform rectTransform2 = rectTransform.parent as RectTransform;
-        //rectTransform.anchoredPosition = new Vector2(rectTransform2.rect.width * num, 0f);
+        this._materialPosition.SetFloat(ShaderPropertyID._Amount, num);
+        RectTransform rectTransform = this.imagePositionKnob.rectTransform;
+        RectTransform rectTransform2 = rectTransform.parent as RectTransform;
+        rectTransform.anchoredPosition = new Vector2(rectTransform2.rect.width * num, 0f);
     }
 
     // Token: 0x06002593 RID: 9619 RVA: 0x000B55B0 File Offset: 0x000B37B0
     private void UpdateVolumeSlider()
     {
-        volumeSlider.value = this.volume;
-        //this._materialVolume.SetFloat(ShaderPropertyID._Amount, this.volume);
-        //RectTransform rectTransform = this.imageVolumeKnob.rectTransform;
-        //RectTransform rectTransform2 = rectTransform.parent as RectTransform;
-        //rectTransform.anchoredPosition = new Vector2(rectTransform2.rect.width * this.volume, 0f);
+        this._materialVolume.SetFloat(ShaderPropertyID._Amount, this.volume);
+        RectTransform rectTransform = this.imageVolumeKnob.rectTransform;
+        RectTransform rectTransform2 = rectTransform.parent as RectTransform;
+        rectTransform.anchoredPosition = new Vector2(rectTransform2.rect.width * this.volume, 0f);
     }
 
     // Token: 0x06002594 RID: 9620 RVA: 0x000B5610 File Offset: 0x000B3810
@@ -498,11 +514,11 @@ public class JukeboxInstance : MonoBehaviour, IConstructable
     // Token: 0x06002597 RID: 9623 RVA: 0x000B5794 File Offset: 0x000B3994
     private void SetPositionKnobVisible(bool visible)
     {
-        //float a = visible ? 1f : 0f;
-        //CanvasRenderer canvasRenderer = this.imagePositionKnob.canvasRenderer;
-        //Color color = canvasRenderer.GetColor();
-        //color.a = a;
-        //canvasRenderer.SetColor(color);
+        float a = visible ? 1f : 0f;
+        CanvasRenderer canvasRenderer = this.imagePositionKnob.canvasRenderer;
+        Color color = canvasRenderer.GetColor();
+        color.a = a;
+        canvasRenderer.SetColor(color);
     }
 
     // Token: 0x06002598 RID: 9624 RVA: 0x000B57D4 File Offset: 0x000B39D4
@@ -520,7 +536,8 @@ public class JukeboxInstance : MonoBehaviour, IConstructable
             return;
         }
         this._file = string.Empty;
-        this.SetLabel(Language.main.GetFormat<string>("JukeboxNoMusicFound", JukeboxV2.fullMusicPath));
+
+        this.SetLabel(AuxPatchers.JukeBoxNoMusicFound(JukeboxV2.fullMusicPath));
     }
 
     // Token: 0x06002599 RID: 9625 RVA: 0x000B5834 File Offset: 0x000B3A34
@@ -543,14 +560,14 @@ public class JukeboxInstance : MonoBehaviour, IConstructable
         }
         else
         {
-            this.SetLabel(Language.main.Get("JukeboxNoPower"));
+            this.SetLabel(AuxPatchers.JukeboxNoPower());
         }
     }
 
     // Token: 0x0600259A RID: 9626 RVA: 0x000B58E2 File Offset: 0x000B3AE2
     public void OnButtonStop()
     {
-        //this.imagePlayPause.sprite = this.spritePlay;
+        this.imagePlayPause.sprite = this.spritePlay;
         if (this.isControlling)
         {
             JukeboxV2.Stop();
@@ -581,7 +598,7 @@ public class JukeboxInstance : MonoBehaviour, IConstructable
     public void OnButtonRepeat()
     {
         this.repeat = JukeboxV2.GetNextRepeat(this.repeat);
-        //this.imageRepeat.sprite = this.spritesRepeat[(int)this.repeat];
+        this.imageRepeat.sprite = this.spritesRepeat[(int)this.repeat];
         if (this.isControlling)
         {
             JukeboxV2.repeat = this.repeat;
@@ -592,7 +609,7 @@ public class JukeboxInstance : MonoBehaviour, IConstructable
     public void OnButtonShuffle()
     {
         this.shuffle = !this.shuffle;
-       // this.imageShuffle.sprite = (this.shuffle ? this.spriteShuffleOn : this.spriteShuffleOff);
+       this.imageShuffle.sprite = (this.shuffle ? this.spriteShuffleOn : this.spriteShuffleOff);
         if (this.isControlling)
         {
             JukeboxV2.shuffle = this.shuffle;
@@ -600,10 +617,16 @@ public class JukeboxInstance : MonoBehaviour, IConstructable
     }
 
     // Token: 0x0600259F RID: 9631 RVA: 0x000B59C0 File Offset: 0x000B3BC0
-    public void OnPositionDown(float value)
+    public void OnPositionDown(PointerEventData eventData)
     {
-        this._position = value;
-        this.UpdatePositionSlider();
+        this._positionDrag = true;
+        this._positionDirty = -0.5f;
+        float position;
+        if (MaterialExtensions.GetBarValue(this.imagePosition.rectTransform, eventData, this._materialPosition, true, out position))
+        {
+            this._position = position;
+            this.UpdatePositionSlider();
+        }
     }
 
     // Token: 0x060025A0 RID: 9632 RVA: 0x000B5A08 File Offset: 0x000B3C08
@@ -639,7 +662,7 @@ public class JukeboxInstance : MonoBehaviour, IConstructable
     // Token: 0x060025A3 RID: 9635 RVA: 0x000B5A7F File Offset: 0x000B3C7F
     public void OnPositionDrag(PointerEventData eventData)
     {
-        //this.OnPositionDown(eventData);
+        this.OnPositionDown(eventData);
     }
 
     // Token: 0x060025A4 RID: 9636 RVA: 0x000B5A88 File Offset: 0x000B3C88
@@ -661,13 +684,18 @@ public class JukeboxInstance : MonoBehaviour, IConstructable
     }
 
     // Token: 0x060025A7 RID: 9639 RVA: 0x000B5A9C File Offset: 0x000B3C9C
-    public void OnVolume(float amount)
+    public void OnVolume(PointerEventData eventData)
     {
-        this.volume = amount;
-        this.textVolume.text = $"{Mathf.FloorToInt(amount * 100)}%";
-        if (this.isControlling)
+        float arg;
+        if (MaterialExtensions.GetBarValue(this.imageVolume.rectTransform, eventData, this._materialVolume, true, out arg))
         {
-            JukeboxV2.volume = this.volume;
+            this.volume = arg;
+            this.UpdateVolumeSlider();
+            this.textVolume.text = AuxPatchers.JukeBoxVolumeFormat(arg);
+            if (this.isControlling)
+            {
+                JukeboxV2.volume = this.volume;
+            }
         }
     }
 
@@ -754,17 +782,6 @@ public class JukeboxInstance : MonoBehaviour, IConstructable
     // Token: 0x0400276C RID: 10092
     private const float moveSpeed = 100f;
 
-    // Token: 0x0400276D RID: 10093
-    [AssertLocalization(1)]
-    private const string volumeKey = "JukeboxVolumePercent";
-
-    // Token: 0x0400276E RID: 10094
-    [AssertLocalization]
-    private const string noPowerKey = "JukeboxNoPower";
-
-    // Token: 0x0400276F RID: 10095
-    [AssertLocalization(1)]
-    private const string jukeboxNoMusicFoundFormatKey = "JukeboxNoMusicFound";
 
     // Token: 0x04002770 RID: 10096
     private const ManagedUpdate.Queue updateQueue = ManagedUpdate.Queue.LateUpdateAfterInput;
@@ -774,9 +791,6 @@ public class JukeboxInstance : MonoBehaviour, IConstructable
 
     // Token: 0x04002772 RID: 10098
     private const float powerConsumption = 0.1f;
-
-    // Token: 0x04002773 RID: 10099
-    private const string playedJukeboxKey = "Log_Alan_Aside_JukeboxMusic";
 
     // Token: 0x04002774 RID: 10100
     public Color flashColor0 = new Color(0f, 0f, 0f, 1f);
@@ -843,36 +857,36 @@ public class JukeboxInstance : MonoBehaviour, IConstructable
     public TextMeshProUGUI textVolume;
 
     //// Token: 0x04002785 RID: 10117
-    //[AssertNotNull]
-    //public Image[] imagesSpectrum;
+    [AssertNotNull]
+    public Image[] imagesSpectrum;
 
     // Token: 0x04002786 RID: 10118
-    //[AssertNotNull]
-    //public Sprite spritePlay;
+    [AssertNotNull]
+    public Sprite spritePlay;
 
     // Token: 0x04002787 RID: 10119
-    //[AssertNotNull]
-    //public Sprite spritePause;
+    [AssertNotNull]
+    public Sprite spritePause;
 
     // Token: 0x04002788 RID: 10120
-    //[AssertNotNull]
-   // public Sprite spriteShuffleOn;
+    [AssertNotNull]
+    public Sprite spriteShuffleOn;
 
     // Token: 0x04002789 RID: 10121
-    //[AssertNotNull]
-   // public Sprite spriteShuffleOff;
+    [AssertNotNull]
+    public Sprite spriteShuffleOff;
 
     // Token: 0x0400278A RID: 10122
-    //[AssertNotNull]
-    //public Sprite[] spritesRepeat;
+    [AssertNotNull]
+    public Sprite[] spritesRepeat;
 
     // Token: 0x0400278B RID: 10123
-   // [AssertNotNull]
-    //public Sprite spriteKnobNormal;
+    [AssertNotNull]
+    public Sprite spriteKnobNormal;
 
     // Token: 0x0400278C RID: 10124
-   // [AssertNotNull]
-    //public Sprite spriteKnobHover;
+   [AssertNotNull]
+    public Sprite spriteKnobHover;
 
     // Token: 0x0400278D RID: 10125
     [AssertNotNull]
@@ -976,10 +990,12 @@ public class JukeboxInstance : MonoBehaviour, IConstructable
     // Token: 0x040027AA RID: 10154
     private static List<Speaker> speakers = new List<Speaker>();
     private bool _runStartUpOnEnable;
-    
-    public Slider volumeSlider;
+    public PointerEventTrigger volumePointEventTrigger;
+    public PointerEventTrigger timelinePointEventTrigger;
 
-    public Slider timSlider;
+    //public Slider volumeSlider;
+
+    //public Slider timSlider;
 
     // Token: 0x02000BC2 RID: 3010
     [Serializable]

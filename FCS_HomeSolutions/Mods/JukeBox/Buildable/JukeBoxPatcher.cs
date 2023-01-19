@@ -26,6 +26,13 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Buildable
     internal class JukeBoxBuildable : SMLHelper.Assets.Buildable
     {
         private readonly GameObject _prefab;
+        private UnityEngine.Sprite _spritePlay;
+        private UnityEngine.Sprite _spritePause;
+        private UnityEngine.Sprite _spriteKnobHover;
+        private UnityEngine.Sprite _spriteKnobNormal;
+        private UnityEngine.Sprite _spriteShuffleOn;
+        private UnityEngine.Sprite _spriteShuffleOff;
+        private UnityEngine.Sprite[] _spritesRepeat;
         internal const string JukeBoxClassID = "FCSJukebox";
         internal const string JukeBoxFriendly = "Jukebox";
         internal const string JukeBoxDescription = "Wall-mounted Alterra Jukebox. Plays your favorite music to help you develop a relaxed attitude toward danger.";
@@ -36,6 +43,28 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Buildable
         public JukeBoxBuildable() : base(JukeBoxClassID, JukeBoxFriendly, JukeBoxDescription)
         {
             _prefab = ModelPrefab.GetPrefab(JukeBoxPrefabName);
+            _spritePlay = ModelPrefab.ModBundle.LoadAsset<UnityEngine.Sprite>("JukeboxIconPlay-resources.assets-4449");
+            _spritePause = ModelPrefab.ModBundle.LoadAsset<UnityEngine.Sprite>("JukeboxIconPause-resources.assets-4730");
+            _spriteKnobHover = ModelPrefab.ModBundle.LoadAsset<UnityEngine.Sprite>("JukeboxKnobHover");
+            _spriteKnobNormal = ModelPrefab.ModBundle.LoadAsset<UnityEngine.Sprite>("JukeboxKnob");
+
+            _spritesRepeat =  ModelPrefab.ModBundle.LoadAssetWithSubAssets<UnityEngine.Sprite>("JukeboxRepeat");
+
+
+            var shuffle = ModelPrefab.ModBundle.LoadAssetWithSubAssets<UnityEngine.Sprite>("JukeboxIconShuffle");
+
+            foreach (UnityEngine.Sprite item in shuffle)
+            {
+                QuickLogger.Info(item.name);
+            }
+
+
+
+            _spriteShuffleOn = shuffle[0];
+            _spriteShuffleOff = shuffle[1];
+
+
+
 
             OnStartedPatching += () =>
             {
@@ -48,6 +77,34 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Buildable
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
             };
         }
+
+
+        public static T GetSubAsset<T>(UnityEngine.Object[] allAssets) where T : class
+        {
+            for (int i = 0; i < allAssets.Length; i++)
+            {
+                if (allAssets[i].GetType() == typeof(T))
+                {
+                    return allAssets[i] as T;
+                }
+            }
+            return null;
+        }
+
+        public static T[] GetSubAssets<T>(UnityEngine.Object[] allAssets) where T : class
+        {
+            List<T> ret = new List<T>();
+            for (int i = 0; i < allAssets.Length; i++)
+            {
+                if (allAssets[i].GetType() == typeof(T))
+                {
+                    ret.Add(allAssets[i] as T);
+                }
+            }
+            return ret.ToArray();
+        }
+
+
 
         public override GameObject GetGameObject()
         {
@@ -107,6 +164,12 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Buildable
 
                 prefab.SetActive(false);
 
+                var volumnGO = GameObjectHelpers.FindGameObject(prefab, "Volume");
+                var vpt = volumnGO.AddComponent<PointerEventTrigger>();
+
+                var timelineGO = GameObjectHelpers.FindGameObject(prefab, "Timeline");
+                var tpt = timelineGO.AddComponent<PointerEventTrigger>();
+
                 var instance = prefab.AddComponent<JukeboxInstance>();
 
                 instance.LOD = lod;
@@ -123,11 +186,11 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Buildable
 
                 //instance.canvasLink = canvasLink;
 
-                instance.imagePlayPause = GameObjectHelpers.FindGameObject(prefab, "PlayBTN").GetComponentInChildren<Image>();
+                instance.imagePlayPause = GameObjectHelpers.FindGameObject(prefab, "PlayBTN").transform.GetChild(0).GetComponent<Image>();
 
-                instance.imageRepeat = GameObjectHelpers.FindGameObject(prefab, "RepeatBTN").GetComponentInChildren<Image>();
+                instance.imageRepeat = GameObjectHelpers.FindGameObject(prefab, "RepeatBTN").transform.GetChild(0).GetComponent<Image>();
 
-                instance.imageShuffle = GameObjectHelpers.FindGameObject(prefab, "ShuffleBTN").GetComponentInChildren<Image>();
+                instance.imageShuffle = GameObjectHelpers.FindGameObject(prefab, "ShuffleBTN").transform.GetChild(0).GetComponent<Image>();
 
                 instance.rectMask = file.gameObject.GetComponent<RectMask2D>();
 
@@ -139,17 +202,31 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Buildable
 
                 instance.textVolume = GameObjectHelpers.FindGameObject(prefab, "TextVolume").GetComponent<TextMeshProUGUI>();
 
-                instance.imagePosition = GameObjectHelpers.FindGameObject(prefab, "TimelinePostionFill").GetComponent<Image>();
+                instance.imagePosition = GameObjectHelpers.FindGameObject(prefab, "TimelineBackground").GetComponent<Image>();
 
                 instance.imagePositionKnob = GameObjectHelpers.FindGameObject(prefab, "TimeLineHandle").GetComponent<Image>();
 
-                instance.imageVolume = GameObjectHelpers.FindGameObject(prefab, "VolumeFill").GetComponent<Image>();
+                instance.imageVolume = GameObjectHelpers.FindGameObject(prefab, "VolumeBackground").GetComponent<Image>();
 
                 instance.imageVolumeKnob = GameObjectHelpers.FindGameObject(prefab, "VolumeHandle").GetComponent<Image>();
-                
-                instance.volumeSlider = GameObjectHelpers.FindGameObject(prefab, "Volume").GetComponent<Slider>();
 
-                instance.timSlider = GameObjectHelpers.FindGameObject(prefab, "Timeline").GetComponent<Slider>();
+                instance.imagesSpectrum = GameObjectHelpers.FindGameObject(prefab, "Spectrum").GetChildren<Image>();
+
+
+                volumnGO.AddComponent<uGUI_Block>();
+                instance.volumePointEventTrigger = vpt;
+
+                timelineGO.AddComponent<uGUI_Block>();
+                instance.timelinePointEventTrigger = tpt;
+
+
+                instance.spritePause = _spritePause;
+                instance.spritePlay = _spritePlay;
+                instance.spriteKnobNormal = _spriteKnobNormal;
+                instance.spriteKnobHover= _spriteKnobHover;
+                instance.spriteShuffleOn = _spriteShuffleOn;
+                instance.spriteShuffleOff = _spriteShuffleOff;
+                instance.spritesRepeat = _spritesRepeat;
 
                 instance.flashRenderer = renderer;
 

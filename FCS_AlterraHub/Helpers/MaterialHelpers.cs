@@ -192,6 +192,31 @@ namespace FCS_AlterraHub.Helpers
             }
         }
 
+        /// <summary>
+        /// Applies the properties for the MarmosetUBER shader that has a normal texture.
+        /// </summary>
+        /// <param name="materialName">The new name of the material.</param>
+        /// <param name="textureName">The name of the texture to look for in the assetBundle.</param>
+        /// <param name="assetBundle">The assetBundle to search in.</param>
+        public static Material CreateUIBarShader(Material material, string materialName,string textureName, AssetBundle assetBundle, bool isHorizontal = true)
+        {
+            QuickLogger.Info($"CreateUIBarShader");
+            var shader = Shader.Find("UI/Bar");
+             var mat = new Material(material);
+            mat.name = materialName;
+            QuickLogger.Info($"UIBar Shader:{shader is not null}",true);
+
+            mat.shader = shader;
+
+            mat.EnableKeyword("USE_BACKGROUND");
+            
+            mat.EnableKeyword(isHorizontal ? "_FILL_HORIZONTAL" : "_FILL_VERTICAL");
+            mat.SetTexture("_BarTex", FindTexture2D(textureName, assetBundle));
+            mat.SetFloat("_Amount", 0.7f);
+            mat.SetFloat("_Fill", 0f);
+            return mat;
+        }
+
 
         /// <summary>
         /// Applies the properties for the MarmosetUBER shader that has a normal texture.

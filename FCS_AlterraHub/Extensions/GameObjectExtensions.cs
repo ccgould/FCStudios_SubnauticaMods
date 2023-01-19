@@ -26,5 +26,17 @@ namespace FCS_AlterraHub.Extensions
             }
             return children.ToArray();
         }
+
+        public static T[] GetChildren<T>(this GameObject go)
+        {
+            List<T> children = new List<T>();
+            foreach (Transform tran in go.transform)
+            {
+                var comp = tran.gameObject.GetComponent<T>();
+                if (comp == null) continue;
+                children.Add(comp);
+            }
+            return children.ToArray();
+        }
     }
 }

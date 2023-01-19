@@ -259,6 +259,7 @@
     <Compile Include="Systems\CreditNotificationSystem.cs" />
     <Compile Include="Systems\StoreInventorySystem.cs" />
     <Compile Include="Systems\VoiceNotificationSystem.cs" />
+    <Compile Include="Triggers\PointEventTrigger.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Mods\FCSPDA\Struct\" />

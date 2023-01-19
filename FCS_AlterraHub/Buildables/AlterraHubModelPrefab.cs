@@ -278,7 +278,7 @@ namespace FCS_AlterraHub.Buildables
 
         public static void LoadV2Materials()
         {
-            QuickLogger.Info($"[LoadV2Materials] processing");
+            //QuickLogger.Info($"[LoadV2Materials] processing");
 
             if (_v2MaterialsLoaded) return;
 
