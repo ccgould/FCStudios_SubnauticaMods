@@ -71,6 +71,14 @@ namespace FCSDemo
                 RuntimeManager.StudioSystem.getBankList(out Bank[] banks);
                 foreach (Bank bank in banks)
                 {
+                    bank.getEventList(out EventDescription[] eventDescriptions);
+
+                    foreach (var eventDescription in eventDescriptions)
+                    {
+                        eventDescription.getPath(out string path);
+                        QuickLogger.Info($"eventPath: {path}");
+                    }
+
                     bank.getPath(out string bankPath);
                     QuickLogger.Info($"bankPath: {bankPath}");
                     bank.getBusList(out Bus[] busArray);

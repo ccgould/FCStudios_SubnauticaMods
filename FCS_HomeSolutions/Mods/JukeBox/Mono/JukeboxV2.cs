@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using FCSCommon.Utilities;
 using FMOD;
 using FMOD.Studio;
 using FMODUnity;
@@ -245,6 +246,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
             this.UpdateLowLevel();
             this.UpdateGameMusicMute();
             this.UpdateInfo();
+            RuntimeManager.StudioSystem.loadBankFile()
         }
 
         // Token: 0x06002548 RID: 9544 RVA: 0x000B2C08 File Offset: 0x000B0E08
@@ -806,10 +808,10 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
             this._fft.setParameterInt(1, 0);
             this._fft.setParameterInt(0, 128);
 
-            //this.snapshotOn = CreateSnapshot("snapshot:/jukebox_on");
-            //this.snapshotMute = CreateSnapshot("snapshot:/jukebox_mute");
-            //this.snapshotMuffle = CreateSnapshot("snapshot:/jukebox_muffle");
-            //this.snapshotReverb = CreateSnapshot("snapshot:/jukebox_verb_small");
+            this.snapshotOn = CreateSnapshot("snapshot:/jukebox_on");
+            this.snapshotMute = CreateSnapshot("snapshot:/jukebox_mute");
+            this.snapshotMuffle = CreateSnapshot("snapshot:/jukebox_muffle");
+            this.snapshotReverb = CreateSnapshot("snapshot:/pod_verb");
         }
 
         // Token: 0x0600255C RID: 9564 RVA: 0x000B38CC File Offset: 0x000B1ACC
@@ -823,18 +825,18 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
                 ERRCHECK(this._fft.release());
                 this._fft.clearHandle();
             }
-            //this.SetSnapshotState(this.snapshotOn, ref this.stateOn, false);
-            //this.SetSnapshotState(this.snapshotMute, ref this.stateMute, false);
-            //this.SetSnapshotState(this.snapshotMuffle, ref this.stateMuffle, false);
-            //this.SetSnapshotState(this.snapshotReverb, ref this.stateReverb, false);
-            //ERRCHECK(this.snapshotOn.release());
-            //ERRCHECK(this.snapshotMute.release());
-            //ERRCHECK(this.snapshotMuffle.release());
-            //ERRCHECK(this.snapshotReverb.release());
-            //this.snapshotOn.clearHandle();
-            //this.snapshotMute.clearHandle();
-            //this.snapshotMuffle.clearHandle();
-            //this.snapshotReverb.clearHandle();
+            this.SetSnapshotState(this.snapshotOn, ref this.stateOn, false);
+            this.SetSnapshotState(this.snapshotMute, ref this.stateMute, false);
+            this.SetSnapshotState(this.snapshotMuffle, ref this.stateMuffle, false);
+            this.SetSnapshotState(this.snapshotReverb, ref this.stateReverb, false);
+            ERRCHECK(this.snapshotOn.release());
+            ERRCHECK(this.snapshotMute.release());
+            ERRCHECK(this.snapshotMuffle.release());
+            ERRCHECK(this.snapshotReverb.release());
+            this.snapshotOn.clearHandle();
+            this.snapshotMute.clearHandle();
+            this.snapshotMuffle.clearHandle();
+            this.snapshotReverb.clearHandle();
             if (this._bus.isValid() && this._busChannelGroupLocked)
             {
                 ERRCHECK(this._bus.unlockChannelGroup());
@@ -1128,7 +1130,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
         // Token: 0x06002568 RID: 9576 RVA: 0x000B3F51 File Offset: 0x000B2151
         private void UpdateGameMusicMute()
         {
-            //this.SetSnapshotState(this.snapshotOn, ref this.stateOn, isStartingOrPlaying && !paused && this._audible);
+            this.SetSnapshotState(this.snapshotOn, ref this.stateOn, isStartingOrPlaying && !paused && this._audible);
         }
 
         // Token: 0x06002569 RID: 9577 RVA: 0x000B3F7C File Offset: 0x000B217C
@@ -1186,11 +1188,14 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
             float sqrMagnitude = (this.soundPosition - position2).sqrMagnitude;
             this._audible = (sqrMagnitude <= maxDistance * maxDistance);
             bool value = !this._audible || (!flag3 && (speakerHost != null || !flag4));
-            //this.SetSnapshotState(this.snapshotMute, ref this.stateMute, value);
-            //bool value2 = flag3;
-            //this.SetSnapshotState(this.snapshotReverb, ref this.stateReverb, value2);
-            //bool value3 = !flag3;
-            //this.SetSnapshotState(this.snapshotMuffle, ref this.stateMuffle, value3);
+            this.SetSnapshotState(this.snapshotMute, ref this.stateMute, value);
+            QuickLogger.Info($"SnapShotMute:{value}",true);
+            bool value2 = flag3;
+            this.SetSnapshotState(this.snapshotReverb, ref this.stateReverb, value2);
+            QuickLogger.Info($"SnapShotReverb:{value2}", true);
+            bool value3 = !flag3;
+            this.SetSnapshotState(this.snapshotMuffle, ref this.stateMuffle, value3);
+            QuickLogger.Info($"SnapShotMuffle:{value3}", true);
         }
 
         // Token: 0x0600256B RID: 9579 RVA: 0x000B4188 File Offset: 0x000B2388
@@ -1425,26 +1430,26 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
             {
             this._channelGroup.handle
             });
-            //Dbg.Write("\nsnapshotOn: {0} {1}", new object[]
-            //{
-            //this.snapshotOn.handle,
-            //this.stateOn
-            //});
-            //Dbg.Write("snapshotMute: {0} {1}", new object[]
-            //{
-            //this.snapshotMute.handle,
-            //this.stateMute
-            //});
-            //Dbg.Write("snapshotMuffle: {0} {1}", new object[]
-            //{
-            //this.snapshotMuffle.handle,
-            //this.stateMuffle
-            //});
-            //Dbg.Write("snapshotReverb: {0} {1}", new object[]
-            //{
-            //this.snapshotReverb.handle,
-            //this.stateReverb
-            //});
+            Dbg.Write("\nsnapshotOn: {0} {1}", new object[]
+            {
+            this.snapshotOn.handle,
+            this.stateOn
+            });
+            Dbg.Write("snapshotMute: {0} {1}", new object[]
+            {
+            this.snapshotMute.handle,
+            this.stateMute
+            });
+            Dbg.Write("snapshotMuffle: {0} {1}", new object[]
+            {
+            this.snapshotMuffle.handle,
+            this.stateMuffle
+            });
+            Dbg.Write("snapshotReverb: {0} {1}", new object[]
+            {
+            this.snapshotReverb.handle,
+            this.stateReverb
+            });
             Dbg.Write("\n_fft: {0}", new object[]
             {
             this._fft.handle
@@ -1497,6 +1502,8 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
 
         // Token: 0x04002725 RID: 10021
         private static float maxDistance = 20f;
+
+        internal static List<string> PlayList => _main._playlist;
 
         // Token: 0x04002726 RID: 10022
         private readonly HashSet<string> supportedExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
@@ -1639,17 +1646,14 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
         // Token: 0x04002750 RID: 10064
         private bool stateReverb;
 
-        // Token: 0x04002751 RID: 10065
-        //private EventInstance snapshotOn;
+        
+        private EventInstance snapshotOn;
 
-        // Token: 0x04002752 RID: 10066
-       // private EventInstance snapshotMute;
+        private EventInstance snapshotMute;
 
-        // Token: 0x04002753 RID: 10067
-       // private EventInstance snapshotMuffle;
+        private EventInstance snapshotMuffle;
 
-        // Token: 0x04002754 RID: 10068
-        //private EventInstance snapshotReverb;
+        private EventInstance snapshotReverb;
 
         // Token: 0x04002755 RID: 10069
         private string _fullMusicPath;

@@ -109,7 +109,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Buildable
             return Mod.AlterraHubDepotIngredients;
         }
 
-        protected override Sprite GetItemSprite()
+        protected override Atlas.Sprite GetItemSprite()
         {
             return ImageUtils.LoadSpriteFromFile(Path.Combine(AssetsFolder, $"{ClassID}.png"));
         }

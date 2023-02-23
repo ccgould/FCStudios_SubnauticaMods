@@ -12,6 +12,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using static JukeboxInstance;
 
 namespace FCS_HomeSolutions.Mods.JukeBox.Mono
 {
@@ -420,7 +421,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
             {
                 var depotPrefab = GameObject.Instantiate(ModelPrefab.JukeboxMusicItemPrefab);
                 var controller = depotPrefab.AddComponent<MusicListItemController>();
-                controller.Set(data, _baseJukeBox, this);
+                //controller.Set(data, _baseJukeBox, this);
                 controller.transform.SetParent(_musicListContent.transform, false);
             }
         }
@@ -593,40 +594,5 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
         }
     }
 
-    internal class MusicListItemController : MonoBehaviour
-    {
-        private BaseJukeBox _baseJukeBox;
-        private Image _playingIcon;
-        private TrackData _data;
-
-        internal void Set(TrackData data, BaseJukeBox baseJuke, JukeBoxController controller)
-        {
-            _baseJukeBox = baseJuke;
-            _data = data;
-            var text = GetComponentInChildren<Text>();
-            text.text = data.Path;
-            _playingIcon = GameObjectHelpers.FindGameObject(gameObject, "NowPlayingIcon")?.GetComponent<Image>();
-
-            var button = GetComponentInChildren<Button>();
-            button.onClick.AddListener((() =>
-            {
-                baseJuke.PlayTrack(data);
-            }));
-            InvokeRepeating(nameof(CheckIsPlaying), 0.3f, 0.3f);
-        }
-
-        private void CheckIsPlaying()
-        {
-            var trackResult = _baseJukeBox?.CurrentTrack.AudioClip != null && _baseJukeBox.CurrentTrack.AudioClip == _data.AudioClip;
-            _playingIcon?.gameObject?.SetActive(trackResult);
-        }
-    }
-
-    internal enum JukeboxPages
-    {
-        PoweringOn,
-        Pairing,
-        Home,
-        MusicList
-    }
+    
 }

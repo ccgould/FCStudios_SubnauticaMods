@@ -33,6 +33,7 @@ namespace FCS_AlterraHub.API
         private static readonly Dictionary<string, Texture2D> loadedImages = new();
         private static readonly Dictionary<string, GameObject> loadedPrefabs = new();
         public string GlobalBundleName => Mod.AssetBundleName;
+
         public Texture2D GetEncyclopediaTexture2D(string imageName, string bundleName = "")
         {
             QuickLogger.Debug($"Trying to find {imageName} in bundle {bundleName}");

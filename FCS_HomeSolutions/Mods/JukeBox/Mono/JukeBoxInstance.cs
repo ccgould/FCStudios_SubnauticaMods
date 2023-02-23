@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Helpers;
@@ -50,6 +51,70 @@ public class JukeboxInstance : MonoBehaviour, IConstructable
     public bool IsConstructed;
     public bool IsInitialized = false;
 
+    private IEnumerator PairJukeBox()
+    {
+        _isPairing = true;
+        //Play(ModelPrefab.PoweringOnClip);
+        GotoPage(JukeboxPages.PoweringOn);
+        yield return new WaitForSeconds(5);
+        //Play(ModelPrefab.ReadyToPairClip);
+        GotoPage(JukeboxPages.Pairing);
+        yield return new WaitForSeconds(5);
+        //Play(ModelPrefab.PairedClip);
+        yield return new WaitForSeconds(5);
+        GotoPage(JukeboxPages.Home);
+        _isPairing = false;
+        yield break;
+
+    }
+
+    private void GotoPage(JukeboxPages page)
+    {
+        _mainScreen.SetActive(false);
+        _overlay.SetActive(false);
+        _pairingScreen.SetActive(false);
+        _musicList.SetActive(false);
+
+
+        switch (page)
+        {
+            case JukeboxPages.PoweringOn:
+                _canvas.gameObject.SetActive(true);
+                break;
+            case JukeboxPages.Pairing:
+                _pairingScreen.SetActive(true);
+                _boot.SetActive(false);
+                break;
+            case JukeboxPages.Home:
+                _mainScreen.SetActive(true);
+                _overlay.SetActive(true);
+                break;
+            case JukeboxPages.MusicList:
+                _musicList.SetActive(true);
+                LoadMusicListScreen();
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(page), page, null);
+        }
+    }
+
+    private void LoadMusicListScreen()
+    {
+        foreach (Transform childTransform in _musicListContent.transform)
+        {
+            Destroy(childTransform.gameObject);
+        }
+
+        foreach (string data in JukeboxV2.PlayList)
+        {
+            var depotPrefab = GameObject.Instantiate(ModelPrefab.JukeboxMusicItemPrefab);
+            var controller = depotPrefab.AddComponent<MusicListItemController>();
+            controller.Set(data, this);
+            controller.transform.SetParent(_musicListContent.transform, false);
+        }
+    }
+
+
     private void Awake()
     {
         this.canvas = GetComponentInChildren<Canvas>(true);
@@ -71,6 +136,18 @@ public class JukeboxInstance : MonoBehaviour, IConstructable
 
         var shuffleBTN = GameObjectHelpers.FindGameObject(gameObject, "ShuffleBTN").GetComponent<Button>();
         shuffleBTN.onClick.AddListener(OnButtonShuffle);
+
+        var playListBTN = GameObjectHelpers.FindGameObject(gameObject, "PlayListBTN").GetComponent<Button>();
+        playListBTN.onClick.AddListener((() =>
+        {
+            GotoPage(JukeboxPages.MusicList);
+        }));
+
+        var backBTN = GameObjectHelpers.FindGameObject(gameObject, "BackBTN").GetComponent<Button>();
+        backBTN.onClick.AddListener((() =>
+        {
+            GotoPage(JukeboxPages.Home);
+        }));
     }
 
     private void OnEnable()
@@ -113,6 +190,26 @@ public class JukeboxInstance : MonoBehaviour, IConstructable
         this.canvas.enabled = true;
         SetEnabled(true);
         JukeboxInstance.all.Add(this);
+
+        _canvas = gameObject.GetComponentInChildren<Canvas>(true);
+
+        _pairingScreen = GameObjectHelpers.FindGameObject(_canvas.gameObject, "PairingScreen");
+        _overlay = GameObjectHelpers.FindGameObject(_canvas.gameObject, "Overlay");
+        _musicList = GameObjectHelpers.FindGameObject(_canvas.gameObject, "MusicList");
+        _mainScreen = GameObjectHelpers.FindGameObject(_canvas.gameObject, "MainScreen");
+        _boot = GameObjectHelpers.FindGameObject(_canvas.gameObject, "Boot");
+        _musicListContent = GameObjectHelpers.FindGameObject(_musicList, "Content");
+
+        LoadMusicListScreen();
+
+
+        MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
+        MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
+        MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.red);
+        MaterialHelpers.ChangeEmissionStrength(string.Empty, gameObject, 3f);
+
+        StartCoroutine(PairJukeBox());
+
         IsInitialized = true;
     }
 
@@ -539,6 +636,25 @@ public class JukeboxInstance : MonoBehaviour, IConstructable
 
         this.SetLabel(AuxPatchers.JukeBoxNoMusicFound(JukeboxV2.fullMusicPath));
     }
+
+
+    private void SwitchTrack(string next)
+    {
+        if (string.IsNullOrEmpty(next))
+        {
+            JukeboxV2.Scan();
+            next = JukeboxV2.GetNext(this, true);
+        }
+        if (!string.IsNullOrEmpty(next))
+        {
+            this.file = next;
+            return;
+        }
+        this._file = string.Empty;
+
+        this.SetLabel(AuxPatchers.JukeBoxNoMusicFound(JukeboxV2.fullMusicPath));
+    }
+
 
     // Token: 0x06002599 RID: 9625 RVA: 0x000B5834 File Offset: 0x000B3A34
     public void OnButtonPlayPause()
@@ -992,6 +1108,14 @@ public class JukeboxInstance : MonoBehaviour, IConstructable
     private bool _runStartUpOnEnable;
     public PointerEventTrigger volumePointEventTrigger;
     public PointerEventTrigger timelinePointEventTrigger;
+    private Canvas _canvas;
+    private GameObject _pairingScreen;
+    private GameObject _overlay;
+    private GameObject _musicList;
+    private GameObject _mainScreen;
+    private GameObject _boot;
+    private GameObject _musicListContent;
+    private bool _isPairing;
 
     //public Slider volumeSlider;
 
@@ -1016,5 +1140,51 @@ public class JukeboxInstance : MonoBehaviour, IConstructable
         [HideInInspector]
         [NonSerialized]
         public int propertyId;
+    }
+
+    internal class MusicListItemController : MonoBehaviour
+    {
+        private JukeboxInstance _baseJukeBox;
+        private Image _playingIcon;
+        private string _data;
+
+        internal void Set(string data, JukeboxInstance controller)
+        {
+            _baseJukeBox = controller;
+            _data = data;
+            var text = GetComponentInChildren<Text>();
+            text.text = data;
+            _playingIcon = GameObjectHelpers.FindGameObject(gameObject, "NowPlayingIcon")?.GetComponent<Image>();
+
+            var button = GetComponentInChildren<Button>();
+            button.onClick.AddListener((() =>
+            {
+                controller.PlayTrack(data);
+            }));
+            InvokeRepeating(nameof(CheckIsPlaying), 0.3f, 0.3f);
+        }
+
+        private void CheckIsPlaying()
+        {
+            var trackResult = _baseJukeBox.file.Equals(_data);
+            _playingIcon?.gameObject?.SetActive(trackResult);
+        }
+    }
+
+    private void PlayTrack(string data)
+    {
+        SwitchTrack(data);
+        if (this.isControlling)
+        {
+            JukeboxV2.Play(this);
+        }
+    }
+
+    internal enum JukeboxPages
+    {
+        PoweringOn,
+        Pairing,
+        Home,
+        MusicList
     }
 }

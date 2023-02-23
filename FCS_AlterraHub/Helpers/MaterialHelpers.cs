@@ -664,6 +664,7 @@ namespace FCS_AlterraHub.Helpers
                     if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
                     {
                         material.shader = shader;
+                        material.EnableKeyword("MARMO_ALPHA");
                         material.EnableKeyword("MARMO_ALPHA_CLIP");
                     }
                 }
@@ -677,6 +678,7 @@ namespace FCS_AlterraHub.Helpers
             if (mat != null)
             {
                 mat.shader = shader;
+                mat.EnableKeyword("MARMO_ALPHA");
                 mat.EnableKeyword("MARMO_ALPHA_CLIP");
                 mat.SetFloat("_EnableCutOff", 1f);
                 mat.SetFloat("_Cutoff", 0.5f);
@@ -867,6 +869,7 @@ namespace FCS_AlterraHub.Helpers
                         {
                             material.mainTexture = LoadPNG(filePath);
                             material.shader = shader;
+                            material.EnableKeyword("MARMO_ALPHA");
                             material.EnableKeyword("MARMO_ALPHA_CLIP");
                         }
                     }
