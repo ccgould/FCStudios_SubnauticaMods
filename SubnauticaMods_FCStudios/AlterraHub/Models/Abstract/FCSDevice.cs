@@ -1,4 +1,5 @@
-﻿using SMLHelper.Assets;
+﻿using FCS_AlterraHub.API;
+using SMLHelper.Assets;
 using System;
 using UnityEngine;
 
@@ -40,6 +41,28 @@ namespace FCS_AlterraHub.Models.Abstract
         /// </summary>
         public virtual void Initialize() { }
 
+
+        /// <summary>
+        /// Gets the TechType of this device
+        /// </summary>
+        /// <returns></returns>
+        public TechType GetTechType()
+        {
+            return gameObject.GetComponent<TechTag>()?.type ??
+                   gameObject.GetComponentInChildren<TechTag>()?.type ??
+                   TechType.None;
+        }
+
+        /// <summary>
+        /// The prefabID of this device
+        /// </summary>
+        /// <returns></returns>
+        public virtual string GetPrefabID()
+        {
+            return gameObject.GetComponent<PrefabIdentifier>()?.Id ??
+                   gameObject.GetComponentInChildren<PrefabIdentifier>()?.Id;
+        }
+
         public virtual Vector3 GetPosition()
         {
             return transform.position;
@@ -76,6 +99,11 @@ namespace FCS_AlterraHub.Models.Abstract
         public string GetDeviceName()
         {
             return FriendlyName.Equals(string.Empty) ? UnitID : FriendlyName;
+        }
+
+        public virtual void Start() 
+        {
+            FCSModsAPI.PublicAPI.RegisterDevice(this, GetTechType());
         }
     }
 }

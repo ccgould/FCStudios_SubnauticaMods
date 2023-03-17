@@ -113,7 +113,7 @@ namespace FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Mono
             var fxController = gameObject.EnsureComponent<CubeGeneratorFxController>();
             fxController.Initialize(this);
 
-            UnitID = "IC001";
+            //UnitID = "IC001";
 
             var interaction = gameObject.GetComponent<HoverInteraction>();
             interaction.onSettingsKeyPressed += onSettingsKeyPressed;
@@ -127,8 +127,9 @@ namespace FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Mono
             //this._saveData = Mod.GetIonCubeGeneratorSaveData(id);
         }
 
-        private void Start()
+        public override void Start()
         {
+            base.Start();
             UpdatePowerRelay();
         }
 

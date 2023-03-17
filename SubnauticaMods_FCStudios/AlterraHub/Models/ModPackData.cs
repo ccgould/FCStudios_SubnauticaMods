@@ -5,6 +5,7 @@ using SMLHelper.Utility;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace FCS_AlterraHub.Models;
@@ -15,7 +16,7 @@ namespace FCS_AlterraHub.Models;
 internal class ModPackData
 {
     private string _modName;
-    private HashSet<Spawnable> _modItems = new();
+    private Dictionary<string,Spawnable> _modItems = new();
     private Assembly _assembly;
     private string _assetBundleName;
 
@@ -62,9 +63,9 @@ internal class ModPackData
     /// Adds a new mod to the ModData
     /// </summary>
     /// <param name="mod"></param>
-    internal void AddModItem(Spawnable mod)
+    internal void AddModItem(string modID,Spawnable mod)
     {
-        _modItems.Add(mod);
+        _modItems.Add(modID,mod);
     }
 
     /// <summary>
@@ -76,8 +77,22 @@ internal class ModPackData
         return _assetBundleName;
     }
 
+    internal string GetModID(TechType techType)
+    {
+        var result = _modItems.FirstOrDefault(x => x.Value.TechType == techType);
+
+        if (result.Value is null) return string.Empty;
+
+        return result.Key;
+    }
+
     internal Dictionary<string, FCSModItemSettings> GetSettings()
     {
         return FileSystemHelper.DeseriaizeSettings(GetModDirectory());
+    }
+
+    internal bool HasMod(TechType techType)
+    {
+        return _modItems.Any(x=>x.Value.TechType == techType);
     }
 }

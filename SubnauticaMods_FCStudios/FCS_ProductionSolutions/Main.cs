@@ -48,7 +48,7 @@ internal class Main : BaseUnityPlugin
 
 
             //Add mod and patch.
-            FCSModsAPI.PublicAPI.RegisterMod(MODNAME, new IonCubeGeneratorBuildable());
+            FCSModsAPI.PublicAPI.RegisterMod(MODNAME,"IC", new IonCubeGeneratorBuildable());
         }));
     }
 }

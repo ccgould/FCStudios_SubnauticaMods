@@ -48,6 +48,8 @@
     <Compile Include="Core\Helpers\TechDataHelpers.cs" />
     <Compile Include="Core\Helpers\UWEHelpers.cs" />
     <Compile Include="Core\Helpers\WorldHelpers.cs" />
+    <Compile Include="Core\Patches\Habitat_Patches.cs" />
+    <Compile Include="Core\Patches\Player_Patches.cs" />
     <Compile Include="Core\Services\AccountService.cs" />
     <Compile Include="Core\Services\EncodeDecode.cs" />
     <Compile Include="Core\Services\HabitatService.cs" />
@@ -70,9 +72,11 @@
     <Compile Include="Core\Services\EncyclopediaService.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Configuation\Config.cs" />
+    <Compile Include="Models\KnownDevice.cs" />
     <Compile Include="Models\ModPackData.cs" />
     <Compile Include="Models\Mono\BaseTeleportItem.cs" />
     <Compile Include="Models\Mono\FCSMessageBox.cs" />
+    <Compile Include="Models\Mono\HabitatManager.cs" />
     <Compile Include="Models\Mono\Handlers\MessageBoxHandler.cs" />
     <Compile Include="Models\Mono\HoverInteraction.cs" />
     <Compile Include="Models\Shipment.cs" />

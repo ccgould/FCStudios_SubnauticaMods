@@ -1,4 +1,5 @@
 ﻿using FCS_AlterraHub.Core.Services;
+using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Enumerators;
 using FCS_AlterraHub.Models.Structs;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.ScreenItems;
@@ -24,11 +25,13 @@ public interface IFCSModsAPIPublic
     /// Adds a mod to the mod pack
     /// </summary>
     /// <param name="modPackName">Name of the mod pack to add the mod to.</param>
+    /// <param name="modID">The ID of the mod. Will be used in the default name e.g DD001</param>
     /// <param name="mod"><see cref="Spawnable"/> class of the mod.</param>
-    void RegisterMod(string modName, Spawnable mod);
+    void RegisterMod(string modPackName, string modID, Spawnable mod);
     bool IsInOreBuildMode();
     string GetModBundleName(string modName, string classID);
     Dictionary<TechType, FCSStoreEntry> GetRegisteredKits();
+    void RegisterDevice(FCSDevice fCSDevice, TechType techType);
 }
 public interface IFCSModsAPIInternal
 {
@@ -49,7 +52,7 @@ public class FCSModsAPI : IFCSModsAPIPublic, IFCSModsAPIInternal
     
     public void RegisterModPack(string modName, Assembly assembly, string assetBundleName) => ModRegistrationService.Register(modName, assembly,assetBundleName);
     
-    public void RegisterMod(string modPackName, Spawnable mod) => ModRegistrationService.RegisterMod(modPackName,mod);
+    public void RegisterMod(string modPackName,string modID, Spawnable mod) => ModRegistrationService.RegisterMod(modPackName, modID, mod);
 
     public bool IsInOreBuildMode() => Main.Configuration.OreBuildMode;
 
@@ -116,5 +119,10 @@ public class FCSModsAPI : IFCSModsAPIPublic, IFCSModsAPIInternal
     public Dictionary<TechType, FCSStoreEntry> GetRegisteredKits()
     {
         return StoreInventoryService.GetRegisteredKits();
+    }
+
+    public void RegisterDevice(FCSDevice fcsDevice, TechType techType)
+    {
+        HabitatService.main.RegisterDevice(fcsDevice,techType);
     }
 }
