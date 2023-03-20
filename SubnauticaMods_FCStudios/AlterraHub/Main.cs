@@ -39,6 +39,9 @@ public class Main : BaseUnityPlugin
 
     private void Awake()
     {
+        LanguageService.AdditionalPatching();
+
+
         MaterialHelpers.GetIngameObjects();
 
         StartCoroutine(MaterialHelpers.GetGameBaseMaterial(() =>

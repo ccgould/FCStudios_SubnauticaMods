@@ -17,7 +17,7 @@ namespace FCS_AlterraHub.Models.Mono
         private int _baseID = -1;
         private string _baseName;
         
-        private string GetBaseFriendlyName()
+        public string GetBaseFriendlyName()
         {
             var baseType = _habitat.isBase ? "Base" : "Cyclops";
             return $"{baseType} {_baseID:D3}";

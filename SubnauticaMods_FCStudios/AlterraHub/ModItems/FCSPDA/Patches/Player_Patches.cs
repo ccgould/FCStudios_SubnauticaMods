@@ -42,25 +42,32 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Patches
             //    }
             //}
 
+            if ((Input.GetKeyDown(Main.Configuration.FCSPDAKeyCode) || ForceOpenPDA))
+            {
+                if (!FCSPDA.IsOpen)
+                {
+                    if (__instance.pda.isOpen)
+                    {
+                        __instance.pda.Close();
+                    }
+
+                    if (Input.GetKey(KeyCode.RightControl) || Input.GetKey(KeyCode.LeftControl))
+                    {                       
+                        FCSPDA.Screen.GoToPage(PDAPages.Teleportation);
+                        FCSPDA.Open();
+                    }
+                    else
+                    {
+                        FCSPDA.Open();
+                    }
+                }
+                ForceOpenPDA = false;
+            }
+
             _timeSinceUse += Time.deltaTime;
             if (_timeSinceUse >= 2f)
             {
-                if (Input.GetKeyDown(Main.Configuration.FCSPDAKeyCode) || ForceOpenPDA && !__instance.GetPDA().isOpen)
-                {
-                    if (!FCSPDA.IsOpen)
-                    {
-                        if (Input.GetKey(KeyCode.RightControl) || Input.GetKey(KeyCode.LeftControl))
-                        {
-                            FCSPDA.Screen.GoToPage(PDAPages.Teleportation);
-                            FCSPDA.Open();
-                        }
-                        else
-                        {
-                            FCSPDA.Open();
-                        }
-                    }
-                    ForceOpenPDA = false;
-                }
+
 
                 _timeSinceUse -= 2f;
             }

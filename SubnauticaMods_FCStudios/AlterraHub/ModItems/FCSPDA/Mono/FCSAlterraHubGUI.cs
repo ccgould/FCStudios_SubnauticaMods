@@ -511,20 +511,18 @@ public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
 
         _accountBalance.text = $"{AccountService.main.GetAccountBalance():N0}";
 
+        var currentBase = HabitatService.GetPlayersCurrentBase();
+        var friendly = currentBase?.GetBaseFriendlyName();
+        var baseId = currentBase?.GetBaseID() ?? 0;
 
-        //TODO Base Manager
-
-        //var friendly = BaseManager.GetPlayersCurrentBase()?.GetBaseName();
-        //var baseId = BaseManager.GetPlayersCurrentBase()?.GetBaseFriendlyId();
-
-        //if (!string.IsNullOrWhiteSpace(friendly))
-        //{
-        //    SetCurrentBaseInfoText($"{friendly} | {LanguageService.BaseIDFormat(baseId)}");
-        //}
-        //else
-        //{
-        //    SetCurrentBaseInfoText("N/A");
-        //}
+        if (!string.IsNullOrWhiteSpace(friendly))
+        {
+            SetCurrentBaseInfoText($"{friendly} | {LanguageService.BaseIDFormat(baseId.ToString("D3"))}");
+        }
+        else
+        {
+            SetCurrentBaseInfoText("N/A");
+        }
     }
 
     private void SetCurrentBaseInfoText(string text)

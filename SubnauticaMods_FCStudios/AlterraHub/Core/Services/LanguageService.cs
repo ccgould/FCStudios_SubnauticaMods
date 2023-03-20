@@ -111,7 +111,7 @@ internal static class LanguageService
     {
         var result = Language.main.Get(key);
 
-        if (string.IsNullOrWhiteSpace(result))
+        if (key.Equals(result))
         {
             var newKey = $"{ModKey}_{key}";
             return LanguageDictionary.ContainsKey(newKey) ? Language.main.Get(newKey) : string.Empty;

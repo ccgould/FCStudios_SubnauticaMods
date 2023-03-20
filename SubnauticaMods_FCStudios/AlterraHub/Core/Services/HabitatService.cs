@@ -146,4 +146,9 @@ public class HabitatService : MonoBehaviour
             baseManager?.UnRegisterDevice(device);
         }
     }
+
+    internal static HabitatManager GetPlayersCurrentBase()
+    {
+        return Player.main.GetCurrentSub()?.GetComponent<HabitatManager>();
+    }
 }

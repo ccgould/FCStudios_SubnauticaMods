@@ -37,7 +37,7 @@
     <Compile Include="Configuration\ModSettings.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="ModItems\Buildables\IonCubeGenerator\Buildable\IonCubeGeneratorBuildable.cs" />
-    <Compile Include="ModItems\Buildables\IonCubeGenerator\Buildable\uGUI_IonCube.cs" />
+    <Compile Include="ModItems\Buildables\IonCubeGenerator\Mono\uGUI_IonCube.cs" />
     <Compile Include="ModItems\Buildables\IonCubeGenerator\Enumerators\CubePhases.cs" />
     <Compile Include="ModItems\Buildables\IonCubeGenerator\Enumerators\IonCubeGenSpeedModes.cs" />
     <Compile Include="ModItems\Buildables\IonCubeGenerator\Interfaces\ICubeContainer.cs" />

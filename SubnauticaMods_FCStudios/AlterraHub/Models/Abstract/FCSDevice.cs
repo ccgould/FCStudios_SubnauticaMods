@@ -84,7 +84,7 @@ namespace FCS_AlterraHub.Models.Abstract
         /// <summary>
         /// If true allows this device to be seen in the Base devices list in the FCSPDA"/>
         /// </summary>
-        public bool IsVisibleInPDA;
+        public bool IsVisibleInPDA = true;
 
         public abstract bool IsDeconstructionObstacle();
 
