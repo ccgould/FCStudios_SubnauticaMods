@@ -1,11 +1,7 @@
-﻿
-
-using BepInEx;
+﻿using BepInEx;
 using FCS_AlterraHub.API;
-using FCS_AlterraHub.Configuation;
 using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Models.Interfaces;
-using FCS_AlterraHub.Models.Structs;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Buildable;
 using FCSCommon.Utilities;
@@ -45,7 +41,6 @@ internal class Main : BaseUnityPlugin
 
             //Register mod pack
             FCSModsAPI.PublicAPI.RegisterModPack(MODNAME, Assembly.GetExecutingAssembly(), ModSettings.AssetBundleName);
-
 
             //Add mod and patch.
             FCSModsAPI.PublicAPI.RegisterMod(MODNAME,"IC", new IonCubeGeneratorBuildable());

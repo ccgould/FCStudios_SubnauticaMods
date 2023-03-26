@@ -36,7 +36,7 @@ namespace FCS_AlterraHub.Core.Services
         public const string TBaseID = "fcsCore_Tex_Trim_colormask";
 
 
-        private static Dictionary<string, GameObject> loadedPrefabs => new();
+        private static Dictionary<string, GameObject> loadedPrefabs = new();
 
         internal static GameObject GetPrefab(string prefabName)
         {
@@ -45,6 +45,7 @@ namespace FCS_AlterraHub.Core.Services
                 return loadedPrefabs[prefabName];
             }
 
+            QuickLogger.Error($"Failed to get Prefab: {prefabName}");
             return null;
         }
 

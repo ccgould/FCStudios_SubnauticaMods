@@ -2,6 +2,7 @@
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_AlterraHub.ModItems.FCSPDA.Interfaces;
+using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
 using FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Enumerators;
 using FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Languages;
 using FCSCommon.Utilities;
@@ -12,7 +13,7 @@ using UnityEngine.UI;
 
 namespace FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Mono;
 
-internal class uGUI_IonCube : MonoBehaviour, IuGUIAdditionalPage
+internal class uGUI_IonCube : Page, IuGUIAdditionalPage
 {
 
     private IonCubeGeneratorController _controller;
@@ -40,9 +41,8 @@ internal class uGUI_IonCube : MonoBehaviour, IuGUIAdditionalPage
     private const float DelayedStartTime = 0.5f;
     private const float RepeatingUpdateInterval = 1f;
 
-    public const string ID = "uGUI_Ioncube";
     public event Action<PDAPages> onBackClicked;
-    public event Action<string, FCSDevice> onSettingsClicked;
+    public event Action<FCSDevice> onSettingsClicked;
 
     public void Initialize(object obj)
     {
@@ -315,13 +315,13 @@ internal class uGUI_IonCube : MonoBehaviour, IuGUIAdditionalPage
         var backButon = GameObjectHelpers.FindGameObject(gameObject, "BackBTN").GetComponent<Button>();
         backButon.onClick.AddListener(() =>
         {
-            onBackClicked?.Invoke(PDAPages.Home);
+            onBackClicked?.Invoke(PDAPages.None);
         });
 
         var settingsButon = GameObjectHelpers.FindGameObject(gameObject, "SettingsBTN").GetComponent<Button>();
         settingsButon.onClick.AddListener(() =>
         {
-            onSettingsClicked?.Invoke(ID, _controller);
+            onSettingsClicked?.Invoke(_controller);
         });
 
         return true;

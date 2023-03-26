@@ -1,6 +1,7 @@
 ﻿using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Mono;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono;
+using FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Buildable;
 using FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Enumerators;
 using FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Interfaces;
 using FCSCommon.Utilities;
@@ -291,7 +292,7 @@ namespace FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Mono
         internal void onSettingsKeyPressed()
         {
             QuickLogger.Debug("Opening Settings",true);
-            FCSPDAController.Main.OpenDeviceUI("uGUI_Ioncube", this);
+            FCSPDAController.Main.OpenDeviceUI(GetTechType(), this);
         }
 
         internal bool IsCrafting()

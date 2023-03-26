@@ -93,6 +93,9 @@ public class FCSAssetBundlesService : IFcAssetBundlesPublicService, IFcAssetBund
 
     public GameObject GetPrefabByName(string prefabName, string bundleName,string modPath, bool applyShaders = true)
     {
+
+        QuickLogger.Debug($"PrefabName: {prefabName} | BundleName: {bundleName} | ModPath: {modPath} | Apply Shaders: {applyShaders}");
+
         if (ModPrefabService.IsPrefabLoaded(prefabName))
         {
             return ModPrefabService.GetPrefab(prefabName);

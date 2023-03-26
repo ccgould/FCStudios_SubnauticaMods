@@ -56,7 +56,7 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.ScreenItems
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            _controller.GoToPage(_page);
+            _controller.GoToPage(_page,_page);
             Hover.SetActive(false);
             _label.text = string.Empty;
         }

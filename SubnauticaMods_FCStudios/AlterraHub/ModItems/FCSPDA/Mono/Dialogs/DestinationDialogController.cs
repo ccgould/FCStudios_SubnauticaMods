@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;
+using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
 {
-    internal class DestinationDialogController : MonoBehaviour
+    internal class DestinationDialogController : Page
     {
         private ToggleGroup _toggleGroup;
         private Transform _list;

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using FCS_AlterraHub.API;
 using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Models;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.ScreenItems;
@@ -9,7 +8,6 @@ using FCS_AlterraHub.ModItems.FCSPDA.Struct;
 using FCSCommon.Utilities;
 using Newtonsoft.Json;
 using UnityEngine;
-
 
 namespace FCS_AlterraHub.Core.Services;
 
@@ -155,13 +153,11 @@ internal class StoreManager : MonoBehaviour
 
     public ShipmentInfo AddItemToCart(IStoreClient sender, ShipmentInfo shipmentInfo, CartItem cartItemComponent)
     {
-
-
         if (string.IsNullOrEmpty(shipmentInfo?.OrderNumber))
         {
             shipmentInfo = new ShipmentInfo();
             shipmentInfo.OrderNumber = Guid.NewGuid().ToString("n").Substring(0, 8);
-
+            cartItemComponent.ShipmentInfo = shipmentInfo;
             AddNewItem(shipmentInfo, new List<CartItemSaveData>
            {
                cartItemComponent.Save()
@@ -171,13 +167,14 @@ internal class StoreManager : MonoBehaviour
         {
             AddNewItemToExisting(shipmentInfo, cartItemComponent.Save());
         }
+        
         sender.OnCreatedCartItem();
 
-        cartItemComponent.onRemoveBTNClicked += pendingItem =>
+        cartItemComponent.onRemoveBTNClicked += (pendingItem) =>
         {
-            AddNewItemToExisting(shipmentInfo, pendingItem.Save());
-            sender.OnRemoveCartItem(pendingItem.gameObject);
-            //Destroy(pendingItem.gameObject);
+            main.RemoveCartItem(shipmentInfo, pendingItem.Save());
+            sender.OnRemoveCartItem(pendingItem);
+            sender.OnDeletedCartItem();
         };
 
         return shipmentInfo;
@@ -207,7 +204,9 @@ internal class StoreManager : MonoBehaviour
 
     internal List<CartItemSaveData> GetCartItems(ShipmentInfo info)
     {
-        return PendingItems.FirstOrDefault(x => x.Key.OrderNumber.Equals(info.OrderNumber)).Value;
+        var result = PendingItems.FirstOrDefault(x => x.Key.OrderNumber.Equals(info.OrderNumber)).Value;
+        QuickLogger.Debug($"GetCartItems: {result.Count}");
+        return result;
     }
 
     public void CreateOrder(IStoreClient sender, ShipmentInfo shipmentInfo)
@@ -243,10 +242,11 @@ internal class StoreManager : MonoBehaviour
 
     public void RemoveCartItem(ShipmentInfo shipmentInfo, CartItemSaveData pendingItem)
     {
-
-
         if (PendingItems.Any(x => x.Key.Equals(shipmentInfo)))
+        {
+            QuickLogger.Debug("GetCartItems: Found Pending Item");
             GetCartItems(shipmentInfo).Remove(pendingItem);
+        }
     }
 
     public void RemovePendingOrder(ShipmentInfo shipmentInfo)
@@ -347,13 +347,13 @@ public class ShipmentInfo
 }
 
 
-public interface IStoreClient
+internal interface IStoreClient
 {
     public StoreClientType ClientType { get; }
     void OnOrderComplete(bool result);
     void OnCreatedCartItem();
     void OnDeletedCartItem();
-    void OnRemoveCartItem(GameObject go);
+    void OnRemoveCartItem(CartItem go);
 }
 
 public enum StoreClientType

@@ -2,13 +2,14 @@
 using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.ModItems.FCSPDA.Data.Models;
+using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;
 
-internal class EncyclopediaTabController : MonoBehaviour, uGUI_IListEntryManager
+internal class EncyclopediaTabController : Page, uGUI_IListEntryManager
 {
     private CraftNode _pdaEncyclopediaTree => PDAEncyclopedia.tree;
     private Dictionary<string, PDAEncyclopedia.EntryData> _pdaEntrees => PDAEncyclopedia.mapping;

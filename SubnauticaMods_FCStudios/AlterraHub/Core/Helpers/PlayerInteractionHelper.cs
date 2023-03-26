@@ -1,4 +1,5 @@
 ﻿using FCS_AlterraHub.Core.Services;
+using FCS_AlterraHub.ModItems.Spawnables.DebitCard.Spawnable;
 using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
@@ -66,7 +67,7 @@ namespace FCS_AlterraHub.Core.Helpers
 
         public static bool HasCard()
         {
-            return Inventory.main.container.Contains(AccountService.main.CardTechType);
+            return Inventory.main.container.Contains(DebitCardSpawnable.PatchedTechType);
         }
 
         public static bool CanPlayerHold(TechType techType)

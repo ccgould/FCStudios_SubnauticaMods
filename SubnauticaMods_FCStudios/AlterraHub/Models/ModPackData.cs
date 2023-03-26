@@ -91,6 +91,11 @@ internal class ModPackData
         return FileSystemHelper.DeseriaizeSettings(GetModDirectory());
     }
 
+    internal Spawnable GetSpawnable(TechType techType)
+    {
+        return _modItems.FirstOrDefault(x => x.Value.TechType == techType).Value;
+    }
+
     internal bool HasMod(TechType techType)
     {
         return _modItems.Any(x=>x.Value.TechType == techType);

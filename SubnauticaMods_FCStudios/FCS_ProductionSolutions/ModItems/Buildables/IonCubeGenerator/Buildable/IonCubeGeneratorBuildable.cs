@@ -1,19 +1,24 @@
 ﻿using FCS_AlterraHub.API;
 using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Core.Services;
+using FCS_AlterraHub.Models;
 using FCS_AlterraHub.Models.Abstract;
+using FCS_AlterraHub.Models.Enumerators;
 using FCS_AlterraHub.Models.Mono;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono;
 using FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Mono;
 using FCSCommon.Helpers;
 using SMLHelper.Crafting;
 using System.Collections;
+using System.IO;
 using UnityEngine;
 
 namespace FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Buildable;
 
 internal class IonCubeGeneratorBuildable : FCSBuildableModBase
 {
+    private TechType _kitTechType;
+
     /// <summary>
     /// A class that defines the IonCube Generator mod
     /// Created by: Primesonic and FCStudios.
@@ -23,9 +28,18 @@ internal class IonCubeGeneratorBuildable : FCSBuildableModBase
 
         var bundleName = FCSModsAPI.PublicAPI.GetModBundleName(Main.MODNAME, ClassID);
 
+
+        OnStartedPatching += () =>
+        {
+            var kit = new FCSKit(ClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
+            kit.PatchSMLHelper();
+            _kitTechType = kit.TechType;
+        };
+
         OnFinishedPatching += () => 
         {            
-            FCSPDAController.AddAdditionalPage<uGUI_IonCube>(uGUI_IonCube.ID, FCSAssetBundlesService.PublicAPI.GetPrefabByName("uGUI_Ioncube", bundleName, FileSystemHelper.ModDirLocation, false));
+            FCSPDAController.AddAdditionalPage<uGUI_IonCube>(TechType, FCSAssetBundlesService.PublicAPI.GetPrefabByName("uGUI_Ioncube", bundleName, FileSystemHelper.ModDirLocation, false));
+            FCSModsAPI.PublicAPI.CreateStoreEntry(TechType, _kitTechType,1, 90000, StoreCategory.Production);
             //uGUIService.AddNewUI<IonCubeGeneratorGUI>("IonCubeGenUI", FCSAssetBundlesService.PublicAPI.GetPrefabByName("IonCubeGenerator_uGUI", bundleName, FileSystemHelper.ModDirLocation,false), new Vector3(1.8f, 1.8f, 1.8f));
         };
     }
@@ -49,12 +63,7 @@ internal class IonCubeGeneratorBuildable : FCSBuildableModBase
         {
             Ingredients =
                 {
-                    //new Ingredient(AlienIngot.TechTypeID, 2),
-                    //new Ingredient(AlienEletronicsCase.TechTypeID, 1),
-
-                    new Ingredient(TechType.Glass, 1),
-                    new Ingredient(TechType.Lubricant, 1),
-                    new Ingredient(TechType.Kyanite, 2),
+                    new Ingredient(_kitTechType, 1),
                 }
         };
     }

@@ -3,6 +3,7 @@ using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Enumerators;
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
+using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
 using FCS_AlterraHub.ModItems.Spawnables.DebitCard.Spawnable;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -10,7 +11,7 @@ using UnityEngine.UI;
 
 namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs
 {
-    internal class AccountPageHandler
+    internal class AccountPageHandler : Page
     {
         private string _fullName;
         private string _userName;
@@ -26,12 +27,12 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs
         private GameObject _createAccountDialog;
         private Text _requestButtonText;
         private IFCSAlterraHubGUI _mono;
-        private readonly Text _sliderText;
-        private readonly Slider _slider;
-        private readonly Toggle _deductionToggle;
+        private  Text _sliderText;
+        private  Slider _slider;
+        private Toggle _deductionToggle;
         private FCSAlterraHubGUISender _sender;
 
-        internal AccountPageHandler(FCSAlterraHubGUI mono)
+        internal void Initialize(FCSAlterraHubGUI mono)
         {
             _mono = mono;
             _sender = mono.SenderType;
@@ -292,6 +293,12 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs
         public bool GetAutomaticDebitDeduction()
         {
             return _deductionToggle.isOn;
+        }
+
+        public override void Enter(object arg = null)
+        {
+            base.Enter();
+            UpdateRequestBTN(AccountService.main.HasBeenRegistered());
         }
     }
 }

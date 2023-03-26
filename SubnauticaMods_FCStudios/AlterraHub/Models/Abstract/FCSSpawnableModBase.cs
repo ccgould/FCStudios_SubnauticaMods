@@ -1,7 +1,7 @@
 ﻿using FCS_AlterraHub.API;
 using FCS_AlterraHub.Core.Services;
+using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.Models.Structs;
-using FCSCommon.Helpers;
 using SMLHelper.Utility;
 using System.Collections;
 using System.IO;
@@ -9,20 +9,29 @@ using UnityEngine;
 
 namespace FCS_AlterraHub.Models.Abstract
 {
-    public abstract class FCSSpawnableModBase : SMLHelper.Assets.Spawnable
+    public abstract class FCSSpawnableModBase : SMLHelper.Assets.Spawnable, IModBase
     {
-        private GameObject _prefab;
+        protected GameObject _prefab;
         private FCSModItemSettings _settings;
+        private string _modName;
+
         public override string AssetsFolder { get; }
 
         public GameObject Prefab { get; private set; }
 
-        protected FCSSpawnableModBase(FCSModItemSettings settings) : base(settings.ClassId, settings.FriendlyName, settings.Description)
+        protected FCSSpawnableModBase(string modName, string prefabName, string modDir, string classId, string friendlyName) : base(classId, friendlyName, string.Empty)
         {
-            AssetsFolder = ModRegistrationService.GetModPackData(settings.MODNAME)?.GetAssetPath();
-            _prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName(settings.PrefabName, ModRegistrationService.GetModPackData(Main.MODNAME)?.GetBundleName(),FileSystemHelper.ModDirLocation);
-            _settings = settings;
+            _modName = modName;
+            AssetsFolder = ModRegistrationService.GetModPackData(modName)?.GetAssetPath();
+            _prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName(prefabName, ModRegistrationService.GetModPackData(modName)?.GetBundleName(), modDir);
         }
+
+        public virtual void PatchSMLHelper()
+        {
+            _settings = FCSModsAPI.InternalAPI.GetModSettings(_modName, ClassID);
+            Patch();
+        }
+
 
         public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
         {

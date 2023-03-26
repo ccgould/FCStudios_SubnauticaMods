@@ -1,7 +1,7 @@
 ﻿using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Abstract;
-using FCS_AlterraHub.Models.Structs;
 using FCS_AlterraHub.ModItems.Spawnables.DebitCard.Mono;
+using FCSCommon.Helpers;
 using System.Collections;
 using UnityEngine;
 
@@ -13,7 +13,7 @@ internal class DebitCardSpawnable : FCSSpawnableModBase
 
     public static TechType PatchedTechType { get; private set; }
 
-    public DebitCardSpawnable(FCSModItemSettings settings) : base(settings)
+    public DebitCardSpawnable() : base(Main.MODNAME, "CreditCard", FileSystemHelper.ModDirLocation, "DebitCard", "Debit Card")
     {
         OnFinishedPatching += () =>
         {

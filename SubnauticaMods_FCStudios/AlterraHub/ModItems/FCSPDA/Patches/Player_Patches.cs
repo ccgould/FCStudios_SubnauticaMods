@@ -86,7 +86,6 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Patches
         private static void Awake_Postfix(Player __instance)
         {
             QuickLogger.Debug("Player Awake", true);
-            __instance.gameObject.EnsureComponent<AccountService>();
             CoroutineHost.StartCoroutine(CreateFcsPda(__instance));
         }
 
@@ -106,7 +105,7 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Patches
 
             pda.EnsureComponent<Rigidbody>().isKinematic = true;
             var controller = pda.AddComponent<FCSPDAController>();
-
+            controller.CreateScreen();
             FCSPDA = controller;
             controller.PDAObj = defPDA;
             controller.SetInstance();

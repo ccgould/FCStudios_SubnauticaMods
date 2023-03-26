@@ -29,6 +29,8 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.ScreenItems
             set => _returnAmount = value;
         }
 
+        public ShipmentInfo ShipmentInfo { get; internal set; }
+
         internal Action<CartItem> onRemoveBTNClicked;
         private int _returnAmount;
 

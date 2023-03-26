@@ -12,6 +12,9 @@ namespace FCS_AlterraHub.Core.Patches
         private static void Awake_Postfix(Player __instance)
         {
             new GameObject("HabitatService").AddComponent<HabitatService>();
+            new GameObject("StoreManager").AddComponent<StoreManager>();
+            new GameObject("VoiceNotificationService").AddComponent<VoiceNotificationService>();
+            new GameObject("AccountService").AddComponent<AccountService>();
         }
     }
 }

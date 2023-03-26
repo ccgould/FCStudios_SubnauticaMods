@@ -5,6 +5,7 @@ using FCS_AlterraHub.Models.Enumerators;
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.Models.Mono.Handlers;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
+using FCS_AlterraHub.ModItems.Spawnables.DebitCard.Spawnable;
 using FCSCommon.Utilities;
 using System;
 using System.Collections;
@@ -73,8 +74,6 @@ namespace FCS_AlterraHub.Core.Services
             _amount += amount;
         }
 
-
-        public TechType CardTechType { get; set; }
         public bool IsLoaded { get; private set; }
         public AccountDetails AccountDetails { get => _accountDetails; set => _accountDetails = value; }
 
@@ -323,8 +322,7 @@ namespace FCS_AlterraHub.Core.Services
                     MessageBoxHandler.ShowMessage(LanguageService.AccountCreated(GetAccountBalance().ToString("N0")), sender);
                     if (!PlayerInteractionHelper.HasCard())
                     {
-                        var newCard = PlayerInteractionHelper.GivePlayerItem(CardTechType);
-                        //GenerateNewCard(newCard.gameObject.GetComponent<PrefabIdentifier>().Id);
+                        PlayerInteractionHelper.GivePlayerItem(DebitCardSpawnable.PatchedTechType);
                     }
 
                     VoiceNotificationService.main.Play("PDA_Account_Created_key");

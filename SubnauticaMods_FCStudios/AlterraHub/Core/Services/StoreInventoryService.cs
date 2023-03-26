@@ -1,4 +1,5 @@
 ﻿using FCS_AlterraHub.API;
+using FCS_AlterraHub.Models.Enumerators;
 using FCS_AlterraHub.Models.Structs;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.ScreenItems;
 using System;
@@ -118,5 +119,22 @@ internal class StoreInventoryService
     internal static Dictionary<TechType, FCSStoreEntry> GetRegisteredKits()
     {
         return _storeItems;
+    }
+
+    public static void CreateStoreEntry(TechType techType, TechType receiveTechType, int returnAmount, decimal cost, StoreCategory category, bool forceUnlocked = false)
+    {
+        if (!_storeItems.ContainsKey(techType))
+        {
+            _storeItems.Add(techType,
+                new FCSStoreEntry
+                {
+                    TechType = techType,
+                    ReceiveTechType = receiveTechType,
+                    Cost = cost,
+                    ReturnAmount = returnAmount,
+                    StoreCategory = category,
+                    ForcedUnlock = forceUnlocked
+                });
+        }
     }
 }

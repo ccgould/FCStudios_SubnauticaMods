@@ -4,6 +4,7 @@ using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Enumerators;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
+using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
 using FCS_AlterraHub.ModItems.FCSPDA.Patches;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -96,13 +97,12 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono
 
             Screen.RefreshTeleportationPage();
 
-            CreateScreen();
-
             FindPDA();
 
             ChangePDAVisibility(false);
 
-            Screen.AttemptToOpenReturnsDialog();
+            //TODO I dont know why i did this
+            //Screen.AttemptToOpenReturnsDialog();
 
             Screen.UpdateDisplay();
 
@@ -125,15 +125,26 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono
             if (_screen == null)
             {
                _screen = Instantiate(FCSAssetBundlesService.PublicAPI.GetLocalPrefab("uGUI_PDAScreen"));
+                Screen = _screen.AddComponent<FCSAlterraHubGUI>();
+                Screen.SetInstance(FCSAlterraHubGUISender.PDA);
             }
+        }
+
+        internal FCSAlterraHubGUI GetGUI()
+        {
+            if(_FCSPDAUI is null)
+            {
+                _FCSPDAUI =  _screen.GetComponent<FCSAlterraHubGUI>();
+            }
+            return _FCSPDAUI;
         }
 
         public void Close()
         {
             IsOpen = false;
 
-            if (Screen.CurrentPage() == PDAPages.DevicePage)
-                Screen.GoToPage(PDAPages.Home);
+            ResetToHome();
+
             ChangePDAVisibility(true);
             gameObject.SetActive(false);
             SetPDAInUse(false);
@@ -172,15 +183,16 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono
             QuickLogger.Debug("FCS PDA Is Closed", true);
         }
 
+        private void ResetToHome()
+        {
+            if (Screen.CurrentPage() == PDAPages.DevicePage || Screen.CurrentPage() == PDAPages.DeviceSettings)
+                Screen.PurgePages();
+        }
+
         internal void SetInstance()
         {
             if (_isInitialized) return;
-            CreateScreen();
-
-            Screen = _screen.AddComponent<FCSAlterraHubGUI>();
-
-            Screen.SetInstance(FCSAlterraHubGUISender.PDA);
-
+                      
             _pdaAnchor = GameObjectHelpers.FindGameObject(gameObject, "ScreenAnchor").transform;
 
             _canvasScalar = Screen.gameObject.AddComponent<uGUI_CanvasScaler>();
@@ -396,9 +408,10 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono
             Main.Close();
         }
 
-        static Dictionary<string,GameObject> additionPages = new();
+        static Dictionary<TechType,GameObject> additionPages = new();
+        private FCSAlterraHubGUI _FCSPDAUI;
 
-        public static void AddAdditionalPage<T>(string id,GameObject ui) where T : Component
+        public static void AddAdditionalPage<T>(TechType id,GameObject ui) where T : Component
         {
             ui.EnsureComponent<T>();
             additionPages.Add(id,ui); 
@@ -420,7 +433,7 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono
         /// </summary>
         /// <param name="id">Id of the UI to display</param>
         /// <param name="fcsDevice">The device to change the settings on.</param>
-        public void OpenDeviceUI(string id, FCSDevice fcsDevice)
+        public void OpenDeviceUI(TechType id, FCSDevice fcsDevice)
         {
             Open();
             Screen.PrepareDevicePage(id, fcsDevice);

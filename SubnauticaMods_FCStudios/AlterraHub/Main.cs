@@ -54,7 +54,8 @@ public class Main : BaseUnityPlugin
             ////Add mod           
             //FCSModsAPI.PublicAPI.RegisterMod(MODNAME,new TestBuildable());
 
-
+            //Add mod and patch.
+            FCSModsAPI.PublicAPI.RegisterMod(MODNAME, "DC", new DebitCardSpawnable());
             // FCSModsAPI.PublicAPI.RegisterMod(MODNAME,
             //new DebitCardSpawnable(new Models.Structs.FCSModItemSettings(MODNAME)
             //{

@@ -1,24 +1,26 @@
 ﻿using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Structs;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
+using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
 using Steamworks;
 using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static UWE.Utils;
 
 namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs
 {
-    internal class PDADeviceSettingsPage : MonoBehaviour
+    internal class PDADeviceSettingsPage : Page
     {
         private Toggle _visiblityToggle;
         private TMP_InputField _friendlyNameInput;
-        private string _uiID;
         private FCSAlterraHubGUI _gui;
         private FCSDevice _device;
 
         private void Awake()
         {
+            _gui = FCSPDAController.Main.GetGUI();
             _visiblityToggle = gameObject.GetComponentInChildren<Toggle>();
             _visiblityToggle.onValueChanged.AddListener((b) =>
             {
@@ -34,23 +36,16 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs
             var backButton = gameObject.GetComponentInChildren<Button>();
             backButton.onClick.AddListener(() =>
             {
-                _gui.GoToPage(PDAPages.DevicePage,new Tuple<string,FCSDevice>(_uiID,_device));
+                _gui.GoToPage(PDAPages.None);
             });
         }
 
-        internal void Show(FCSAlterraHubGUI gui,string uiID, FCSDevice args)
+        public override void Enter(object arg = null)
         {
-            _uiID = uiID;
-            _gui = gui;
-            _device = args;
-            gameObject.SetActive(true);
-            _visiblityToggle?.SetIsOnWithoutNotify(args.IsVisibleInPDA);
-            _friendlyNameInput.SetTextWithoutNotify(args.GetDeviceName());
-        }
-
-        internal void Hide()
-        {
-            gameObject.SetActive(false);
+            base.Enter(arg);
+            _device = (FCSDevice)arg;
+            _visiblityToggle?.SetIsOnWithoutNotify(_device.IsVisibleInPDA);
+            _friendlyNameInput.SetTextWithoutNotify(_device.GetDeviceName());
         }
     }
 }

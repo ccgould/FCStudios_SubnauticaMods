@@ -2,6 +2,7 @@
 
 public enum PDAPages
 {
+    None = -1,
     Home = 0,
     Store = 1,
     StorePage = 2,
@@ -17,5 +18,6 @@ public enum PDAPages
     Shipment = 12,
     Teleportation = 13,
     DeviceSettings = 14,
-    DevicePage = 15
+    DevicePage = 15,
+    BaseDevices = 16,
 }

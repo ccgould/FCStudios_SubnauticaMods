@@ -8,7 +8,7 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Interfaces;
 public interface IuGUIAdditionalPage
 {
     public event Action<PDAPages> onBackClicked;
-    public event Action<string,FCSDevice> onSettingsClicked;
+    public event Action<FCSDevice> onSettingsClicked;
 
     void Hide();
     void Initialize(object obj);

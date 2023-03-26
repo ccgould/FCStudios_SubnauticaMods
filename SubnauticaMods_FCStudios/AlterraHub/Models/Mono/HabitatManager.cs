@@ -86,5 +86,25 @@ namespace FCS_AlterraHub.Models.Mono
             
             _baseID = id;
         }
+
+        internal Dictionary<string, List<FCSDevice>> GetDevicesList()
+        {
+            var result = new Dictionary<string, List<FCSDevice>>();
+
+            foreach (var device in _registeredDevices)
+            {
+                var modName = ModRegistrationService.GetModName(device);
+                if(result.ContainsKey(modName))
+                {
+                    result[modName].Add(device);
+                }
+                else
+                {
+                    result.Add(modName,new List<FCSDevice>() { device});
+                }
+            }
+
+            return result;
+        }
     }
 }

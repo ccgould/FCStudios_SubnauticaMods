@@ -26,6 +26,10 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Subnautica\BepInEx\plugins\FCS_AlterraHub\System.Memory.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -40,6 +44,9 @@
     <Compile Include="Core\Extensions\CollectionExtentions.cs" />
     <Compile Include="Core\Extensions\SpriteExtensions.cs" />
     <Compile Include="Core\Extensions\StringExtensions.cs" />
+    <Compile Include="Core\Helpers\CSVHelper\CSVParser.cs" />
+    <Compile Include="Core\Helpers\CSVHelper\Delimiter.cs" />
+    <Compile Include="Core\Helpers\CSVHelper\DelimiterExtensions.cs" />
     <Compile Include="Core\Helpers\FModHelpers.cs" />
     <Compile Include="Core\Helpers\GameObjectHelpers.cs" />
     <Compile Include="Core\Helpers\MaterialHelpers.cs" />
@@ -66,6 +73,7 @@
     <Compile Include="Models\Abstract\FCSSpawnableModBase.cs" />
     <Compile Include="Models\AccountDetails.cs" />
     <Compile Include="Models\Enumerators\StoreCategory.cs" />
+    <Compile Include="Models\FCSKit.cs" />
     <Compile Include="Models\Interfaces\IFCSAlterraHubGUI.cs" />
     <Compile Include="Models\Interfaces\IModBase.cs" />
     <Compile Include="Models\Interfaces\IModSettingsBase.cs" />
@@ -88,6 +96,9 @@
     <Compile Include="ModItems\FCSPDA\Enums\FCSAlterraHubGUISender.cs" />
     <Compile Include="ModItems\FCSPDA\Enums\PDAPages.cs" />
     <Compile Include="ModItems\FCSPDA\Interfaces\IuGUIAdditionalPage.cs" />
+    <Compile Include="ModItems\FCSPDA\Mono\DeviceCatergory.cs" />
+    <Compile Include="ModItems\FCSPDA\Mono\DeviceEntry.cs" />
+    <Compile Include="ModItems\FCSPDA\Mono\DevicePageController.cs" />
     <Compile Include="ModItems\FCSPDA\Mono\Dialogs\AlterraHubDepotItemController.cs" />
     <Compile Include="ModItems\FCSPDA\Mono\Dialogs\AlterraHubReturnItemController.cs" />
     <Compile Include="ModItems\FCSPDA\Mono\Dialogs\CartDropDownHandler.cs" />
@@ -95,8 +106,12 @@
     <Compile Include="ModItems\FCSPDA\Mono\Dialogs\DestinationDialogController.cs" />
     <Compile Include="ModItems\FCSPDA\Mono\Dialogs\ReturnsDialogController.cs" />
     <Compile Include="ModItems\FCSPDA\Mono\Dialogs\ShipmentPageController.cs" />
+    <Compile Include="ModItems\FCSPDA\Mono\Dialogs\StoreItemPageController.cs" />
     <Compile Include="ModItems\FCSPDA\Mono\Dialogs\TeleportationPageController.cs" />
     <Compile Include="ModItems\FCSPDA\Mono\Dialogs\PDADeviceSettingsPage.cs" />
+    <Compile Include="ModItems\FCSPDA\Mono\Dialogs\BlankPageController.cs" />
+    <Compile Include="ModItems\FCSPDA\Mono\Model\MenuController.cs" />
+    <Compile Include="ModItems\FCSPDA\Mono\Model\Page.cs" />
     <Compile Include="ModItems\FCSPDA\Mono\ShipmentTracker.cs" />
     <Compile Include="ModItems\FCSPDA\Mono\FCSAlterraHubGUI.cs" />
     <Compile Include="ModItems\FCSPDA\Mono\FCSPDAController.cs" />
@@ -107,6 +122,7 @@
     <Compile Include="ModItems\FCSPDA\Mono\ScreenItems\StoreItem.cs" />
     <Compile Include="ModItems\Buildables\TestObject\Buildable\TestBuildable.cs" />
     <Compile Include="ModItems\Buildables\TestObject\Mono\TestController.cs" />
+    <Compile Include="ModItems\FCSPDA\Mono\StorePageController.cs" />
     <Compile Include="ModItems\FCSPDA\Patches\InGameMenuQuitPatcher.cs" />
     <Compile Include="ModItems\FCSPDA\Patches\Player_Patches.cs" />
     <Compile Include="ModItems\FCSPDA\Struct\CartItemSaveData.cs" />

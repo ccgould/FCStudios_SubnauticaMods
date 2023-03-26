@@ -4,6 +4,7 @@ using FCS_AlterraHub.Models.Enumerators;
 using FCS_AlterraHub.Models.Structs;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.ScreenItems;
 using FCSCommon.Utilities;
+using FMOD;
 using SMLHelper.Assets;
 using System;
 using System.Collections.Generic;
@@ -32,6 +33,7 @@ public interface IFCSModsAPIPublic
     string GetModBundleName(string modName, string classID);
     Dictionary<TechType, FCSStoreEntry> GetRegisteredKits();
     void RegisterDevice(FCSDevice fCSDevice, TechType techType);
+    void CreateStoreEntry(TechType parentTechType, TechType receiveTechType,int returnAmount, decimal cost, StoreCategory energy);
 }
 public interface IFCSModsAPIInternal
 {
@@ -83,7 +85,7 @@ public class FCSModsAPI : IFCSModsAPIPublic, IFCSModsAPIInternal
                 return listOfModSettings[classID];
             }
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             QuickLogger.Error(ex.Message);
             QuickLogger.Error(ex.StackTrace);
@@ -124,5 +126,10 @@ public class FCSModsAPI : IFCSModsAPIPublic, IFCSModsAPIInternal
     public void RegisterDevice(FCSDevice fcsDevice, TechType techType)
     {
         HabitatService.main.RegisterDevice(fcsDevice,techType);
+    }
+
+    public void CreateStoreEntry(TechType parentTechType, TechType receiveTechType, int returnAmount, decimal cost, StoreCategory category)
+    {
+        StoreInventoryService.CreateStoreEntry(parentTechType, receiveTechType, returnAmount, cost, category);
     }
 }

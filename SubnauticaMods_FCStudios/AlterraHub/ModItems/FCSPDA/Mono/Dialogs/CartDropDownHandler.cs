@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FCS_AlterraHub.API;
 using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Interfaces;
@@ -13,6 +14,7 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;
 
 internal class CartDropDownHandler : MonoBehaviour, IStoreClient
 {
+    internal static CartDropDownHandler main;
     public Action<CartDropDownHandler> OnBuyAllBtnClick;
     private GameObject _cartList;
     private Text _totalAmount;
@@ -20,12 +22,17 @@ internal class CartDropDownHandler : MonoBehaviour, IStoreClient
     private ShipmentInfo _shipmentInfo;
     private IFCSAlterraHubGUI _mono;
 
-    internal void Initialize(FCSAlterraHubGUI mono)
+    internal void Initialize()
     {
-        _mono = mono;
+        main = this;
+        _mono = FCSPDAController.Main.GetGUI();
         _cartList = GameObjectHelpers.FindGameObject(gameObject, "CartDropDownContent");
         _totalAmount = GameObjectHelpers.FindGameObject(gameObject, "TotalAmount").GetComponent<Text>();
         ResetDropDown();
+
+       var result =  ModPrefabService.LoadAsset("CartItem", FCSAssetBundlesService.PublicAPI.GetAssetBundleByName(FCSAssetBundlesService.PublicAPI.GlobalBundleName), out var go, false);
+
+        QuickLogger.Info($"Cart Item Result; {result}");
 
         var buyAllButton = GameObjectHelpers.FindGameObject(gameObject, "BuyButton").GetComponent<Button>();
         buyAllButton.onClick.AddListener(() =>
@@ -73,7 +80,6 @@ internal class CartDropDownHandler : MonoBehaviour, IStoreClient
         if (StoreManager.main.GetCartCount(_shipmentInfo) < slots)
         {
             CreateCartItem(item, receiveTechType, returnAmount);
-            UpdateTotalAmount();
         }
         else
         {
@@ -83,24 +89,13 @@ internal class CartDropDownHandler : MonoBehaviour, IStoreClient
 
     private void CreateCartItem(TechType item, TechType receiveTechType, int returnAmount)
     {
-        var cartItem = GameObject.Instantiate(ModPrefabService.GetPrefab("DebitCard"));
+        var cartItem = GameObject.Instantiate(ModPrefabService.GetPrefab("CartItem"));
         var cartItemComponent = cartItem.AddComponent<CartItem>();
         cartItemComponent.TechType = item;
         cartItemComponent.ReceiveTechType = receiveTechType;
         cartItemComponent.ReturnAmount = returnAmount;
         cartItem.transform.SetParent(_cartList.transform, false);
         _shipmentInfo = StoreManager.main.AddItemToCart(this, _shipmentInfo, cartItemComponent);
-
-        cartItemComponent.onRemoveBTNClicked += pendingItem =>
-        {
-            QuickLogger.Debug("Remove Item.", true);
-            StoreManager.main.RemoveCartItem(_shipmentInfo, pendingItem.Save());
-            QuickLogger.Debug("Remove Pending Item.", true);
-            Destroy(pendingItem.gameObject);
-            QuickLogger.Debug("Destroy Item.", true);
-            UpdateTotalAmount();
-            QuickLogger.Debug("Updated Amount.", true);
-        };
     }
 
     private void ResetDropDown()
@@ -118,11 +113,9 @@ internal class CartDropDownHandler : MonoBehaviour, IStoreClient
 
     private void UpdateTotalAmount()
     {
-        QuickLogger.Debug("Updating Total Amount");
         _totalAmount.text = GetTotal().ToString("n0");
-        QuickLogger.Debug("Updating Total Amount");
         onTotalChanged?.Invoke(GetTotal());
-        QuickLogger.Debug("Updating Total Amount");
+        QuickLogger.Debug("Updated Total Amount");
     }
 
     internal decimal GetTotal()
@@ -155,14 +148,17 @@ internal class CartDropDownHandler : MonoBehaviour, IStoreClient
 
     public void OnCreatedCartItem()
     {
+        UpdateTotalAmount();
     }
 
     public void OnDeletedCartItem()
     {
+        UpdateTotalAmount();
     }
 
-    public void OnRemoveCartItem(GameObject go)
+    public void OnRemoveCartItem(CartItem cartItem)
     {
+        Destroy(cartItem.gameObject);
     }
 
     public ShipmentInfo GetShipmentInfo()

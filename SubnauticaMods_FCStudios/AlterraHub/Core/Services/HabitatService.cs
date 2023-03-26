@@ -151,4 +151,12 @@ public class HabitatService : MonoBehaviour
     {
         return Player.main.GetCurrentSub()?.GetComponent<HabitatManager>();
     }
+
+    internal Dictionary<string, List<FCSDevice>> GetDevicesInCurrentBase()
+    {
+        var currentBase = GetPlayersCurrentBase();
+
+        return currentBase.GetDevicesList();
+
+    }
 }

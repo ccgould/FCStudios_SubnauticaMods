@@ -3,7 +3,6 @@ using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.Models.Structs;
-using FCSCommon.Helpers;
 using SMLHelper.Utility;
 using System.Collections;
 using System.IO;
@@ -36,6 +35,7 @@ namespace FCS_AlterraHub.Models.Abstract
         public virtual void PatchSMLHelper() 
         {
             _settings = FCSModsAPI.InternalAPI.GetModSettings(_modName,ClassID);
+            Description = _settings.Description;
             Patch();
         }
 

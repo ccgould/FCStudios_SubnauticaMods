@@ -1,4 +1,5 @@
 ﻿using FCS_AlterraHub.Models;
+using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Interfaces;
 using FCSCommon.Utilities;
 using SMLHelper.Assets;
@@ -6,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using static System.Xml.Xsl.Xslt.XslAstAnalyzer;
+
 
 namespace FCS_AlterraHub.Core.Services;
 
@@ -15,7 +16,8 @@ namespace FCS_AlterraHub.Core.Services;
 /// </summary>
 internal static class ModRegistrationService
 {
-    private static Dictionary<string, ModPackData> _registeredMods = new(); 
+    private static Dictionary<string, ModPackData> _registeredMods = new();
+    private static Dictionary<TechType, Spawnable> modNameCache = new();
 
     /// <summary>
     /// Checks if the modPack by the provided name exist in memory.
@@ -81,5 +83,25 @@ internal static class ModRegistrationService
         if (result.Value is null) return string.Empty;
 
         return result.Value.GetModID(techType);
+    }
+
+    internal static string GetModName(FCSDevice device)
+    {
+        var techType = device.GetTechType();
+        if (modNameCache.ContainsKey(techType))
+        {
+            return modNameCache[techType].FriendlyName;
+        }
+
+        var result = _registeredMods.FirstOrDefault(x => x.Value.HasMod(techType) == true);
+
+        if(result.Value is null) return string.Empty;
+
+        var spawnable = result.Value.GetSpawnable(techType);
+        
+
+        modNameCache.Add(techType,spawnable);
+
+        return spawnable.FriendlyName;
     }
 }
