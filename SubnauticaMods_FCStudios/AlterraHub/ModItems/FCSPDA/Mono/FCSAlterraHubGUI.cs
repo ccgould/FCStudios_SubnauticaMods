@@ -1,10 +1,8 @@
 ﻿using FCS_AlterraHub.Core.Helpers;
-using FCS_AlterraHub.Models.Enumerators;
 using FCS_AlterraHub.Models.Mono.Handlers;
 using FCS_AlterraHub.Models.Mono;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.ScreenItems;
 using FCSCommon.Utilities;
-using SMLHelper.Utility;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,12 +11,10 @@ using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;
-using FCS_AlterraHub.Models;
 using FCS_AlterraHub.API;
 using FCS_AlterraHub.ModItems.FCSPDA.Interfaces;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
-using static UWE.Utils;
 
 namespace FCS_AlterraHub.ModItems.FCSPDA.Mono;
 
@@ -40,6 +36,7 @@ public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
     private Text _currentBaseInfo;
     private TeleportationPageController _teleportationPageController;
     private GameObject _404;
+    public Action<TechType> OnInfoButtonClicked;
     internal EncyclopediaTabController EncyclopediaTabController { get; set; }
 
     private bool _isInitialized;
@@ -101,6 +98,7 @@ public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
         DevicePage();
         TeleportationPage();
 
+        OnInfoButtonClicked += EncyclopediaTabController.OpenEntry;
         _menuController.Initialize();
         //MaterialHelpers.ApplyEmissionShader(AlterraHub.BasePrimaryCol, gameObject, Color.white, 0, 0.01f, 0.01f);
         //MaterialHelpers.ApplySpecShader(AlterraHub.BasePrimaryCol, gameObject, 1, 6.15f);
@@ -414,6 +412,7 @@ public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
     private void OnDestroy()
     {
         _accountPageHandler = null;
+        OnInfoButtonClicked -= EncyclopediaTabController.OpenEntry;
     }
 
     internal void LoadFromSave(ShipmentInfo shipmentInfo)

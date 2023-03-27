@@ -2,7 +2,9 @@
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_AlterraHub.ModItems.FCSPDA.Interfaces;
+using FCS_AlterraHub.ModItems.FCSPDA.Mono;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
+using FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Buildable;
 using FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Enumerators;
 using FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Languages;
 using FCSCommon.Utilities;
@@ -10,6 +12,8 @@ using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+
+
 
 namespace FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Mono;
 
@@ -309,6 +313,12 @@ internal class uGUI_IonCube : Page, IuGUIAdditionalPage
 
         overClocking.GetComponent<TMP_Text>().text = GetLanguage(DisplayLanguagePatching.OverClockKey);
         #endregion
+
+        var infoBTN = GameObjectHelpers.FindGameObject(gameObject, "InfoBTN").GetComponent<Button>();
+        infoBTN.onClick.AddListener(() =>
+        {
+            FCSPDAController.Main.GetGUI().OnInfoButtonClicked?.Invoke(IonCubeGeneratorBuildable.PatchedTechType);
+        });
 
         _deviceName = GameObjectHelpers.FindGameObject(gameObject, "Label").GetComponent<Text>();
 

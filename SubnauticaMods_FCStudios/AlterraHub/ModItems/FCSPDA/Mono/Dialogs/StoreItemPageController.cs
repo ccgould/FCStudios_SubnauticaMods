@@ -49,8 +49,8 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs
 
         private void UpdateCartValues()
         {
-            _cartAmountLabel.text = $"Cart Amount: {StoreManager.main.GetCartCount(CartDropDownHandler.main.GetShipmentInfo()):n0}";
-            _cartTotalLabel.text = $"Cart Total: {StoreManager.main.GetCartTotal(CartDropDownHandler.main.GetShipmentInfo())}";
+            _cartAmountLabel.text = $"Cart Amount: {StoreManager.main.GetCartTotal(CartDropDownHandler.main.GetShipmentInfo())}";
+            _cartTotalLabel.text = $"Cart Total: {StoreManager.main.GetCartCount(CartDropDownHandler.main.GetShipmentInfo()):n0}";
         }
 
         public override void Enter(object arg)

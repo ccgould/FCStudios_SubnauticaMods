@@ -130,7 +130,7 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono
             }
         }
 
-        internal FCSAlterraHubGUI GetGUI()
+        public FCSAlterraHubGUI GetGUI()
         {
             if(_FCSPDAUI is null)
             {

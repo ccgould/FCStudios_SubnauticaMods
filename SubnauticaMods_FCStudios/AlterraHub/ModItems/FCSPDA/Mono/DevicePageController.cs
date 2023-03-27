@@ -13,13 +13,18 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono
     internal class DevicePageController : Page
     {
         private Transform _content;
+        private Toggle _showAllToggle;
         private Dictionary<string, DeviceCatergory> _groups = new();
 
         internal void Initialize(FCSAlterraHubGUI gui)
         {
             var backButton = gameObject.FindChild("BackBTN")?.GetComponent<Button>();
             _content = GameObjectHelpers.FindGameObject(gameObject.FindChild("Body"),"Content").transform;
-
+            _showAllToggle = GameObjectHelpers.FindGameObject(gameObject, "ShowAll").GetComponent<Toggle>();
+            _showAllToggle.onValueChanged.AddListener((b) => 
+            {
+                Enter(null);
+            });
             if (backButton != null)
             {
                 backButton.onClick.AddListener((() =>
@@ -27,6 +32,11 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono
                     gui.GoToPage(PDAPages.None);
                 }));
             }
+        }
+
+        internal bool GetShowAllState()
+        {
+            return _showAllToggle.isOn;
         }
 
         public override void Enter(object arg)
@@ -47,7 +57,7 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono
             {
                 var category = Instantiate(FCSAssetBundlesService.PublicAPI.GetLocalPrefab("DeviceCategory"));
                 var deviceCat = category.EnsureComponent<DeviceCatergory>();
-                deviceCat.Initialize(device);
+                deviceCat.Initialize(this,device);
                 deviceCat.gameObject.transform.SetParent(_content, false);
                 _groups.Add(device.Key, deviceCat);
             }

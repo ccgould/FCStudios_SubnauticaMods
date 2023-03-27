@@ -37,12 +37,15 @@ internal class IonCubeGeneratorBuildable : FCSBuildableModBase
         };
 
         OnFinishedPatching += () => 
-        {            
+        {
+            PatchedTechType = TechType;
             FCSPDAController.AddAdditionalPage<uGUI_IonCube>(TechType, FCSAssetBundlesService.PublicAPI.GetPrefabByName("uGUI_Ioncube", bundleName, FileSystemHelper.ModDirLocation, false));
             FCSModsAPI.PublicAPI.CreateStoreEntry(TechType, _kitTechType,1, 90000, StoreCategory.Production);
             //uGUIService.AddNewUI<IonCubeGeneratorGUI>("IonCubeGenUI", FCSAssetBundlesService.PublicAPI.GetPrefabByName("IonCubeGenerator_uGUI", bundleName, FileSystemHelper.ModDirLocation,false), new Vector3(1.8f, 1.8f, 1.8f));
         };
     }
+
+    public static TechType PatchedTechType { get; private set; }
 
     public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
     {
