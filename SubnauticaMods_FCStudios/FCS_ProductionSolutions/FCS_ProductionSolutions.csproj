@@ -34,7 +34,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\Config.cs" />
+    <Compile Include="Configuration\ModSaveManager.cs" />
     <Compile Include="Configuration\ModSettings.cs" />
+    <Compile Include="Configuration\SaveData.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="ModItems\Buildables\IonCubeGenerator\Buildable\IonCubeGeneratorBuildable.cs" />
     <Compile Include="ModItems\Buildables\IonCubeGenerator\Mono\uGUI_IonCube.cs" />

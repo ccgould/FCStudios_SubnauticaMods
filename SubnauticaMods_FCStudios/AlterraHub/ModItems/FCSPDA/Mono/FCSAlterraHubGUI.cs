@@ -339,7 +339,7 @@ public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
 
         _accountBalance.text = $"{AccountService.main.GetAccountBalance():N0}";
 
-        var currentBase = HabitatService.GetPlayersCurrentBase();
+        var currentBase = HabitatService.main.GetPlayersCurrentBase();
         var friendly = currentBase?.GetBaseFriendlyName();
         var baseId = currentBase?.GetBaseID() ?? 0;
 

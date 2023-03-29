@@ -1,4 +1,5 @@
-﻿using FCS_AlterraHub.Models.Structs;
+﻿using FCS_AlterraHub.Models.Abstract;
+using FCS_AlterraHub.Models.Structs;
 using FCSCommon.Helpers;
 using SMLHelper.Assets;
 using SMLHelper.Utility;

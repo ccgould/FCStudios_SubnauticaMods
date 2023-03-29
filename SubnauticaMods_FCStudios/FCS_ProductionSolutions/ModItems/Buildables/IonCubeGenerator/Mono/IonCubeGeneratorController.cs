@@ -1,17 +1,21 @@
-﻿using FCS_AlterraHub.Models.Abstract;
+﻿using FCS_AlterraHub.API;
+using FCS_AlterraHub.Core.Services;
+using FCS_AlterraHub.Models.Abstract;
+using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.Models.Mono;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono;
-using FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Buildable;
+using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Enumerators;
 using FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Interfaces;
 using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using static FCS_ProductionSolutions.Configuration.SaveData;
 
 namespace FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Mono
 {
-    internal class IonCubeGeneratorController : FCSDevice
+    internal class IonCubeGeneratorController : FCSDevice, IFCSSave<SaveData>
     {
 
         private const float CubeEnergyCost = 1500f;
@@ -31,7 +35,7 @@ namespace FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Mono
             }
         }
         private ICubeContainer _cubeContainer;
-
+        private CubeGeneratorSaveData _saveData;
         internal const float ProgressComplete = 100f;
         internal const IonCubeGenSpeedModes StartingMode = IonCubeGenSpeedModes.Off;
         internal const float StartUpComplete = 4f;
@@ -96,12 +100,13 @@ namespace FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Mono
 
         #region Unity methods
 
-        public new void Awake()
+        public override void Awake()
         {
-            //if (_saveData == null)
-            //{
-            //    ReadySaveData();
-            //}
+            base.Awake();
+            if (_saveData == null)
+            {
+                ReadySaveData();
+            }
 
             if (_cubeContainer == null)
             {
@@ -113,19 +118,18 @@ namespace FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Mono
 
             var fxController = gameObject.EnsureComponent<CubeGeneratorFxController>();
             fxController.Initialize(this);
-
-            //UnitID = "IC001";
-
             var interaction = gameObject.GetComponent<HoverInteraction>();
             interaction.onSettingsKeyPressed += onSettingsKeyPressed;
 
             UpdatePowerRelay();
+
+            IsInitialized = true;
         }
 
-        private void ReadySaveData()
+        public override void ReadySaveData()
         {
             string id = (base.GetComponentInParent<PrefabIdentifier>() ?? base.GetComponent<PrefabIdentifier>()).Id;
-            //this._saveData = Mod.GetIonCubeGeneratorSaveData(id);
+            this._saveData = ModSaveManager.GetSaveData<CubeGeneratorSaveData>(id);
         }
 
         public override void Start()
@@ -281,12 +285,27 @@ namespace FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Mono
 
         public override void OnProtoDeserialize(ProtobufSerializer serializer)
         {
-
+            this.PauseUpdates = true;
+            QuickLogger.Debug("In OnProtoDeserialize", false);
+            if (this._saveData == null)
+            {
+                this.ReadySaveData();
+            }
+            IsFromSave = true;
+            this.PauseUpdates = false;
         }
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
-
+            this.PauseUpdates = true;
+            QuickLogger.Debug("In OnProtoSerialize", false);
+            if (!ModSaveManager.IsSaving())
+            {
+                QuickLogger.Info("Saving " + this.GetPrefabID(), false);
+                ModSaveManager.Save();
+                QuickLogger.Info("Saved " + this.GetPrefabID(), false);
+            }
+            this.PauseUpdates = false;
         }
 
         internal void onSettingsKeyPressed()
@@ -298,6 +317,26 @@ namespace FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Mono
         internal bool IsCrafting()
         {
             return GenerationProgress > -1f && GenerationProgress < CubeEnergyCost;
+        }
+
+        public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)
+        {
+            QuickLogger.Debug("Saving vube Gen",true);
+
+            if (!IsInitialized || !IsConstructed) return;
+
+            if (_savedData == null)
+            {
+                _savedData = new CubeGeneratorSaveData();
+            }
+
+            var save = _savedData as CubeGeneratorSaveData;
+
+            save.Id = GetPrefabID();
+            save.BaseId = FCSModsAPI.PublicAPI.GetHabitat(this)?.GetBasePrefabID();
+            save.ColorTemplate = _colorManager.SaveTemplate();
+            newSaveData.Data.Add(save);
+            QuickLogger.Debug($"Saves Cube Gen {newSaveData.Data.Count}", true);
         }
     }
 }

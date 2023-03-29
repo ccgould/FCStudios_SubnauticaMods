@@ -1,4 +1,6 @@
 ﻿using FCS_AlterraHub.API;
+using FCS_AlterraHub.Models.Interfaces;
+using FCS_AlterraHub.Models.Mono;
 using SMLHelper.Assets;
 using System;
 using UnityEngine;
@@ -13,8 +15,12 @@ namespace FCS_AlterraHub.Models.Abstract
     [RequireComponent(typeof(TechTag))]
     public abstract class FCSDevice : MonoBehaviour, IProtoEventListener, IConstructable
     {
+        
         private Constructable buildable;
         protected bool _runStartUpOnEnable;
+        protected bool IsFromSave;
+        protected object _savedData;
+
 
         /// <summary>
         /// Boolean that represents if the device is constructed and ready to operate
@@ -41,6 +47,39 @@ namespace FCS_AlterraHub.Models.Abstract
         /// </summary>
         public virtual void Initialize() { }
 
+        public virtual void Awake() 
+        { 
+            _colorManager = gameObject.GetComponent<ColorManager>();
+            _colorManager.Initialize(gameObject);
+        }
+
+        public virtual void OnEnable()
+        {
+            if (_runStartUpOnEnable)
+            {
+                if (!IsInitialized)
+                {
+                    Initialize();
+                }
+
+                if (IsFromSave)
+                {
+                    if (_savedData == null)
+                    {
+                        ReadySaveData();
+                    }
+
+                    if (_savedData is not null)
+                    {
+                        _colorManager?.LoadTemplate(((ISaveDataEntry)_savedData).ColorTemplate);
+                    }             
+                }
+
+                _runStartUpOnEnable = false;
+            }
+        }
+
+        public abstract void ReadySaveData();
 
         /// <summary>
         /// Gets the TechType of this device
@@ -85,6 +124,7 @@ namespace FCS_AlterraHub.Models.Abstract
         /// If true allows this device to be seen in the Base devices list in the FCSPDA"/>
         /// </summary>
         public bool IsVisibleInPDA = true;
+        protected ColorManager _colorManager;
 
         public abstract bool IsDeconstructionObstacle();
 

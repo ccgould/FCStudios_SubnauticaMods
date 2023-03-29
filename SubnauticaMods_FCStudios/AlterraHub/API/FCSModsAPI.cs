@@ -1,6 +1,7 @@
 ﻿using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Enumerators;
+using FCS_AlterraHub.Models.Mono;
 using FCS_AlterraHub.Models.Structs;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.ScreenItems;
 using FCSCommon.Utilities;
@@ -34,6 +35,10 @@ public interface IFCSModsAPIPublic
     Dictionary<TechType, FCSStoreEntry> GetRegisteredKits();
     void RegisterDevice(FCSDevice fCSDevice, TechType techType);
     void CreateStoreEntry(TechType parentTechType, TechType receiveTechType,int returnAmount, decimal cost, StoreCategory energy);
+    string GetModID(TechType techType);
+    HashSet<FCSDevice> GetRegisteredDevices();
+    HabitatManager GetHabitat(FCSDevice device);
+    string GetModPackID(TechType techType);
 }
 public interface IFCSModsAPIInternal
 {
@@ -131,5 +136,25 @@ public class FCSModsAPI : IFCSModsAPIPublic, IFCSModsAPIInternal
     public void CreateStoreEntry(TechType parentTechType, TechType receiveTechType, int returnAmount, decimal cost, StoreCategory category)
     {
         StoreInventoryService.CreateStoreEntry(parentTechType, receiveTechType, returnAmount, cost, category);
+    }
+
+    public string GetModID(TechType techType)
+    {
+        return ModRegistrationService.GetModID(techType);
+    }
+
+    public HashSet<FCSDevice> GetRegisteredDevices()
+    {
+        return HabitatService.main.GetRegisteredDevices();
+    }
+
+    public HabitatManager GetHabitat(FCSDevice device)
+    {
+        return HabitatService.main.GetHabitat(device);
+    }
+
+    public string GetModPackID(TechType techType)
+    {
+        return ModRegistrationService.GetModPackID(techType);
     }
 }

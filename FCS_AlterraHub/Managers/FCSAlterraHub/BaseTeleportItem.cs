@@ -28,4 +28,6 @@ internal class BaseTeleportItem : MonoBehaviour
         _baseName.text = manager.GetBaseName();
         _baseManager = manager;
     }
+
+    
 }

@@ -15,6 +15,7 @@ namespace FCS_AlterraHub.Core.Patches
             new GameObject("StoreManager").AddComponent<StoreManager>();
             new GameObject("VoiceNotificationService").AddComponent<VoiceNotificationService>();
             new GameObject("AccountService").AddComponent<AccountService>();
+            new GameObject("SaveLoadService").AddComponent<SaveLoadDataService>();
         }
     }
 }

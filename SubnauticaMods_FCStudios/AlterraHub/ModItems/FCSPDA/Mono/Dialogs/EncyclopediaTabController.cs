@@ -13,7 +13,7 @@ internal class EncyclopediaTabController : Page, uGUI_IListEntryManager
 {
     private CraftNode _pdaEncyclopediaTree => PDAEncyclopedia.tree;
     private Dictionary<string, PDAEncyclopedia.EntryData> _pdaEntrees => PDAEncyclopedia.mapping;
-    
+
     internal static CraftNode Tree { get; set; }
 
     private uGUI_ListEntry selectedEntry

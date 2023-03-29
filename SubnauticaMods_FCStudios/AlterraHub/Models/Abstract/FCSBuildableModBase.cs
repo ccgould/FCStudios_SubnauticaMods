@@ -21,7 +21,7 @@ namespace FCS_AlterraHub.Models.Abstract
 
         public override string AssetsFolder { get; }
         public override TechType RequiredForUnlock => TechType;
-        public override bool UnlockedAtStart => false;
+        public override bool UnlockedAtStart => true;
 
         public GameObject Prefab { get; private set; }
 

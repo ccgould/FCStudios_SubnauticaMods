@@ -5,6 +5,7 @@ using SMLHelper.Utility;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using Unity.Audio;
 using UnityEngine;
 
 
@@ -66,6 +67,14 @@ public interface IFcAssetBundlesPublicService
     /// <returns></returns>
     GameObject GetPrefabByName(string prefabName, string bundle,string modPath, bool applyShaders = true);
     GameObject GetLocalPrefab(string prefabName, bool applyShaders = false);
+
+    /// <summary>
+    /// Finds a <see cref="Texture2D"/> in the supplied bundle.
+    /// </summary>
+    /// <param name="imageName">Name of the inmage to find</param>
+    /// <param name="bundleName">NAme of the bundle to look in.</param>
+    /// <returns></returns>
+    Texture2D GetTextureByName(string imageName, string bundleName);
 }
 
 
@@ -163,5 +172,35 @@ public class FCSAssetBundlesService : IFcAssetBundlesPublicService, IFcAssetBund
     public Sprite GetIconByNameFromFile(string iconName, string bundleName)
     {
         throw new System.NotImplementedException();
+    }
+
+    public Texture2D GetTextureByName(string imageName, string bundleName)
+    {
+        if (loadedImages.ContainsKey(imageName)) return loadedImages[imageName];
+
+        AssetBundle bundle = null;
+
+        QuickLogger.Debug($"Image {imageName} not already loaded. Trying to locate in bundle {bundleName}");
+
+        if (loadedAssetBundles.TryGetValue(bundleName, out AssetBundle preLoadedBundle))
+        {
+            bundle = preLoadedBundle;
+        }
+
+        if (bundle == null)
+        {
+            QuickLogger.Debug("Bundle returned null. Getting Image failed");
+            return null;
+        }
+
+        var image = bundle.LoadAsset<Texture2D>(imageName);
+        if (image == null)
+        {
+            QuickLogger.DebugError($"Failed to find image {imageName} in bundle {bundleName}");
+            return null;
+        }
+
+        loadedImages.Add(imageName, image);
+        return loadedImages[imageName];
     }
 }

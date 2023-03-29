@@ -16,7 +16,7 @@ namespace FCS_AlterraHub.Core.Services;
 /// </summary>
 internal static class ModRegistrationService
 {
-    private static Dictionary<string, ModPackData> _registeredMods = new();
+    private static readonly Dictionary<string, ModPackData> _registeredMods = new();
     private static Dictionary<TechType, Spawnable> modNameCache = new();
 
     /// <summary>
@@ -28,6 +28,18 @@ internal static class ModRegistrationService
     {
         if(string.IsNullOrWhiteSpace(modPackName)) return false;
         return _registeredMods.ContainsKey(modPackName);
+    }
+
+    internal static bool GetModPackData(string modPackName, out ModPackData data)
+    {
+        data = null;
+        var result = GetModPackData(modPackName);
+        if (result is not null)
+        {
+            data = result;
+            return true;
+        }
+        return false;
     }
 
     internal static ModPackData GetModPackData(string modPackName)
@@ -103,5 +115,23 @@ internal static class ModRegistrationService
         modNameCache.Add(techType,spawnable);
 
         return spawnable.FriendlyName;
+    }
+
+    internal static Dictionary<string, ModPackData> GetRegisteredMods()
+    {
+        return _registeredMods;
+    }
+
+    internal static string GetModPackID(TechType techType)
+    {
+        foreach (var item in _registeredMods)
+        {
+            if(item.Value.HasMod(techType))
+            {
+                return item.Key;
+            }
+        }
+
+        return string.Empty;
     }
 }
