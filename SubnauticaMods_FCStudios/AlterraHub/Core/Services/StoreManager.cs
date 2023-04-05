@@ -153,6 +153,7 @@ internal class StoreManager : MonoBehaviour
 
     public ShipmentInfo AddItemToCart(IStoreClient sender, ShipmentInfo shipmentInfo, CartItem cartItemComponent)
     {
+        QuickLogger.Debug($"Shippment Info: OrderNumber:{shipmentInfo?.OrderNumber}",true);
         if (string.IsNullOrEmpty(shipmentInfo?.OrderNumber))
         {
             shipmentInfo = new ShipmentInfo();
@@ -163,19 +164,14 @@ internal class StoreManager : MonoBehaviour
                cartItemComponent.Save()
            });
         }
-        else if (PendingItems.Any(x => x.Key.Equals(shipmentInfo)))
+        else if (PendingItems.Any(x => x.Key.OrderNumber.Equals(shipmentInfo.OrderNumber)))
         {
             AddNewItemToExisting(shipmentInfo, cartItemComponent.Save());
         }
         
         sender.OnCreatedCartItem();
 
-        cartItemComponent.onRemoveBTNClicked += (pendingItem) =>
-        {
-            main.RemoveCartItem(shipmentInfo, pendingItem.Save());
-            sender.OnRemoveCartItem(pendingItem);
-            sender.OnDeletedCartItem();
-        };
+        
 
         return shipmentInfo;
     }
@@ -187,7 +183,7 @@ internal class StoreManager : MonoBehaviour
 
     private void AddNewItemToExisting(ShipmentInfo shipmentInfo, CartItemSaveData cartItemSaveDatas)
     {
-        PendingItems.First(x => x.Key.Equals(shipmentInfo)).Value.Add(cartItemSaveDatas);
+        PendingItems.First(x => x.Key.OrderNumber.Equals(shipmentInfo.OrderNumber)).Value.Add(cartItemSaveDatas);
     }
 
     private bool HasShipment(ShipmentInfo info)
@@ -205,7 +201,7 @@ internal class StoreManager : MonoBehaviour
     internal List<CartItemSaveData> GetCartItems(ShipmentInfo info)
     {
         var result = PendingItems.FirstOrDefault(x => x.Key.OrderNumber.Equals(info.OrderNumber)).Value;
-        QuickLogger.Debug($"GetCartItems: {result.Count}");
+        QuickLogger.Debug($"GetCartItems: {result?.Count}");
         return result;
     }
 
@@ -242,7 +238,7 @@ internal class StoreManager : MonoBehaviour
 
     public void RemoveCartItem(ShipmentInfo shipmentInfo, CartItemSaveData pendingItem)
     {
-        if (PendingItems.Any(x => x.Key.Equals(shipmentInfo)))
+        if (PendingItems.Any(x => x.Key.OrderNumber.Equals(shipmentInfo.OrderNumber)))
         {
             QuickLogger.Debug("GetCartItems: Found Pending Item");
             GetCartItems(shipmentInfo).Remove(pendingItem);
@@ -280,41 +276,35 @@ internal class StoreManager : MonoBehaviour
         PendingShipments.Remove(pendingOrder);
     }
 
-    public void Save()
+    public StoreManagerSaveData Save()
     {
-        //TODO Add to Save Manager
-
-        //Mod.GamePlaySettings.StoreManagerSaveData = new StoreManagerSaveData
-        //{
-        //    PendingItems = PendingItems,
-        //    PendingShipments = PendingShipments
-        //};
+        QuickLogger.Debug("Save StoreManagerData");
+        return  new StoreManagerSaveData
+        {
+            PendingItems = PendingItems,
+            PendingShipments = PendingShipments
+        };
     }
 
-    internal void LoadSave()
+    internal void LoadSave(StoreManagerSaveData saveData)
     {
+        if (saveData?.PendingItems is not null)
+        {
+            PendingItems = saveData.PendingItems;
+        }
 
-        //TODO Add to Save Manager
+        if (saveData?.PendingShipments is not null)
+        {
+            PendingShipments = saveData.PendingShipments;
+            //TODO Waiting for shipping
+            //if (PendingShipments.Any())
+            //{
+            //    var shipment = PendingShipments.First();
+            //    Ship(null, shipment.Info, FCSAlterraHubService.PublicAPI.GetRegisteredBaseOfId(shipment.Info.DestinationID).GetPortManager(), shipment.CartItems);
+            //}
+        }
 
-        //var saveData = Mod.GamePlaySettings.StoreManagerSaveData;
-
-        //if (saveData?.PendingItems is not null)
-        //{
-        //    PendingItems = saveData.PendingItems;
-        //}
-
-        //if (saveData?.PendingShipments is not null)
-        //{
-        //    PendingShipments = saveData.PendingShipments;
-
-        //    if (PendingShipments.Any())
-        //    {
-        //        var shipment = PendingShipments.First();
-        //        Ship(null, shipment.Info, FCSAlterraHubService.PublicAPI.GetRegisteredBaseOfId(shipment.Info.DestinationID).GetPortManager(), shipment.CartItems);
-        //    }
-        //}
-
-        //QuickLogger.Debug("Store Manager Save Loaded");
+        QuickLogger.Debug("Store Manager Save Loaded");
     }
 
     internal void CompleteOrder(Shipment shipment)
@@ -327,11 +317,10 @@ internal class StoreManager : MonoBehaviour
 internal class StoreManagerSaveData
 {
     [JsonProperty]
-    internal List<KeyValuePair<ShipmentInfo, List<CartItemSaveData>>> PendingItems { get; set; } = new();
+    internal List<KeyValuePair<ShipmentInfo, List<CartItemSaveData>>> PendingItems { get; set; }
     [JsonProperty]
-    internal List<Shipment> PendingShipments { get; set; } = new();
+    internal List<Shipment> PendingShipments { get; set; }
 }
-
 
 public class ShipmentInfo
 {
@@ -345,7 +334,6 @@ public class ShipmentInfo
     internal List<Vector2int> Sizes { get; set; }
     public string BaseName { get; set; }
 }
-
 
 internal interface IStoreClient
 {

@@ -57,6 +57,7 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs
         {
             base.Enter(arg);
             LoadStorePage((PDAPages)arg);
+            UpdateCartValues();
         }
 
         private void LoadStore()

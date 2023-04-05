@@ -40,7 +40,10 @@
   <ItemGroup>
     <Compile Include="API\FCSModsAPI.cs" />
     <Compile Include="API\FCSAssetBundlesService.cs" />
+    <Compile Include="Configuation\Commands.cs" />
+    <Compile Include="Configuation\ModSaveManager.cs" />
     <Compile Include="Configuation\ModSettings.cs" />
+    <Compile Include="Configuation\SaveData.cs" />
     <Compile Include="Core\Extensions\CollectionExtentions.cs" />
     <Compile Include="Core\Extensions\ColorExtensions.cs" />
     <Compile Include="Core\Extensions\SpriteExtensions.cs" />
@@ -61,10 +64,12 @@
     <Compile Include="Core\Patches\Player_Patches.cs" />
     <Compile Include="Core\Services\AccountService.cs" />
     <Compile Include="Core\Services\EncodeDecode.cs" />
+    <Compile Include="Core\Services\GamePlayService.cs" />
     <Compile Include="Core\Services\HabitatService.cs" />
     <Compile Include="Core\Services\LanguageService.cs" />
     <Compile Include="Core\Services\ModPrefabService.cs" />
     <Compile Include="Core\Services\ModRegistrationService.cs" />
+    <Compile Include="Core\Services\NotificationService.cs" />
     <Compile Include="Core\Services\PingTypeService.cs" />
     <Compile Include="Core\Services\SaveLoadDataService.cs" />
     <Compile Include="Core\Services\StoreInventoryService.cs" />
@@ -101,6 +106,7 @@
     <Compile Include="Models\Structs\FCSModItemSettings.cs" />
     <Compile Include="Models\Structs\FCSStoreEntry.cs" />
     <Compile Include="Models\Mono\FCSToolTip.cs" />
+    <Compile Include="Models\Structs\GSPSaveData.cs" />
     <Compile Include="Models\Structs\Vec3.cs" />
     <Compile Include="Models\Structs\Vec4.cs" />
     <Compile Include="Models\TimeCache.cs" />

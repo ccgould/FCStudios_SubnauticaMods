@@ -61,7 +61,7 @@ namespace FCS_AlterraHub.Core.Services
                 else
                 {
                     stream.Close();
-                    File.WriteAllText(filePath, JsonConvert.SerializeObject(Data));
+                    File.WriteAllText(filePath, CreatejsonData(Data));
                 }
 
                 callBack?.Invoke();
@@ -140,6 +140,7 @@ namespace FCS_AlterraHub.Core.Services
                 }
                 else
                 {
+                    JsonSerializer serializer = new JsonSerializer();
                     data = JsonConvert.DeserializeObject<T>(File.ReadAllText(filePath));
                 }
                 dataCallback?.Invoke(data);

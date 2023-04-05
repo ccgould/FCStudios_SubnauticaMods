@@ -229,7 +229,8 @@ namespace FCS_AlterraHub.Core.Services
                 AccountDetails = account;
                 if (account.Version.Equals("2.0"))
                 {
-                    AccountDetails.Balance = Convert.ToDecimal(EncodeDecode.Decrypt(account.AccountBalance));
+                    var enUs = new CultureInfo("en-US");
+                    AccountDetails.Balance = Convert.ToDecimal(EncodeDecode.Decrypt(account.AccountBalance), enUs);
                 }
 
                 QuickLogger.Debug($"Alterra account loaded for player {account.Username}", true);

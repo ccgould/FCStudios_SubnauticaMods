@@ -40,7 +40,7 @@ public class Main : BaseUnityPlugin
     private void Awake()
     {
         LanguageService.AdditionalPatching();
-
+        RegisterCommands();
 
         MaterialHelpers.GetIngameObjects();
 
@@ -84,5 +84,11 @@ public class Main : BaseUnityPlugin
         //Harmony
         var harmony = new Harmony($"com.{MODNAME.ToLower()}.fcstudios");
         harmony.PatchAll(Assembly.GetExecutingAssembly());
+    }
+
+    private static void RegisterCommands()
+    {
+        //Register Info commands
+        ConsoleCommandsHandler.RegisterConsoleCommands(typeof(Commands));
     }
 }

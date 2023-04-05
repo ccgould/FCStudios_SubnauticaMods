@@ -71,6 +71,7 @@ internal class CartDropDownHandler : MonoBehaviour, IStoreClient
             return;
         }
         gameObject.SetActive(!gameObject.activeSelf);
+        UpdateTotalAmount();
     }
 
     internal void AddItem(TechType item, TechType receiveTechType, int returnAmount)
@@ -89,13 +90,27 @@ internal class CartDropDownHandler : MonoBehaviour, IStoreClient
 
     private void CreateCartItem(TechType item, TechType receiveTechType, int returnAmount)
     {
+        CartItem cartItemComponent = CreateCartItemGameObject(item, receiveTechType, returnAmount);
+        _shipmentInfo = StoreManager.main.AddItemToCart(this, _shipmentInfo, cartItemComponent);
+    }
+
+    private CartItem CreateCartItemGameObject(TechType item, TechType receiveTechType, int returnAmount)
+    {
         var cartItem = GameObject.Instantiate(ModPrefabService.GetPrefab("CartItem"));
         var cartItemComponent = cartItem.AddComponent<CartItem>();
         cartItemComponent.TechType = item;
         cartItemComponent.ReceiveTechType = receiveTechType;
         cartItemComponent.ReturnAmount = returnAmount;
         cartItem.transform.SetParent(_cartList.transform, false);
-        _shipmentInfo = StoreManager.main.AddItemToCart(this, _shipmentInfo, cartItemComponent);
+
+        cartItemComponent.onRemoveBTNClicked += (pendingItem) =>
+        {
+            StoreManager.main.RemoveCartItem(_shipmentInfo, pendingItem.Save());
+            OnRemoveCartItem(pendingItem);
+            OnDeletedCartItem();
+        };
+
+        return cartItemComponent;
     }
 
     private void ResetDropDown()
@@ -176,9 +191,11 @@ internal class CartDropDownHandler : MonoBehaviour, IStoreClient
         }
         else
         {
-            foreach (CartItemSaveData cartItem in cartItems)
+            for (int i = 0; i < cartItems.Count; i++)
             {
-                AddItem(cartItem.TechType, cartItem.ReceiveTechType, cartItem.ReturnAmount <= 0 ? 1 : cartItem.ReturnAmount);
+                CartItemSaveData cartItem = cartItems[i];
+                CreateCartItemGameObject(cartItem.TechType, cartItem.ReceiveTechType, cartItem.ReturnAmount <= 0 ? 1 : cartItem.ReturnAmount);
+                //AddItem(cartItem.TechType, cartItem.ReceiveTechType, cartItem.ReturnAmount <= 0 ? 1 : cartItem.ReturnAmount);
             }
         }
     }

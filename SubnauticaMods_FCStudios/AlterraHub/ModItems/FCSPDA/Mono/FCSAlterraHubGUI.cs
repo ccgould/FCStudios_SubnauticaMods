@@ -108,9 +108,6 @@ public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
         _isInitialized = true;
     }
 
-
-
-
     private void AddPages()
     {
 
@@ -300,12 +297,6 @@ public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
 
     internal PDAPages CurrentPage() => _currentPage;
 
-
-    internal bool GetAutomaticDebitDeduction()
-    {
-        return _accountPageHandler.GetAutomaticDebitDeduction();
-    }
-
     internal void ShowMission()
     {
         // uGUI_PowerIndicator_Initialize_Patch.MissionHUD.ShowMessage("Hi","Eggo"); 
@@ -399,11 +390,6 @@ public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
         return EncyclopediaTabController.Tree;
     }
 
-    internal float GetRate()
-    {
-        return _accountPageHandler.GetRate();
-    }
-
     internal void CloseAccountPage()
     {
         _accountPageHandler.Close();
@@ -474,5 +460,10 @@ public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
     {
         if (!_pages.ContainsKey(page)) return null;
         return _pages[page];
+    }
+
+    internal ShipmentInfo GetShipmentInfo()
+    {
+        return _storePage.GetShipmentInfo();
     }
 }

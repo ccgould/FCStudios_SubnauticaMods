@@ -1,4 +1,5 @@
-﻿using FCS_AlterraHub.Core.Services;
+﻿using FCS_AlterraHub.Configuation;
+using FCS_AlterraHub.Core.Services;
 using HarmonyLib;
 using UnityEngine;
 
@@ -16,6 +17,22 @@ namespace FCS_AlterraHub.Core.Patches
             new GameObject("VoiceNotificationService").AddComponent<VoiceNotificationService>();
             new GameObject("AccountService").AddComponent<AccountService>();
             new GameObject("SaveLoadService").AddComponent<SaveLoadDataService>();
+            new GameObject("GamePlayService").AddComponent<GamePlayService>();
+        }
+
+        [HarmonyPatch(typeof(Player), nameof(Player.OnProtoSerialize))]
+        [HarmonyPostfix]
+        private static void OnProtoSerialize_Postfix()
+        {
+            //Mod.SaveGamePlaySettings();
+            ModSaveManager.Save();
+        }
+
+        [HarmonyPatch(typeof(Player), nameof(Player.OnProtoDeserialize))]
+        [HarmonyPostfix]
+        private static void OnProtoDeserialize_Postfix()
+        {
+            ModSaveManager.LoadData();
         }
     }
 }

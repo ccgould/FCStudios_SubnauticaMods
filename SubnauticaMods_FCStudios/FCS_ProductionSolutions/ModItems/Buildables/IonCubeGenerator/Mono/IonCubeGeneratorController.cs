@@ -102,11 +102,8 @@ namespace FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Mono
 
         public override void Awake()
         {
+            QuickLogger.Debug("Awake");
             base.Awake();
-            if (_saveData == null)
-            {
-                ReadySaveData();
-            }
 
             if (_cubeContainer == null)
             {
@@ -126,16 +123,62 @@ namespace FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Mono
             IsInitialized = true;
         }
 
-        public override void ReadySaveData()
+        public  CubeGeneratorSaveData ReadySaveData1()
         {
             string id = (base.GetComponentInParent<PrefabIdentifier>() ?? base.GetComponent<PrefabIdentifier>()).Id;
-            this._saveData = ModSaveManager.GetSaveData<CubeGeneratorSaveData>(id);
+            var data = ModSaveManager.GetSaveData<CubeGeneratorSaveData>(id);
+            QuickLogger.Debug($"Prefab Id : {GetPrefabID()} || SaveData: {data.StartUpProgress}");
+            return data;
+        }
+
+        public override void ReadySaveData()
+        {
         }
 
         public override void Start()
         {
+            QuickLogger.Debug($"Start: {GetPrefabID()}");
             base.Start();
             UpdatePowerRelay();
+
+            if (_runStartUpOnEnable)
+            {
+                if (!IsInitialized)
+                {
+                    Initialize();
+                }
+
+                if (IsFromSave)
+                {
+                    QuickLogger.Debug($"Is From Save: {GetPrefabID()}");
+                    if (_savedData == null)
+                    {
+                        var g = ReadySaveData1();
+
+
+                        QuickLogger.Debug($"Is Save Data Present: {g is not null}");
+                         if (g is not null)
+                        {
+                        QuickLogger.Debug($"Setting Data");
+
+                        //_colorManager?.LoadTemplate(((ISaveDataEntry)_savedData).ColorTemplate);
+
+                        NumberOfCubes = g.NumberOfCubes;
+                        StartUpProgress = g.StartUpProgress;
+                        GenerationProgress = g.GenerationProgress;
+                        CoolDownProgress = g.CoolDownProgress;
+                        CurrentSpeedMode = g.CurrentSpeedMode;
+                        QuickLogger.Debug($"StartUp Progress Mode: {g.StartUpProgress} || {StartUpProgress}", false);
+                        QuickLogger.Debug($"Current Speed Mode: {g.CurrentSpeedMode} || {CurrentSpeedMode}", false);
+                        QuickLogger.Debug($"In OnProtoDeserialize Save Loaded: {GetPrefabID()}", false);
+
+                    }
+                    
+                    }
+                }
+
+                _runStartUpOnEnable = false;
+            }
         }
 
         private void Update()
@@ -192,6 +235,14 @@ namespace FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Mono
                 // Is currently in start up routine
                 StartUpProgress = Mathf.Min(StartUpComplete, StartUpProgress + DayNightCycle.main.deltaTime);
             }
+        }
+
+
+        public override void OnEnable()
+        {
+            QuickLogger.Debug($"OnEnable: {GetPrefabID()}");
+            base.OnEnable();
+            
         }
 
         #endregion
@@ -286,19 +337,23 @@ namespace FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Mono
         public override void OnProtoDeserialize(ProtobufSerializer serializer)
         {
             this.PauseUpdates = true;
-            QuickLogger.Debug("In OnProtoDeserialize", false);
+            QuickLogger.Debug($"In OnProtoDeserialize: {GetPrefabID()}", false);
             if (this._saveData == null)
             {
-                this.ReadySaveData();
+                var data = ReadySaveData1();
+
+                QuickLogger.Debug($"{data.StartUpProgress}");
             }
             IsFromSave = true;
+                               
+
             this.PauseUpdates = false;
         }
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
             this.PauseUpdates = true;
-            QuickLogger.Debug("In OnProtoSerialize", false);
+            QuickLogger.Debug($"In OnProtoSerialize: {GetPrefabID()}", false);
             if (!ModSaveManager.IsSaving())
             {
                 QuickLogger.Info("Saving " + this.GetPrefabID(), false);
@@ -335,6 +390,16 @@ namespace FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Mono
             save.Id = GetPrefabID();
             save.BaseId = FCSModsAPI.PublicAPI.GetHabitat(this)?.GetBasePrefabID();
             save.ColorTemplate = _colorManager.SaveTemplate();
+            save.NumberOfCubes = NumberOfCubes;
+
+            save.Progress = _progress;
+
+
+            save.StartUpProgress = StartUpProgress;
+            save.GenerationProgress = GenerationProgress;
+            save.CoolDownProgress = CoolDownProgress;
+            save.CurrentSpeedMode = CurrentSpeedMode;
+
             newSaveData.Data.Add(save);
             QuickLogger.Debug($"Saves Cube Gen {newSaveData.Data.Count}", true);
         }

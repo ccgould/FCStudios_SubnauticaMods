@@ -1,4 +1,5 @@
 ﻿using FCS_AlterraHub.API;
+using FCS_AlterraHub.Configuation;
 using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Abstract;
@@ -376,26 +377,23 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono
             }
         }
 
-
         private void OnQuit()
         {
             //Mod.DeepCopySave(CardSystem.main.SaveDetails());
-            //QuickLogger.Debug("Quitting Purging CardSystem and AlterraHubSave", true);
-            //CardSystem.main.Purge();
+            QuickLogger.Debug("Quitting Purging CardSystem and AlterraHubSave", true);
+            AccountService.main.Purge();
             //Mod.PurgeSave();
         }
 
-        //internal void Save(SaveData newSaveData)
-        //{
-        //    Mod.GamePlaySettings.PDAShipmentInfo = Screen.GetShipmentInfo();
-        //    Mod.GamePlaySettings.Rate = Screen.GetRate();
-        //    Mod.GamePlaySettings.AutomaticDebitDeduction = Screen.GetAutomaticDebitDeduction();
-        //}
+        internal void Save()
+        {
+            GamePlayService.Main.SetShipmentInfo(Screen.GetShipmentInfo());
+        }
 
 
         internal void LoadFromSave()
         {
-            //Screen.LoadFromSave(Mod.GamePlaySettings.PDAShipmentInfo);
+            Screen.LoadFromSave(GamePlayService.Main.GetShipmentInfo());
         }
 
         public static void ForceOpen()

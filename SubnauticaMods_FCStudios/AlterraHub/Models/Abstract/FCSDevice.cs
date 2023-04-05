@@ -55,28 +55,7 @@ namespace FCS_AlterraHub.Models.Abstract
 
         public virtual void OnEnable()
         {
-            if (_runStartUpOnEnable)
-            {
-                if (!IsInitialized)
-                {
-                    Initialize();
-                }
-
-                if (IsFromSave)
-                {
-                    if (_savedData == null)
-                    {
-                        ReadySaveData();
-                    }
-
-                    if (_savedData is not null)
-                    {
-                        _colorManager?.LoadTemplate(((ISaveDataEntry)_savedData).ColorTemplate);
-                    }             
-                }
-
-                _runStartUpOnEnable = false;
-            }
+            
         }
 
         public abstract void ReadySaveData();

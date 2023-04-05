@@ -91,9 +91,14 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono
                 _cartDropDownManager.Initialize();
                 _cartDropDownManager.onTotalChanged += amount =>
                 {
-                    _cartButtonNumber.text = _cartDropDownManager.GetCartCount().ToString();
+                    UpdateCartTotals();
                 };
             }
+        }
+
+        private void UpdateCartTotals()
+        {
+            _cartButtonNumber.text = _cartDropDownManager.GetCartCount().ToString();
         }
 
         private void LoadShipmentPage()
@@ -138,6 +143,7 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono
         public override void Enter(object arg = null)
         {
             base.Enter(arg);
+            UpdateCartTotals();
         }
 
         internal void AttemptToOpenReturnsDialog()

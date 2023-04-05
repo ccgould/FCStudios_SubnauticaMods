@@ -2,20 +2,16 @@
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.Models.Mono;
+using FCS_AlterraHub.ModItems.FCSPDA.Mono;
 using FCSCommon.Utilities;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using SMLHelper.Utility;
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using static FCS_ProductionSolutions.Configuration.SaveData;
+using UWE;
+using Valve.VR;
 
-namespace FCS_ProductionSolutions.Configuration
+
+namespace FCS_AlterraHub.Configuation
 {
     internal static class ModSaveManager
     {
@@ -42,6 +38,10 @@ namespace FCS_ProductionSolutions.Configuration
                     }
                 }
 
+                _saveData.StoreManagerSaveData = StoreManager.main.Save();
+                _saveData.AccountDetails = AccountService.main.SaveDetails();
+                FCSPDAController.Main.Save();
+                _saveData.GamePlayService = GamePlayService.Main.Save();
                 SaveLoadDataService.instance.SaveData(Main.MODNAME, _saveData, false, OnSaveComplete);
 
                 QuickLogger.Debug($"=================== Saved {Main.MODNAME} ===================");
@@ -65,7 +65,7 @@ namespace FCS_ProductionSolutions.Configuration
                 yield return null;
             }
 
-            GameObject.DestroyImmediate(_saveObject.gameObject);
+            Object.DestroyImmediate(_saveObject.gameObject);
             _saveObject = null;
         }
 
@@ -81,6 +81,16 @@ namespace FCS_ProductionSolutions.Configuration
             {
                 _saveData = data;
                 QuickLogger.Info("Save Data Loaded");
+
+                if (!AccountService.main.IsLoaded)
+                {
+                    QuickLogger.Info("Save Data Loaded");
+                    CoroutineHost.StartCoroutine(AccountService.main.Load(_saveData.AccountDetails));
+                }
+
+                GamePlayService.Main.LoadFromSave(_saveData.GamePlayService);
+                StoreManager.main.LoadSave(_saveData.StoreManagerSaveData);
+                FCSPDAController.Main.LoadFromSave();
             });
         }
 
@@ -94,7 +104,7 @@ namespace FCS_ProductionSolutions.Configuration
             {
                 foreach (JObject entry in saveData.Data)
                 {
-                    var tokenIdValue = entry.Value<string?>("Id");
+                    var tokenIdValue = entry.Value<string>("Id");
                     if (string.IsNullOrEmpty(tokenIdValue)) continue;
 
                     if (tokenIdValue.Equals(id))
