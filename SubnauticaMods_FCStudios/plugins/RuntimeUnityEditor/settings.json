@@ -1,9 +1,0 @@
-{
-    "EnableClickForParentGameObject": true,
-    "EnableClickForChildGameObject": true,
-    "ShowGizmos": false,
-    "ShowGizmosOutsideEditor": false,
-    "Wireframe": false,
-    "DNSpyPath": "",
-    "PinnedVariablesCompactMode": true
-}
