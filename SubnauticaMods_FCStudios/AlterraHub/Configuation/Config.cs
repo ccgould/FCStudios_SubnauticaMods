@@ -40,7 +40,7 @@ public class Config : ConfigFile
     internal Action<bool> OnPlaySoundToggleEvent { get; set; }
 
     [Keybind("FCS DevicePage Interface Information Button")]
-    public KeyCode PDASettingsKeyCode = KeyCode.O;
+    public KeyCode PDASettingsKeyCode = KeyCode.F2;
 
     [Toggle("[Alterra Transport Drone] Enable Drone Audio", Order = 1, Tooltip = "Enables/Disables the sound effects on the drone.")]
     public bool AlterraTransportDroneFxAllowed = true;

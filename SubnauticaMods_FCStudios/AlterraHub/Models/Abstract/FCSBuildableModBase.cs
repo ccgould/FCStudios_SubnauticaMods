@@ -2,6 +2,7 @@
 using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Interfaces;
+using FCS_AlterraHub.Models.Mono;
 using FCS_AlterraHub.Models.Structs;
 using SMLHelper.Utility;
 using System.Collections;
@@ -73,7 +74,10 @@ namespace FCS_AlterraHub.Models.Abstract
 
             prefab.AddComponent<TechTag>().type = TechType;
 
-            if(_settings.HasGlass)
+            var hover = prefab.AddComponent<HoverInteraction>();
+            hover.TechType = TechType;
+            
+            if (_settings.HasGlass)
             {
                 //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Main.ModSettings.ModPackID);

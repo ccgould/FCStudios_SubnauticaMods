@@ -1,0 +1,1210 @@
+[
+  {
+    "Name": "Quartz",
+    "Value": 1
+  },
+  {
+    "Name": "ScrapMetal",
+    "Value": 2
+  },
+  {
+    "Name": "FiberMesh",
+    "Value": 3
+  },
+  {
+    "Name": "Copper",
+    "Value": 7
+  },
+  {
+    "Name": "Lead",
+    "Value": 8
+  },
+  {
+    "Name": "Salt",
+    "Value": 9
+  },
+  {
+    "Name": "MercuryOre",
+    "Value": 12
+  },
+  {
+    "Name": "Glass",
+    "Value": 15
+  },
+  {
+    "Name": "Titanium",
+    "Value": 16
+  },
+  {
+    "Name": "Silicone",
+    "Value": 17
+  },
+  {
+    "Name": "Gold",
+    "Value": 21
+  },
+  {
+    "Name": "Magnesium",
+    "Value": 22
+  },
+  {
+    "Name": "Sulphur",
+    "Value": 23
+  },
+  {
+    "Name": "SandLoot",
+    "Value": 26
+  },
+  {
+    "Name": "Bleach",
+    "Value": 27
+  },
+  {
+    "Name": "Silver",
+    "Value": 28
+  },
+  {
+    "Name": "TitaniumIngot",
+    "Value": 30
+  },
+  {
+    "Name": "CopperWire",
+    "Value": 32
+  },
+  {
+    "Name": "WiringKit",
+    "Value": 33
+  },
+  {
+    "Name": "AdvancedWiringKit",
+    "Value": 34
+  },
+  {
+    "Name": "CrashPowder",
+    "Value": 35
+  },
+  {
+    "Name": "Diamond",
+    "Value": 36
+  },
+  {
+    "Name": "Lithium",
+    "Value": 40
+  },
+  {
+    "Name": "PlasteelIngot",
+    "Value": 41
+  },
+  {
+    "Name": "EnameledGlass",
+    "Value": 42
+  },
+  {
+    "Name": "PowerCell",
+    "Value": 43
+  },
+  {
+    "Name": "ComputerChip",
+    "Value": 44
+  },
+  {
+    "Name": "Uranium",
+    "Value": 51
+  },
+  {
+    "Name": "AluminumOxide",
+    "Value": 52
+  },
+  {
+    "Name": "HydrochloricAcid",
+    "Value": 53
+  },
+  {
+    "Name": "Magnetite",
+    "Value": 54
+  },
+  {
+    "Name": "Polyaniline",
+    "Value": 56
+  },
+  {
+    "Name": "AramidFibers",
+    "Value": 57
+  },
+  {
+    "Name": "Aerogel",
+    "Value": 59
+  },
+  {
+    "Name": "Benzene",
+    "Value": 61
+  },
+  {
+    "Name": "Lubricant",
+    "Value": 62
+  },
+  {
+    "Name": "UraniniteCrystal",
+    "Value": 63
+  },
+  {
+    "Name": "ReactorRod",
+    "Value": 64
+  },
+  {
+    "Name": "DepletedReactorRod",
+    "Value": 65
+  },
+  {
+    "Name": "PrecursorIonCrystal",
+    "Value": 66
+  },
+  {
+    "Name": "PrecursorIonCrystalMatrix",
+    "Value": 67
+  },
+  {
+    "Name": "Kyanite",
+    "Value": 68
+  },
+  {
+    "Name": "Nickel",
+    "Value": 69
+  },
+  {
+    "Name": "Fins",
+    "Value": 502
+  },
+  {
+    "Name": "Tank",
+    "Value": 503
+  },
+  {
+    "Name": "Battery",
+    "Value": 504
+  },
+  {
+    "Name": "Knife",
+    "Value": 505
+  },
+  {
+    "Name": "Flashlight",
+    "Value": 507
+  },
+  {
+    "Name": "Beacon",
+    "Value": 508
+  },
+  {
+    "Name": "Builder",
+    "Value": 509
+  },
+  {
+    "Name": "Compass",
+    "Value": 512
+  },
+  {
+    "Name": "AirBladder",
+    "Value": 513
+  },
+  {
+    "Name": "Terraformer",
+    "Value": 514
+  },
+  {
+    "Name": "Pipe",
+    "Value": 515
+  },
+  {
+    "Name": "Thermometer",
+    "Value": 516
+  },
+  {
+    "Name": "DiveReel",
+    "Value": 517
+  },
+  {
+    "Name": "Rebreather",
+    "Value": 518
+  },
+  {
+    "Name": "RadiationSuit",
+    "Value": 519
+  },
+  {
+    "Name": "RadiationHelmet",
+    "Value": 520
+  },
+  {
+    "Name": "RadiationGloves",
+    "Value": 521
+  },
+  {
+    "Name": "ReinforcedDiveSuit",
+    "Value": 522
+  },
+  {
+    "Name": "Scanner",
+    "Value": 523
+  },
+  {
+    "Name": "FireExtinguisher",
+    "Value": 524
+  },
+  {
+    "Name": "MapRoomHUDChip",
+    "Value": 525
+  },
+  {
+    "Name": "PipeSurfaceFloater",
+    "Value": 526
+  },
+  {
+    "Name": "CyclopsDecoy",
+    "Value": 527
+  },
+  {
+    "Name": "DoubleTank",
+    "Value": 528
+  },
+  {
+    "Name": "ReinforcedGloves",
+    "Value": 529
+  },
+  {
+    "Name": "Welder",
+    "Value": 750
+  },
+  {
+    "Name": "Seaglide",
+    "Value": 751
+  },
+  {
+    "Name": "Constructor",
+    "Value": 752
+  },
+  {
+    "Name": "Transfuser",
+    "Value": 753
+  },
+  {
+    "Name": "Flare",
+    "Value": 754
+  },
+  {
+    "Name": "StasisRifle",
+    "Value": 755
+  },
+  {
+    "Name": "PropulsionCannon",
+    "Value": 757
+  },
+  {
+    "Name": "Gravsphere",
+    "Value": 758
+  },
+  {
+    "Name": "SmallStorage",
+    "Value": 759
+  },
+  {
+    "Name": "LaserCutter",
+    "Value": 761
+  },
+  {
+    "Name": "LEDLight",
+    "Value": 762
+  },
+  {
+    "Name": "DiamondBlade",
+    "Value": 800
+  },
+  {
+    "Name": "HeatBlade",
+    "Value": 801
+  },
+  {
+    "Name": "LithiumIonBattery",
+    "Value": 802
+  },
+  {
+    "Name": "PlasteelTank",
+    "Value": 803
+  },
+  {
+    "Name": "HighCapacityTank",
+    "Value": 804
+  },
+  {
+    "Name": "UltraGlideFins",
+    "Value": 805
+  },
+  {
+    "Name": "SwimChargeFins",
+    "Value": 806
+  },
+  {
+    "Name": "RepulsionCannon",
+    "Value": 807
+  },
+  {
+    "Name": "Stillsuit",
+    "Value": 808
+  },
+  {
+    "Name": "StasisRifleFragment",
+    "Value": 1101
+  },
+  {
+    "Name": "ReinforceHullFragment",
+    "Value": 1105
+  },
+  {
+    "Name": "PropulsionCannonFragment",
+    "Value": 1107
+  },
+  {
+    "Name": "SeaglideFragment",
+    "Value": 1117
+  },
+  {
+    "Name": "SolarPanelFragment",
+    "Value": 1119
+  },
+  {
+    "Name": "PowerTransmitterFragment",
+    "Value": 1120
+  },
+  {
+    "Name": "SpecimenAnalyzerFragment",
+    "Value": 1130
+  },
+  {
+    "Name": "LEDLightFragment",
+    "Value": 1143
+  },
+  {
+    "Name": "SafeShallowsEgg",
+    "Value": 1250
+  },
+  {
+    "Name": "KelpForestEgg",
+    "Value": 1251
+  },
+  {
+    "Name": "GrassyPlateausEgg",
+    "Value": 1252
+  },
+  {
+    "Name": "GrandReefsEgg",
+    "Value": 1253
+  },
+  {
+    "Name": "MushroomForestEgg",
+    "Value": 1254
+  },
+  {
+    "Name": "KooshZoneEgg",
+    "Value": 1255
+  },
+  {
+    "Name": "TwistyBridgesEgg",
+    "Value": 1256
+  },
+  {
+    "Name": "LavaZoneEgg",
+    "Value": 1257
+  },
+  {
+    "Name": "StalkerEgg",
+    "Value": 1258
+  },
+  {
+    "Name": "ReefbackEgg",
+    "Value": 1259
+  },
+  {
+    "Name": "SpadefishEgg",
+    "Value": 1260
+  },
+  {
+    "Name": "RabbitrayEgg",
+    "Value": 1261
+  },
+  {
+    "Name": "MesmerEgg",
+    "Value": 1262
+  },
+  {
+    "Name": "JumperEgg",
+    "Value": 1263
+  },
+  {
+    "Name": "SandsharkEgg",
+    "Value": 1264
+  },
+  {
+    "Name": "JellyrayEgg",
+    "Value": 1265
+  },
+  {
+    "Name": "BonesharkEgg",
+    "Value": 1266
+  },
+  {
+    "Name": "CrabsnakeEgg",
+    "Value": 1267
+  },
+  {
+    "Name": "ShockerEgg",
+    "Value": 1268
+  },
+  {
+    "Name": "GasopodEgg",
+    "Value": 1269
+  },
+  {
+    "Name": "CrashEgg",
+    "Value": 1281
+  },
+  {
+    "Name": "CrabsquidEgg",
+    "Value": 1283
+  },
+  {
+    "Name": "CutefishEgg",
+    "Value": 1285
+  },
+  {
+    "Name": "LavaLizardEgg",
+    "Value": 1287
+  },
+  {
+    "Name": "HullReinforcementModule",
+    "Value": 1501
+  },
+  {
+    "Name": "PowerUpgradeModule",
+    "Value": 1516
+  },
+  {
+    "Name": "CyclopsHullModule1",
+    "Value": 1537
+  },
+  {
+    "Name": "CyclopsHullModule2",
+    "Value": 1538
+  },
+  {
+    "Name": "HatchingEnzymes",
+    "Value": 1547
+  },
+  {
+    "Name": "CyclopsShieldModule",
+    "Value": 1551
+  },
+  {
+    "Name": "CyclopsSonarModule",
+    "Value": 1552
+  },
+  {
+    "Name": "CyclopsSeamothRepairModule",
+    "Value": 1553
+  },
+  {
+    "Name": "CyclopsDecoyModule",
+    "Value": 1554
+  },
+  {
+    "Name": "CyclopsFireSuppressionModule",
+    "Value": 1555
+  },
+  {
+    "Name": "CyclopsThermalReactorModule",
+    "Value": 1557
+  },
+  {
+    "Name": "CyclopsHullModule3",
+    "Value": 1558
+  },
+  {
+    "Name": "LuggageBag",
+    "Value": 1807
+  },
+  {
+    "Name": "ArcadeGorgetoy",
+    "Value": 1808
+  },
+  {
+    "Name": "LabEquipment1",
+    "Value": 1809
+  },
+  {
+    "Name": "LabEquipment2",
+    "Value": 1810
+  },
+  {
+    "Name": "LabEquipment3",
+    "Value": 1811
+  },
+  {
+    "Name": "Cap1",
+    "Value": 1814
+  },
+  {
+    "Name": "Cap2",
+    "Value": 1815
+  },
+  {
+    "Name": "LabContainer",
+    "Value": 1816
+  },
+  {
+    "Name": "LabContainer2",
+    "Value": 1817
+  },
+  {
+    "Name": "LabContainer3",
+    "Value": 1818
+  },
+  {
+    "Name": "StarshipSouvenir",
+    "Value": 1823
+  },
+  {
+    "Name": "PosterAurora",
+    "Value": 1824
+  },
+  {
+    "Name": "PosterExoSuit1",
+    "Value": 1825
+  },
+  {
+    "Name": "PosterExoSuit2",
+    "Value": 1826
+  },
+  {
+    "Name": "PosterKitty",
+    "Value": 1827
+  },
+  {
+    "Name": "Signal",
+    "Value": 2005
+  },
+  {
+    "Name": "SeamothReinforcementModule",
+    "Value": 2100
+  },
+  {
+    "Name": "VehiclePowerUpgradeModule",
+    "Value": 2101
+  },
+  {
+    "Name": "SeamothSolarCharge",
+    "Value": 2102
+  },
+  {
+    "Name": "VehicleStorageModule",
+    "Value": 2103
+  },
+  {
+    "Name": "SeamothElectricalDefense",
+    "Value": 2104
+  },
+  {
+    "Name": "VehicleArmorPlating",
+    "Value": 2105
+  },
+  {
+    "Name": "SeamothTorpedoModule",
+    "Value": 2109
+  },
+  {
+    "Name": "SeamothSonarModule",
+    "Value": 2110
+  },
+  {
+    "Name": "WhirlpoolTorpedo",
+    "Value": 2111
+  },
+  {
+    "Name": "VehicleHullModule1",
+    "Value": 2112
+  },
+  {
+    "Name": "VehicleHullModule2",
+    "Value": 2113
+  },
+  {
+    "Name": "VehicleHullModule3",
+    "Value": 2114
+  },
+  {
+    "Name": "ExosuitJetUpgradeModule",
+    "Value": 2115
+  },
+  {
+    "Name": "ExosuitDrillArmModule",
+    "Value": 2116
+  },
+  {
+    "Name": "ExosuitThermalReactorModule",
+    "Value": 2117
+  },
+  {
+    "Name": "GasTorpedo",
+    "Value": 2119
+  },
+  {
+    "Name": "ExosuitPropulsionArmModule",
+    "Value": 2120
+  },
+  {
+    "Name": "ExosuitGrapplingArmModule",
+    "Value": 2121
+  },
+  {
+    "Name": "ExosuitTorpedoArmModule",
+    "Value": 2122
+  },
+  {
+    "Name": "ExosuitPropulsionArmFragment",
+    "Value": 2124
+  },
+  {
+    "Name": "ExosuitGrapplingArmFragment",
+    "Value": 2125
+  },
+  {
+    "Name": "ExosuitTorpedoArmFragment",
+    "Value": 2126
+  },
+  {
+    "Name": "ExoHullModule1",
+    "Value": 2128
+  },
+  {
+    "Name": "ExoHullModule2",
+    "Value": 2129
+  },
+  {
+    "Name": "MapRoomUpgradeScanRange",
+    "Value": 2250
+  },
+  {
+    "Name": "MapRoomUpgradeScanSpeed",
+    "Value": 2251
+  },
+  {
+    "Name": "HoleFish",
+    "Value": 2501
+  },
+  {
+    "Name": "CreepvineSeedCluster",
+    "Value": 2503
+  },
+  {
+    "Name": "Peeper",
+    "Value": 2504
+  },
+  {
+    "Name": "Oculus",
+    "Value": 2505
+  },
+  {
+    "Name": "GarryFish",
+    "Value": 2507
+  },
+  {
+    "Name": "Boomerang",
+    "Value": 2510
+  },
+  {
+    "Name": "Eyeye",
+    "Value": 2513
+  },
+  {
+    "Name": "Bladderfish",
+    "Value": 2515
+  },
+  {
+    "Name": "Hoverfish",
+    "Value": 2516
+  },
+  {
+    "Name": "Reginald",
+    "Value": 2519
+  },
+  {
+    "Name": "Spadefish",
+    "Value": 2520
+  },
+  {
+    "Name": "Floater",
+    "Value": 2522
+  },
+  {
+    "Name": "CreepvinePiece",
+    "Value": 2529
+  },
+  {
+    "Name": "GasPod",
+    "Value": 2530
+  },
+  {
+    "Name": "Hoopfish",
+    "Value": 2531
+  },
+  {
+    "Name": "Spinefish",
+    "Value": 2546
+  },
+  {
+    "Name": "LavaBoomerang",
+    "Value": 2554
+  },
+  {
+    "Name": "LavaEyeye",
+    "Value": 2555
+  },
+  {
+    "Name": "JellyPlant",
+    "Value": 3010
+  },
+  {
+    "Name": "AcidMushroom",
+    "Value": 3021
+  },
+  {
+    "Name": "BloodOil",
+    "Value": 3034
+  },
+  {
+    "Name": "WhiteMushroom",
+    "Value": 3035
+  },
+  {
+    "Name": "PinkMushroom",
+    "Value": 3039
+  },
+  {
+    "Name": "PurpleRattle",
+    "Value": 3040
+  },
+  {
+    "Name": "SeaTreaderPoop",
+    "Value": 3063
+  },
+  {
+    "Name": "JeweledDiskPiece",
+    "Value": 3501
+  },
+  {
+    "Name": "CoralChunk",
+    "Value": 3502
+  },
+  {
+    "Name": "KooshChunk",
+    "Value": 3503
+  },
+  {
+    "Name": "StalkerTooth",
+    "Value": 3504
+  },
+  {
+    "Name": "BulboTreePiece",
+    "Value": 3506
+  },
+  {
+    "Name": "OrangeMushroomSpore",
+    "Value": 3507
+  },
+  {
+    "Name": "PurpleVasePlantSeed",
+    "Value": 3508
+  },
+  {
+    "Name": "AcidMushroomSpore",
+    "Value": 3509
+  },
+  {
+    "Name": "WhiteMushroomSpore",
+    "Value": 3510
+  },
+  {
+    "Name": "PinkMushroomSpore",
+    "Value": 3511
+  },
+  {
+    "Name": "PurpleRattleSpore",
+    "Value": 3512
+  },
+  {
+    "Name": "HangingFruit",
+    "Value": 3513
+  },
+  {
+    "Name": "PurpleVegetable",
+    "Value": 3514
+  },
+  {
+    "Name": "SmallMelon",
+    "Value": 3515
+  },
+  {
+    "Name": "Melon",
+    "Value": 3516
+  },
+  {
+    "Name": "MelonSeed",
+    "Value": 3517
+  },
+  {
+    "Name": "PurpleBrainCoralPiece",
+    "Value": 3518
+  },
+  {
+    "Name": "SpikePlantSeed",
+    "Value": 3519
+  },
+  {
+    "Name": "BluePalmSeed",
+    "Value": 3520
+  },
+  {
+    "Name": "PurpleFanSeed",
+    "Value": 3521
+  },
+  {
+    "Name": "SmallFanSeed",
+    "Value": 3522
+  },
+  {
+    "Name": "PurpleTentacleSeed",
+    "Value": 3523
+  },
+  {
+    "Name": "JellyPlantSeed",
+    "Value": 3524
+  },
+  {
+    "Name": "GabeSFeatherSeed",
+    "Value": 3525
+  },
+  {
+    "Name": "SeaCrownSeed",
+    "Value": 3526
+  },
+  {
+    "Name": "MembrainTreeSeed",
+    "Value": 3527
+  },
+  {
+    "Name": "PinkFlowerSeed",
+    "Value": 3528
+  },
+  {
+    "Name": "FernPalmSeed",
+    "Value": 3529
+  },
+  {
+    "Name": "OrangePetalsPlantSeed",
+    "Value": 3530
+  },
+  {
+    "Name": "EyesPlantSeed",
+    "Value": 3531
+  },
+  {
+    "Name": "RedGreenTentacleSeed",
+    "Value": 3532
+  },
+  {
+    "Name": "PurpleStalkSeed",
+    "Value": 3533
+  },
+  {
+    "Name": "RedBasketPlantSeed",
+    "Value": 3534
+  },
+  {
+    "Name": "RedBushSeed",
+    "Value": 3535
+  },
+  {
+    "Name": "RedConePlantSeed",
+    "Value": 3536
+  },
+  {
+    "Name": "ShellGrassSeed",
+    "Value": 3537
+  },
+  {
+    "Name": "SpottedLeavesPlantSeed",
+    "Value": 3538
+  },
+  {
+    "Name": "RedRollPlantSeed",
+    "Value": 3539
+  },
+  {
+    "Name": "PurpleBranchesSeed",
+    "Value": 3540
+  },
+  {
+    "Name": "SnakeMushroomSpore",
+    "Value": 3541
+  },
+  {
+    "Name": "PrecursorKey_Red",
+    "Value": 4200
+  },
+  {
+    "Name": "PrecursorKey_Blue",
+    "Value": 4201
+  },
+  {
+    "Name": "PrecursorKey_Orange",
+    "Value": 4202
+  },
+  {
+    "Name": "PrecursorKey_White",
+    "Value": 4203
+  },
+  {
+    "Name": "PrecursorKey_Purple",
+    "Value": 4204
+  },
+  {
+    "Name": "PrecursorIonPowerCell",
+    "Value": 4209
+  },
+  {
+    "Name": "PrecursorIonBattery",
+    "Value": 4210
+  },
+  {
+    "Name": "FilteredWater",
+    "Value": 4500
+  },
+  {
+    "Name": "DisinfectedWater",
+    "Value": 4501
+  },
+  {
+    "Name": "CookedPeeper",
+    "Value": 4502
+  },
+  {
+    "Name": "CookedHoleFish",
+    "Value": 4503
+  },
+  {
+    "Name": "CookedGarryFish",
+    "Value": 4504
+  },
+  {
+    "Name": "CookedReginald",
+    "Value": 4505
+  },
+  {
+    "Name": "CookedBladderfish",
+    "Value": 4506
+  },
+  {
+    "Name": "CookedHoverfish",
+    "Value": 4507
+  },
+  {
+    "Name": "CookedSpadefish",
+    "Value": 4508
+  },
+  {
+    "Name": "CookedBoomerang",
+    "Value": 4509
+  },
+  {
+    "Name": "CookedEyeye",
+    "Value": 4510
+  },
+  {
+    "Name": "CookedOculus",
+    "Value": 4511
+  },
+  {
+    "Name": "CookedHoopfish",
+    "Value": 4512
+  },
+  {
+    "Name": "NutrientBlock",
+    "Value": 4513
+  },
+  {
+    "Name": "FirstAidKit",
+    "Value": 4514
+  },
+  {
+    "Name": "StillsuitWater",
+    "Value": 4515
+  },
+  {
+    "Name": "BigFilteredWater",
+    "Value": 4516
+  },
+  {
+    "Name": "CookedSpinefish",
+    "Value": 4517
+  },
+  {
+    "Name": "CookedLavaEyeye",
+    "Value": 4518
+  },
+  {
+    "Name": "CookedLavaBoomerang",
+    "Value": 4519
+  },
+  {
+    "Name": "Snack1",
+    "Value": 4520
+  },
+  {
+    "Name": "Snack2",
+    "Value": 4521
+  },
+  {
+    "Name": "Snack3",
+    "Value": 4522
+  },
+  {
+    "Name": "Coffee",
+    "Value": 4523
+  },
+  {
+    "Name": "CuredPeeper",
+    "Value": 4600
+  },
+  {
+    "Name": "CuredHoleFish",
+    "Value": 4601
+  },
+  {
+    "Name": "CuredGarryFish",
+    "Value": 4602
+  },
+  {
+    "Name": "CuredReginald",
+    "Value": 4603
+  },
+  {
+    "Name": "CuredBladderfish",
+    "Value": 4604
+  },
+  {
+    "Name": "CuredHoverfish",
+    "Value": 4605
+  },
+  {
+    "Name": "CuredSpadefish",
+    "Value": 4606
+  },
+  {
+    "Name": "CuredBoomerang",
+    "Value": 4607
+  },
+  {
+    "Name": "CuredEyeye",
+    "Value": 4608
+  },
+  {
+    "Name": "CuredOculus",
+    "Value": 4609
+  },
+  {
+    "Name": "CuredHoopfish",
+    "Value": 4610
+  },
+  {
+    "Name": "CuredSpinefish",
+    "Value": 4611
+  },
+  {
+    "Name": "CuredLavaEyeye",
+    "Value": 4612
+  },
+  {
+    "Name": "CuredLavaBoomerang",
+    "Value": 4613
+  },
+  {
+    "Name": "MapRoomCamera",
+    "Value": 5527
+  },
+  {
+    "Name": "Poster",
+    "Value": 6005
+  },
+  {
+    "Name": "BoneShark",
+    "Value": 2534
+  },
+  {
+    "Name": "CrabSquid",
+    "Value": 2550
+  },
+  {
+    "Name": "Crabsnake",
+    "Value": 2539
+  },
+  {
+    "Name": "Crash",
+    "Value": 2509
+  },
+  {
+    "Name": "Gasopod",
+    "Value": 2523
+  },
+  {
+    "Name": "Jellyray",
+    "Value": 2517
+  },
+  {
+    "Name": "Jumper",
+    "Value": 2502
+  },
+  {
+    "Name": "LavaLizard",
+    "Value": 2551
+  },
+  {
+    "Name": "Mesmer",
+    "Value": 2535
+  },
+  {
+    "Name": "RabbitRay",
+    "Value": 2506
+  },
+  {
+    "Name": "Reefback",
+    "Value": 2518
+  },
+  {
+    "Name": "Sandshark",
+    "Value": 2524
+  },
+  {
+    "Name": "Shocker",
+    "Value": 2545
+  },
+  {
+    "Name": "Stalker",
+    "Value": 2512
+  },
+  {
+    "Name": "Cutefish",
+    "Value": 2538
+  },
+    {
+    "Name": "NuclearTorpedo",
+    "Value": 11149
+  }
+]

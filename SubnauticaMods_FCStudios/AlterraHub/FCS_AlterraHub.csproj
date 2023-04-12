@@ -122,6 +122,8 @@
     <Compile Include="ModItems\FCSPDA\Mono\Dialogs\CartDropDownHandler.cs" />
     <Compile Include="ModItems\FCSPDA\Mono\Dialogs\CheckOutPopupDialogWindow.cs" />
     <Compile Include="ModItems\FCSPDA\Mono\Dialogs\DestinationDialogController.cs" />
+    <Compile Include="ModItems\FCSPDA\Mono\Dialogs\EncyclopediaListItem.cs" />
+    <Compile Include="ModItems\FCSPDA\Mono\Dialogs\EncyclopediaMainTabController.cs" />
     <Compile Include="ModItems\FCSPDA\Mono\Dialogs\ReturnsDialogController.cs" />
     <Compile Include="ModItems\FCSPDA\Mono\Dialogs\ShipmentPageController.cs" />
     <Compile Include="ModItems\FCSPDA\Mono\Dialogs\StoreItemPageController.cs" />

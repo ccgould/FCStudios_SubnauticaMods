@@ -63,6 +63,7 @@ internal static class ModRegistrationService
         };
 
         _registeredMods.Add(modPackName, new ModPackData(modPackName, assembly, assetBundleName));
+        EncyclopediaService.GetEncyclopediaEntries(modPackName);
         QuickLogger.Info($"Registered {modPackName}");
     }
 

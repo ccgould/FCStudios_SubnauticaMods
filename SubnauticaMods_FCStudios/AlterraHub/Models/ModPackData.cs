@@ -101,4 +101,9 @@ internal class ModPackData
     {
         return _modItems.Any(x=>x.Value.TechType == techType);
     }
+
+    internal string GetModPackName()
+    {
+        return _modName;
+    }
 }

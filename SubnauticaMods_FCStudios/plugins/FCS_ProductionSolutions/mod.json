@@ -1,0 +1,22 @@
+{
+  "Id": "FCSProductionSolutions",
+  "DisplayName": "FCS Production Solutions",
+  "Author": "Field Creators Studios",
+  "Version": "1.0.1.117",
+  "Game": "Subnautica",
+  "AssemblyName": "FCS_ProductionSolutions.dll",
+  "VersionDependencies": {
+    "FCSAlterraHub": "1.0.1.91"
+  },
+  "QModSAM": {
+    "DeprecatedMods": [
+      "FCSDeepDriller",
+      "GasPodCollector",
+      "HydroponicHarvesters"
+    ]
+  },
+  "VersionChecker": {
+    "LatestVersionURL": "https://github.com/ccgould/FCStudios_SubnauticaMods/raw/master/VersionChecker/FCS_ProductionSolutions/mod.json"
+  },
+  "Enable": true
+}

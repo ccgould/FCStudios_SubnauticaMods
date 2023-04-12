@@ -1,0 +1,249 @@
+{
+  "DirectoryFiles": [
+    {
+      "FileName": "FCSModdingUtilitySave.fcs",
+      "AllowedToPackage": false,
+      "ModID": 0
+    },
+    {
+      "FileName": "FCS_AlterraHub.dll",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "mod.json",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "AlterraHubDepot.png",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "AlterraHubPing.png",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "DebitCard.png",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "DronePortPad.png",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "fcsalterrahubbundle",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "filters.json",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "OreConsumer.png",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "PaintCan.png",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "PatreonStatue.png",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "TransportDronePing.png",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "type_reference.json",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "icon.png",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "booster.mp3",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "ElectricalBoxesNeedFixing.mp3",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "PDA.mp3",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "PDA_Account_Created.mp3",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "PDA_Account_Instructions.mp3",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "PDA_Drone_Instructions.mp3",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "PDA_Instructions.mp3",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "Play_DebtPaid.mp3",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "Play_NotDebtPaid.mp3",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "PDA.mp3",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "PDA_Account_Created.mp3",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "PDA_Account_Instructions.mp3",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "PDA_Drone_Instructions.mp3",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "PDA_Instructions.mp3",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "EncyclopediaEntries.json",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "arrowDown.png",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "arrowUp.png",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "BasesIcon.png",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "Cart_Icon.png",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "ContactsIcon.png",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "EncyclopediaIcon.png",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "EnergySolutionsIcon_W.png",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "HomeSolutionsIcon_W.png",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "IconAccount.png",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "LifeSupportIcon_W.png",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "MessageIcon.png",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "MiscIcon_W.png",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "MissionIcon.png",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "ProductionSolutionsIcon_W.png",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "QuantumTeleporterIcon_W.png",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "SettingsIcon.png",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "StoreSolutionsIcon_W.png",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "VehicleSolutionsIcon_W.png",
+      "AllowedToPackage": true,
+      "ModID": 0
+    },
+    {
+      "FileName": "alterrahub-config.json",
+      "AllowedToPackage": false,
+      "ModID": 0
+    }
+  ]
+}

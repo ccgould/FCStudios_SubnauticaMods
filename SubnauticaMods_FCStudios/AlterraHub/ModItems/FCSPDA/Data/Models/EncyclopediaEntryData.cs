@@ -37,6 +37,12 @@ public class EncyclopediaEntryData
         return techType.Equals(TechTypeString);
     }
 
+    public string GetCategory()
+    {
+        var paths = Path.Split('/');
+        return paths.GetLast();
+    }
+
     public override string ToString()
     {
         return $"Title: {Title} | Tab Title: {TabTitle}";

@@ -55,7 +55,6 @@ internal class IonCubeGeneratorBuildable : FCSBuildableModBase
         MaterialHelpers.ChangeEmissionColor(ModPrefabService.BaseSecondaryCol, Prefab, Color.green);
         MaterialHelpers.ChangeEmissionStrength(ModPrefabService.BasePrimaryCol, Prefab, 5f);
         MaterialHelpers.ChangeEmissionStrength(ModPrefabService.BaseSecondaryCol, Prefab, 5f);
-        Prefab.AddComponent<HoverInteraction>();
         Prefab.AddComponent<ColorManager>();
         Prefab.AddComponent<IonCubeGeneratorController>();
         yield break;

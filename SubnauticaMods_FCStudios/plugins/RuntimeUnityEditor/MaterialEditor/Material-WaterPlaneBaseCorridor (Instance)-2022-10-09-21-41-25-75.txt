@@ -1,0 +1,13 @@
+Code generated from Material: WaterPlaneBaseCorridor (Instance)
+
+using UnityEngine;
+
+Material material;
+material.shader = Shader.Find("FX/WBOIT-WaterPlane");
+
+material.SetColor("_Color", new Color(0.4779411f, 0.8955883f, 1f, 0.2352941f));
+material.SetVector("_ScrollSpeed", new Vector4(0.05f, 0.01f, -0.02f, -0.02f));
+material.SetVector("_Scale", new Vector4(0f, 0.1f, 0f, 0f));
+material.SetVector("_Frequency", new Vector4(0.34f, 0.4f, 0.23f, 0.7f));
+material.SetVector("_Speed", new Vector4(0f, 0f, 0f, 0f));
+material.SetFloat("_MyCullVariable", 0f);

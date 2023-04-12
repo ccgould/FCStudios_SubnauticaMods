@@ -10,6 +10,9 @@ using FCS_AlterraHub.Models;
 using SMLHelper.Handlers;
 using SMLHelper.Utility;
 using System.IO;
+using Newtonsoft.Json;
+using System.Xml.Schema;
+using System.Linq;
 
 namespace FCS_AlterraHub.Core.Services
 {
@@ -21,11 +24,11 @@ namespace FCS_AlterraHub.Core.Services
         internal static List<Dictionary<string, List<EncyclopediaEntryData>>> EncyclopediaEntries { get; set; } = new();
         internal static bool IsRegisteringEncyclopedia { get; set; }
 
-        public static void RegisterEncyclopediaEntries(List<Dictionary<string, List<EncyclopediaEntryData>>> encyclopediaEntries)
+        public static void RegisterEncyclopediaEntries()
         {
             LanguageHandler.SetLanguageLine($"EncyPath_fcs", "Field Creators Studios");
 
-            foreach (Dictionary<string, List<EncyclopediaEntryData>> entry in encyclopediaEntries)
+            foreach (Dictionary<string, List<EncyclopediaEntryData>> entry in EncyclopediaEntries)
             {
                 foreach (KeyValuePair<string, List<EncyclopediaEntryData>> data in entry)
                 {
@@ -112,6 +115,59 @@ namespace FCS_AlterraHub.Core.Services
             }
             
             return FCSAssetBundlesService.PublicAPI.GetTextureByName(imageName, bundleName);           
+        }
+
+        public static void GetEncyclopediaEntries(string modID)
+        {
+            try
+            {
+                QuickLogger.Debug("Get Encyclopedia Entries");
+
+                if (ModRegistrationService.GetRegisteredMods().TryGetValue(modID, out ModPackData data))
+                {
+                    var encyclopediaJson = Path.Combine(data.GetAssetPath(), "Encyclopedia", "EncyclopediaEntries.json");
+
+                    if (File.Exists(encyclopediaJson))
+                    {
+                        QuickLogger.Debug("Encyclopedia Json Found");
+                        var jsonData = JsonConvert.DeserializeObject<Dictionary<string, List<EncyclopediaEntryData>>>(File.ReadAllText(encyclopediaJson));
+
+                        foreach (var value in jsonData.Values)
+                        {
+                            foreach (var entryData in value)
+                            {
+                                entryData.ModPackID = modID;
+                            }
+                        }
+
+                        EncyclopediaEntries.Insert(0, jsonData);
+
+                        QuickLogger.Debug($"Count of Encyclopedia Entries: {EncyclopediaEntries.Count}");
+                    }
+                    else
+                    {
+                        QuickLogger.Warning($"No encyclopedia file found for mod pack {modID}");
+                    }
+                }
+                else
+                {
+                    QuickLogger.Error($"Failed to find {modID}! Registering Encyclopedia Data failed");
+                }
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error(e.Message);
+                QuickLogger.Error(e.StackTrace);
+            }
+        }
+
+        internal static IEnumerable<EncyclopediaEntryData> GetCategoryEntries(string category)
+        {
+            return from item in EncyclopediaEntries
+                   from entry in item.Values
+                   from h in entry
+                   where h.GetCategory() == category
+                   select h;
         }
     }
 }

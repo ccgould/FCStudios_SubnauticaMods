@@ -20,4 +20,5 @@ public enum PDAPages
     DeviceSettings = 14,
     DevicePage = 15,
     BaseDevices = 16,
+    EncyclopediaMain = 17,
 }
