@@ -13,6 +13,7 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs
     {
         private TMP_Text _label;
         private Button _button;
+        private EncyclopediaData _encyclopediaData;
         private EncyclopediaMainTabController _controller;
         private EncyclopediaTabController _encyclopediaPage;
         private EncyclopediaEntryData _entryData;
@@ -31,28 +32,39 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs
                 }
                 else
                 {
-                    FCSPDAController.Main.Screen.GoToPage(PDAPages.Encyclopedia, _label.text);
+                    FCSPDAController.Main.Screen.GoToPage(PDAPages.Encyclopedia, _encyclopediaData);
                 }
             });
 
         }
 
-        internal void Initialize(string text, EncyclopediaEntryData item = null)
+        internal void Initialize(EncyclopediaData value)
         {
             if(_label != null)
             {
-                _label.text = text;
+                _label.text = value.Title;
             }
+            _encyclopediaData = value;
             _controller  = EncyclopediaMainTabController.Instance;
             _encyclopediaPage = EncyclopediaTabController.Instance;
-            _entryData = item;
+        }
+
+        internal void Initialize(EncyclopediaEntryData value)
+        {
+            if (_label != null)
+            {
+                _label.text = value.Title;
+            }
+            _controller = EncyclopediaMainTabController.Instance;
+            _encyclopediaPage = EncyclopediaTabController.Instance;
+            _entryData = value;
         }
 
         public void OnPointerEnter(PointerEventData eventData)
         {
             //TODO decouple
             if (_controller == null) return;
-            _controller.HoverTriggered(_label.text);
+            _controller.HoverTriggered(_encyclopediaData);
         }
 
         public void OnPointerExit(PointerEventData eventData)

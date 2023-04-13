@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
+﻿using System.Collections.Generic;
 using FCS_AlterraHub.API;
 using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Core.Services;
+using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.ModItems.FCSPDA.Data.Models;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
 using FCSCommon.Utilities;
@@ -64,48 +63,15 @@ internal class EncyclopediaMainTabController : Page
         }
 
 
-        foreach (string item in GetCategories())
+        foreach (var item in EncyclopediaService.EncyclopediaEntries)
         {
             var prefab = GameObject.Instantiate(_itemPrefab);
             var listItem = prefab.EnsureComponent<EncyclopediaListItem>();
             prefab.transform.SetParent(_listCanvas.transform, false);
-            listItem.Initialize(item);
+            listItem.Initialize(item.Value);
         }
-
-        //foreach (Dictionary<string, List<EncyclopediaEntryData>> item in EncyclopediaService.EncyclopediaEntries)
-        //{
-        //    foreach (var entries in item.Values)
-        //    {
-        //        foreach (var entry in entries)
-        //        {
-        //            var prefab = GameObject.Instantiate(_itemPrefab);
-        //            var listItem = prefab.EnsureComponent<EncyclopediaListItem>();
-        //            prefab.transform.SetParent(_listCanvas.transform, false);
-        //            listItem.Instantiate(entry.TabTitle);
-        //        }
-        //    }
-        //}
-
-
 
         _isInitialize = true;
-    }
-
-    private HashSet<string> GetCategories()
-    {
-        var result = new HashSet<string>();
-        foreach (Dictionary<string, List<EncyclopediaEntryData>> item in EncyclopediaService.EncyclopediaEntries)
-        {
-            foreach (var entries in item.Values)
-            {
-                foreach (var entry in entries)
-                {
-                    result.Add(entry.GetCategory());
-                }
-            }
-        }
-
-        return result;
     }
 
     internal void OpenEntry(TechType techType)
@@ -121,10 +87,31 @@ internal class EncyclopediaMainTabController : Page
     internal void Clear()
     {
         _title.text = string.Empty;
+        
     }
 
-    internal void HoverTriggered(string text)
+    internal void HoverTriggered(EncyclopediaData data)
     {
-        _title.text = text;
+        if (data is null) return;
+        _title.text = data.Title;
+        SetImage(data);
+        //FCSAssetBundlesService.PublicAPI.GetIconByName("HomeSolutionsIcon_W", Main.MODNAME)
+    }
+
+    private void SetImage(EncyclopediaData entryData)
+    {
+        var texture = EncyclopediaService.GetEncyclopediaTexture2D(entryData.ModPackID, ModRegistrationService.GetModPackData(entryData.ModPackID).GetBundleName());
+        _image.texture = texture;
+        if (texture != null)
+        {
+            float num = (float)texture.height / (float)texture.width;
+            float num2 = _image.rectTransform.rect.width * num;
+            _imageLayout.minHeight = num2;
+            _imageLayout.preferredHeight = num2;
+            _image.gameObject.SetActive(true);
+            return;
+        }
+
+        _image.gameObject.SetActive(false);
     }
 }

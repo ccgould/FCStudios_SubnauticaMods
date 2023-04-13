@@ -84,6 +84,7 @@
     <Compile Include="Models\Enumerators\ColorTargetMode.cs" />
     <Compile Include="Models\Enumerators\StoreCategory.cs" />
     <Compile Include="Models\FCSKit.cs" />
+    <Compile Include="Models\Interfaces\EncyclopediaComparer.cs" />
     <Compile Include="Models\Interfaces\IDataService.cs" />
     <Compile Include="Models\Interfaces\IFCSAlterraHubGUI.cs" />
     <Compile Include="Models\Interfaces\IFCSSave.cs" />
