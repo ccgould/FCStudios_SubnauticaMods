@@ -15,6 +15,7 @@ using FCS_AlterraHub.API;
 using FCS_AlterraHub.ModItems.FCSPDA.Interfaces;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
+using static HandReticle;
 
 namespace FCS_AlterraHub.ModItems.FCSPDA.Mono;
 
@@ -98,7 +99,7 @@ public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
         DevicePage();
         TeleportationPage();
 
-        OnInfoButtonClicked += EncyclopediaTabController.OpenEntry;
+        OnInfoButtonClicked += onInfoButtonClicked;
         _menuController.Initialize();
         //MaterialHelpers.ApplyEmissionShader(AlterraHub.BasePrimaryCol, gameObject, Color.white, 0, 0.01f, 0.01f);
         //MaterialHelpers.ApplySpecShader(AlterraHub.BasePrimaryCol, gameObject, 1, 6.15f);
@@ -106,6 +107,11 @@ public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
         //MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
         InvokeRepeating(nameof(UpdateDisplay), .5f, .5f);
         _isInitialized = true;
+    }
+
+    private void onInfoButtonClicked(TechType techType)
+    {
+        FCSPDAController.Main.Screen.OpenEncyclopedia(techType);
     }
 
     private void AddPages()
@@ -299,22 +305,9 @@ public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
     internal void OpenEncyclopedia(TechType techType)
     {
         if (CheckIfPDAHasEntry(techType))
-        {
-            GoToPage(PDAPages.Encyclopedia);
-            EncyclopediaTabController.OpenEntry(techType);
-        }
-        else
-        {
-            QuickLogger.ModMessage($"AlterraHub PDA doesn't have any entry for {Language.main.Get(techType)}");
-        }
-    }
-
-    internal void OpenEncyclopedia(string techType)
-    {
-        if (CheckIfPDAHasEntry(techType))
-        {
-            GoToPage(PDAPages.Encyclopedia);
-            EncyclopediaTabController.OpenEntry(techType);
+        {            
+            QuickLogger.Debug($"Openning PDA Entry of techType:{techType}");
+            GoToPage(PDAPages.Encyclopedia, EncyclopediaService.GetEntryByTechType(techType));
         }
         else
         {

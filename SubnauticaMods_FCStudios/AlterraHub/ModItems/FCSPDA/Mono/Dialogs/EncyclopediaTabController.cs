@@ -1,4 +1,5 @@
 ﻿using FCS_AlterraHub.API;
+using FCS_AlterraHub.Core.Extensions;
 using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.ModItems.FCSPDA.Data.Models;
@@ -22,11 +23,17 @@ internal class EncyclopediaTabController : Page
     internal static EncyclopediaTabController Instance;
     public override void Enter(object arg = null)
     {
-        base.Enter(arg);
-
-        
+        base.Enter(arg);               
         Initialize();
         RefreshList((EncyclopediaData)arg);
+    }
+
+    public override void Exit()
+    {
+        base.Exit();
+        _image.gameObject.SetActive(false);
+        _title.text = string.Empty;
+        _message.text = string.Empty;
     }
 
     internal bool HasEntry(TechType techType)
@@ -79,24 +86,16 @@ internal class EncyclopediaTabController : Page
             prefab.transform.SetParent(_listCanvas.transform, false);
             listItem.Initialize(entry);
         }
-
-        //foreach (EncyclopediaEntryData item in EncyclopediaService.GetCategoryEntries(category))
-        //{
-        //    var prefab = GameObject.Instantiate(_itemPrefab);
-        //    var listItem = prefab.EnsureComponent<EncyclopediaListItem>();
-        //    prefab.transform.SetParent(_listCanvas.transform, false);
-        //    listItem.Initialize(item.Title, item);
-        //}
     }
 
     internal void OpenEntry(TechType techType)
     {
-
+        Enter(EncyclopediaService.GetEntryByTechType(techType));
     }
 
     internal void OpenEntry(string techType)
     {
-
+        Enter(EncyclopediaService.GetEntryByTechType(techType.ToTechType()));
     }
 
     internal void SetData(EncyclopediaEntryData entryData)
@@ -109,6 +108,7 @@ internal class EncyclopediaTabController : Page
             return;
         }
     }
+
     private void SetImage(EncyclopediaEntryData entryData)
     {
         var texture = EncyclopediaService.GetEncyclopediaTexture2D(entryData.ImageName, ModRegistrationService.GetModPackData(EncyclopediaService.GetModPackID(entryData)).GetBundleName());

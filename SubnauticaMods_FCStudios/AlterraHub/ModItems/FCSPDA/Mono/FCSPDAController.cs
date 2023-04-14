@@ -1,13 +1,9 @@
 ﻿using FCS_AlterraHub.API;
-using FCS_AlterraHub.Configuation;
 using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Abstract;
-using FCS_AlterraHub.Models.Enumerators;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
-using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
 using FCS_AlterraHub.ModItems.FCSPDA.Patches;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FMOD;
 using System;
@@ -80,12 +76,18 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono
                 Destroy(gameObject);
                 return;
             }
+
+            EncyclopediaService.OnOpenEncyclopedia += OnOpenEncyclopedia;
+        }
+
+        private void OnOpenEncyclopedia(TechType techType)
+        {
+            ForceOpen();
+            Screen.OpenEncyclopedia(techType);
         }
 
         public bool Open()
         {
-
-
             Player main = Player.main;
 
             QuickLogger.Debug("PDA Open : 1");
@@ -219,6 +221,7 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono
 
         private void OnDestroy()
         {
+            EncyclopediaService.OnOpenEncyclopedia -= OnOpenEncyclopedia;
             _isBeingDestroyed = true;
         }
 
@@ -389,7 +392,6 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono
         {
             GamePlayService.Main.SetShipmentInfo(Screen.GetShipmentInfo());
         }
-
 
         internal void LoadFromSave()
         {

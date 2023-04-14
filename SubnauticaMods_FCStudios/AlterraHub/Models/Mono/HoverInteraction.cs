@@ -38,7 +38,7 @@ namespace FCS_AlterraHub.Models.Mono
             {
                 //TODO V2 FIx
 
-                //FCSPDAController.Main.OpenEncyclopedia(_controller.GetTechType());
+                EncyclopediaService.OpenEncyclopedia(_controller.GetTechType());
             }
 
             if (Input.GetKeyDown(Main.Configuration.PDASettingsKeyCode))

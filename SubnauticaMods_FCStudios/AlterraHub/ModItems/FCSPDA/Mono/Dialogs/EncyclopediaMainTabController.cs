@@ -29,6 +29,14 @@ internal class EncyclopediaMainTabController : Page
         _title?.gameObject?.SetActive(true);
     }
 
+    public override void Exit()
+    {
+        base.Exit();
+        _image.gameObject.SetActive(false);
+        _title.text = string.Empty;
+        _message.text = string.Empty;
+    }
+
     internal bool HasEntry(TechType techType)
     {
         return true;

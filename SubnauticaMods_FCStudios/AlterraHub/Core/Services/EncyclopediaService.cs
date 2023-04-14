@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 using System.Xml.Schema;
 using System.Linq;
 using Discord;
+using FCS_AlterraHub.Core.Extensions;
 
 namespace FCS_AlterraHub.Core.Services
 {
@@ -24,6 +25,7 @@ namespace FCS_AlterraHub.Core.Services
     {
         internal static Dictionary<string, EncyclopediaData> EncyclopediaEntries { get; set; } = new();
         internal static bool IsRegisteringEncyclopedia { get; set; }
+        internal static Action<TechType> OnOpenEncyclopedia;
 
         public static Texture2D GetEncyclopediaTexture2D(string imageName, string bundleName = "")
         {
@@ -83,6 +85,41 @@ namespace FCS_AlterraHub.Core.Services
         internal static string GetModPackID(EncyclopediaEntryData entryData)
         {
             return EncyclopediaEntries.First(x=>x.Value.Data.Contains(entryData)).Value?.ModPackID ?? string.Empty;
+        }
+
+        internal static void OpenEncyclopedia(TechType techType)
+        {
+            OnOpenEncyclopedia?.Invoke(techType);
+        }
+
+        internal static EncyclopediaEntryData GetDataEntryByTechType(TechType techType)
+        {
+            foreach (var item in EncyclopediaEntries)
+            {
+                foreach (var data in item.Value.Data)
+                {
+                    if(data.TechTypeString.ToTechType() == techType)
+                    {
+                        return data;
+                    }
+                }
+            }
+            return null;
+        }
+
+        internal static EncyclopediaData GetEntryByTechType(TechType techType)
+        {
+            foreach (var item in EncyclopediaEntries)
+            {
+                foreach (var data in item.Value.Data)
+                {
+                    if (data.TechTypeString.ToTechType() == techType)
+                    {
+                        return item.Value;
+                    }
+                }
+            }
+            return null;
         }
     }
 }
