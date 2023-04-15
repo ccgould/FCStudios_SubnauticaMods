@@ -23,18 +23,7 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs
             _label = gameObject.GetComponentInChildren<TMP_Text>();
             _button = gameObject.GetComponent<Button>();
 
-            _button.onClick.AddListener(() =>
-            {
-                if(FCSPDAController.Main.Screen.GetCurrentPage() == PDAPages.Encyclopedia)
-                {
-                    QuickLogger.Debug($"Passing Data: {_entryData.Path}");
-                    _encyclopediaPage.SetData(_entryData);
-                }
-                else
-                {
-                    FCSPDAController.Main.Screen.GoToPage(PDAPages.Encyclopedia, _encyclopediaData);
-                }
-            });
+            _button.onClick.AddListener(onClick);
 
         }
 
@@ -71,6 +60,24 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs
         {
             if (_controller == null) return;
             _controller.Clear();
+        }
+
+        public EncyclopediaEntryData GetData()
+        {
+            return _entryData;
+        }
+
+        internal void onClick()
+        {
+            if (FCSPDAController.Main.Screen.GetCurrentPage() == PDAPages.Encyclopedia)
+            {
+                QuickLogger.Debug($"Passing Data: {_entryData.Path}");
+                _encyclopediaPage.SetData(_entryData);
+            }
+            else
+            {
+                FCSPDAController.Main.Screen.GoToPage(PDAPages.Encyclopedia, _encyclopediaData);
+            }
         }
     }
 }

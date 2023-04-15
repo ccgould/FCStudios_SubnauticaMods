@@ -26,6 +26,7 @@ namespace FCS_AlterraHub.Core.Services
         internal static Dictionary<string, EncyclopediaData> EncyclopediaEntries { get; set; } = new();
         internal static bool IsRegisteringEncyclopedia { get; set; }
         internal static Action<TechType> OnOpenEncyclopedia;
+        private static TechType _selectedEntry;
 
         public static Texture2D GetEncyclopediaTexture2D(string imageName, string bundleName = "")
         {
@@ -37,8 +38,8 @@ namespace FCS_AlterraHub.Core.Services
             {
                 bundleName = FCSAssetBundlesService.PublicAPI.GlobalBundleName;
             }
-            
-            return FCSAssetBundlesService.PublicAPI.GetTextureByName(imageName, bundleName);           
+
+            return FCSAssetBundlesService.PublicAPI.GetTextureByName(imageName, bundleName);
         }
 
         public static void GetEncyclopediaEntries(string modID)
@@ -84,7 +85,7 @@ namespace FCS_AlterraHub.Core.Services
 
         internal static string GetModPackID(EncyclopediaEntryData entryData)
         {
-            return EncyclopediaEntries.First(x=>x.Value.Data.Contains(entryData)).Value?.ModPackID ?? string.Empty;
+            return EncyclopediaEntries.First(x => x.Value.Data.Contains(entryData)).Value?.ModPackID ?? string.Empty;
         }
 
         internal static void OpenEncyclopedia(TechType techType)
@@ -98,7 +99,7 @@ namespace FCS_AlterraHub.Core.Services
             {
                 foreach (var data in item.Value.Data)
                 {
-                    if(data.TechTypeString.ToTechType() == techType)
+                    if (data.TechTypeString.ToTechType() == techType)
                     {
                         return data;
                     }
@@ -120,6 +121,18 @@ namespace FCS_AlterraHub.Core.Services
                 }
             }
             return null;
+        }
+
+        internal static void SetSelectedEntry(TechType techType)
+        {
+            _selectedEntry = techType;
+        }
+
+        internal static TechType GetSelectedEntry() { return _selectedEntry; }
+
+        internal static void ClearSelectedEntry()
+        {
+            _selectedEntry = TechType.None;
         }
     }
 }

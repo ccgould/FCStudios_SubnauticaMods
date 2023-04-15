@@ -222,7 +222,9 @@ public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
 
         Page currentPage = null;
 
-        if(page == PDAPages.None)
+        _currentPage = page;
+
+        if (page == PDAPages.None)
         {
            currentPage =  _menuController.PopPage();
         }
@@ -245,7 +247,6 @@ public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
         }
 
         _toggleHud.gameObject.SetActive(currentPage.ShowHud());
-        _currentPage = page;
     }
 
     internal PDAPages CurrentPage() => _currentPage;
@@ -307,7 +308,9 @@ public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
         if (CheckIfPDAHasEntry(techType))
         {            
             QuickLogger.Debug($"Openning PDA Entry of techType:{techType}");
+            EncyclopediaService.SetSelectedEntry(techType);
             GoToPage(PDAPages.Encyclopedia, EncyclopediaService.GetEntryByTechType(techType));
+            EncyclopediaService.ClearSelectedEntry();
         }
         else
         {

@@ -1,4 +1,5 @@
 ﻿using FCS_AlterraHub.Core.Extensions;
+using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
 
@@ -37,6 +38,13 @@ public class EncyclopediaEntryData
         if (_techType == TechType.None)
         {
             _techType = TechTypeString.ToTechType();
+        }
+
+        QuickLogger.Debug($"Current TechType{_techType} || Comparison {techType}");
+
+        if(_techType == TechType.None)
+        {
+            return false;
         }
 
         return _techType == techType;

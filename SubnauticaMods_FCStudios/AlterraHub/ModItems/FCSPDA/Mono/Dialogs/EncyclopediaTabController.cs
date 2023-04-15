@@ -5,6 +5,8 @@ using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.ModItems.FCSPDA.Data.Models;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
 using FCSCommon.Utilities;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -21,11 +23,26 @@ internal class EncyclopediaTabController : Page
     private RectTransform _listCanvas;
     private bool _isInitialize;
     internal static EncyclopediaTabController Instance;
+    private readonly List<EncyclopediaListItem> _trackedEntries = new();
+
     public override void Enter(object arg = null)
     {
         base.Enter(arg);               
         Initialize();
         RefreshList((EncyclopediaData)arg);
+        SelectActiveEntry();
+    }
+
+    private void SelectActiveEntry()
+    {
+        foreach (var item in _trackedEntries)
+        {
+            if(item.GetData().IsSame(EncyclopediaService.GetSelectedEntry()))
+            {
+                item.onClick();
+                break;
+            }
+        }
     }
 
     public override void Exit()
@@ -74,18 +91,38 @@ internal class EncyclopediaTabController : Page
 
     private void RefreshList(EncyclopediaData data)
     {
+        QuickLogger.Debug("1");
+        _trackedEntries?.Clear();
+        QuickLogger.Debug("2");
+
         foreach (Transform item in _listCanvas.transform)
         {
             Destroy(item.gameObject);
         }
+        QuickLogger.Debug("3");
 
-        foreach (var entry in data.Data)
+        if (data?.Data is null)
         {
-            var prefab = GameObject.Instantiate(_itemPrefab);
-            var listItem = prefab.EnsureComponent<EncyclopediaListItem>();
-            prefab.transform.SetParent(_listCanvas.transform, false);
-            listItem.Initialize(entry);
+            QuickLogger.Debug("Receieved Data was null");
+            return;
         }
+
+        foreach (var entry in data?.Data)
+        {
+            QuickLogger.Debug("3.1");
+            var prefab = GameObject.Instantiate(_itemPrefab);
+            QuickLogger.Debug("3.2");
+            var listItem = prefab.EnsureComponent<EncyclopediaListItem>();
+            QuickLogger.Debug("3.3");
+            prefab.transform.SetParent(_listCanvas.transform, false);
+            QuickLogger.Debug("3.4");
+            listItem.Initialize(entry);
+            QuickLogger.Debug("3.5");
+            _trackedEntries?.Add(listItem);
+            QuickLogger.Debug("3.6");
+        }
+        QuickLogger.Debug("4");
+
     }
 
     internal void OpenEntry(TechType techType)
