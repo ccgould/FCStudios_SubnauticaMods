@@ -62,7 +62,6 @@ public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
         }
     }
 
-
     internal void SetInstance(FCSAlterraHubGUISender sender)
     {
         if (_isInitialized) return;
@@ -176,6 +175,7 @@ public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
         var backButton = _pages[PDAPages.AccountPage].FindChild("BackBTN").GetComponent<Button>();
         backButton.onClick.AddListener((() =>
         {
+            NotificationService.CSVLog(backButton);
             GoToPage(PDAPages.None);
         }));
     }
@@ -194,6 +194,7 @@ public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
         var backButton = page.FindChild("BackBTN").GetComponent<Button>();
         backButton.onClick.AddListener((() =>
         {
+            NotificationService.CSVLog(backButton);
             GoToPage(PDAPages.None);
         }));
     }
@@ -205,6 +206,7 @@ public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
         var backButton = page.FindChild("BackBTN").GetComponent<Button>();
         backButton.onClick.AddListener((() =>
         {
+            NotificationService.CSVLog(backButton);
             GoToPage(PDAPages.None);
         }));
     }

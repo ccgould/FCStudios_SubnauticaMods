@@ -60,13 +60,13 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs
         {
             var backBtn = GameObjectHelpers.FindGameObject(gameObject, "CloseBTN").GetComponent<Button>();
 
-            backBtn.onClick.AddListener(HideDialog);
+            backBtn.onClick.AddListener(() => { NotificationService.CSVLog(backBtn); HideDialog(); });
         }
 
         private void CreateDestinationButton()
         {
             var destinationButton = GameObjectHelpers.FindGameObject(gameObject, "DestinationBTN").GetComponent<Button>();
-            destinationButton.onClick.AddListener(() => { _destinationDialogController.Open(); });
+            destinationButton.onClick.AddListener(() => { NotificationService.CSVLog(destinationButton); _destinationDialogController.Open(); });
         }
 
         private void CreatePurchaseButton()
@@ -75,6 +75,7 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs
             purchaseBTN.onClick.AddListener(() =>
             {
                 QuickLogger.Debug("Purchase Button Clicked", true);
+                NotificationService.CSVLog(purchaseBTN);
                 MakePurchase();
             });
         }
@@ -152,6 +153,7 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs
             var purchaseBTN = GameObjectHelpers.FindGameObject(gameObject.transform.parent.gameObject, "PurchaseExitBTN").GetComponent<Button>();
             purchaseBTN.onClick.AddListener(() =>
             {
+                NotificationService.CSVLog(purchaseBTN);
                 QuickLogger.Debug("Purchase Button Clicked", true);
                 if (MakePurchase())
                 {

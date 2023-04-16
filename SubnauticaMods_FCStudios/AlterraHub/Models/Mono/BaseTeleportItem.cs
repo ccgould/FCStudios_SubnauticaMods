@@ -1,4 +1,5 @@
 ﻿using FCS_AlterraHub.Core.Helpers;
+using FCS_AlterraHub.Core.Services;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,6 +19,7 @@ namespace FCS_AlterraHub.Models.Mono
             var button = GameObjectHelpers.FindGameObject(gameObject, "TeleportBtn")?.GetComponent<Button>();
             button?.onClick.AddListener((() =>
             {
+                NotificationService.CSVLog(button);
                 //QuickLogger.Debug($"Trying to teleport to base: {_baseManager.GetBaseName()}", true);
                 //FCSAlterraHubService.PublicAPI.TeleportationIgnitiated?.Invoke(_baseManager);
             }));

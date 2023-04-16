@@ -49,6 +49,7 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.ScreenItems
             var addToCartBTN = gameObject.GetComponentInChildren<Button>();
             addToCartBTN.onClick.AddListener(() =>
             {
+                NotificationService.CSVLog(addToCartBTN);
                 callback?.Invoke(TechType, storeEntry.ReceiveTechType, _returnAmount);
             });
 

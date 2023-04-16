@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
 using UnityEngine;
@@ -21,12 +22,13 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
             _checkoutWindow = checkoutWindow;
             var cancelBTN = gameObject.FindChild("Content").FindChild("GameObject").FindChild("CancelBTN")
                 .GetComponent<Button>();
-            cancelBTN.onClick.AddListener((() => { Close(true); }));
+            cancelBTN.onClick.AddListener((() => { NotificationService.CSVLog(cancelBTN); Close(true); }));
 
             var doneBTN = gameObject.FindChild("Content").FindChild("GameObject").FindChild("DoneBTN")
                 .GetComponent<Button>();
             doneBTN.onClick.AddListener((() =>
             {
+                NotificationService.CSVLog(doneBTN);
                 foreach (AlterraHubDepotItemController toggle in _toggles)
                 {
                     if (toggle.IsChecked)

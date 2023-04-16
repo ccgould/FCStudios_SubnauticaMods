@@ -1,5 +1,6 @@
 ﻿using FCS_AlterraHub.API;
 using FCS_AlterraHub.Core.Helpers;
+using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Abstract;
 using System.Collections.Generic;
 using TMPro;
@@ -23,7 +24,8 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono
             var infoBTN = GameObjectHelpers.FindGameObject(gameObject, "InfoBTN").GetComponent<Button>();
             infoBTN.onClick.AddListener(() => 
             {
-                if(devices.Value.Count > 0)
+                NotificationService.CSVLog(infoBTN);
+                if (devices.Value.Count > 0)
                 {
                     FCSPDAController.Main.GetGUI().OnInfoButtonClicked?.Invoke(devices.Value[0]?.GetTechType() ?? TechType.None);
                 }
@@ -31,7 +33,11 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono
 
             _content = gameObject.FindChild("Device_Content").transform;
 
-            dropDownToggle.onValueChanged.AddListener(_content.gameObject.SetActive);
+            dropDownToggle.onValueChanged.AddListener((b)=> 
+            {
+                NotificationService.CSVLog(dropDownToggle,b.ToString());
+                _content.gameObject.SetActive(b);
+            });
 
             foreach (var device in devices.Value)
             {

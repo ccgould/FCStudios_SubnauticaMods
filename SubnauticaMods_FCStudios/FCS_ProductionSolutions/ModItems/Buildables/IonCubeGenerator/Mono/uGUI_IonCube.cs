@@ -1,4 +1,5 @@
 ﻿using FCS_AlterraHub.Core.Helpers;
+using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_AlterraHub.ModItems.FCSPDA.Interfaces;
@@ -169,6 +170,7 @@ internal class uGUI_IonCube : Page, IuGUIAdditionalPage
 
         _lButton.onClick.AddListener(() =>
         {
+            NotificationService.CSVLog(_lButton);
             ProcessSpeedChange("LButton");
         });
         #endregion
@@ -185,6 +187,7 @@ internal class uGUI_IonCube : Page, IuGUIAdditionalPage
 
         _rButton.onClick.AddListener(() =>
         {
+            NotificationService.CSVLog(_rButton);
             ProcessSpeedChange("RButton");
         });
         #endregion
@@ -201,6 +204,7 @@ internal class uGUI_IonCube : Page, IuGUIAdditionalPage
 
         storage_BTN.onClick.AddListener(() =>
         {
+            NotificationService.CSVLog(storage_BTN);
             _controller.OpenStorage();
         });
 
@@ -317,6 +321,7 @@ internal class uGUI_IonCube : Page, IuGUIAdditionalPage
         var infoBTN = GameObjectHelpers.FindGameObject(gameObject, "InfoBTN").GetComponent<Button>();
         infoBTN.onClick.AddListener(() =>
         {
+            NotificationService.CSVLog(infoBTN);
             FCSPDAController.Main.GetGUI().OnInfoButtonClicked?.Invoke(IonCubeGeneratorBuildable.PatchedTechType);
         });
 
@@ -325,12 +330,14 @@ internal class uGUI_IonCube : Page, IuGUIAdditionalPage
         var backButon = GameObjectHelpers.FindGameObject(gameObject, "BackBTN").GetComponent<Button>();
         backButon.onClick.AddListener(() =>
         {
+            NotificationService.CSVLog(backButon);
             onBackClicked?.Invoke(PDAPages.None);
         });
 
         var settingsButon = GameObjectHelpers.FindGameObject(gameObject, "SettingsBTN").GetComponent<Button>();
         settingsButon.onClick.AddListener(() =>
         {
+            NotificationService.CSVLog(settingsButon);
             onSettingsClicked?.Invoke(_controller);
         });
 

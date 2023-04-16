@@ -23,12 +23,14 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono
             _showAllToggle = GameObjectHelpers.FindGameObject(gameObject, "ShowAll").GetComponent<Toggle>();
             _showAllToggle.onValueChanged.AddListener((b) => 
             {
+                NotificationService.CSVLog(_showAllToggle,b.ToString());
                 Enter(null);
             });
             if (backButton != null)
             {
                 backButton.onClick.AddListener((() =>
                 {
+                    NotificationService.CSVLog(backButton);
                     gui.GoToPage(PDAPages.None);
                 }));
             }

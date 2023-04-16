@@ -49,7 +49,7 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.ScreenItems
 
 
             var removeBTN = gameObject.GetComponentInChildren<Button>();
-            removeBTN.onClick.AddListener(() => { onRemoveBTNClicked?.Invoke(this); });
+            removeBTN.onClick.AddListener(() => { NotificationService.CSVLog(removeBTN); onRemoveBTNClicked?.Invoke(this); });
         }
 
         internal CartItemSaveData Save()

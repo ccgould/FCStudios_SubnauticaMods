@@ -26,12 +26,13 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs
             _list = content.FindChild("Scroll View").FindChild("Viewport").FindChild("Content").transform;
 
             var cancelBTN = content.FindChild("GameObject").FindChild("CancelBTN").GetComponent<Button>();
-            cancelBTN.onClick.AddListener(() => { Close(true); });
+            cancelBTN.onClick.AddListener(() => { NotificationService.CSVLog(cancelBTN); Close(true); });
 
             var doneBTN = content.FindChild("GameObject").FindChild("DoneBTN")
                 .GetComponent<Button>();
             doneBTN.onClick.AddListener(() =>
             {
+                NotificationService.CSVLog(doneBTN);
                 foreach (AlterraHubReturnItemController toggle in _toggles)
                 {
                     if (toggle.IsChecked)

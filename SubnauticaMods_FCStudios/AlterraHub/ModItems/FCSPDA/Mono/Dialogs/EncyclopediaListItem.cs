@@ -1,4 +1,5 @@
-﻿using FCS_AlterraHub.ModItems.FCSPDA.Data.Models;
+﻿using FCS_AlterraHub.Core.Services;
+using FCS_AlterraHub.ModItems.FCSPDA.Data.Models;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCSCommon.Utilities;
 using System;
@@ -23,7 +24,7 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs
             _label = gameObject.GetComponentInChildren<TMP_Text>();
             _button = gameObject.GetComponent<Button>();
 
-            _button.onClick.AddListener(onClick);
+            _button.onClick.AddListener(()=> { NotificationService.CSVLog(_button); onClick(); });
 
         }
 

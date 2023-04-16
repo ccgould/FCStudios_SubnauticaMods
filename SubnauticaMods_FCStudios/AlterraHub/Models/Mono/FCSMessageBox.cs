@@ -1,5 +1,6 @@
 ﻿
 using FCS_AlterraHub.Core.Helpers;
+using FCS_AlterraHub.Core.Services;
 using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
@@ -28,24 +29,28 @@ namespace FCS_AlterraHub.Models.Mono
             _yesBTN = GameObjectHelpers.FindGameObject(gameObject, "YesBTN").GetComponent<Button>();
             _yesBTN.onClick.AddListener(() =>
             {
+                NotificationService.CSVLog(_yesBTN);
                 _result?.Invoke(FCSMessageResult.OKYES);
                 Close();
             });
             _noBTN = GameObjectHelpers.FindGameObject(gameObject, "NoBTN").GetComponent<Button>();
             _noBTN.onClick.AddListener(() =>
             {
+                NotificationService.CSVLog(_noBTN);
                 _result?.Invoke(FCSMessageResult.NO);
                 Close();
             });
             _okBTN = GameObjectHelpers.FindGameObject(gameObject, "OKBTN").GetComponent<Button>();
             _okBTN.onClick.AddListener(() =>
             {
+                NotificationService.CSVLog(_okBTN);
                 _result?.Invoke(FCSMessageResult.OKYES);
                 Close();
             });
             _cancelBTN = GameObjectHelpers.FindGameObject(gameObject, "CancelBTN")?.GetComponent<Button>();
             _cancelBTN.onClick.AddListener(() =>
             {
+                NotificationService.CSVLog(_cancelBTN);
                 _result?.Invoke(FCSMessageResult.CANCEL);
                 Close();
             });

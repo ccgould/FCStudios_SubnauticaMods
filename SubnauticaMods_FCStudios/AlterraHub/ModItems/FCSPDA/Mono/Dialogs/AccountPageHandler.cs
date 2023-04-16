@@ -45,6 +45,7 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs
             _sliderText = _slider.GetComponentInChildren<Text>();
             _slider.onValueChanged.AddListener(value =>
             {
+                NotificationService.CSVLog(_slider,value.ToString());
                 var rate = _slider.value * 10f;
                 _sliderText.text = $"{Mathf.CeilToInt(rate)}%";
                 GamePlayService.Main.SetRate(rate);
@@ -53,12 +54,14 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs
             _deductionToggle = GameObjectHelpers.FindGameObject(accountPage, "AutomaticDebitDeduction").GetComponent<Toggle>();
             _deductionToggle.onValueChanged.AddListener(value =>
             {
+                NotificationService.CSVLog(_deductionToggle,value.ToString());
                 GamePlayService.Main.SetAutomaticDebitDeduction(value);
             });
 
             var createAccountDialogCloseBtn = GameObjectHelpers.FindGameObject(_createAccountDialog, "CloseBTN").GetComponent<Button>();
             createAccountDialogCloseBtn.onClick.AddListener(() =>
             {
+                NotificationService.CSVLog(createAccountDialogCloseBtn);
                 _createAccountDialog.SetActive(false);
             });
 
@@ -74,6 +77,7 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs
 
             _paymentInput.onEndEdit.AddListener((value) =>
             {
+                NotificationService.CSVLog(_paymentInput);
 
                 if (_paymentInput.text.Contains("-"))
                 {
@@ -90,6 +94,7 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs
             var paymentButton = GameObjectHelpers.FindGameObject(_paymentScreen, "SubmitPaymentBTN").GetComponent<Button>();
             paymentButton.onClick.AddListener(() =>
             {
+                NotificationService.CSVLog(_paymentInput);
                 if (_paymentInput.text.Contains("-"))
                 {
                     _mono.ShowMessage(LanguageService.NegativeNumbersNotAllowed());
@@ -116,6 +121,7 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs
             var closeButton = GameObjectHelpers.FindGameObject(_paymentScreen, "CloseBTN").GetComponent<Button>();
             closeButton.onClick.AddListener(() =>
             {
+                NotificationService.CSVLog(closeButton);
                 ResetPaymentScreen();
                 HidePaymentScreen();
             });
@@ -132,6 +138,7 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs
             var createBTN = _createAccountDialog.GetComponentInChildren<Button>();
             createBTN.onClick.AddListener(() =>
             {
+                NotificationService.CSVLog(createBTN);
                 if (PlayerInteractionHelper.CanPlayerHold(DebitCardSpawnable.PatchedTechType))
                 {
                     if (AccountService.main.CreateUserAccount(_fullName, _userName, _password, _pin, 0, _sender))
@@ -178,7 +185,11 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs
             var fullNameInputField = GameObjectHelpers.FindGameObject(dialog, "FullNameInputField")
                 .GetComponentInChildren<InputField>();
 
-            fullNameInputField.onEndEdit.AddListener(value => { _fullName = value; });
+            fullNameInputField.onEndEdit.AddListener(value => 
+            {
+                NotificationService.CSVLog(fullNameInputField);
+                _fullName = value; 
+            });
             GameObjectHelpers.FindGameObject(dialog, "FullNamePlaceholder").GetComponentInChildren<Text>().text =
                 LanguageService.FullNamePlaceholder();
         }
@@ -187,7 +198,11 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs
         {
             var userNameInputField = GameObjectHelpers.FindGameObject(dialog, "UserNameInputField")
                 .GetComponentInChildren<InputField>();
-            userNameInputField.onEndEdit.AddListener(value => { _userName = value; });
+            userNameInputField.onEndEdit.AddListener(value => 
+            {
+                NotificationService.CSVLog(userNameInputField);
+                _userName = value; 
+            });
             GameObjectHelpers.FindGameObject(dialog, "UserNamePlaceholder").GetComponentInChildren<Text>().text =
                 LanguageService.UserNamePlaceholder();
             GameObjectHelpers.FindGameObject(dialog, "UserNameTitle").GetComponentInChildren<Text>().text =
@@ -198,7 +213,11 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs
         {
             var passwordInputField = GameObjectHelpers.FindGameObject(dialog, "PasswordInputField")
                 .GetComponentInChildren<InputField>();
-            passwordInputField.onEndEdit.AddListener(value => { _password = value; });
+            passwordInputField.onEndEdit.AddListener(value => 
+            {
+                NotificationService.CSVLog(passwordInputField);
+                _password = value; 
+            });
             GameObjectHelpers.FindGameObject(dialog, "PasswordPlaceholder").GetComponentInChildren<Text>().text =
                 LanguageService.PasswordPlaceholder();
             GameObjectHelpers.FindGameObject(dialog, "PasswordTitle").GetComponentInChildren<Text>().text =
@@ -209,7 +228,11 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs
         {
             var pinInputField = GameObjectHelpers.FindGameObject(dialog, "PINInputField")
                 .GetComponentInChildren<InputField>();
-            pinInputField.onEndEdit.AddListener(value => { _pin = value; });
+            pinInputField.onEndEdit.AddListener(value => 
+            {
+                NotificationService.CSVLog(pinInputField);
+                _pin = value; 
+            });
             GameObjectHelpers.FindGameObject(dialog, "PINPlaceholder").GetComponentInChildren<Text>().text =
                 LanguageService.PINPlaceholder();
             GameObjectHelpers.FindGameObject(dialog, "PINTitle").GetComponentInChildren<Text>().text =
@@ -218,20 +241,15 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs
 
         private void CreateWelcomePage(GameObject accountPage)
         {
-            QuickLogger.Info("0");
             QuickLogger.Info($"Account Page Name: {accountPage?.transform?.parent?.gameObject?.name}");
             _userNameLBL = GameObjectHelpers.FindGameObject(accountPage.transform.parent.gameObject, "UserName").GetComponentInChildren<Text>();
-            QuickLogger.Info($"1 {_userNameLBL is null}");
             _userNameLBL.text = AccountService.main.GetUserName();
-            QuickLogger.Info("2");
             var requestButton = GameObjectHelpers.FindGameObject(accountPage, "CardRequestBTN").GetComponent<Button>();
-            QuickLogger.Info("3");
             _requestButtonText = requestButton.GetComponentInChildren<Text>();
-            QuickLogger.Info("4");
             UpdateRequestBTN(AccountService.main.HasBeenRegistered());
-            QuickLogger.Info("5");
             requestButton.onClick.AddListener(() =>
             {
+                NotificationService.CSVLog(requestButton);
                 if (AccountService.main.HasBeenRegistered())
                 {
                     //Check if player has any FiberMesh and Magniette
@@ -250,11 +268,12 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs
                     _createAccountDialog.SetActive(true);
                 }
             });
-            QuickLogger.Info("6");
             var payDebitButton = GameObjectHelpers.FindGameObject(accountPage, "RepayBTN").GetComponent<Button>();
-            QuickLogger.Info("7");
-            payDebitButton.onClick.AddListener(ShowPaymentScreen);
-            QuickLogger.Info("8");
+            payDebitButton.onClick.AddListener(()=> 
+            {
+                NotificationService.CSVLog(payDebitButton);
+                ShowPaymentScreen(); }
+            );
         }
 
         internal void UpdateRequestBTN(bool accountReg)

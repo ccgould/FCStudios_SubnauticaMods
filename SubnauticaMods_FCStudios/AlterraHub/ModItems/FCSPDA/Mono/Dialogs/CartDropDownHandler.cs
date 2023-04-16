@@ -37,6 +37,7 @@ internal class CartDropDownHandler : MonoBehaviour, IStoreClient
         var buyAllButton = GameObjectHelpers.FindGameObject(gameObject, "BuyButton").GetComponent<Button>();
         buyAllButton.onClick.AddListener(() =>
         {
+            NotificationService.CSVLog(buyAllButton);
             if (!PlayerInteractionHelper.HasCard())
             {
                 SendMessageFromDialog(LanguageService.CardNotDetected());
@@ -54,6 +55,7 @@ internal class CartDropDownHandler : MonoBehaviour, IStoreClient
         var closeBTN = GameObjectHelpers.FindGameObject(gameObject, "CloseBTN").GetComponent<Button>();
         closeBTN.onClick.AddListener(() =>
         {
+            NotificationService.CSVLog(closeBTN);
             ToggleVisibility();
         });
     }

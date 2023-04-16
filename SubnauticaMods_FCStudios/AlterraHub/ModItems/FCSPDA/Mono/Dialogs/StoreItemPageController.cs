@@ -40,6 +40,7 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs
             {
                 backButton.onClick.AddListener((() =>
                 {
+                    NotificationService.CSVLog(backButton);
                     gui.GoToPage(PDAPages.None);
                 }));
             }

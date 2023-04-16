@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using FCS_AlterraHub.Core.Helpers;
+using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
 using FCSCommon.Utilities;
@@ -18,6 +19,7 @@ internal class TeleportationPageController : Page
         var backButton = gameObject.FindChild("BackBTN").GetComponent<Button>();
         backButton.onClick.AddListener(() =>
         {
+            NotificationService.CSVLog(backButton);
             gui.GoToPage(PDAPages.None);
         });
 

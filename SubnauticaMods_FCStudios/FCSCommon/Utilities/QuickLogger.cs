@@ -2,10 +2,13 @@
 namespace FCSCommon.Utilities
 {
     using BepInEx.Logging;
-
     using FCS_AlterraHub;
     using System;
+    using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Diagnostics;
+    using System.Globalization;
+    using System.IO;
     using System.Reflection;
 
     //Created by PrimeSonic GitHub repo: https://github.com/PrimeSonic/PrimeSonicSubnauticaMods
@@ -173,6 +176,23 @@ namespace FCSCommon.Utilities
         private static void AddDebug(string message)
         {
             ErrorMessage.AddDebug(message);
+        }
+    }
+
+    internal class FCSLog
+    {
+        public string DateTimeString { get; set; }
+        public string SenderName { get; set; }
+        public string SenderType { get; set; }
+        public string Value { get; set; }          
+
+        public FCSLog(string senderName,Type sender,string value = null) 
+        {
+            DateTimeString = DateTime.Now.ToString();
+            SenderName = senderName;
+            SenderType = sender.Name;
+            Value = value;
+
         }
     }
 }
