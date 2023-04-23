@@ -4,10 +4,7 @@ namespace FCS_AlterraHub.Models.Structs
 {
     public struct FCSModItemSettings
     {
-        public string ClassId;
-        public string FriendlyName;
         public string Description;
-        public string PrefabName;
         public LargeWorldEntity.CellLevel CellLevel;
         public Vector3 ConstructableSize;
         public Vector3 ConstructableCenter;

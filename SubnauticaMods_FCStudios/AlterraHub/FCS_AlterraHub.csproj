@@ -129,6 +129,7 @@
     <Compile Include="Models\Structs\Vec3.cs" />
     <Compile Include="Models\Structs\Vec4.cs" />
     <Compile Include="Models\TimeCache.cs" />
+    <Compile Include="ModItems\Buildables\DroneDepotPort\Buildable\DroneDepotPortBuildable.cs" />
     <Compile Include="ModItems\FCSPDA\Data\Models\EncyclopediaEntryData.cs" />
     <Compile Include="ModItems\FCSPDA\Enums\FCSAlterraHubGUISender.cs" />
     <Compile Include="ModItems\FCSPDA\Enums\PDAPages.cs" />

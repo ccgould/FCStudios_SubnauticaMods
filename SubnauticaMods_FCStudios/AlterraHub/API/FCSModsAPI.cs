@@ -82,9 +82,9 @@ public class FCSModsAPI : IFCSModsAPIPublic, IFCSModsAPIInternal
             {
                 QuickLogger.Info("Mod Settings were successfully loaded!");
 
-                if(listOfModSettings is null) { throw new NullReferenceException("Mod Settings Not Found"); }
+                if(listOfModSettings is null) { throw new NullReferenceException($"Mod Settings Not Found {classID}"); }
 
-                if (!listOfModSettings.ContainsKey(classID)) { throw new KeyNotFoundException("Mod Class ID Not Found"); }
+                if (!listOfModSettings.ContainsKey(classID)) { throw new KeyNotFoundException($"Mod Class ID Not Found {classID}"); }
 
 
                 return listOfModSettings[classID];
