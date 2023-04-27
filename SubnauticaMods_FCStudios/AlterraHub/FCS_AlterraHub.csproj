@@ -62,6 +62,8 @@
     <Compile Include="Configuation\ModSaveManager.cs" />
     <Compile Include="Configuation\ModSettings.cs" />
     <Compile Include="Configuation\SaveData.cs" />
+    <Compile Include="Core\Components\DoorController.cs" />
+    <Compile Include="Core\Components\DoorTrigger.cs" />
     <Compile Include="Core\Extensions\CollectionExtentions.cs" />
     <Compile Include="Core\Extensions\ColorExtensions.cs" />
     <Compile Include="Core\Extensions\SpriteExtensions.cs" />
@@ -130,6 +132,7 @@
     <Compile Include="Models\Structs\Vec4.cs" />
     <Compile Include="Models\TimeCache.cs" />
     <Compile Include="ModItems\Buildables\DroneDepotPort\Buildable\DroneDepotPortBuildable.cs" />
+    <Compile Include="ModItems\Buildables\DroneDepotPort\Mono\DroneDepotPortController.cs" />
     <Compile Include="ModItems\FCSPDA\Data\Models\EncyclopediaEntryData.cs" />
     <Compile Include="ModItems\FCSPDA\Enums\FCSAlterraHubGUISender.cs" />
     <Compile Include="ModItems\FCSPDA\Enums\PDAPages.cs" />
