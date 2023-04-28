@@ -1,33 +1,28 @@
 ﻿using FCSCommon.Utilities;
-using rail;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Core.Components
 {
     internal class DoorController : MonoBehaviour
     {
-        private bool _isRotatingDoor;
-        public Vector3 direction;
-        public bool IsOpen;
+        public bool _isRotatingDoor;
         private float _speed = 1f;
-        private float _rotationAmount = 90f;
-        private float _forwardDirection = 0f;
+        public float _rotationAmount = 90f;
+        public float _forwardDirection = 0f;
 
         private Vector3 _startRotation;
         private Vector3 _forward;
+        private Coroutine _animationCoroutine;
 
-        private Vector3 _slideDirection = Vector3.back;
-        private float _slideAmount = 1.9f;
+        public Vector3 _slideDirection = Vector3.back;
+        public float _slideAmount = 1.9f;
         private Vector3 _startPosition;
 
-        private Coroutine _animationCoroutine;
+        public Vector3 direction;
+        public bool IsOpen;
+
 
         private void Awake()
         {
@@ -37,7 +32,7 @@ namespace FCS_AlterraHub.Core.Components
             _forward = transform.right;
         }
 
-        public void Initialize ()
+        public void Initialize()
         {
 
         }
@@ -76,6 +71,7 @@ namespace FCS_AlterraHub.Core.Components
                 yield return null;
                 time += DayNightCycle.main.deltaTime * _speed;
             }
+            IsOpen = true;
         }
 
         private IEnumerator DoSlidingClose()
@@ -90,6 +86,8 @@ namespace FCS_AlterraHub.Core.Components
                 yield return null;
                 time += DayNightCycle.main.deltaTime * _speed;
             }
+
+            IsOpen = false;
         }
 
         public void Close ()
@@ -119,11 +117,11 @@ namespace FCS_AlterraHub.Core.Components
 
             if (forwardAmount >= _forwardDirection)
             {
-                endRotation = Quaternion.Euler(new Vector3(_startRotation.x, _startRotation.y - _rotationAmount, _startRotation.z));
+                endRotation = Quaternion.Euler(new Vector3(0, _startRotation.y - _rotationAmount, 0));
             }
             else
             {
-                endRotation = Quaternion.Euler(new Vector3(_startRotation.x, _startRotation.y + _rotationAmount, _startRotation.z));
+                endRotation = Quaternion.Euler(new Vector3(0, _startRotation.y + _rotationAmount, 0));
             }
 
             IsOpen = true;
@@ -150,6 +148,18 @@ namespace FCS_AlterraHub.Core.Components
                 transform.rotation = Quaternion.Slerp(startRotation, endRotation, time);
                 yield return null;
                 time += DayNightCycle.main.deltaTime * _speed;
+            }
+        }
+
+        public void Toggle(Vector3 userPosition)
+        {
+            if(IsOpen)
+            {
+                Close();
+            }
+            else
+            {
+                Open(userPosition);
             }
         }
     }

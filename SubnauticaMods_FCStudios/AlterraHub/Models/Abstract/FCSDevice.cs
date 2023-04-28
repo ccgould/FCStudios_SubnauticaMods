@@ -45,12 +45,15 @@ namespace FCS_AlterraHub.Models.Abstract
         /// <summary>
         /// The initializer of this device
         /// </summary>
-        public virtual void Initialize() { }
+        public virtual void Initialize() 
+        {
+            IsInitialized = true;
+        }
 
         public virtual void Awake() 
         { 
             _colorManager = gameObject.GetComponent<ColorManager>();
-            _colorManager.Initialize(gameObject);
+            _colorManager?.Initialize(gameObject);
         }
 
         public virtual void OnEnable()

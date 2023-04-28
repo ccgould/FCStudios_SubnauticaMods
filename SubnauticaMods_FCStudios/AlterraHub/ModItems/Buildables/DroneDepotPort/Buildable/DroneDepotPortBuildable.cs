@@ -2,6 +2,7 @@
 using FCS_AlterraHub.Models;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Enumerators;
+using FCS_AlterraHub.Models.Mono;
 using FCS_AlterraHub.ModItems.Buildables.DroneDepotPort.Mono;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono;
 using FCS_AlterraHub.ModItems.TestObject.Mono;
@@ -40,6 +41,7 @@ namespace FCS_AlterraHub.ModItems.Buildables.DroneDepotPort.Buildable
         {
             yield return base.GetGameObjectAsync(gameObject);
 
+            Prefab.AddComponent<ColorManager>();
             Prefab.AddComponent<DroneDepotPortController>();
 
             yield break;
