@@ -24,7 +24,6 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono
             var infoBTN = GameObjectHelpers.FindGameObject(gameObject, "InfoBTN").GetComponent<Button>();
             infoBTN.onClick.AddListener(() => 
             {
-                NotificationService.CSVLog(infoBTN);
                 if (devices.Value.Count > 0)
                 {
                     FCSPDAController.Main.GetGUI().OnInfoButtonClicked?.Invoke(devices.Value[0]?.GetTechType() ?? TechType.None);
@@ -35,7 +34,6 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono
 
             dropDownToggle.onValueChanged.AddListener((b)=> 
             {
-                NotificationService.CSVLog(dropDownToggle,b.ToString());
                 _content.gameObject.SetActive(b);
             });
 

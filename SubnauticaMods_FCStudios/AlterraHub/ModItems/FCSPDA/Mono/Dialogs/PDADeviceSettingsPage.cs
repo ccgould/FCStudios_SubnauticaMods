@@ -25,21 +25,18 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs
             _visiblityToggle = gameObject.GetComponentInChildren<Toggle>();
             _visiblityToggle.onValueChanged.AddListener((b) =>
             {
-                NotificationService.CSVLog(_visiblityToggle, b.ToString());
                 _device.IsVisibleInPDA = b;
             });
 
             _friendlyNameInput = gameObject.GetComponentInChildren<TMP_InputField>();
             _friendlyNameInput.onValueChanged.AddListener((t) =>
             {
-                NotificationService.CSVLog(_friendlyNameInput,t.ToString());
                 _device.FriendlyName = t;
             });
 
             var backButton = gameObject.GetComponentInChildren<Button>();
             backButton.onClick.AddListener(() =>
             {
-                NotificationService.CSVLog(backButton);
                 _gui.GoToPage(PDAPages.None);
             });
         }

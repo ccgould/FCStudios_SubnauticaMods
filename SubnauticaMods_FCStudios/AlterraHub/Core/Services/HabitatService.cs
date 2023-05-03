@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 using static System.Diagnostics.ConfigurationManagerInternalFactory;
 using static uGUI_TabbedControlsPanel;
 
@@ -133,6 +134,11 @@ internal class HabitatService : MonoBehaviour
         }
 
         QuickLogger.Debug($"Registering Device: {device.UnitID}");
+
+        foreach (var item in device.GetAllComponentsInChildren<Button>())
+        {
+
+        }
     }
 
     internal void UnRegisterDevice(FCSDevice device)

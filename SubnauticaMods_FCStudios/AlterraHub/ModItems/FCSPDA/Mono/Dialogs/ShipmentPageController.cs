@@ -19,7 +19,6 @@ internal class ShipmentPageController : Page
         var backButton = gameObject.FindChild("BackBTN").GetComponent<Button>();
         backButton.onClick.AddListener(() =>
         {
-            NotificationService.CSVLog(backButton);
             gui.GoToPage(PDAPages.None);
         });
 

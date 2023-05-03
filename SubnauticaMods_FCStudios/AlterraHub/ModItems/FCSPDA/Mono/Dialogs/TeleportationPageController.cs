@@ -19,8 +19,7 @@ internal class TeleportationPageController : Page
         var backButton = gameObject.FindChild("BackBTN").GetComponent<Button>();
         backButton.onClick.AddListener(() =>
         {
-            NotificationService.CSVLog(backButton);
-            gui.GoToPage(PDAPages.None);
+            gui.GoToPage(PDAPages.None);    
         });
 
         _grid = GameObjectHelpers.FindGameObject(gameObject, "Content");

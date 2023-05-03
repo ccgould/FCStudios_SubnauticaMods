@@ -25,7 +25,6 @@ internal class ShipmentTracker : MonoBehaviour
 
         _cancelButton.onClick.AddListener(() =>
         {
-            NotificationService.CSVLog(_cancelButton);
             StoreManager.main.CancelOrder(pendingOrder);
             Delete();
         });

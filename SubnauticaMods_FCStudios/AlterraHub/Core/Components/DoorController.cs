@@ -117,11 +117,11 @@ namespace FCS_AlterraHub.Core.Components
 
             if (forwardAmount >= _forwardDirection)
             {
-                endRotation = Quaternion.Euler(new Vector3(0, _startRotation.y - _rotationAmount, 0));
+                endRotation = Quaternion.Euler(new Vector3(_startRotation.x, _startRotation.y - _rotationAmount, _startRotation.z));
             }
             else
             {
-                endRotation = Quaternion.Euler(new Vector3(0, _startRotation.y + _rotationAmount, 0));
+                endRotation = Quaternion.Euler(new Vector3(_startRotation.x, _startRotation.y + _rotationAmount, _startRotation.z));
             }
 
             IsOpen = true;

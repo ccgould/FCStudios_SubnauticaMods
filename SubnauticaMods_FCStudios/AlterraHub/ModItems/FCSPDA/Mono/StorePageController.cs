@@ -43,7 +43,6 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono
             {
                 cartBTN.onClick.AddListener((() =>
                 {
-                    NotificationService.CSVLog(cartBTN);
                     _cartDropDownManager.ToggleVisibility();
                 }));
             }
@@ -51,7 +50,6 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono
             var returnsBTN = gameObject.FindChild("Returns").GetComponent<Button>();
             returnsBTN.onClick.AddListener(() =>
             {
-                NotificationService.CSVLog(returnsBTN);
                 _returnsDialogController.Open();
             });
 
@@ -60,7 +58,6 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono
             {
                 backButton.onClick.AddListener((() =>
                 {
-                    NotificationService.CSVLog(backButton);
                     gui.GoToPage(PDAPages.None);
                 }));
             }
@@ -110,7 +107,6 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono
             var shipmentButton = gameObject.FindChild("ShipmentBTN").GetComponent<Button>();
             shipmentButton.onClick.AddListener((() =>
             {
-                NotificationService.CSVLog(shipmentButton);
                 _gui.GoToPage(PDAPages.Shipment);
             }));
 
