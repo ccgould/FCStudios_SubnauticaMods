@@ -3,29 +3,50 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33530.505
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCS_AlterraHub", "FCStudios_SubnauticaMods\FCS_AlterraHub.csproj", "{847DF2CA-66AA-4566-96FA-966CA500E78D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FCS_AlterraHub", "FCStudios_SubnauticaMods\FCS_AlterraHub.csproj", "{847DF2CA-66AA-4566-96FA-966CA500E78D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCS_ProductionSolutions", "FCS_ProductionSolutions\FCS_ProductionSolutions.csproj", "{80BC769B-72AB-4938-9AF1-E735928A3777}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FCS_ProductionSolutions", "FCS_ProductionSolutions\FCS_ProductionSolutions.csproj", "{80BC769B-72AB-4938-9AF1-E735928A3777}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "FCSCommon", "FCSCommon\FCSCommon.shproj", "{7B707A4C-D832-408E-A5DC-2C7DDA6FB63F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{B036E928-011F-4FDE-A4AE-3CF2C029FE93}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		BZ_Stable|Any CPU = BZ_Stable|Any CPU
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+		SN_Stable|Any CPU = SN_Stable|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{847DF2CA-66AA-4566-96FA-966CA500E78D}.BZ_Stable|Any CPU.ActiveCfg = BZ_Stable|Any CPU
+		{847DF2CA-66AA-4566-96FA-966CA500E78D}.BZ_Stable|Any CPU.Build.0 = BZ_Stable|Any CPU
 		{847DF2CA-66AA-4566-96FA-966CA500E78D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{847DF2CA-66AA-4566-96FA-966CA500E78D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{847DF2CA-66AA-4566-96FA-966CA500E78D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{847DF2CA-66AA-4566-96FA-966CA500E78D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{847DF2CA-66AA-4566-96FA-966CA500E78D}.SN_Stable|Any CPU.ActiveCfg = SN_Stable|Any CPU
+		{847DF2CA-66AA-4566-96FA-966CA500E78D}.SN_Stable|Any CPU.Build.0 = SN_Stable|Any CPU
+		{80BC769B-72AB-4938-9AF1-E735928A3777}.BZ_Stable|Any CPU.ActiveCfg = BZ_Stable|Any CPU
+		{80BC769B-72AB-4938-9AF1-E735928A3777}.BZ_Stable|Any CPU.Build.0 = BZ_Stable|Any CPU
 		{80BC769B-72AB-4938-9AF1-E735928A3777}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{80BC769B-72AB-4938-9AF1-E735928A3777}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{80BC769B-72AB-4938-9AF1-E735928A3777}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{80BC769B-72AB-4938-9AF1-E735928A3777}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80BC769B-72AB-4938-9AF1-E735928A3777}.SN_Stable|Any CPU.ActiveCfg = SN_Stable|Any CPU
+		{80BC769B-72AB-4938-9AF1-E735928A3777}.SN_Stable|Any CPU.Build.0 = SN_Stable|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7B707A4C-D832-408E-A5DC-2C7DDA6FB63F} = {B036E928-011F-4FDE-A4AE-3CF2C029FE93}
+	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {79065CEC-4A2F-482C-8498-08CC377B3E61}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		FCSCommon\FCSCommon.projitems*{7b707a4c-d832-408e-a5dc-2c7dda6fb63f}*SharedItemsImports = 13
+		FCSCommon\FCSCommon.projitems*{847df2ca-66aa-4566-96fa-966ca500e78d}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal
