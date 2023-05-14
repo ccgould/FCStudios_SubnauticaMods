@@ -7,14 +7,25 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
 
 internal class MenuController : MonoBehaviour
 {
-    public Page InitialPage;
+    [SerializeField]
+    private Page InitialPage;
     private GameObject FirstFocusItem;
-    private Canvas RootCanvas;
+    private Canvas _rootCanvas;
     private Stack<Page> PageStack = new Stack<Page>();
 
     private void Awake()
     {
-        RootCanvas = GetComponent<Canvas>();
+        _rootCanvas = GetComponent<Canvas>();
+
+        if (FirstFocusItem != null)
+        {
+            EventSystem.current.SetSelectedGameObject(FirstFocusItem);
+        }
+
+        if (InitialPage != null)
+        {
+            PushPage(InitialPage);
+        }
 
     }
 
@@ -75,25 +86,12 @@ internal class MenuController : MonoBehaviour
 
     public void OnCancel()
     {
-        if(RootCanvas.enabled && RootCanvas.gameObject.activeInHierarchy)
+        if(_rootCanvas.enabled && _rootCanvas.gameObject.activeInHierarchy)
         {
             if(PageStack.Count != 0)
             {
                 PopPage();
             }
-        }
-    }
-
-    internal void Initialize()
-    {
-        if (FirstFocusItem != null)
-        {
-            EventSystem.current.SetSelectedGameObject(FirstFocusItem);
-        }
-
-        if (InitialPage != null)
-        {
-            PushPage(InitialPage);
         }
     }
 }

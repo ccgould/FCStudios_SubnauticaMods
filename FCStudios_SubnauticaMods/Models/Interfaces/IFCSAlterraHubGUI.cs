@@ -1,6 +1,8 @@
-﻿namespace FCS_AlterraHub.Models.Interfaces;
+﻿using System;
 
-    internal interface IFCSAlterraHubGUI
+namespace FCS_AlterraHub.Models.Interfaces;
+
+    public interface IFCSAlterraHubGUI
     {
-        void ShowMessage(string message);
+        public void ShowMessage(string message);
     }

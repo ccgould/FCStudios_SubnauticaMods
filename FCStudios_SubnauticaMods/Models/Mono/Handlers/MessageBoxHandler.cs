@@ -13,8 +13,10 @@ namespace FCS_AlterraHub.Models.Mono.Handlers;
 internal class MessageBoxHandler : MonoBehaviour
 {
     private Action<FCSMessageResult> _result;
+    [SerializeField]
     private FCSMessageBox _messageBox;
-    private GameObject _objectRoot;
+    [SerializeField]
+    private IFCSAlterraHubGUI _gui;
     private readonly Queue<MessageBoxData> _messageQueue = new Queue<MessageBoxData>();
     private static Dictionary<FCSAlterraHubGUISender, IFCSAlterraHubGUI> _registeredGUI = new();
 
@@ -23,25 +25,11 @@ internal class MessageBoxHandler : MonoBehaviour
         _messageQueue.Enqueue(new MessageBoxData("Test", FCSMessageButton.OK, null));
     }
 
-    public GameObject ObjectRoot
-    {
-        get => _objectRoot;
-        set
-        {
-            _objectRoot = value;
-            if (_messageBox == null)
-            {
-                _messageBox = GameObjectHelpers.FindGameObject(ObjectRoot, "MessageBox").AddComponent<FCSMessageBox>();
-            }
-        }
-    }
-
     public void Initialize(GameObject go, FCSAlterraHubGUISender sender)
-    {
-        var gui = ObjectRoot.GetComponentInChildren<IFCSAlterraHubGUI>();
-        if (gui is not null && !_registeredGUI.ContainsValue(gui))
+    {       
+        if (_gui is not null && !_registeredGUI.ContainsValue(_gui))
         {
-            _registeredGUI.Add(sender, gui);
+            _registeredGUI.Add(sender, _gui);
         }
     }
 

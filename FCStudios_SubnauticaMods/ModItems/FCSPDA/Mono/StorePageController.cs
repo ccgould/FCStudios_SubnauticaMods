@@ -17,101 +17,64 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono;
 
 internal class StorePageController : Page
 {
-    private Text _cartButtonNumber;
     protected override bool showHud => false;
+
+    [SerializeField]
+    private Text _cartButtonNumber;
+    [SerializeField]
+    private Text _pageTextLabel;
+    [SerializeField]
     private FCSAlterraHubGUI _gui;
+    [SerializeField]
     private CartDropDownHandler _cartDropDownManager;
+    [SerializeField]
     private CheckOutPopupDialogWindow _checkoutDialog;
+    [SerializeField]
     private ReturnsDialogController _returnsDialogController;
+    [SerializeField]
     private ShipmentPageController _shipmentPageController;
+    [SerializeField]
+    private RadialMenu _radialMenu;
+    [SerializeField]
+    private Button _shipmentButton;
 
 
-    internal void Initialize(FCSAlterraHubGUI gui)
+    private void Awake()
     {
-        _gui = gui;
-        _checkoutDialog = GameObjectHelpers.FindGameObject(gui.gameObject, "CheckOutPopUp")?.AddComponent<CheckOutPopupDialogWindow>();
-
-        _returnsDialogController = GameObjectHelpers.FindGameObject(gui.gameObject, "ReturnItemsDialog")?.AddComponent<ReturnsDialogController>();
-        _returnsDialogController?.Initialize(gui);
-
-        _cartButtonNumber = GameObjectHelpers.FindGameObject(gameObject, "CartCount")?.GetComponentInChildren<Text>();
-        var pageTextLabel = gameObject.FindChild("PageName")?.GetComponent<Text>();
-        var radialMenu = gameObject.FindChild("RadialMenu")?.AddComponent<RadialMenu>();
-
-        var cartBTN = gameObject.FindChild("Cart")?.GetComponent<Button>();
-        if (cartBTN != null)
-        {
-            cartBTN.onClick.AddListener((() =>
-            {
-                _cartDropDownManager.ToggleVisibility();
-            }));
-        }
-
         var returnsBTN = gameObject.FindChild("Returns").GetComponent<Button>();
         returnsBTN.onClick.AddListener(() =>
         {
             _returnsDialogController.Open();
         });
 
-        var backButton = gameObject.FindChild("BackBTN")?.GetComponent<Button>();
-        if (backButton != null)
-        {
-            backButton.onClick.AddListener((() =>
-            {
-                gui.GoToPage(PDAPages.None);
-            }));
-        }
-
-        if (radialMenu is not null)
+        if (_radialMenu is not null)
         {
             // TODO Figure out how to allor paths to icon FCSAssetBundlesService.PublicAPI.GetIconByName("Cart_Icon", PluginInfo.PLUGIN_NAME)
-            radialMenu.AddEntry(gui, FCSAssetBundlesService.PublicAPI.GetIconByName("HomeSolutionsIcon_W", PluginInfo.PLUGIN_NAME), pageTextLabel, "Home Solutions", PDAPages.HomeSolutions);
-            radialMenu.AddEntry(gui, FCSAssetBundlesService.PublicAPI.GetIconByName("LifeSupportIcon_W", PluginInfo.PLUGIN_NAME), pageTextLabel, "Life Solutions", PDAPages.LifeSolutions);
-            radialMenu.AddEntry(gui, FCSAssetBundlesService.PublicAPI.GetIconByName("EnergySolutionsIcon_W", PluginInfo.PLUGIN_NAME), pageTextLabel, "Energy Solutions", PDAPages.EnergySolutions);
-            radialMenu.AddEntry(gui, FCSAssetBundlesService.PublicAPI.GetIconByName("ProductionSolutionsIcon_W", PluginInfo.PLUGIN_NAME), pageTextLabel, "Production Solutions", PDAPages.ProductionSolutions);
-            radialMenu.AddEntry(gui, FCSAssetBundlesService.PublicAPI.GetIconByName("StoreSolutionsIcon_W", PluginInfo.PLUGIN_NAME), pageTextLabel, "Storage Solutions", PDAPages.StorageSolutions);
-            radialMenu.AddEntry(gui, FCSAssetBundlesService.PublicAPI.GetIconByName("VehicleSolutionsIcon_W", PluginInfo.PLUGIN_NAME), pageTextLabel, "Vehicle Solutions", PDAPages.VehicleSolutions);
-            radialMenu.AddEntry(gui, FCSAssetBundlesService.PublicAPI.GetIconByName("MiscIcon_W", PluginInfo.PLUGIN_NAME), pageTextLabel, "Misc", PDAPages.MiscSolutions);
+            _radialMenu.AddEntry(_gui, FCSAssetBundlesService.PublicAPI.GetIconByName("HomeSolutionsIcon_W", PluginInfo.PLUGIN_NAME), _pageTextLabel, "Home Solutions", PDAPages.HomeSolutions);
+            _radialMenu.AddEntry(_gui, FCSAssetBundlesService.PublicAPI.GetIconByName("LifeSupportIcon_W", PluginInfo.PLUGIN_NAME), _pageTextLabel, "Life Solutions", PDAPages.LifeSolutions);
+            _radialMenu.AddEntry(_gui, FCSAssetBundlesService.PublicAPI.GetIconByName("EnergySolutionsIcon_W", PluginInfo.PLUGIN_NAME), _pageTextLabel, "Energy Solutions", PDAPages.EnergySolutions);
+            _radialMenu.AddEntry(_gui, FCSAssetBundlesService.PublicAPI.GetIconByName("ProductionSolutionsIcon_W", PluginInfo.PLUGIN_NAME), _pageTextLabel, "Production Solutions", PDAPages.ProductionSolutions);
+            _radialMenu.AddEntry(_gui, FCSAssetBundlesService.PublicAPI.GetIconByName("StoreSolutionsIcon_W", PluginInfo.PLUGIN_NAME), _pageTextLabel, "Storage Solutions", PDAPages.StorageSolutions);
+            _radialMenu.AddEntry(_gui, FCSAssetBundlesService.PublicAPI.GetIconByName("VehicleSolutionsIcon_W", PluginInfo.PLUGIN_NAME), _pageTextLabel, "Vehicle Solutions", PDAPages.VehicleSolutions);
+            _radialMenu.AddEntry(_gui, FCSAssetBundlesService.PublicAPI.GetIconByName("MiscIcon_W", PluginInfo.PLUGIN_NAME), _pageTextLabel, "Misc", PDAPages.MiscSolutions);
         }
-        radialMenu?.Rearrange();
-
-        CreateCartDropDown();
+        _radialMenu?.Rearrange();
 
         LoadShipmentPage();
     }
 
-    private void CreateCartDropDown()
-    {
-
-        _cartDropDownManager = GameObjectHelpers.FindGameObject(_gui.gameObject, "CartDropDown")?.AddComponent<CartDropDownHandler>();
-
-        if (_cartDropDownManager is not null)
-        {
-            _cartDropDownManager.OnBuyAllBtnClick += OnBuyAllBtnClick;
-            _cartDropDownManager.Initialize();
-            _cartDropDownManager.onTotalChanged += amount =>
-            {
-                UpdateCartTotals();
-            };
-        }
-    }
-
-    private void UpdateCartTotals()
+    public void UpdateCartTotals()
     {
         _cartButtonNumber.text = _cartDropDownManager.GetCartCount().ToString();
     }
 
     private void LoadShipmentPage()
     {
-
-        var shipmentButton = gameObject.FindChild("ShipmentBTN").GetComponent<Button>();
-        shipmentButton.onClick.AddListener((() =>
+        _shipmentButton.onClick.AddListener((() =>
         {
             _gui.GoToPage(PDAPages.Shipment);
         }));
 
-        _shipmentPageController = _gui.GetPage(PDAPages.Shipment).gameObject.EnsureComponent<ShipmentPageController>();
-        _shipmentPageController.Initialize(_gui);
     }
 
     internal void AddShipment(Shipment shipment)
@@ -124,15 +87,10 @@ internal class StorePageController : Page
         _shipmentPageController.RemoveItem(shipment);
     }
 
-    private void OnBuyAllBtnClick(CartDropDownHandler obj)
+    public void OnBuyAllBtnClick()
     {
         _checkoutDialog.ShowDialog(_gui, _cartDropDownManager);
         _cartDropDownManager.ToggleVisibility();
-    }
-
-    private void OnDestroy()
-    {
-        _cartDropDownManager.OnBuyAllBtnClick -= OnBuyAllBtnClick;
     }
 
     internal ShipmentInfo GetShipmentInfo()
@@ -157,5 +115,10 @@ internal class StorePageController : Page
     internal void LoadSave(ShipmentInfo shipmentInfo)
     {
         _cartDropDownManager.LoadShipmentInfo(shipmentInfo);
+    }
+
+    public override void OnBackButtonClicked()
+    {
+        _gui.GoBackAPage();
     }
 }

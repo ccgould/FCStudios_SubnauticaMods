@@ -15,17 +15,21 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;
 
 internal class StoreItemPageController : Page
 {
+    [SerializeField]
     private FCSAlterraHubGUI _gui;
     protected override bool showHud => false;
+    [SerializeField]
     private GameObject _storePageGrid;
     private Dictionary<StoreCategory, List<StoreItem>> _storeItems = new();
+    [SerializeField]
     private Text _storeLabel;
+    [SerializeField]
     private Text _cartAmountLabel;
+    [SerializeField]
     private Text _cartTotalLabel;
 
-    internal void Initialize(FCSAlterraHubGUI gui)
+    private void Awake()
     {
-        _gui = gui;
         _storePageGrid = GameObjectHelpers.FindGameObject(gameObject, "Content");
         _storeLabel = GameObjectHelpers.FindGameObject(gameObject, "StoreLabel")?.GetComponent<Text>();
         
@@ -38,7 +42,7 @@ internal class StoreItemPageController : Page
         {
             backButton.onClick.AddListener((() =>
             {
-                gui.GoToPage(PDAPages.None);
+                _gui.GoToPage(PDAPages.None);
             }));
         }
 
@@ -47,7 +51,11 @@ internal class StoreItemPageController : Page
 
     private void UpdateCartValues()
     {
+        QuickLogger.Debug($"{_cartAmountLabel is null} || {StoreManager.main is null} || {CartDropDownHandler.main is null}",true);
+        QuickLogger.Debug("1");
         _cartAmountLabel.text = $"Cart Amount: {StoreManager.main.GetCartTotal(CartDropDownHandler.main.GetShipmentInfo())}";
+        
+        QuickLogger.Debug("2");
         _cartTotalLabel.text = $"Cart Total: {StoreManager.main.GetCartCount(CartDropDownHandler.main.GetShipmentInfo()):n0}";
     }
 
@@ -170,5 +178,10 @@ internal class StoreItemPageController : Page
     {
         CartDropDownHandler.main.AddItem(techType, receiveTechType, returnAmount);
         UpdateCartValues();
+    }
+
+    public override void OnBackButtonClicked()
+    {
+        _gui.GoBackAPage();
     }
 }

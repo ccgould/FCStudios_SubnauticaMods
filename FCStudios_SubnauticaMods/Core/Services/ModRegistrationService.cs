@@ -44,8 +44,17 @@ internal static class ModRegistrationService
 
     internal static ModPackData GetModPackData(string modPackName)
     {
-        QuickLogger.Debug($"{modPackName} || {_registeredMods.Count} || {_registeredMods.ElementAt(0).Key}");
+        QuickLogger.Debug($"GetModPackData:");
+        QuickLogger.Debug($"Requested Mod Pack {modPackName} || Registration Count:  {_registeredMods.Count}");
+        QuickLogger.Debug($"===== Registered Mods List: =========");
+        foreach (var item in _registeredMods)
+        {
+            QuickLogger.Debug($"GetModPackData_Entries:{item.Key}");
+        }
+        QuickLogger.Debug($"===== Registered Mods List: =========");
         _registeredMods.TryGetValue(modPackName, out ModPackData modData);
+
+        QuickLogger.Debug($"Result ModPackData:{modData?.ToString()}");
         return modData;
     }
 

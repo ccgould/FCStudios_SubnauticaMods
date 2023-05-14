@@ -1,28 +1,15 @@
 ﻿using System.Collections.Generic;
-using FCS_AlterraHub.Core.Helpers;
-using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
 using FCSCommon.Utilities;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;
 
 internal class TeleportationPageController : Page
 {
+    [SerializeField]
     private GameObject _grid;
     private List<ShipmentTracker> _trackedShipments = new();
-
-    public void Initialize(FCSAlterraHubGUI gui)
-    {
-        var backButton = gameObject.FindChild("BackBTN").GetComponent<Button>();
-        backButton.onClick.AddListener(() =>
-        {
-            gui.GoToPage(PDAPages.None);    
-        });
-
-        _grid = GameObjectHelpers.FindGameObject(gameObject, "Content");
-    }
 
     internal void Refresh()
     {
@@ -51,5 +38,10 @@ internal class TeleportationPageController : Page
     {
         base.Enter();
         Refresh();
+    }
+
+    public override void OnBackButtonClicked()
+    {
+        FCSPDAController.Main.GetGUI().GoBackAPage();
     }
 }

@@ -434,6 +434,7 @@ public static class MaterialHelpers
             if (render.material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
             {
                 render.material.shader = shader;
+
             }
         }
     }

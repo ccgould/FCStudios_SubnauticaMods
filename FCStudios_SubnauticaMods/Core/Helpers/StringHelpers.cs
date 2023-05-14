@@ -53,16 +53,35 @@ public static class StringHelpers
         var main = HandReticle.main;
         var pda = FCSPDAController.Main;
 
+        QuickLogger.Debug($"PDA Is Null Check {pda is null}",true);
+
         if (strings == null || main == null) return;
 
-        var text = pda?.Screen.CheckIfPDAHasEntry(techType) ?? false ? LanguageService.ViewInPDA() : string.Empty;
+        QuickLogger.Debug("1");
+
+        var text = pda?.Screen?.CheckIfPDAHasEntry(techType) ?? false ? LanguageService.ViewInPDA() : string.Empty;
+
+        QuickLogger.Debug("2");
+
         CreateText(strings);
 
-        HandReticle.main.SetText(HandReticle.TextType.Hand, Sb.ToString(), false, GameInput.Button.None);
-        HandReticle.main.SetText(HandReticle.TextType.HandSubscript, text, false, GameInput.Button.None);
-        HandReticle.main.SetIcon(icon, 1f);
+        QuickLogger.Debug("3");
+
+        main.SetText(HandReticle.TextType.Hand, Sb.ToString(), false, GameInput.Button.None);
+
+        QuickLogger.Debug("4");
+
+        main.SetText(HandReticle.TextType.HandSubscript, text, false, GameInput.Button.None);
+
+        QuickLogger.Debug("5");
+
+        main.SetIcon(icon, 1f);
+
+        QuickLogger.Debug("6");
+
 
         Sb.Clear();
+        QuickLogger.Debug("1");
 
         if (icon == HandReticle.IconType.Progress)
         {

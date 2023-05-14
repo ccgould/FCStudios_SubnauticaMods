@@ -8,10 +8,15 @@ namespace FCS_AlterraHub.Models.Mono;
 
 public class FCSMessageBox : MonoBehaviour
 {
+    [SerializeField]
     private Text _message;
+    [SerializeField]
     private Button _yesBTN;
+    [SerializeField]
     private Button _noBTN;
+    [SerializeField]
     private Button _okBTN;
+    [SerializeField]
     private Button _cancelBTN;
     private Action<FCSMessageResult> _result;
     private bool _initialize;
@@ -19,33 +24,13 @@ public class FCSMessageBox : MonoBehaviour
     private void Initialize()
     {
         if (_initialize) return;
-        _message = GameObjectHelpers.FindGameObject(gameObject, "Message").GetComponent<Text>();
-        _yesBTN = GameObjectHelpers.FindGameObject(gameObject, "YesBTN").GetComponent<Button>();
-        _yesBTN.onClick.AddListener(() =>
-        {
-            _result?.Invoke(FCSMessageResult.OKYES);
-            Close();
-        });
-        _noBTN = GameObjectHelpers.FindGameObject(gameObject, "NoBTN").GetComponent<Button>();
-        _noBTN.onClick.AddListener(() =>
-        {
-            _result?.Invoke(FCSMessageResult.NO);
-            Close();
-        });
-        _okBTN = GameObjectHelpers.FindGameObject(gameObject, "OKBTN").GetComponent<Button>();
-        _okBTN.onClick.AddListener(() =>
-        {
-            _result?.Invoke(FCSMessageResult.OKYES);
-            Close();
-        });
-        _cancelBTN = GameObjectHelpers.FindGameObject(gameObject, "CancelBTN")?.GetComponent<Button>();
-        _cancelBTN.onClick.AddListener(() =>
-        {
-            _result?.Invoke(FCSMessageResult.CANCEL);
-            Close();
-        });
         _initialize = true;
+    }
 
+    public void SendResponse(int result)
+    {
+        _result?.Invoke((FCSMessageResult)result);
+        Close();
     }
 
     public void Show(string message, FCSMessageButton button, Action<FCSMessageResult> result)
@@ -97,6 +82,7 @@ public class FCSMessageBox : MonoBehaviour
     }
 }
 
+[Serializable]
 public enum FCSMessageButton
 {
     NO,
@@ -108,7 +94,8 @@ public enum FCSMessageButton
 
 public enum FCSMessageResult
 {
-    NO,
-    OKYES,
-    CANCEL
+    NO = -1,
+    OKYES = 0,
+    CANCEL = 1
 }
+

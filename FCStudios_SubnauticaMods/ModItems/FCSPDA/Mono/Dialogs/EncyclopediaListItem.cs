@@ -11,21 +11,13 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;
 
 internal class EncyclopediaListItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
+    [SerializeField]
     private TMP_Text _label;
     private Button _button;
     private EncyclopediaData _encyclopediaData;
     private EncyclopediaMainTabController _controller;
     private EncyclopediaTabController _encyclopediaPage;
     private EncyclopediaEntryData _entryData;
-
-    private void Awake()
-    {
-        _label = gameObject.GetComponentInChildren<TMP_Text>();
-        _button = gameObject.GetComponent<Button>();
-
-        _button.onClick.AddListener(()=> { onClick(); });
-
-    }
 
     internal void Initialize(EncyclopediaData value)
     {
@@ -67,16 +59,16 @@ internal class EncyclopediaListItem : MonoBehaviour, IPointerEnterHandler, IPoin
         return _entryData;
     }
 
-    internal void onClick()
+    public void onClick()
     {
-        if (FCSPDAController.Main.Screen.GetCurrentPage() == PDAPages.Encyclopedia)
+        if (FCSPDAController.Main.GetGUI().GetCurrentPage() == PDAPages.Encyclopedia)
         {
             QuickLogger.Debug($"Passing Data: {_entryData.Path}");
             _encyclopediaPage.SetData(_entryData);
         }
         else
         {
-            FCSPDAController.Main.Screen.GoToPage(PDAPages.Encyclopedia, _encyclopediaData);
+            FCSPDAController.Main.GetGUI().GoToPage(PDAPages.Encyclopedia, _encyclopediaData);
         }
     }
 }

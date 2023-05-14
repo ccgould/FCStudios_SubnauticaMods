@@ -33,22 +33,27 @@ internal class CartItem : MonoBehaviour
     internal Action<CartItem> onRemoveBTNClicked;
     private int _returnAmount;
 
+    [SerializeField]
+    private uGUI_Icon _uGUIIcon;
+    [SerializeField]
+    private Text _itemName;
+    [SerializeField]
+    private Text _itemPrice;
+
     private void Start()
     {
-        var icon = GameObjectHelpers.FindGameObject(gameObject, "Icon");
-        uGUI_Icon uGUIIcon = icon.AddComponent<uGUI_Icon>();
-        uGUIIcon.sprite = SpriteManager.Get(TechType);
+        _uGUIIcon.sprite = SpriteManager.Get(TechType);
 
-        var itemName = GameObjectHelpers.FindGameObject(gameObject, "ItemName").GetComponent<Text>();
         var name = Language.main.Get(TechType);
-        itemName.text = ReturnAmount > 1 ? $"{name} x{ReturnAmount}" : Language.main.Get(TechType);
+        _itemName.text = ReturnAmount > 1 ? $"{name} x{ReturnAmount}" : Language.main.Get(TechType);
 
-        var itemPrice = GameObjectHelpers.FindGameObject(gameObject, "ItemPrice").GetComponent<Text>();
-        itemPrice.text = StoreInventoryService.GetPrice(TechType).ToString("n0");
+        _itemPrice = GameObjectHelpers.FindGameObject(gameObject, "ItemPrice").GetComponent<Text>();
+        _itemPrice.text = StoreInventoryService.GetPrice(TechType).ToString("n0");
+    }
 
-
-        var removeBTN = gameObject.GetComponentInChildren<Button>();
-        removeBTN.onClick.AddListener(() => { onRemoveBTNClicked?.Invoke(this); });
+    public void OnRemoveBTNClicked()
+    {
+        onRemoveBTNClicked?.Invoke(this);
     }
 
     internal CartItemSaveData Save()

@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 
 namespace FCS_AlterraHub.Models;
 
@@ -106,5 +107,16 @@ internal class ModPackData
     internal string GetModPackName()
     {
         return _modName;
+    }
+
+    public override string ToString()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.Append($"Mod Pack Name: {_modName}");
+        sb.Append(Environment.NewLine);
+        sb.Append($"Mod Pack Count: {_modItems.Count()}");
+        sb.Append(Environment.NewLine);
+        sb.Append($"Mod Pack Asset Path: {GetAssetPath()}");
+        return sb.ToString();
     }
 }

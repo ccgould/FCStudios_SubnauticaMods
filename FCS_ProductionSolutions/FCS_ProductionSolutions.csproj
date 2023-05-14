@@ -16,6 +16,14 @@
     <Configurations>Debug;Release;SN_Stable;BZ_Stable</Configurations>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SN_Stable|AnyCPU'">
+    <DefineConstants>$(DefineConstants);SUBNAUTICA;SUBNAUTICA_STABLE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BZ_Stable|AnyCPU'">
+    <DefineConstants>$(DefineConstants);BELOWZERO;BELOWZERO_STABLE</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
     <PackageReference Include="BepInEx.Core" Version="5.4.21" />
@@ -29,4 +37,14 @@
   <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FCStudios_SubnauticaMods\FCS_AlterraHub.csproj" />
+  </ItemGroup>
+
+  <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;C:\FCSThunderkitProject\Packages\Subnautica\&quot; /Y /I" />
+  </Target>
 </Project>

@@ -10,38 +10,25 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;
 
 internal class ReturnsDialogController : MonoBehaviour
 {
-    private ToggleGroup _toggleGroup;
+    [SerializeField]
     private Transform _list;
     private readonly List<AlterraHubReturnItemController> _toggles = new List<AlterraHubReturnItemController>();
+    [SerializeField]
     private FCSAlterraHubGUI _mono;
 
     public Action OnClose { get; set; }
 
-
-    internal void Initialize(FCSAlterraHubGUI mono)
+    public void OnDoneButtonClicked()
     {
-        _mono = mono;
-        var content = gameObject.FindChild("Content");
-
-        _list = content.FindChild("Scroll View").FindChild("Viewport").FindChild("Content").transform;
-
-        var cancelBTN = content.FindChild("GameObject").FindChild("CancelBTN").GetComponent<Button>();
-        cancelBTN.onClick.AddListener(() => { Close(true); });
-
-        var doneBTN = content.FindChild("GameObject").FindChild("DoneBTN")
-            .GetComponent<Button>();
-        doneBTN.onClick.AddListener(() =>
-        {   
-            foreach (AlterraHubReturnItemController toggle in _toggles)
+        foreach (AlterraHubReturnItemController toggle in _toggles)
+        {
+            if (toggle.IsChecked)
             {
-                if (toggle.IsChecked)
-                {
-                    AccountService.main.Refund(FCSAlterraHubGUISender.None, toggle.InventoryItem.item.GetTechType());
-                    Destroy(toggle.InventoryItem.item.gameObject);
-                }
+                AccountService.main.Refund(FCSAlterraHubGUISender.None, toggle.InventoryItem.item.GetTechType());
+                Destroy(toggle.InventoryItem.item.gameObject);
             }
-            Close();
-        });
+        }
+        Close();
     }
 
     private void RefreshReturnItemsList()
@@ -65,12 +52,12 @@ internal class ReturnsDialogController : MonoBehaviour
         }
     }
 
-    private void Close(bool isCancel = false)
+    public void Close(bool isCancel = false)
     {
         gameObject.SetActive(false);
     }
 
-    internal void Open()
+    public void Open()
     {
         RefreshReturnItemsList();
         gameObject.SetActive(true);

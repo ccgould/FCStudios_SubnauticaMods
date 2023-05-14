@@ -37,13 +37,13 @@ public class FCSPDAController : MonoBehaviour
     public Action OnClose { get; set; }
     public Channel AudioTrack { get; set; }
     public bool isFocused => this.ui != null && this.ui.focused;
-    public uGUI_InputGroup ui
+    private uGUI_InputGroup ui
     {
         get
         {
             if (_ui == null)
             {
-                _ui = _canvas.gameObject.GetComponentInChildren<Canvas>(true).gameObject.AddComponent<uGUI_InputGroup>();
+                _ui = _canvas.gameObject.GetComponentInChildren<Canvas>(true).gameObject.GetComponent<uGUI_InputGroup>();
             }
             return _ui;
         }
@@ -107,7 +107,7 @@ public class FCSPDAController : MonoBehaviour
         //TODO I dont know why i did this
         //Screen.AttemptToOpenReturnsDialog();
 
-        Screen.UpdateDisplay();
+        //Screen.UpdateDisplay();
 
         PatchAdditionalPages();
 
@@ -127,8 +127,8 @@ public class FCSPDAController : MonoBehaviour
     {
         if (_screen == null)
         {
-           _screen = Instantiate(FCSAssetBundlesService.PublicAPI.GetLocalPrefab("uGUI_PDAScreen"));
-            Screen = _screen.AddComponent<FCSAlterraHubGUI>();
+           _screen = Instantiate(_uGUI_PDAScreenPrefab);
+            Screen = GetGUI();
             Screen.SetInstance(FCSAlterraHubGUISender.PDA);
         }
     }
@@ -137,7 +137,7 @@ public class FCSPDAController : MonoBehaviour
     {
         if(_FCSPDAUI is null)
         {
-            _FCSPDAUI =  _screen.GetComponent<FCSAlterraHubGUI>();
+            _FCSPDAUI =  _screen?.GetComponent<FCSAlterraHubGUI>();
         }
         return _FCSPDAUI;
     }
@@ -198,15 +198,8 @@ public class FCSPDAController : MonoBehaviour
                   
         _pdaAnchor = GameObjectHelpers.FindGameObject(gameObject, "ScreenAnchor").transform;
 
-        _canvasScalar = Screen.gameObject.AddComponent<uGUI_CanvasScaler>();
-        var raycaster = Screen.gameObject.AddComponent<uGUI_GraphicRaycaster>();
-        raycaster.guiCameraSpace = true;
-        raycaster.ignoreReversedGraphics = false;
-
-        _canvasScalar.mode = uGUI_CanvasScaler.Mode.Inversed;
-        _canvasScalar.vrMode = uGUI_CanvasScaler.Mode.Inversed;
+        _canvasScalar = Screen.gameObject.GetComponent<uGUI_CanvasScaler>();
         _canvasScalar.SetAnchor(_pdaAnchor.transform);
-
 
         _canvas = Screen.GetComponentInChildren<Canvas>();
         _canvas.sortingLayerName = "PDA";
@@ -410,6 +403,8 @@ public class FCSPDAController : MonoBehaviour
 
     static Dictionary<TechType,GameObject> additionPages = new();
     private FCSAlterraHubGUI _FCSPDAUI;
+    [SerializeField]
+    private GameObject _uGUI_PDAScreenPrefab;
 
     public static void AddAdditionalPage<T>(TechType id,GameObject ui) where T : Component
     {

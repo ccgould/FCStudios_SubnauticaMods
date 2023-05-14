@@ -1,7 +1,5 @@
-﻿using FCS_AlterraHub.API;
-using FCS_AlterraHub.Core.Helpers;
+﻿using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Core.Services;
-using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,26 +10,22 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono;
 
 internal class DevicePageController : Page
 {
+    [SerializeField]
     private Transform _content;
+    [SerializeField]
     private Toggle _showAllToggle;
+    [SerializeField]
+    private GameObject _categoryPrefab;
     private Dictionary<string, DeviceCatergory> _groups = new();
 
-    internal void Initialize(FCSAlterraHubGUI gui)
+    private void Awake()
     {
-        var backButton = gameObject.FindChild("BackBTN")?.GetComponent<Button>();
         _content = GameObjectHelpers.FindGameObject(gameObject.FindChild("Body"),"Content").transform;
-        _showAllToggle = GameObjectHelpers.FindGameObject(gameObject, "ShowAll").GetComponent<Toggle>();
-        _showAllToggle.onValueChanged.AddListener((b) => 
-        {
-            Enter(null);
-        });
-        if (backButton != null)
-        {
-            backButton.onClick.AddListener((() =>
-            {
-                gui.GoToPage(PDAPages.None);
-            }));
-        }
+
+        //_showAllToggle.onValueChanged.AddListener((b) => 
+        //{
+        //    Enter(null);
+        //});
     }
 
     internal bool GetShowAllState()
@@ -55,11 +49,16 @@ internal class DevicePageController : Page
 
         foreach (var device in devices)
         {
-            var category = Instantiate(FCSAssetBundlesService.PublicAPI.GetLocalPrefab("DeviceCategory"));
-            var deviceCat = category.EnsureComponent<DeviceCatergory>();
+            var category = Instantiate(_categoryPrefab);
+            var deviceCat = category.GetComponent<DeviceCatergory>();
             deviceCat.Initialize(this,device);
             deviceCat.gameObject.transform.SetParent(_content, false);
             _groups.Add(device.Key, deviceCat);
         }
+    }
+
+    public override void OnBackButtonClicked()
+    {
+        FCSPDAController.Main.GetGUI().GoBackAPage();
     }
 }

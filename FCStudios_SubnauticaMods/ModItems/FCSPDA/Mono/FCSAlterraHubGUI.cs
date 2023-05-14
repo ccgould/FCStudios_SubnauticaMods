@@ -1,7 +1,6 @@
 ﻿using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Models.Mono.Handlers;
 using FCS_AlterraHub.Models.Mono;
-using FCS_AlterraHub.ModItems.FCSPDA.Mono.ScreenItems;
 using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
@@ -11,7 +10,6 @@ using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;
-using FCS_AlterraHub.API;
 using FCS_AlterraHub.ModItems.FCSPDA.Interfaces;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
@@ -21,38 +19,61 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono;
 
 public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
 {
-    private Text _cartButtonNumber;
-    private Text _cartAmountLabel;
-    private Text _cartTotalLabel;
+
+
+    [SerializeField]
     private Text _clock;
-    private Text _currentBiome;
-    private Text _accountName;
-    private Text _accountBalance;
+
+
     private bool _goToEncyclopedia;
+
     private readonly Dictionary<PDAPages, GameObject> _pages = new();
     private readonly Dictionary<TechType, IuGUIAdditionalPage> _additionalPagesCollection = new();
-    private GameObject _storePageGrid;
+
+    [SerializeField]
     private AccountPageHandler _accountPageHandler;
-    private Text _currentBaseInfo;
+
+    [SerializeField]
     private TeleportationPageController _teleportationPageController;
+    [SerializeField]
     private GameObject _404;
+
     public Action<TechType> OnInfoButtonClicked;
-    internal EncyclopediaTabController EncyclopediaTabController { get; set; }
+
+    [SerializeField]
+    private EncyclopediaTabController _encyclopediaTabController;
+
 
     private bool _isInitialized;
+
     private Canvas _canvas;
+
+    [SerializeField]
     private GameObject _toggleHud;
+
+    [SerializeField]
     private MessageBoxHandler _messageBox;
+    [SerializeField]
     private GameObject _additionalPages;
+
     private PDAPages _currentPage;
-    private PDADeviceSettingsPage _deviceSettingsPage;
-    private RadialMenu _radialMenu;
-    private DevicePageController _devicePageController;
+
+    [SerializeField]
+    private CartDropDownHandler _cartDropDownController;
+    [SerializeField]
     private MenuController _menuController;
+    [SerializeField]
     private StorePageController _storePage;
 
     public bool IsOpen { get; set; }
     public FCSAlterraHubGUISender SenderType { get; set; }
+
+    private void Awake()
+    {
+        _menuController = gameObject.GetComponent<MenuController>();
+        _canvas = gameObject.GetComponent<Canvas>();
+        _cartDropDownController.Initialize();
+    }
 
     private void Update()
     {
@@ -67,50 +88,24 @@ public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
         if (_isInitialized) return;
 
         SenderType = SenderType;
-        _canvas = gameObject.GetComponent<Canvas>();
-        _messageBox = gameObject.AddComponent<MessageBoxHandler>();
-        _currentBiome = GameObjectHelpers.FindGameObject(_canvas.gameObject, "BiomeLBL")?.GetComponent<Text>();
-
-        _404 = GameObjectHelpers.FindGameObject(_canvas.gameObject, "404");
-
         if (_404 is not null)
         {
             _404.FindChild("Message").GetComponent<Text>().text = LanguageService.Error404();
         }
-
-
-
-        _toggleHud = GameObjectHelpers.FindGameObject(_canvas.gameObject, "ToggleHud");
-        _accountName = GameObjectHelpers.FindGameObject(_canvas.gameObject, "UserName")?.GetComponent<Text>();
-        _currentBaseInfo = GameObjectHelpers.FindGameObject(_canvas.gameObject, "CurrentBaseInfo")?.GetComponent<Text>();
-        _accountBalance = GameObjectHelpers.FindGameObject(_canvas.gameObject, "AccountBalance")?.GetComponent<Text>();
-        _clock = GameObjectHelpers.FindGameObject(_canvas.gameObject, "Clock")?.GetComponent<Text>();
-        _menuController = gameObject.AddComponent<MenuController>();
-
+        
         AddPages();
-        CreateHomePage();
         CreateStorePage();
-        CreateDeviceSettingsPage();
-        EncyclopediaPage();
-        EncyclopediaMainPage();
-        CreateStorePagePage();
-        AccountPage();
-        DevicePage();
-        TeleportationPage();
 
         OnInfoButtonClicked += onInfoButtonClicked;
-        _menuController.Initialize();
         //MaterialHelpers.ApplyEmissionShader(AlterraHub.BasePrimaryCol, gameObject, Color.white, 0, 0.01f, 0.01f);
         //MaterialHelpers.ApplySpecShader(AlterraHub.BasePrimaryCol, gameObject, 1, 6.15f);
-        _messageBox.ObjectRoot = gameObject;
         //MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
-        InvokeRepeating(nameof(UpdateDisplay), .5f, .5f);
         _isInitialized = true;
     }
 
     private void onInfoButtonClicked(TechType techType)
     {
-        FCSPDAController.Main.Screen.OpenEncyclopedia(techType);
+        FCSPDAController.Main.GetGUI().OpenEncyclopedia(techType);
     }
 
     private void AddPages()
@@ -123,28 +118,8 @@ public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
         }
     }
 
-    private void CreateHomePage()
-    {
-        _menuController.InitialPage = _pages[PDAPages.Home].gameObject.EnsureComponent<BlankPageController>();
-
-
-        var pageTextLabel = _pages[PDAPages.Home]?.FindChild("PageName")?.GetComponent<Text>();
-        _radialMenu = _pages[PDAPages.Home]?.FindChild("RadialMenu")?.AddComponent<RadialMenu>();
-
-        if (_radialMenu is null) return;
-
-        _radialMenu.AddEntry(this, FCSAssetBundlesService.PublicAPI.GetIconByName("Cart_Icon"), pageTextLabel, "Store", PDAPages.Store);
-        _radialMenu.AddEntry(this, FCSAssetBundlesService.PublicAPI.GetIconByName("EncyclopediaIcon"), pageTextLabel, "Encyclopedia", PDAPages.EncyclopediaMain);
-        _radialMenu.AddEntry(this, FCSAssetBundlesService.PublicAPI.GetIconByName("IconAccount"), pageTextLabel, "Account", PDAPages.AccountPage);
-        _radialMenu.AddEntry(this, FCSAssetBundlesService.PublicAPI.GetIconByName("QuantumTeleporterIcon_W"), pageTextLabel, "Teleportation", PDAPages.Teleportation);
-        _radialMenu.AddEntry(this, FCSAssetBundlesService.PublicAPI.GetIconByName("QuantumTeleporterIcon_W"), pageTextLabel, "Base Devices", PDAPages.BaseDevices,false);
-    }
-
     private void CreateStorePage()
     {
-        _storePage = _pages[PDAPages.Store].gameObject.EnsureComponent<StorePageController>();
-        _storePage.Initialize(this);
-
         //Set gameobject to toggle for pages
         _pages[PDAPages.HomeSolutions] = _pages[PDAPages.StorePage];
         _pages[PDAPages.LifeSolutions] = _pages[PDAPages.StorePage];
@@ -155,69 +130,9 @@ public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
         _pages[PDAPages.MiscSolutions] = _pages[PDAPages.StorePage];
     }
 
-    private void CreateDeviceSettingsPage()
-    {
-        _deviceSettingsPage = _pages[PDAPages.DeviceSettings]?.EnsureComponent<PDADeviceSettingsPage>();
-
-
-    }
-
-    private void CreateStorePagePage()
-    {
-        var storePage = _pages[PDAPages.StorePage].gameObject.EnsureComponent<StoreItemPageController>();
-        storePage.Initialize(this);
-    }
-
-    private void AccountPage()
-    {
-        _accountPageHandler = _pages[PDAPages.AccountPage].gameObject.EnsureComponent<AccountPageHandler>();
-        _accountPageHandler.Initialize(this);
-        var backButton = _pages[PDAPages.AccountPage].FindChild("BackBTN").GetComponent<Button>();
-        backButton.onClick.AddListener((() =>
-        {
-            GoToPage(PDAPages.None);
-        }));
-    }
-
-    private void TeleportationPage()
-    {
-        _teleportationPageController = _pages[PDAPages.Teleportation].AddComponent<TeleportationPageController>();
-        _teleportationPageController.Initialize(this);
-
-    }
-
-    private void EncyclopediaPage()
-    {
-        var page = _pages[PDAPages.Encyclopedia];
-        EncyclopediaTabController = page.AddComponent<EncyclopediaTabController>();
-        var backButton = page.FindChild("BackBTN").GetComponent<Button>();
-        backButton.onClick.AddListener((() =>
-        {
-            GoToPage(PDAPages.None);
-        }));
-    }
-
-    private void EncyclopediaMainPage()
-    {
-        var page = _pages[PDAPages.EncyclopediaMain];
-        page.AddComponent<EncyclopediaMainTabController>();
-        var backButton = page.FindChild("BackBTN").GetComponent<Button>();
-        backButton.onClick.AddListener((() =>
-        {
-            GoToPage(PDAPages.None);
-        }));
-    }
-
-    private void DevicePage()
-    {
-        _devicePageController = _pages[PDAPages.BaseDevices].AddComponent<DevicePageController>();
-        _devicePageController.Initialize(this);
-
-    }
-
     internal void GoToPage(PDAPages page,object arg = null)
     {
-        QuickLogger.Debug($"Goto Page {arg is null}");
+        QuickLogger.Debug($"Goto Page: Is Arg null =  {arg is null}");
 
         Page currentPage = null;
 
@@ -272,36 +187,7 @@ public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
         //_404?.SetActive(!DroneDeliveryService.Main.DetermineIfFixed());
     }
 
-    internal void UpdateDisplay()
-    {
-        if (_currentBiome == null || _accountName == null || _currentBaseInfo == null) return;
-
-        _currentBiome.text = Player.main.GetBiomeString();
-
-        if (!string.IsNullOrWhiteSpace(AccountService.main.GetUserName()))
-            _accountName.text = AccountService.main.GetUserName();
-
-        _accountBalance.text = $"{AccountService.main.GetAccountBalance():N0}";
-
-        var currentBase = HabitatService.main.GetPlayersCurrentBase();
-        var friendly = currentBase?.GetBaseFriendlyName();
-        var baseId = currentBase?.GetBaseID() ?? 0;
-
-        if (!string.IsNullOrWhiteSpace(friendly))
-        {
-            SetCurrentBaseInfoText($"{friendly} | {LanguageService.BaseIDFormat(baseId.ToString("D3"))}");
-        }
-        else
-        {
-            SetCurrentBaseInfoText("N/A");
-        }
-    }
-
-    private void SetCurrentBaseInfoText(string text)
-    {
-        _currentBaseInfo.text = $"Current Base : {text}";
-    }
-
+    
     internal void OpenEncyclopedia(TechType techType)
     {
         if (CheckIfPDAHasEntry(techType))
@@ -319,12 +205,12 @@ public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
 
     internal bool CheckIfPDAHasEntry(TechType techType)
     {
-        return EncyclopediaTabController.HasEntry(techType);
+        return _encyclopediaTabController?.HasEntry(techType) ?? false;
     }
 
     internal bool CheckIfPDAHasEntry(string techType)
     {
-        return EncyclopediaTabController.HasEntry(techType);
+        return _encyclopediaTabController.HasEntry(techType);
     }
 
     internal void CloseAccountPage()
@@ -335,7 +221,7 @@ public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
     private void OnDestroy()
     {
         _accountPageHandler = null;
-        OnInfoButtonClicked -= EncyclopediaTabController.OpenEntry;
+        OnInfoButtonClicked -= _encyclopediaTabController.OpenEntry;
     }
 
     internal void LoadFromSave(ShipmentInfo shipmentInfo)
@@ -348,7 +234,7 @@ public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
         _accountPageHandler.Refresh();
     }
 
-    void IFCSAlterraHubGUI.ShowMessage(string message)
+    public void ShowMessage(string message)
     {
         _messageBox.Show(message, FCSMessageButton.OK);
     }
@@ -365,9 +251,11 @@ public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
         ui.SetActive(false);
         ui.transform.SetParent(_additionalPages.gameObject.transform, false);
         var interf = ui.GetComponent<IuGUIAdditionalPage>();
+        
         interf.onBackClicked += (s) => {
             GoToPage(s);
         };
+        
         interf.onSettingsClicked += (device)=> {
             GoToPage(PDAPages.DeviceSettings, device);
         };
@@ -395,6 +283,11 @@ public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
     {
         if (!_pages.ContainsKey(page)) return null;
         return _pages[page];
+    }
+
+    public void GoBackAPage()
+    {
+        GoToPage(PDAPages.None);
     }
 
     internal ShipmentInfo GetShipmentInfo()

@@ -8,6 +8,7 @@ using FCS_AlterraHub.ModItems.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.ModItems.FCSPDA.Struct;
 using FCSCommon.Utilities;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;
@@ -15,47 +16,40 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;
 internal class CartDropDownHandler : MonoBehaviour, IStoreClient
 {
     internal static CartDropDownHandler main;
-    public Action<CartDropDownHandler> OnBuyAllBtnClick;
+    [SerializeField]
     private GameObject _cartList;
+    [SerializeField]
     private Text _totalAmount;
-    internal Action<decimal> onTotalChanged;
+    [SerializeField]
+    private UnityEvent<decimal> onTotalChanged;
+    [SerializeField]
     private ShipmentInfo _shipmentInfo;
+    [SerializeField]
     private IFCSAlterraHubGUI _mono;
+    [SerializeField]
+    private GameObject _cartItemPrefab;
 
-    internal void Initialize()
+    public void Initialize()
     {
+        QuickLogger.Debug("CartDropDownHandler Awake");
         main = this;
         _mono = FCSPDAController.Main.GetGUI();
-        _cartList = GameObjectHelpers.FindGameObject(gameObject, "CartDropDownContent");
-        _totalAmount = GameObjectHelpers.FindGameObject(gameObject, "TotalAmount").GetComponent<Text>();
         ResetDropDown();
+    }
 
-       var result =  ModPrefabService.LoadAsset("CartItem", FCSAssetBundlesService.PublicAPI.GetAssetBundleByName(FCSAssetBundlesService.PublicAPI.GlobalBundleName), out var go, false);
-
-        QuickLogger.Info($"Cart Item Result; {result}");
-
-        var buyAllButton = GameObjectHelpers.FindGameObject(gameObject, "BuyButton").GetComponent<Button>();
-        buyAllButton.onClick.AddListener(() =>
+    public void OnBuyAllButtonClicked()
+    {
+        if (!PlayerInteractionHelper.HasCard())
         {
-            if (!PlayerInteractionHelper.HasCard())
-            {
-                SendMessageFromDialog(LanguageService.CardNotDetected());
-                return;
-            }
+            SendMessageFromDialog(LanguageService.CardNotDetected());
+            return;
+        }
 
-            if (StoreManager.main.GetCartCount(_shipmentInfo) <= 0)
-            {
-                SendMessageFromDialog(LanguageService.NoItemsInCart());
-                return;
-            }
-            OnBuyAllBtnClick?.Invoke(this);
-        });
-
-        var closeBTN = GameObjectHelpers.FindGameObject(gameObject, "CloseBTN").GetComponent<Button>();
-        closeBTN.onClick.AddListener(() =>
+        if (StoreManager.main.GetCartCount(_shipmentInfo) <= 0)
         {
-            ToggleVisibility();
-        });
+            SendMessageFromDialog(LanguageService.NoItemsInCart());
+            return;
+        }
     }
 
     private void SendMessageFromDialog(string message)
@@ -63,7 +57,7 @@ internal class CartDropDownHandler : MonoBehaviour, IStoreClient
         _mono.ShowMessage(message);
     }
 
-    internal void ToggleVisibility(bool forceClose = false)
+    public void ToggleVisibility(bool forceClose = false)
     {
         if (forceClose)
         {
@@ -96,8 +90,8 @@ internal class CartDropDownHandler : MonoBehaviour, IStoreClient
 
     private CartItem CreateCartItemGameObject(TechType item, TechType receiveTechType, int returnAmount)
     {
-        var cartItem = GameObject.Instantiate(ModPrefabService.GetPrefab("CartItem"));
-        var cartItemComponent = cartItem.AddComponent<CartItem>();
+        var cartItem = GameObject.Instantiate(_cartItemPrefab);
+        var cartItemComponent = cartItem.GetComponent<CartItem>();
         cartItemComponent.TechType = item;
         cartItemComponent.ReceiveTechType = receiveTechType;
         cartItemComponent.ReturnAmount = returnAmount;
@@ -115,7 +109,6 @@ internal class CartDropDownHandler : MonoBehaviour, IStoreClient
 
     private void ResetDropDown()
     {
-
         StoreManager.main?.RemovePendingOrder(_shipmentInfo);
 
         foreach (Transform child in _cartList.transform)

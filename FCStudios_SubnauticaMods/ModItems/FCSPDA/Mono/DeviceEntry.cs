@@ -1,9 +1,8 @@
 ﻿using FCS_AlterraHub.Models.Abstract;
-using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using static HandReticle;
+
 
 namespace FCS_AlterraHub.ModItems.FCSPDA.Mono;
 
@@ -11,6 +10,10 @@ internal class DeviceEntry : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 {
     private TechType _techType;
     private FCSDevice _device;
+    [SerializeField]
+    private uGUI_Icon _icon;
+    [SerializeField]
+    private TMP_Text _text;
 
     public void OnPointerClick(PointerEventData eventData)
     {
@@ -31,10 +34,7 @@ internal class DeviceEntry : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     {
         _techType = device.GetTechType();
         _device = device;
-        var icon = gameObject.FindChild("Icon").EnsureComponent<uGUI_Icon>();
-        icon.sprite = SpriteManager.Get(device.GetTechType());
-
-        var text = gameObject.GetComponentInChildren<TMP_Text>();
-        text.text = device.GetDeviceName();
+        _icon.sprite = SpriteManager.Get(device.GetTechType());
+        _text.text = device.GetDeviceName();
     }
 }

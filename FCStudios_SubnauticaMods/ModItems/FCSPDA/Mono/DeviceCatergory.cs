@@ -11,39 +11,42 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono;
 
 internal class DeviceCatergory : MonoBehaviour
 {
+    [SerializeField]
     private Transform _content;
     private DevicePageController _controller;
+    [SerializeField]
+    private TMP_Text _title;
+    [SerializeField]
+    private List<FCSDevice> _devices;
+    [SerializeField]
+    private GameObject _deviceEntryPrefab;
 
     internal void Initialize(DevicePageController controller,KeyValuePair<string, List<FCSDevice>> devices)
     {
         _controller = controller;
-        var title = gameObject.FindChild("Title").GetComponentInChildren<TMP_Text>();
-        title.text = devices.Key;
-
-        var dropDownToggle = GameObjectHelpers.FindGameObject(gameObject, "DropDownToggle").GetComponent<Toggle>();
-        var infoBTN = GameObjectHelpers.FindGameObject(gameObject, "InfoBTN").GetComponent<Button>();
-        infoBTN.onClick.AddListener(() => 
-        {
-            if (devices.Value.Count > 0)
-            {
-                FCSPDAController.Main.GetGUI().OnInfoButtonClicked?.Invoke(devices.Value[0]?.GetTechType() ?? TechType.None);
-            }
-        });
-
-        _content = gameObject.FindChild("Device_Content").transform;
-
-        dropDownToggle.onValueChanged.AddListener((b)=> 
-        {
-            _content.gameObject.SetActive(b);
-        });
+        _title.text = devices.Key;
+        _devices = devices.Value;
 
         foreach (var device in devices.Value)
         {
             if (!device.IsVisibleInPDA && !_controller.GetShowAllState()) continue;
-            var item = Instantiate(FCSAssetBundlesService.PublicAPI.GetLocalPrefab("DeviceEntry"));
-            var deviceEntry = item.EnsureComponent<DeviceEntry>();
+            var item = Instantiate(_deviceEntryPrefab);
+            var deviceEntry = item.GetComponent<DeviceEntry>();
             deviceEntry.Initialize(device);
             item.gameObject.transform.SetParent(_content, false);
         }
+    }
+
+    public void OnInfoButtonClicked()
+    {
+        if (_devices.Count > 0)
+        {
+            FCSPDAController.Main.GetGUI().OnInfoButtonClicked?.Invoke(_devices[0]?.GetTechType() ?? TechType.None);
+        }
+    }
+
+    public void OnUpdateToggleValueChanged(bool b)
+    {
+        _content.gameObject.SetActive(b);
     }
 }

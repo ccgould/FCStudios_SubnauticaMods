@@ -56,6 +56,6 @@
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;C:\Users\SPV_s\OneDrive\Documents\Field Creators Studios\Unity\SubnauticMods_FCStudios\Packages\Subnautica\&quot; /Y /I" />
+    <Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;C:\FCSThunderkitProject\Packages\Subnautica\&quot; /Y /I" />
   </Target>
 </Project>

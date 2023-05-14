@@ -10,6 +10,9 @@ namespace FCS_AlterraHub.Models.Abstract;
 /// </summary>
 [RequireComponent(typeof(PrefabIdentifier))]
 [RequireComponent(typeof(TechTag))]
+[RequireComponent(typeof(HoverInteraction))]
+[RequireComponent(typeof(Constructable))]
+[RequireComponent(typeof(LargeWorldEntity))]
 public abstract class FCSDevice : MonoBehaviour, IProtoEventListener, IConstructable
 {
     

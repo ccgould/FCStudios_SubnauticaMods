@@ -11,18 +11,19 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;
 
 internal class ShipmentPageController : Page
 {
+    [SerializeField]
     private GameObject _grid;
+    [SerializeField]
+    private FCSAlterraHubGUI _gui;
     private List<ShipmentTracker> _trackedShipments = new();
 
-    public void Initialize(FCSAlterraHubGUI gui)
+    public void Awake()
     {
         var backButton = gameObject.FindChild("BackBTN").GetComponent<Button>();
         backButton.onClick.AddListener(() =>
         {
-            gui.GoToPage(PDAPages.None);
+            _gui.GoToPage(PDAPages.None);
         });
-
-        _grid = GameObjectHelpers.FindGameObject(gameObject, "Content");
     }
 
     internal void AddItem(Shipment pendingOrder)
@@ -49,5 +50,10 @@ internal class ShipmentPageController : Page
                 break;
             }
         }
+    }
+
+    public override void OnBackButtonClicked()
+    {
+        _gui.GoBackAPage();
     }
 }

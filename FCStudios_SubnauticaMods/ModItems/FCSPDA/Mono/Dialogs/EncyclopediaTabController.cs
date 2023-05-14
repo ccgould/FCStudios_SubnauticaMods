@@ -3,6 +3,7 @@ using FCS_AlterraHub.Core.Extensions;
 using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.ModItems.FCSPDA.Data.Models;
+using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
 using FCSCommon.Utilities;
 using System;
@@ -14,16 +15,29 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;
 
 internal class EncyclopediaTabController : Page
 {
+    [SerializeField]
     private GameObject _itemPrefab;
+    [SerializeField]
     private Text _title;
+    [SerializeField]
     private Text _message;
+    [SerializeField]
     private RawImage _image;
+    [SerializeField]
     private LayoutElement _imageLayout;
+    [SerializeField]
     private ScrollRect _listScrollRect;
+    [SerializeField]
     private RectTransform _listCanvas;
     private bool _isInitialize;
     internal static EncyclopediaTabController Instance;
     private readonly List<EncyclopediaListItem> _trackedEntries = new();
+    
+    private void Awake()
+    {
+        QuickLogger.Debug("Set Encyclopedia Tab Instance");
+        Instance = this;
+    }
 
     public override void Enter(object arg = null)
     {
@@ -68,38 +82,22 @@ internal class EncyclopediaTabController : Page
 
         if (_isInitialize) return;
 
-        Instance = this;
-        _itemPrefab = FCSAssetBundlesService.PublicAPI.GetLocalPrefab("encyclopediaListItem");
-        _title = GameObjectHelpers.FindGameObject(gameObject, "Title").GetComponent<Text>();
-        _message = GameObjectHelpers.FindGameObject(gameObject, "Description").GetComponent<Text>();
-        var banner = GameObjectHelpers.FindGameObject(gameObject, "Banner");
-        _image = banner.GetComponent<RawImage>();
-        _imageLayout = banner.GetComponent<LayoutElement>();
-        var encycList = GameObjectHelpers.FindGameObject(gameObject, "EncyclopediaList");
-        _listScrollRect = encycList.GetComponent<ScrollRect>();
-        _listCanvas = encycList.FindChild("Viewport").FindChild("Content").GetComponent<RectTransform>();
-
-
         if (_itemPrefab is null)
         {
-            QuickLogger.Error("Encyuclopedia List Item Prefab Returned Null");
+            QuickLogger.Error("Encyclopedia List Item Prefab Returned Null");
             return;
         }
-
         _isInitialize = true;
     }
 
     private void RefreshList(EncyclopediaData data)
     {
-        QuickLogger.Debug("1");
         _trackedEntries?.Clear();
-        QuickLogger.Debug("2");
 
         foreach (Transform item in _listCanvas.transform)
         {
             Destroy(item.gameObject);
         }
-        QuickLogger.Debug("3");
 
         if (data?.Data is null)
         {
@@ -109,20 +107,12 @@ internal class EncyclopediaTabController : Page
 
         foreach (var entry in data?.Data)
         {
-            QuickLogger.Debug("3.1");
-            var prefab = GameObject.Instantiate(_itemPrefab);
-            QuickLogger.Debug("3.2");
-            var listItem = prefab.EnsureComponent<EncyclopediaListItem>();
-            QuickLogger.Debug("3.3");
+            var prefab = Instantiate(_itemPrefab);
+            var listItem = prefab.GetComponent<EncyclopediaListItem>();
             prefab.transform.SetParent(_listCanvas.transform, false);
-            QuickLogger.Debug("3.4");
             listItem.Initialize(entry);
-            QuickLogger.Debug("3.5");
             _trackedEntries?.Add(listItem);
-            QuickLogger.Debug("3.6");
         }
-        QuickLogger.Debug("4");
-
     }
 
     internal void OpenEntry(TechType techType)
@@ -148,18 +138,31 @@ internal class EncyclopediaTabController : Page
 
     private void SetImage(EncyclopediaEntryData entryData)
     {
-        var texture = EncyclopediaService.GetEncyclopediaTexture2D(entryData.ImageName, ModRegistrationService.GetModPackData(EncyclopediaService.GetModPackID(entryData)).GetBundleName());
-        _image.texture = texture;
-        if (texture != null)
+        if(entryData is not null)
         {
-            float num = (float)texture.height / (float)texture.width;
-            float num2 = _image.rectTransform.rect.width * num;
-            _imageLayout.minHeight = num2;
-            _imageLayout.preferredHeight = num2;
-            _image.gameObject.SetActive(true);
-            return;
+            QuickLogger.Debug("Entry Data is not null");
+            var texture = EncyclopediaService.GetEncyclopediaTexture2D(entryData.ImageName, ModRegistrationService.GetModPackData(EncyclopediaService.GetModPackID(entryData))?.GetBundleName());
+            QuickLogger.Debug($"Texture Returned Texture: {texture}");
+            _image.texture = texture;
+            QuickLogger.Debug($"Setting Texture");
+            if (texture != null)
+            {
+                QuickLogger.Debug("Has Image");
+                float num = (float)texture.height / (float)texture.width;
+                float num2 = _image.rectTransform.rect.width * num;
+                _imageLayout.minHeight = num2;
+                _imageLayout.preferredHeight = num2;
+                _image.gameObject.SetActive(true);
+                return;
+            }
         }
 
+        QuickLogger.Debug("Doesnt Have Image");
         _image.gameObject.SetActive(false);
+    }
+
+    public override void OnBackButtonClicked()
+    {
+        FCSPDAController.Main.GetGUI().GoBackAPage();
     }
 }

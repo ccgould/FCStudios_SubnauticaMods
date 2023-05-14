@@ -101,9 +101,7 @@ public static class Player_Patches
         var canvas = pda.GetComponentInChildren<Canvas>();
         if (canvas != null)
             canvas.sortingLayerID = 1479780821;
-
-        pda.EnsureComponent<Rigidbody>().isKinematic = true;
-        var controller = pda.AddComponent<FCSPDAController>();
+        var controller = pda.GetComponent<FCSPDAController>();
         controller.CreateScreen();
         FCSPDA = controller;
         controller.PDAObj = defPDA;

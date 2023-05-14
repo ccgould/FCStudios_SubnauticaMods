@@ -24,4 +24,10 @@ public abstract class Page : MonoBehaviour
     {
         return showHud;
     }
+
+    public abstract void OnBackButtonClicked();
+
+    public virtual void OnSettingsButtonClicked() { }
+
+    public virtual void OnInfoButtonClicked() { }
 }
