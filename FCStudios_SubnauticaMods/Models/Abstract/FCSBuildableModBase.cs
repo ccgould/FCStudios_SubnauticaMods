@@ -21,6 +21,7 @@ public abstract class FCSBuildableModBase : ModBase, IModBase
     private string _modName;
     protected readonly string _classID;
     protected readonly string _friendlyName;
+    private readonly string _prefabName;
     private readonly string AssetsFolder;
     public event Action OnStartRegister;
     public event Action OnFinishRegister;
@@ -30,6 +31,7 @@ public abstract class FCSBuildableModBase : ModBase, IModBase
         _modName = modName;
         _classID = classId;
         _friendlyName = friendlyName;
+        _prefabName = prefabName;
         AssetsFolder = ModRegistrationService.GetModPackData(modName)?.GetAssetPath();
         Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName(prefabName, ModRegistrationService.GetModPackData(modName)?.GetBundleName(),modDir);
         QuickLogger.Debug($"FCSBuildable Prefab: {Prefab?.name}");
@@ -38,8 +40,9 @@ public abstract class FCSBuildableModBase : ModBase, IModBase
     public virtual void PatchSMLHelper() 
     {
         _settings = FCSModsAPI.InternalAPI.GetModSettings(_modName, _classID);
-        PrefabInfo = PrefabInfo.WithTechType(_classID, FriendlyName, _settings.Description);
-        PrefabInfo.WithIcon(ImageUtils.LoadSpriteFromFile(Path.Combine(AssetsFolder, $"{_classID}.png")));
+        PrefabInfo = PrefabInfo.WithTechType(_classID, FriendlyName, _settings.Description)
+            .WithIcon(ImageUtils.LoadSpriteFromFile(Path.Combine(AssetsFolder, $"{_classID}.png")))
+            .WithFileName(_prefabName);
         Register();
     }
 
@@ -105,7 +108,7 @@ public abstract class FCSBuildableModBase : ModBase, IModBase
             MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Plugin.ModSettings.ModPackID);
         }
 
-        Prefab = prefab;
+        //Prefab = prefab;
 
         yield return ModifyPrefab(prefab);
 
