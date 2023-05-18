@@ -1,4 +1,4 @@
-﻿using FCS_AlterraHub.Models.Abstract;
+using FCS_AlterraHub.Models.Abstract;
 using FCSCommon.Helpers;
 using System.Collections;
 using UnityEngine;
