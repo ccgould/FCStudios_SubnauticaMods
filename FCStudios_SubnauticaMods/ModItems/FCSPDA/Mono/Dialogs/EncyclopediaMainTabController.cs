@@ -76,7 +76,7 @@ internal class EncyclopediaMainTabController : Page
             var prefab = GameObject.Instantiate(_itemPrefab);
             var listItem = prefab.GetComponent<EncyclopediaListItem>();
             prefab.transform.SetParent(_listCanvas.transform, false);
-            listItem.Initialize(item.Value);
+            listItem.Initialize(this,item.Value);
         }
 
         _isInitialize = true;

@@ -37,15 +37,6 @@ internal class StoreItemPageController : Page
         _cartAmountLabel = storeHud.FindChild("CartAmount")?.GetComponent<Text>();
         _cartTotalLabel = storeHud.FindChild("CartTotal")?.GetComponent<Text>();
 
-        var backButton = gameObject.FindChild("BackBTN")?.GetComponent<Button>();
-        if (backButton != null)
-        {
-            backButton.onClick.AddListener((() =>
-            {
-                _gui.GoToPage(PDAPages.None);
-            }));
-        }
-
         LoadStore();
     }     
 

@@ -30,14 +30,7 @@ internal class EncyclopediaTabController : Page
     [SerializeField]
     private RectTransform _listCanvas;
     private bool _isInitialize;
-    internal static EncyclopediaTabController Instance;
     private readonly List<EncyclopediaListItem> _trackedEntries = new();
-    
-    private void Awake()
-    {
-        QuickLogger.Debug("Set Encyclopedia Tab Instance");
-        Instance = this;
-    }
 
     public override void Enter(object arg = null)
     {

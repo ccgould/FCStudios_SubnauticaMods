@@ -9,6 +9,8 @@ using Newtonsoft.Json;
 using System.Linq;
 using FCS_AlterraHub.Core.Extensions;
 using FCS_AlterraHub.ModItems.FCSPDA.Data.Models;
+using FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;
+using FCS_AlterraHub.ModItems.FCSPDA.Mono;
 
 namespace FCS_AlterraHub.Core.Services;
 
@@ -127,5 +129,10 @@ internal static class EncyclopediaService
     internal static void ClearSelectedEntry()
     {
         _selectedEntry = TechType.None;
+    }
+
+    internal static EncyclopediaTabController GetEncyclopediaTabController()
+    {
+        return FCSPDAController.Main.Screen.GetEncyclopediaTabController();
     }
 }

@@ -16,18 +16,16 @@ internal class EncyclopediaListItem : MonoBehaviour, IPointerEnterHandler, IPoin
     private Button _button;
     private EncyclopediaData _encyclopediaData;
     private EncyclopediaMainTabController _controller;
-    private EncyclopediaTabController _encyclopediaPage;
     private EncyclopediaEntryData _entryData;
 
-    internal void Initialize(EncyclopediaData value)
+    internal void Initialize(EncyclopediaMainTabController encyclopediaMainTabController, EncyclopediaData value)
     {
         if(_label != null)
         {
             _label.text = value.Title;
         }
         _encyclopediaData = value;
-        _controller  = EncyclopediaMainTabController.Instance;
-        _encyclopediaPage = EncyclopediaTabController.Instance;
+        _controller = encyclopediaMainTabController;
     }
 
     internal void Initialize(EncyclopediaEntryData value)
@@ -36,8 +34,6 @@ internal class EncyclopediaListItem : MonoBehaviour, IPointerEnterHandler, IPoin
         {
             _label.text = value.Title;
         }
-        _controller = EncyclopediaMainTabController.Instance;
-        _encyclopediaPage = EncyclopediaTabController.Instance;
         _entryData = value;
     }
 
@@ -61,14 +57,22 @@ internal class EncyclopediaListItem : MonoBehaviour, IPointerEnterHandler, IPoin
 
     public void onClick()
     {
+        QuickLogger.Debug("InOnClick");
         if (FCSPDAController.Main.GetGUI().GetCurrentPage() == PDAPages.Encyclopedia)
         {
             QuickLogger.Debug($"Passing Data: {_entryData.Path}");
-            _encyclopediaPage.SetData(_entryData);
+            EncyclopediaService.GetEncyclopediaTabController().SetData(_entryData);
+            QuickLogger.Debug("DataPassed");
+
         }
         else
         {
+            QuickLogger.Debug("Current Page isnt Encycopedia. Going to Encyclopedia page and passing data.");
+
             FCSPDAController.Main.GetGUI().GoToPage(PDAPages.Encyclopedia, _encyclopediaData);
+
+            QuickLogger.Debug("Passing Data Complete");
+
         }
     }
 }

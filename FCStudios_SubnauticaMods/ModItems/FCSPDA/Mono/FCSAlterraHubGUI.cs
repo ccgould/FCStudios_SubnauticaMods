@@ -299,4 +299,9 @@ public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
     {
         return _currentPage;
     }
+
+    internal EncyclopediaTabController GetEncyclopediaTabController()
+    {
+        return _encyclopediaTabController;
+    }
 }
