@@ -1,395 +1,302 @@
-﻿using FCS_AlterraHub.API;
-using FCS_AlterraHub.Core.Helpers;
+﻿using FCS_AlterraHub;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
-using FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;
+using FCS_AlterraHub.ModItems.FCSPDA.Mono;
 using FCS_AlterraHub.ModItems.FCSPDA.Patches;
 using FCSCommon.Utilities;
-using FMOD;
+using FMOD.Studio;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-
-namespace FCS_AlterraHub.ModItems.FCSPDA.Mono;
+using UWE;
 
 public class FCSPDAController : MonoBehaviour
 {
-    private PDA _pda;
-    private int prevQuickSlot;
-    private Sequence sequence = new(false);
-    private GameObject _inputDummy;
-    private uGUI_InputGroup _ui;
+    public bool isInUse { get; private set; }
 
-    private bool _isBeingDestroyed;
-
-    private bool _depthState;
-
-
-    private bool _isInitialized;
-    private Canvas _canvas;
-
-    public GameObject PDAObj { get; set; }
-    public float cameraFieldOfView = 62f;
-    public float cameraFieldOfViewAtFourThree = 66f;
-    public Canvas PdaCanvas { get; set; }
-    internal bool IsOpen { get; private set; }
-    public Action OnClose { get; set; }
-    public Channel AudioTrack { get; set; }
-    public bool isFocused => this.ui != null && this.ui.focused;
-    private uGUI_InputGroup ui
+    public bool isFocused
     {
         get
         {
-            if (_ui == null)
+            return this.ui != null && this.ui.focused;
+        }
+    }
+
+    public bool isOpen
+    {
+        get
+        {
+            return this.state == PDA.State.Opened;
+        }
+    }
+
+    public PDA.State state
+    {
+        get
+        {
+            if (this.sequence.target)
             {
-                _ui = _canvas.gameObject.GetComponentInChildren<Canvas>(true).gameObject.GetComponent<uGUI_InputGroup>();
+                if (!this.sequence.active)
+                {
+                    return PDA.State.Opened;
+                }
+                return PDA.State.Opening;
             }
-            return _ui;
+            else
+            {
+                if (!base.gameObject.activeInHierarchy || !this.sequence.active)
+                {
+                    return PDA.State.Closed;
+                }
+                return PDA.State.Closing;
+            }
         }
     }
 
-    #region SINGLETON PATTERN
-    private List<MeshRenderer> _pdaMeshes = new();
-
-    private Transform _pdaAnchor;
-    private uGUI_CanvasScaler _canvasScalar;
-    public static FCSPDAController Main;
-
-    private int _timesOpen;
-
-    internal FCSAlterraHubGUI Screen;
-    private bool _goToEncyclopedia;
-    private GameObject _screen;
-
-    #endregion
-
-    private void Awake()
+    public FCSAlterraHubGUI ui
     {
-        if (Main == null)
+        get
         {
-            Main = this;
-            DontDestroyOnLoad(this);
+            if (this._ui == null)
+            {   
+                GameObject gameObject = Instantiate<GameObject>(this.prefabScreen);
+                this._ui = gameObject.GetComponent<FCSAlterraHubGUI>();
+                gameObject.GetComponent<uGUI_CanvasScaler>().SetAnchor(this.screenAnchor);
+                this._ui.Initialize();
+            }
+            return this._ui;
         }
-        else if (Main != null)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        EncyclopediaService.OnOpenEncyclopedia += OnOpenEncyclopedia;
     }
 
-    private void OnOpenEncyclopedia(TechType techType)
+    public static float time { get; private set; }
+
+    public static float deltaTime { get; private set; }
+
+    public static float GetDeltaTime()
     {
-        ForceOpen();
-        Screen.OpenEncyclopedia(techType);
+        return deltaTime;
     }
 
-    public bool Open()
+    public void SetIgnorePDAInput(bool ignore)
+    {
+        this.ignorePDAInput = ignore;
+    }
+
+    public static void PerformUpdate()
     {
         Player main = Player.main;
+        FCSPDAController pda = (main != null) ? Player_Patches.FCSPDA : null;
+        if ((main != null) && pda.isActiveAndEnabled)
+        {
+            pda.ManagedUpdate();
+            return;
+        }
+        UpdateTime(false);
+    }
 
-        QuickLogger.Debug("PDA Open : 1");
+    private static void UpdateTime(bool pausedByPDA)
+    {
+        deltaTime = (pausedByPDA ? Time.unscaledDeltaTime : Time.deltaTime);
+        time += deltaTime;
+        Shader.SetGlobalFloat(ShaderPropertyID._PDATime, time);
+    }
 
-        main.GetPDA().sequence.ForceState(true);
+    public static void Deinitialize()
+    {
+        time = 0f;
+    }
 
-        PlayAppropriateVoiceMessage();
+    private void ManagedUpdate()
+    {
+        bool flag = MiscSettings.pdaPause && (this.state == PDA.State.Opened || this.state == PDA.State.Opening || this.state == PDA.State.Closing);
+        FreezeTime.Set(FreezeTime.Id.PDA, flag ? this.sequence.t : 0f);
+        bool flag2 = FreezeTime.GetTopmostId() == FreezeTime.Id.PDA;
+        bool flag3 = flag && flag2;
+        UpdateTime(flag3);
+        Player.main.playerAnimator.updateMode = (flag3 ? AnimatorUpdateMode.UnscaledTime : AnimatorUpdateMode.Normal);
+        this.sequence.Update(deltaTime);
+        Player main = Player.main;
+        if (this.isInUse && this.isFocused && (GameInput.GetButtonDown(GameInput.Button.PDA) || Input.GetKeyDown(Plugin.Configuration.FCSPDAKeyCode)))
+        {
+            this.Close();
+            return;
+        }
+        if (this.targetWasSet && (this.target == null || (this.target.transform.position - main.transform.position).sqrMagnitude >= this.activeSqrDistance))
+        {
+            this.Close();
+        }
+    }
 
-        Screen.TryRemove404Screen();
-
-        Screen.RefreshTeleportationPage();
-
-        FindPDA();
-
-        ChangePDAVisibility(false);
-
-        //TODO I dont know why i did this
-        //Screen.AttemptToOpenReturnsDialog();
-
-        //Screen.UpdateDisplay();
+    public bool Open(PDATab tab = PDATab.None, Transform target = null, OnClose onCloseCallback = null)
+    {
+        if (this.isInUse || this.ignorePDAInput)
+        {
+            return false;
+        }
 
         PatchAdditionalPages();
 
-        DOFOperations();
+        uGUI.main.quickSlots.SetTarget(null);
+        this.prevQuickSlot = Inventory.main.quickSlots.activeSlot;
+        bool flag = Inventory.main.ReturnHeld(true);
+        Player main = Player.main;
+        if (!flag || main.cinematicModeActive)
+        {
+            return false;
+        }
+        MainCameraControl.main.SaveLockedVRViewModelAngle();
+        Inventory.main.quickSlots.SetSuspendSlotActivation(true);
+        this.isInUse = true;
+        Player.main.GetPDA().isInUse = true;
+        main.armsController.SetUsingPda(true);
+        base.gameObject.SetActive(true);
+        this.ui.OnOpenPDA(tab);
+        this.sequence.Set(timeDraw, true, new SequenceCallback(this.Activated));
+        //TODO Create Goal  = GoalManager.main.OnCustomGoalEvent("Open_PDA");
+        if (HandReticle.main != null)
+        {
+            HandReticle.main.RequestCrosshairHide();
+        }
+        Inventory.main.SetViewModelVis(false);
+        this.targetWasSet = (target != null);
+        this.target = target;
+        this.onCloseCallback = onCloseCallback;
+        if (this.targetWasSet)
+        {
+            this.activeSqrDistance = (target.transform.position - main.transform.position).sqrMagnitude + 1f;
+        }
+        if (this.audioSnapshotInstance.isValid())
+        {
+            this.audioSnapshotInstance.start();
+        }
+        UwePostProcessingManager.OpenPDA();
 
-        SetPDAInUse(true);
+        ui.TryRemove404Screen();
 
-        if (!DetemineIfInCinematicMode(main)) return false;
+        ui.RefreshTeleportationPage();
 
-        SetRequiredParametersToOpenPDA();
-
-        QuickLogger.Debug("FCS PDA Is Open", true);
         return true;
-    }
-
-    internal void CreateScreen()
-    {
-        if (_screen == null)
-        {
-           _screen = Instantiate(_uGUI_PDAScreenPrefab);
-            Screen = GetGUI();
-            Screen.SetInstance(FCSAlterraHubGUISender.PDA);
-        }
-    }
-
-    public FCSAlterraHubGUI GetGUI()
-    {
-        if(_FCSPDAUI is null)
-        {
-            _FCSPDAUI =  _screen?.GetComponent<FCSAlterraHubGUI>();
-        }
-        return _FCSPDAUI;
     }
 
     public void Close()
     {
-        IsOpen = false;
-
-        ResetToHome();
-
-        ChangePDAVisibility(true);
-        gameObject.SetActive(false);
-        SetPDAInUse(false);
+        if (!this.isInUse || this.ignorePDAInput)
+        {
+            return;
+        }
         Player main = Player.main;
-        main.GetPDA().sequence.ForceState(false);
+        QuickSlots quickSlots = Inventory.main.quickSlots;
+        quickSlots.EndAssign(false);
         MainCameraControl.main.ResetLockedVRViewModelAngle();
-        Screen.gameObject.SetActive(false);
         Vehicle vehicle = main.GetVehicle();
         if (vehicle != null)
         {
             uGUI.main.quickSlots.SetTarget(vehicle);
         }
-
-        Screen.CloseAccountPage();
-
-
-#if SUBNAUTICA_STABLE
-        MainGameController.Instance.PerformGarbageAndAssetCollection();
-#else
-        MainGameController.Instance.PerformIncrementalGarbageCollection();
-#endif
-        HandReticle.main?.UnrequestCrosshairHide();
+        this.targetWasSet = false;
+        this.target = null;
+        main.armsController.SetUsingPda(false);
+        quickSlots.SetSuspendSlotActivation(false);
+        this.ui.OnClosePDA();
+        if (HandReticle.main != null)
+        {
+            HandReticle.main.UnrequestCrosshairHide();
+        }
         Inventory.main.SetViewModelVis(true);
-
-
-        //sequence.Set(0.5f, false, Deactivated);
-
-        SafeAnimator.SetBool(Player.main.armsController.animator, "using_pda", false);
-        ui.Deselect(null);
+        this.sequence.Set(timeHolster, false, new SequenceCallback(this.Deactivated));
+        if (this.audioSnapshotInstance.isValid())
+        {
+            this.audioSnapshotInstance.stop(STOP_MODE.ALLOWFADEOUT);
+            this.audioSnapshotInstance.release();
+        }
         UwePostProcessingManager.ClosePDA();
-#if SUBNAUTICA
-        _pda.ui.soundQueue.PlayImmediately(_pda.ui.soundClose);
-#else
-#endif
-        UwePostProcessingManager.ToggleDof(_depthState);
-        QuickLogger.Debug("FCS PDA Is Closed", true);
+        if (this.onCloseCallback != null)
+        {
+            OnClose onClose = this.onCloseCallback;
+            this.onCloseCallback = null;
+            onClose(this);
+        }
+
+        ResetToHome();
+
     }
 
     private void ResetToHome()
     {
-        if (Screen.CurrentPage() == PDAPages.DevicePage || Screen.CurrentPage() == PDAPages.DeviceSettings)
-            Screen.PurgePages();
-    }
-
-    internal void SetInstance()
-    {
-        if (_isInitialized) return;
-                  
-        _pdaAnchor = GameObjectHelpers.FindGameObject(gameObject, "ScreenAnchor").transform;
-
-        _canvasScalar = Screen.gameObject.GetComponent<uGUI_CanvasScaler>();
-        _canvasScalar.SetAnchor(_pdaAnchor.transform);
-
-        _canvas = Screen.GetComponentInChildren<Canvas>();
-        _canvas.sortingLayerName = "PDA";
-        _canvas.sortingLayerID = 1479780821;
-        //MaterialHelpers.ApplyEmissionShader(AlterraHub.BasePrimaryCol, gameObject, Color.white, 0, 0.01f, 0.01f);
-        //MaterialHelpers.ApplySpecShader(AlterraHub.BasePrimaryCol, gameObject, 1, 6.15f);
-        //MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
-        InGameMenuQuitPatcher.AddEventHandlerIfMissing(OnQuit);
-        Screen.gameObject.SetActive(false);
-        _isInitialized = true;
-    }
-
-    private void OnDestroy()
-    {
-        EncyclopediaService.OnOpenEncyclopedia -= OnOpenEncyclopedia;
-        _isBeingDestroyed = true;
-    }
-
-    private void Update()
-    {
-        sequence.Update();
-
-        if (sequence.active)
-        {
-            float b = (SNCameraRoot.main.mainCamera.aspect > 1.5f) ? cameraFieldOfView : cameraFieldOfViewAtFourThree;
-            SNCameraRoot.main.SetFov(Mathf.Lerp(MiscSettings.fieldOfView, b, sequence.t));
-        }
-
-        if (!ui.selected && IsOpen && AvatarInputHandler.main.IsEnabled())
-        {
-            ui.Select(false);
-        }
-
-        if (IsOpen && this.isFocused && (GameInput.GetButtonDown(GameInput.Button.PDA) || Input.GetKeyDown(Plugin.Configuration.FCSPDAKeyCode)))
-        {
-            this.Close();
-            return;
-        }
-
-        FPSInputModule.current.EscapeMenu();
-    }
-
-    private void SetRequiredParametersToOpenPDA()
-    {
-        MainCameraControl.main.SaveLockedVRViewModelAngle();
-        IsOpen = true;
-        gameObject.SetActive(true);
-        sequence.Set(0.5f, true, Activated);
-        UWE.Utils.lockCursor = false;
-        HandReticle.main?.RequestCrosshairHide();
-
-        if (HandReticle.main?.hideCount > 1)
-        {
-            QuickLogger.Debug("Fixing Hide Count", true);
-            while (HandReticle.main.hideCount > 1)
-            {
-                HandReticle.main?.UnrequestCrosshairHide();
-            }
-        }
-
-        Inventory.main.SetViewModelVis(false);
-        Screen.gameObject.SetActive(true);
-        UwePostProcessingManager.OpenPDA();
-        SafeAnimator.SetBool(Player.main.armsController.animator, "using_pda", true);
-
-        //#if SUBNAUTICA
-        //            _pda.ui.soundQueue.PlayImmediately(_pda.ui.soundOpen);
-        //            if (_pda.screen.activeSelf)
-        //            {
-        //                _pda.screen.SetActive(false);
-        //            }
-        //#else
-        //#endif
-    }
-
-    private bool DetemineIfInCinematicMode(Player main)
-    {
-        var flag = InventorySlotHandler();
-
-        if (!flag || main.cinematicModeActive)
-        {
-            return false;
-        }
-        return true;
-    }
-
-    private void SetPDAInUse(bool isInUse)
-    {
-        _pda.isInUse = isInUse;
-    }
-
-    private void PlayAppropriateVoiceMessage()
-    {
-        //if (_timesOpen > 0 && !CardSystem.main.HasBeenRegistered() && !Mod.GamePlaySettings.IsPDAOpenFirstTime &&
-        //    DroneDeliveryService.Main.DetermineIfFixed())
-        //{
-        //    VoiceNotificationSystem.main.Play("PDA_Account_Instructions_key", 26);
-        //}
-
-        //if (Mod.GamePlaySettings.IsPDAOpenFirstTime && DroneDeliveryService.Main.DetermineIfFixed())
-        //{
-        //    VoiceNotificationSystem.main.Play("PDA_Instructions_key", 26);
-        //    Mod.GamePlaySettings.IsPDAOpenFirstTime = false;
-        //    _timesOpen++;
-        //    Mod.SaveGamePlaySettings();
-        //}
-    }
-
-    private bool InventorySlotHandler()
-    {
-        uGUI.main.quickSlots.SetTarget(null);
-        prevQuickSlot = Inventory.main.quickSlots.activeSlot;
-        bool flag = Inventory.main.ReturnHeld();
-        return flag;
-    }
-
-    private void DOFOperations()
-    {
-        _depthState = UwePostProcessingManager.GetDofEnabled();
-
-        UwePostProcessingManager.ToggleDof(false);
-    }
-
-    private void ChangePDAVisibility(bool value)
-    {
-        _pda.gameObject.SetActive(!value);
-        foreach (var meshRenderer in _pdaMeshes)
-        {
-            meshRenderer.enabled = value;
-        }
+        if (ui.CurrentPage() == PDAPages.DevicePage || ui.CurrentPage() == PDAPages.DeviceSettings)
+            ui.PurgePages();
     }
 
     public void Activated()
     {
-        ui.Select();
+        UWE.Utils.lockCursor = false;
+        this.ui.Select(false);
+        this.ui.OnPDAOpened();
     }
 
     public void Deactivated()
     {
-        SNCameraRoot.main.SetFov(0f);
-        OnClose?.Invoke();
-        gameObject.SetActive(false);
-
-        if (!_goToEncyclopedia)
+        if (!this.ignorePDAInput)
         {
-            Inventory.main.quickSlots.Select(prevQuickSlot);
+            Inventory.main.quickSlots.Select(this.prevQuickSlot);
         }
-        else
-        {
-            Player.main.GetPDA().Open(PDATab.Encyclopedia);
-            _goToEncyclopedia = false;
-        }
+        this.ui.OnPDAClosed();
+        base.gameObject.SetActive(false);
+        this.isInUse = false;
+        Player.main.GetPDA().isInUse = false; 
     }
 
-    private void FindPDA()
-    {
-        QuickLogger.Debug("In Find PDA", true);
-        if (PdaCanvas == null)
-        {
-#if SUBNAUTICA
-            PdaCanvas = PDAObj?.GetComponent<PDA>()?._ui?.gameObject?.GetComponent<Canvas>();
-#else
-#endif
-            Player main = Player.main;
-            _pda = main.GetPDA();
-        }
+    private const float timeDraw = 0.5f;
 
-        foreach (MeshRenderer meshRenderer in _pda.gameObject.GetComponentsInChildren<MeshRenderer>())
-        {
-            _pdaMeshes.Add(meshRenderer);
-        }
+    private const float timeHolster = 0.3f;
+
+    public const string pauseId = "PDA";
+
+    [AssertNotNull]
+    public GameObject prefabScreen;
+
+    [AssertNotNull]
+    public Transform screenAnchor;
+
+    private Sequence sequence = new Sequence(false);
+
+
+    private int prevQuickSlot = -1;
+
+    private bool targetWasSet;
+
+    private Transform target;
+
+    private OnClose onCloseCallback;
+
+    private float activeSqrDistance;
+
+    private bool ignorePDAInput;
+
+    private FCSAlterraHubGUI _ui;
+
+    private EventInstance audioSnapshotInstance;
+
+    public delegate void OnClose(FCSPDAController pda);
+
+    //=======================================================================//
+    public static FCSPDAController Main;
+    static Dictionary<TechType, GameObject> additionPages = new();
+    private bool _isInitialized;
+    private bool _isBeingDestroyed;
+
+    private void Awake()
+    {
+        Main = this;
+
+        EncyclopediaService.OnOpenEncyclopedia += OnOpenEncyclopedia;
     }
 
-    private void OnQuit()
+    public FCSAlterraHubGUI GetGUI()
     {
-        //Mod.DeepCopySave(CardSystem.main.SaveDetails());
-        QuickLogger.Debug("Quitting Purging CardSystem and AlterraHubSave", true);
-        AccountService.main.Purge();
-        //Mod.PurgeSave();
-    }
-
-    internal void Save()
-    {
-        GamePlayService.Main.SetShipmentInfo(Screen.GetShipmentInfo());
-    }
-
-    internal void LoadFromSave()
-    {
-        Screen.LoadFromSave(GamePlayService.Main.GetShipmentInfo());
+        return ui;
     }
 
     public static void ForceOpen()
@@ -402,26 +309,22 @@ public class FCSPDAController : MonoBehaviour
         Main.Close();
     }
 
-    static Dictionary<TechType,GameObject> additionPages = new();
-    private FCSAlterraHubGUI _FCSPDAUI;
-    [SerializeField]
-    private GameObject _uGUI_PDAScreenPrefab;
-
-    public static void AddAdditionalPage<T>(TechType id,GameObject ui) where T : Component
+    private void OnQuit()
     {
-        ui.EnsureComponent<T>();
-        additionPages.Add(id,ui); 
+        //Mod.DeepCopySave(CardSystem.main.SaveDetails());
+        QuickLogger.Debug("Quitting Purging CardSystem and AlterraHubSave", true);
+        AccountService.main.Purge();
+        //Mod.PurgeSave();
     }
 
-    private void PatchAdditionalPages()
+    internal void Save()
     {
-        for (int a = additionPages.Count - 1; a >= 0; a--)
-        {
-            var page = additionPages.ElementAt(a);
+        GamePlayService.Main.SetShipmentInfo(ui.GetShipmentInfo());
+    }
 
-            Screen.AddAdditionalPage(page.Key,page.Value);
-            additionPages.Remove(page.Key);
-        }
+    internal void LoadFromSave()    
+    {
+        ui.LoadFromSave(GamePlayService.Main.GetShipmentInfo());
     }
 
     /// <summary>
@@ -432,6 +335,42 @@ public class FCSPDAController : MonoBehaviour
     public void OpenDeviceUI(TechType id, FCSDevice fcsDevice)
     {
         Open();
-        Screen.PrepareDevicePage(id, fcsDevice);
+        ui.PrepareDevicePage(id, fcsDevice);
+    }
+
+    public static void AddAdditionalPage<T>(TechType id, GameObject ui) where T : Component
+    {
+        ui.EnsureComponent<T>();
+        additionPages.Add(id, ui);
+    }
+
+    private void PatchAdditionalPages()
+    {
+        for (int a = additionPages.Count - 1; a >= 0; a--)
+        {
+            var page = additionPages.ElementAt(a);
+
+            ui.AddAdditionalPage(page.Key, page.Value);
+            additionPages.Remove(page.Key);
+        }
+    }
+
+    internal void SetInstance()
+    {
+        if (_isInitialized) return;
+        InGameMenuQuitPatcher.AddEventHandlerIfMissing(OnQuit);
+        _isInitialized = true;
+    }
+
+    private void OnOpenEncyclopedia(TechType techType)
+    {
+        ForceOpen();
+        ui.OpenEncyclopedia(techType);
+    }
+
+    private void OnDestroy()
+    {
+        EncyclopediaService.OnOpenEncyclopedia -= OnOpenEncyclopedia;
+        _isBeingDestroyed = true;
     }
 }

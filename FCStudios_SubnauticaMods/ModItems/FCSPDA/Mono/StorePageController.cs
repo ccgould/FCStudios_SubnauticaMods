@@ -1,5 +1,4 @@
 ﻿using FCS_AlterraHub.API;
-using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models;
 using FCS_AlterraHub.Models.Enumerators;
@@ -7,9 +6,6 @@ using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.ScreenItems;
-using FCSCommon.Utilities;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 

@@ -15,10 +15,10 @@ internal class DebitCardSpawnable : FCSSpawnableModBase
 
     public DebitCardSpawnable() : base(PluginInfo.PLUGIN_NAME, "CreditCard", FileSystemHelper.ModDirLocation, "DebitCard", "Debit Card")
     {
-        //OnFinishedPatching += () =>
-        //{
-        //    PatchedTechType = TechType;
-        //};
+        OnFinishRegister += () =>
+        {
+            PatchedTechType = TechType;
+        };
     }
 
     protected override IEnumerator ModifyPrefab(GameObject prefab)

@@ -13,11 +13,10 @@ using FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;
 using FCS_AlterraHub.ModItems.FCSPDA.Interfaces;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
-using static HandReticle;
 
 namespace FCS_AlterraHub.ModItems.FCSPDA.Mono;
 
-public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
+public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI
 {
 
 
@@ -64,22 +63,47 @@ public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
     private MenuController _menuController;
     [SerializeField]
     private StorePageController _storePage;
+    private List<RectMask2D> rectMasks = new List<RectMask2D>();
+    private List<ScrollRect> scrollRects = new List<ScrollRect>();
+    [AssertNotNull]
+    public uGUI_CanvasScaler canvasScaler;
 
+    [AssertNotNull]
+    public CanvasGroup canvasGroup;
     public bool IsOpen { get; set; }
     public FCSAlterraHubGUISender SenderType { get; set; }
 
-    private void Awake()
+    public override void Awake()
+    {
+        base.Awake();
+        base.GetComponentsInChildren<RectMask2D>(true, this.rectMasks);
+        base.GetComponentsInChildren<ScrollRect>(true, this.scrollRects);
+        this.SetCanvasVisible(false);
+    }
+
+    public void Initialize()
     {
         _menuController = gameObject.GetComponent<MenuController>();
         _canvas = gameObject.GetComponent<Canvas>();
         _cartDropDownController.Initialize();
+        SetInstance(FCSAlterraHubGUISender.PDA);
     }
 
-    private void Update()
+    public override void Update()
     {
+        base.Update();
         if (_clock != null)
         {
             _clock.text = WorldHelpers.GetGameTimeFormat();
+        }
+
+        if (!base.selected && FCSPDAController.Main.isOpen && AvatarInputHandler.main.IsEnabled())
+        {
+            base.Select(false);
+        }
+        if (!uGUI.isIntro)
+        {
+            FPSInputModule.current.EscapeMenu();
         }
     }
 
@@ -87,7 +111,7 @@ public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
     {
         if (_isInitialized) return;
 
-        SenderType = SenderType;
+        SenderType = sender;
         if (_404 is not null)
         {
             _404.FindChild("Message").GetComponent<Text>().text = LanguageService.Error404();
@@ -132,7 +156,7 @@ public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
 
     internal void GoToPage(PDAPages page,object arg = null)
     {
-        QuickLogger.Debug($"Goto Page: Is Arg null =  {arg is null}");
+        QuickLogger.Debug($"Goto Page: {page} Is Arg null =  {arg is null}");
 
         Page currentPage = null;
 
@@ -303,5 +327,93 @@ public class FCSAlterraHubGUI : MonoBehaviour, IFCSAlterraHubGUI
     internal EncyclopediaTabController GetEncyclopediaTabController()
     {
         return _encyclopediaTabController;
+    }
+
+
+    public void OnPDAOpened()
+    {
+        //this.content.interactable = true;
+        //this.content.blocksRaycasts = true;
+    }
+
+    public void OnPDAClosed()
+    {
+        this.SetCanvasVisible(false);
+    }
+
+    private void SetCanvasVisible(bool visible)
+    {
+        this.canvasGroup.SetVisible(visible);
+        this.canvasScaler.active = visible;
+        foreach (RectMask2D rectMask2D in this.rectMasks)
+        {
+            rectMask2D.enabled = visible;
+        }
+        foreach (ScrollRect scrollRect in this.scrollRects)
+        {
+            scrollRect.enabled = visible;
+        }
+    }
+
+    public void OnOpenPDA(PDATab tabId)
+    {
+        this.SetCanvasVisible(true);
+        //this.content.interactable = false;
+        //this.content.blocksRaycasts = false;
+        //this.content.alpha = 1f;
+        //if (!this.introActive)
+        //{
+        //    RuntimeManager.PlayOneShot(this.soundOpen.path, default(Vector3));
+        //}
+        //bool flag = tabId == PDATab.None;
+        //if (flag)
+        //{
+        //    uGUI_PopupNotification main = uGUI_PopupNotification.main;
+        //    if (main.isShowingMessage && !string.IsNullOrEmpty(main.id))
+        //    {
+        //        string id = main.id;
+        //        if (id == "PDAEncyclopediaTab")
+        //        {
+        //            tabId = PDATab.Encyclopedia;
+        //        }
+        //    }
+        //    if (tabId == PDATab.None && this.tabOpen == PDATab.None)
+        //    {
+        //        tabId = this.tabPrev;
+        //    }
+        //}
+        //if (tabId == PDATab.TimeCapsule)
+        //{
+        //    this.SetTabs(null);
+        //    Inventory.main.SetUsedStorage(PlayerTimeCapsule.main.container, false);
+        //    uGUI_GalleryTab uGUI_GalleryTab = this.GetTab(PDATab.Gallery) as uGUI_GalleryTab;
+        //    uGUI_TimeCapsuleTab @object = this.GetTab(PDATab.TimeCapsule) as uGUI_TimeCapsuleTab;
+        //    uGUI_GalleryTab.SetSelectListener(new uGUI_GalleryTab.ImageSelectListener(@object.SelectImage), "ScreenshotSelect", "ScreenshotSelectTooltip");
+        //}
+        //foreach (KeyValuePair<PDATab, uGUI_PDATab> keyValuePair in this.tabs)
+        //{
+        //    keyValuePair.Value.OnOpenPDA(tabId, flag);
+        //}
+        //this.OpenTab(tabId);
+        //ManagedUpdate.Subscribe(ManagedUpdate.Queue.UpdateAfterInput, new ManagedUpdate.OnUpdate(this.OnUpdate));
+        //ManagedUpdate.Subscribe(ManagedUpdate.Queue.LateUpdateAfterInput, new ManagedUpdate.OnUpdate(this.OnLateUpdate));
+    }
+    public void OnClosePDA()
+    {
+        //ManagedUpdate.Unsubscribe(ManagedUpdate.Queue.UpdateAfterInput, new ManagedUpdate.OnUpdate(this.OnUpdate));
+        //ManagedUpdate.Unsubscribe(ManagedUpdate.Queue.LateUpdateAfterInput, new ManagedUpdate.OnUpdate(this.OnLateUpdate));
+        //RuntimeManager.PlayOneShot(this.soundClose.path, default(Vector3));
+        //if (this.tabOpen != PDATab.None)
+        //{
+        //    this.tabs[this.tabOpen].Close();
+        //    this.tabOpen = PDATab.None;
+        //}
+        //foreach (KeyValuePair<PDATab, uGUI_PDATab> keyValuePair in this.tabs)
+        //{
+        //    keyValuePair.Value.OnClosePDA();
+        //}
+        base.Deselect();
+        //this.SetTabs(uGUI_PDA.regularTabs);
+        //this.content.SetVisible(false);
     }
 }

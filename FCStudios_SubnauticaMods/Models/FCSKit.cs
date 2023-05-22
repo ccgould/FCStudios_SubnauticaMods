@@ -16,13 +16,7 @@ public class FCSKit : FCSSpawnableModBase
 
     public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
     {
-        var prefab = GameObject.Instantiate(_prefab);
-
-        PrefabIdentifier prefabID = prefab.GetComponent<PrefabIdentifier>();
-        prefabID.ClassId = this.ClassID;
-
-        var techTag = prefab.GetComponent<TechTag>();
-        techTag.type = TechType;
+        var prefab = GameObject.Instantiate(Prefab);
 
         yield return ModifyPrefab(prefab);
 

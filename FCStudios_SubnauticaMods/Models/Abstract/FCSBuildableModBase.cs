@@ -23,8 +23,6 @@ public abstract class FCSBuildableModBase : ModBase, IModBase
     protected readonly string _friendlyName;
     private readonly string _prefabName;
     private readonly string AssetsFolder;
-    public event Action OnStartRegister;
-    public event Action OnFinishRegister;
 
     protected FCSBuildableModBase(string modName, string prefabName,string modDir, string classId, string friendlyName) : base(friendlyName)
     {
@@ -93,11 +91,6 @@ public abstract class FCSBuildableModBase : ModBase, IModBase
         constructable.allowedInSub = _settings.AllowedInSub;
         constructable.allowedOnConstructables = _settings.AllowedOnConstructables;
         constructable.techType = PrefabInfo.TechType;
-
-        PrefabIdentifier prefabID = prefab.GetComponent<PrefabIdentifier>();
-        prefabID.ClassId = _classID;
-
-        prefab.GetComponent<TechTag>().type = PrefabInfo.TechType;
 
         var hover = prefab.GetComponent<HoverInteraction>();
         hover.TechType = PrefabInfo.TechType;

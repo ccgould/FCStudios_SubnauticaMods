@@ -133,6 +133,6 @@ internal static class EncyclopediaService
 
     internal static EncyclopediaTabController GetEncyclopediaTabController()
     {
-        return FCSPDAController.Main.Screen.GetEncyclopediaTabController();
+        return FCSPDAController.Main.GetGUI().GetEncyclopediaTabController();
     }
 }

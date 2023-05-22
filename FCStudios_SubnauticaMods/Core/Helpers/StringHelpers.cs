@@ -59,7 +59,7 @@ public static class StringHelpers
 
         QuickLogger.Debug("1");
 
-        var text = pda?.Screen?.CheckIfPDAHasEntry(techType) ?? false ? LanguageService.ViewInPDA() : string.Empty;
+        var text = pda.GetGUI()?.CheckIfPDAHasEntry(techType) ?? false ? LanguageService.ViewInPDA() : string.Empty;
 
         QuickLogger.Debug("2");
 
@@ -104,7 +104,7 @@ public static class StringHelpers
 
         CreateText(strings);
 
-        var text = pda?.Screen.CheckIfPDAHasEntry(techType) ?? false ? LanguageService.ViewInPDA() : string.Empty;
+        var text = pda?.GetGUI().CheckIfPDAHasEntry(techType) ?? false ? LanguageService.ViewInPDA() : string.Empty;
         main.SetTextRaw(HandReticle.TextType.Count, $"{Sb}/n {text}");
 
 

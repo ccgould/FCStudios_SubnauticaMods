@@ -43,7 +43,7 @@ public static class Player_Patches
 
         if ((Input.GetKeyDown(Plugin.Configuration.FCSPDAKeyCode) || ForceOpenPDA))
         {
-            if (!FCSPDA.IsOpen)
+            if (!FCSPDA.isOpen)
             {
                 if (__instance.pda.isOpen)
                 {
@@ -51,8 +51,8 @@ public static class Player_Patches
                 }
 
                 if (Input.GetKey(KeyCode.RightControl) || Input.GetKey(KeyCode.LeftControl))
-                {                       
-                    FCSPDA.Screen.GoToPage(PDAPages.Teleportation);
+                {
+                    //FCSPDA.Screen.GoToPage(PDAPages.Teleportation);
                     FCSPDA.Open();
                 }
                 else
@@ -63,15 +63,15 @@ public static class Player_Patches
             ForceOpenPDA = false;
         }
 
-        _timeSinceUse += Time.deltaTime;
-        if (_timeSinceUse >= 2f)
-        {
+        //_timeSinceUse += Time.deltaTime;
+        //if (_timeSinceUse >= 2f)
+        //{
 
 
-            _timeSinceUse -= 2f;
-        }
+        //    _timeSinceUse -= 2f;
+        //}
 
-     
+
         //_time += Time.deltaTime;
 
         //if (_time >= 1)
@@ -98,18 +98,29 @@ public static class Player_Patches
 
        
         var pda = GameObject.Instantiate(FCSAssetBundlesService.PublicAPI.GetLocalPrefab("fcsPDA"));
+        QuickLogger.Debug("1");
         var canvas = pda.GetComponentInChildren<Canvas>();
+        QuickLogger.Debug("2");
+
         if (canvas != null)
             canvas.sortingLayerID = 1479780821;
         var controller = pda.GetComponent<FCSPDAController>();
-        controller.CreateScreen();
+        QuickLogger.Debug("3");
+
+        //controller.CreateScreen();
         FCSPDA = controller;
-        controller.PDAObj = defPDA;
+        //controller.PDAObj = defPDA;
+        QuickLogger.Debug("4");
+
         controller.SetInstance();
+        QuickLogger.Debug("5");
+
         //AddUnlockedEncyclopediaEntries(FCSAlterraHubService.InternalAPI.EncyclopediaEntries);
         pda.SetActive(false);
+        QuickLogger.Debug("6");
+
         QuickLogger.Debug("FCS PDA Created");
-        MoveFcsPdaIntoPosition(FCSPDA.gameObject);
+        MoveFcsPdaIntoPosition(pda.gameObject);
     }
 
     private static void MoveFcsPdaIntoPosition(GameObject pda)
@@ -126,5 +137,18 @@ public static class Player_Patches
         pda.transform.SetParent(defPDA.gameObject.transform.parent, false);
         Utils.ZeroTransform(pda.transform);
         MaterialHelpers.ApplyGlassShaderTemplate(pda, "_glass", "AH");
+    }
+
+    [HarmonyPatch(typeof(Player), nameof(Player.OnKill))]
+    [HarmonyPostfix]
+    private static void OnKill_Postfix(Player __instance, DamageType damageType)
+    {
+        FCSPDAController pda = FCSPDAController.Main;
+        if (pda.state == PDA.State.Opening || pda.state == PDA.State.Opened)
+        {
+            pda.SetIgnorePDAInput(false);
+            pda.Close();
+        }
+        pda.SetIgnorePDAInput(true);
     }
 }

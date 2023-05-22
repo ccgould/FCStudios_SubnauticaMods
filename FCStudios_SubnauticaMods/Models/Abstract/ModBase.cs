@@ -1,5 +1,6 @@
 ﻿using Nautilus.Assets;
 using Nautilus.Crafting;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,7 +9,8 @@ public abstract class ModBase
 {
 
     public GameObject Prefab { get; set; }
-
+    protected Action OnStartRegister;
+    protected Action OnFinishRegister;
 
     /// <summary>
     /// Information for registering the prefab.
