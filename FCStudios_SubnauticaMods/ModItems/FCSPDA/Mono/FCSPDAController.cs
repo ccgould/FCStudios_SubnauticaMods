@@ -1,4 +1,5 @@
 ﻿using FCS_AlterraHub;
+using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
@@ -87,8 +88,8 @@ public class FCSPDAController : MonoBehaviour
     public static void PerformUpdate()
     {
         Player main = Player.main;
-        FCSPDAController pda = (main != null) ? Player_Patches.FCSPDA : null;
-        if ((main != null) && pda.isActiveAndEnabled)
+        FCSPDAController pda = (main is not null) ? Player_Patches.FCSPDA : null;
+        if ((main is not null && pda is not null) && pda.isActiveAndEnabled)
         {
             pda.ManagedUpdate();
             return;
@@ -120,11 +121,13 @@ public class FCSPDAController : MonoBehaviour
         Player main = Player.main;
         if (this.isInUse && this.isFocused && (GameInput.GetButtonDown(GameInput.Button.PDA) || Input.GetKeyDown(Plugin.Configuration.FCSPDAKeyCode)))
         {
+
             this.Close();
             return;
         }
         if (this.targetWasSet && (this.target == null || (this.target.transform.position - main.transform.position).sqrMagnitude >= this.activeSqrDistance))
         {
+            EncyclopediaService.ClearCurrentDevice();
             this.Close();
         }
     }
@@ -220,7 +223,6 @@ public class FCSPDAController : MonoBehaviour
         }
 
         ResetToHome();
-
     }
 
     private void ResetToHome()
@@ -290,8 +292,9 @@ public class FCSPDAController : MonoBehaviour
     private void Awake()
     {
         Main = this;
-
-        EncyclopediaService.OnOpenEncyclopedia += OnOpenEncyclopedia;
+        MaterialHelpers.ChangeEmissionColor(ModPrefabService.BasePrimaryCol, gameObject, Color.cyan);
+        MaterialHelpers.ChangeEmissionStrength(ModPrefabService.BasePrimaryCol, gameObject, 1f);
+        EncyclopediaService.OnOpenEncyclopedia += OnOpenEncyclopedia;   
     }
 
     public FCSAlterraHubGUI GetGUI()
@@ -332,9 +335,9 @@ public class FCSPDAController : MonoBehaviour
     /// </summary>
     /// <param name="id">Id of the UI to display</param>
     /// <param name="fcsDevice">The device to change the settings on.</param>
-    public void OpenDeviceUI(TechType id, FCSDevice fcsDevice)
+    public void OpenDeviceUI(TechType id, FCSDevice fcsDevice,OnClose onClose = null)
     {
-        Open();
+        Open(PDATab.None,fcsDevice.transform,onClose);
         ui.PrepareDevicePage(id, fcsDevice);
     }
 
@@ -366,6 +369,12 @@ public class FCSPDAController : MonoBehaviour
     {
         ForceOpen();
         ui.OpenEncyclopedia(techType);
+    }
+
+    private void OnOpenEncyclopedia(FCSDevice device)
+    {
+        ForceOpen();
+        ui.OpenEncyclopedia(device);
     }
 
     private void OnDestroy()

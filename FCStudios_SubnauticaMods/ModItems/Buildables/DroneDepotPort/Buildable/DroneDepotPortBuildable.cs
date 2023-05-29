@@ -14,7 +14,7 @@ namespace FCS_AlterraHub.ModItems.Buildables.DroneDepotPort.Buildable;
 internal class DroneDepotPortBuildable : FCSBuildableModBase
 {
     private TechType _kitTechType;
-
+    public static TechType PatchedTechType { get; private set; }
     public DroneDepotPortBuildable() : base(PluginInfo.PLUGIN_NAME, "fcsDepotDronePort", FileSystemHelper.ModDirLocation, "DepotDronePort", "Drone Port")
     {
         //DeepDrillerMK3
@@ -31,7 +31,7 @@ internal class DroneDepotPortBuildable : FCSBuildableModBase
         };
     }
 
-    public static TechType PatchedTechType { get; private set; }
+    
 
     protected override IEnumerator ModifyPrefab(GameObject prefab)
     {

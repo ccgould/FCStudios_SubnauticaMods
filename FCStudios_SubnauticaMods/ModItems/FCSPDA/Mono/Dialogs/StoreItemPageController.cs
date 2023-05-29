@@ -18,6 +18,9 @@ internal class StoreItemPageController : Page
     [SerializeField]
     private FCSAlterraHubGUI _gui;
     protected override bool showHud => false;
+
+    public override PDAPages PageType => PDAPages.StorePage;
+
     [SerializeField]
     private GameObject _storePageGrid;
     private Dictionary<StoreCategory, List<StoreItem>> _storeItems = new();
@@ -30,13 +33,6 @@ internal class StoreItemPageController : Page
 
     private void Awake()
     {
-        _storePageGrid = GameObjectHelpers.FindGameObject(gameObject, "Content");
-        _storeLabel = GameObjectHelpers.FindGameObject(gameObject, "StoreLabel")?.GetComponent<Text>();
-        
-        var storeHud = gameObject.FindChild("StoreHud");
-        _cartAmountLabel = storeHud.FindChild("CartAmount")?.GetComponent<Text>();
-        _cartTotalLabel = storeHud.FindChild("CartTotal")?.GetComponent<Text>();
-
         LoadStore();
     }     
 
@@ -139,6 +135,10 @@ internal class StoreItemPageController : Page
             case PDAPages.MiscSolutions:
                 category = StoreCategory.Misc;
                 _storeLabel.text = "Misc";
+                break;
+            case PDAPages.AlterraHub:
+                category = StoreCategory.AlterraHub;
+                _storeLabel.text = "Alterra Hub";
                 break;
         }
         foreach (var storeItem in _storeItems)

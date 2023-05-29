@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Models;
+using FCS_AlterraHub.Models.Structs;
+using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.ModItems.FCSPDA.Struct;
 using FCSCommon.Utilities;
@@ -18,6 +20,7 @@ internal class StoreManager : MonoBehaviour
     public List<Shipment> PendingShipments { get; set; } = new();
 
     public static StoreManager main;
+    private static HashSet<StoreModCategory> _registerStoreMods = new();
 
     //TODO Drone System
     //public DroneDeliveryService DeliveryService;
@@ -310,6 +313,28 @@ internal class StoreManager : MonoBehaviour
     internal void CompleteOrder(Shipment shipment)
     {
         PendingShipments.Remove(shipment);
+    }
+
+
+    /// <summary>
+    /// Returns a list of mod that are register for store useablity
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    internal HashSet<StoreModCategory> GetRegisteredMods()
+    {
+        return _registerStoreMods;
+    }
+
+
+    /// <summary>
+    /// Registers a mod to be used for the FCSPDA Store
+    /// </summary>
+    /// <param name="modPackGUID">The GUID registerd in BepinEx <see cref="PluginInfo"/></param>
+   public static void RegisterStoreMod(string modPackGUID, string iconName, string pageName, PDAPages pdaPage)
+    {
+        
+        _registerStoreMods.Add(new StoreModCategory(modPackGUID,iconName,pageName,pdaPage));
     }
 }
 

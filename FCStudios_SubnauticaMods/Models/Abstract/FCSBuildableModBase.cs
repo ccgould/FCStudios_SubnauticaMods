@@ -31,7 +31,7 @@ public abstract class FCSBuildableModBase : ModBase, IModBase
         _friendlyName = friendlyName;
         _prefabName = prefabName;
         AssetsFolder = ModRegistrationService.GetModPackData(modName)?.GetAssetPath();
-        Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName(prefabName, ModRegistrationService.GetModPackData(modName)?.GetBundleName(),modDir);
+        Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName(prefabName, ModRegistrationService.GetModPackData(modName)?.GetBundleName(), modDir) ?? FCSAssetBundlesService.InternalAPI.GetLocalPrefab("DummyObject");
         QuickLogger.Debug($"FCSBuildable Prefab: {Prefab?.name}");
     }
 
@@ -73,7 +73,7 @@ public abstract class FCSBuildableModBase : ModBase, IModBase
         var prefab = GameObject.Instantiate(Prefab);
                     
         //========== Allows the building animation and material colors ==========//
-        GameObjectHelpers.SetDefaultSkyApplier(prefab);
+        //GameObjectHelpers.SetDefaultSkyApplier(prefab);
         //========== Allows the building animation and material colors ==========// 
 
         var lw = prefab.GetComponent<LargeWorldEntity>();
@@ -93,15 +93,12 @@ public abstract class FCSBuildableModBase : ModBase, IModBase
         constructable.techType = PrefabInfo.TechType;
 
         var hover = prefab.GetComponent<HoverInteraction>();
-        hover.TechType = PrefabInfo.TechType;
         
         if (_settings.HasGlass)
         {
             //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
             MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Plugin.ModSettings.ModPackID);
         }
-
-        //Prefab = prefab;
 
         yield return ModifyPrefab(prefab);
 

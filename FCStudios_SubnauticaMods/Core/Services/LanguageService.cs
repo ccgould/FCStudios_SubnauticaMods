@@ -1,11 +1,15 @@
-﻿using FCSCommon.Utilities;
+﻿using FCS_AlterraHub.Models.Abstract;
+using FCSCommon.Utilities;
 using Nautilus.Handlers;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using static HandReticle;
+using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 namespace FCS_AlterraHub.Core.Services;
 
-internal static class LanguageService
+public static class LanguageService
 {
     private const string ModKey = "AHB";
 
@@ -70,7 +74,7 @@ internal static class LanguageService
         { $"{ModKey}_NoDestinationFound","Please select a destination for your items to be transferred to. You must have an AlterraHub Depot at a base."},
         { $"{ModKey}_IsDeviceOn","DevicePage On: {0}"},
         { $"{ModKey}_PowerPerMinuteDistance", "Distance Related Power Loss: {0} epm" },
-        { $"{ModKey}_PowerPerMinute", "Distance Related Power Loss: {0} epm" },
+        { $"{ModKey}_PowerPerMinute", "Power Per Minute: {0} epm" },
         { $"{ModKey}_Waiting","WAITING"},
         { $"{ModKey}_DoorInstructions","Put in the correct 4 digit pin to unlock the door"},
         { $"{ModKey}_CannotRemovePowercell","Cannot remove powercell from generator."},
@@ -88,7 +92,9 @@ internal static class LanguageService
         { $"{ModKey}_NoPowerEmergencyMode", "NO POWER SYSTEM IN EMERGENCY MODE" },
         { $"{ModKey}_BaseIDFormat", "Base ID: {0}" },
         { $"{ModKey}_CreditMessage", "Added {0} to account new balance is {1}" },
-        { $"{ModKey}_PressToInteractWith", "Press {0} to interact with {1}" }
+        { $"{ModKey}_PressToInteractWith", "Press {0} to interact." },
+        { $"{ModKey}_DeviceNameStructure", "{0} [{1}] {2}" },
+        { $"{ModKey}_NotConnectedToBaseManager", "Not Connected To Base Manager" },
     };
 
     /// <summary>
@@ -538,9 +544,33 @@ internal static class LanguageService
         return string.Format(GetLanguage("CreditMessage"), amount, AccountService.main.GetAccountBalance());
     }
 
-    public static string PressToInteractWith(KeyCode keyCode, string unitName)
+    public static string PressToInteractWith(KeyCode keyCode)
     {
-        return string.Format(GetLanguage("PressToInteractWith"), keyCode, unitName);
+        return string.Format(GetLanguage("PressToInteractWith"), keyCode);
+    }
+
+    internal static string DeviceNameStructure(FCSDevice controller)
+    {
+        if (controller is null) return string.Empty;
+        string additional = string.Empty;   
+
+        if (!string.IsNullOrWhiteSpace(controller.FriendlyName))
+        {
+            additional = $": {controller.FriendlyName}";
+        }
+
+        return string.Format(GetLanguage("DeviceNameStructure"), Language.main.Get(controller.GetTechType()), controller.UnitID, additional);
+    }
+
+    internal static string DeviceFriendlyNameStructure(FCSDevice controller)
+    {
+        if(controller is null || string.IsNullOrWhiteSpace(controller.FriendlyName)) return string.Empty;   
+        return string.Format(GetLanguage("DeviceFriendlyNameStructure"), controller.FriendlyName);
+    }
+
+    public static string NotConnectedToBaseManager()
+    {
+        return GetLanguage("NotConnectedToBaseManager");
     }
 
     internal static string DebitCardDescription => "This card lets you access your Alterra Account. You must have this card with you to make Alterra Hub purchases.";

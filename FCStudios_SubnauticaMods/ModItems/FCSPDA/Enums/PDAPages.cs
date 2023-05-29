@@ -21,4 +21,5 @@ public enum PDAPages
     DevicePage = 15,
     BaseDevices = 16,
     EncyclopediaMain = 17,
+    AlterraHub = 18,
 }

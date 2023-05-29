@@ -16,7 +16,7 @@ using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
 
 namespace FCS_AlterraHub.ModItems.FCSPDA.Mono;
 
-public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI
+public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI, uGUI_IButtonReceiver
 {
 
 
@@ -134,7 +134,6 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI
 
     private void AddPages()
     {
-
         foreach (PDAPages page in Enum.GetValues(typeof(PDAPages)))
         {
             var gPage = GameObjectHelpers.FindGameObject(_canvas.gameObject, page.ToString());
@@ -145,6 +144,7 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI
     private void CreateStorePage()
     {
         //Set gameobject to toggle for pages
+        _pages[PDAPages.AlterraHub] = _pages[PDAPages.StorePage];
         _pages[PDAPages.HomeSolutions] = _pages[PDAPages.StorePage];
         _pages[PDAPages.LifeSolutions] = _pages[PDAPages.StorePage];
         _pages[PDAPages.EnergySolutions] = _pages[PDAPages.StorePage];
@@ -211,7 +211,16 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI
         //_404?.SetActive(!DroneDeliveryService.Main.DetermineIfFixed());
     }
 
-    
+    internal void OpenEncyclopedia(FCSDevice device)
+    {
+        PurgePages();
+        EncyclopediaService.SetCurrentDevice(device);
+        GoToPage(PDAPages.BaseDevices);
+        PrepareDevicePage(device.GetTechType(),device);
+        OpenEncyclopedia(device.GetTechType());
+    }
+
+
     internal void OpenEncyclopedia(TechType techType)
     {
         if (CheckIfPDAHasEntry(techType))
@@ -415,5 +424,16 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI
         base.Deselect();
         //this.SetTabs(uGUI_PDA.regularTabs);
         //this.content.SetVisible(false);
+    }
+
+    internal Page GetPreviousPage()
+    {
+        return _menuController.GetPreviousPage();
+    }
+
+    public bool OnButtonDown(GameInput.Button button)
+    {
+        Page page = _menuController.GetCurrentPage();
+        return page != null && page.OnButtonDown(button);
     }
 }

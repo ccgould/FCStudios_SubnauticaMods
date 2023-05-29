@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
@@ -16,6 +17,7 @@ internal class DestinationDialogController : Page
     private CheckOutPopupDialogWindow _checkoutWindow;
     public Action OnClose { get; set; }
 
+    public override PDAPages PageType => PDAPages.None;
 
     internal  void Initialize(CheckOutPopupDialogWindow checkoutWindow)
     {

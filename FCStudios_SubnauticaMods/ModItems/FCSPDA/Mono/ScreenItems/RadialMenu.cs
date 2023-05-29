@@ -1,7 +1,10 @@
 ﻿using FCS_AlterraHub.API;
+using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.UI;
 //#if SUBNAUTICA
@@ -12,16 +15,22 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.ScreenItems;
 
 public class RadialMenu : MonoBehaviour
 {
-    private readonly Dictionary<PDAPages, RadialMenuEntry> _entries = new();
+    //private readonly Dictionary<PDAPages, RadialMenuEntry> _entries = new();
     private float Radius = 280;
+    private KeyValuePair<PDAPages, RadialMenuEntry> selected;
+    private readonly SortedList<PDAPages, RadialMenuEntry> _entries = new();
+    [SerializeField]
+    private GameObject _radialMenuEntryPrefab;
+    [SerializeField]
+    private Text _parentPageNameLabel;
 
     internal RadialMenuEntry AddEntry(FCSAlterraHubGUI controller, Sprite pIcon, Text pageLabel, string buttonName, PDAPages pages,bool isActive = true)
     {
-        GameObject entry = Instantiate(FCSAssetBundlesService.PublicAPI.GetLocalPrefab("RadialMenuEntry"), transform);
+        GameObject entry = Instantiate(_radialMenuEntryPrefab, transform);
         entry.SetActive(isActive);
         entry.transform.localScale = new Vector3(1.4f, 1.4f, 1.4f);
-        RadialMenuEntry rme = entry.EnsureComponent<RadialMenuEntry>();
-        rme.Initialize(controller, transform.parent.Find("PageName").gameObject.GetComponent<Text>(), pIcon, pageLabel, buttonName, pages);
+        RadialMenuEntry rme = entry.GetComponent<RadialMenuEntry>();
+        rme.Initialize(controller, _parentPageNameLabel, pIcon, pageLabel, buttonName, pages);
         _entries.Add(pages,rme);
         Rearrange();
         return rme;
@@ -31,7 +40,7 @@ public class RadialMenu : MonoBehaviour
     {
         if (_entries.Count == 0 || !_entries.ContainsKey(PDAPages.BaseDevices)) return;
 
-        if (Player.main.IsInBase())
+        if (HabitatService.main.IsBaseManagerBuilt())
         {
             if (!_entries[PDAPages.BaseDevices].gameObject.activeSelf)
             {
@@ -46,7 +55,6 @@ public class RadialMenu : MonoBehaviour
             }
         }
     }
-
 
     internal void Rearrange()
     {
@@ -76,5 +84,92 @@ public class RadialMenu : MonoBehaviour
     {
         _entries[page].gameObject.SetActive(true);
         Rearrange();
+    }
+
+    internal void SelectNextItem()
+    {
+        ResetEntries();
+        var result = CheckIfItemSelected();
+
+        if (result)
+        {
+            var index = _entries.IndexOfValue(selected.Value);
+
+            if (index + 1 < _entries.Count)
+            { 
+                var next = _entries.ElementAt(index + 1);
+
+                next.Value.Select();
+                selected = next;
+            }
+            else
+            {
+                var next = _entries.First();
+
+                next.Value.Select();
+                selected = next;
+            }
+
+        }
+
+
+    }
+
+    private bool CheckIfItemSelected()
+    {
+        if (selected.Value is null)
+        {
+            selected = _entries.First();
+            selected.Value.Select();
+            return false;
+        }
+        return true;
+    }
+
+    private void ResetEntries()
+    {
+        foreach (var entry in _entries)
+        {
+            var go = entry.Value;
+            go.Deselect();
+        }
+    }
+
+    internal void SelectPrevItem()
+    {
+        ResetEntries();
+
+        var result = CheckIfItemSelected();
+
+        if (result)
+        {
+            var index = _entries.IndexOfValue(selected.Value);
+
+            if (index - 1 > -1)
+            {
+                var prev = _entries.ElementAt(index - 1);
+
+                prev.Value.Select();
+                selected = prev;
+            }
+            else
+            {
+                var prev = _entries.Last();
+
+                prev.Value.Select();
+                selected = prev;
+            }
+        }
+
+    }
+
+    internal void PressSelectedButton()
+    {
+        selected.Value?.OnPointerClick(null);
+    }
+
+    internal void ClearSelectedItem()
+    {
+        selected = new();
     }
 }

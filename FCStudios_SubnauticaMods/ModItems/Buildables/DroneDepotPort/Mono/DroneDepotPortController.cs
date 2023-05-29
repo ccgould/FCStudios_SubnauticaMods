@@ -45,6 +45,7 @@ internal class DroneDepotPortController : FCSDevice
     public override void OnConstructedChanged(bool constructed)
     {
         IsConstructed = constructed;
+
         if (constructed)
         {
             if (base.isActiveAndEnabled)

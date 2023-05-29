@@ -1,6 +1,8 @@
 ﻿using FCS_AlterraHub.Models;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Mono;
+using FCS_AlterraHub.ModItems.Buildables.BaseManager.Buildable;
+using FCS_AlterraHub.ModItems.Buildables.BaseManager.Mono;
 using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
@@ -16,8 +18,8 @@ namespace FCS_AlterraHub.Core.Services;
 internal class HabitatService : MonoBehaviour
 {
     public static HabitatService main { get; private set; }
-    private HashSet<KnownDevice> knownDevices { get; set; } = new();
-    private HashSet<HabitatManager> knownBases { get; set; } = new();
+    private HashSet<KnownDevice> knownDevices  = new();
+    private HashSet<HabitatManager> knownBases  = new();
     
     public Action<HabitatManager> onBaseDestroyed;
 
@@ -100,7 +102,7 @@ internal class HabitatService : MonoBehaviour
         knownBases.Remove(baseManager);
     }
 
-    internal void RegisterDevice(FCSDevice device, TechType techType)
+    internal void RegisterDevice(FCSDevice device)
     {
         var prefabID = device.GetPrefabID();
 
@@ -116,7 +118,7 @@ internal class HabitatService : MonoBehaviour
         else
         {
             QuickLogger.Debug($"Creating new ID: Known Count{knownDevices.Count}");
-            var unitID = GenerateNewID(ModRegistrationService.GetModID(techType), prefabID);
+            var unitID = GenerateNewID(ModRegistrationService.GetModID(device.GetTechType()), prefabID);
             device.UnitID = unitID;
 
             //SaveDevices(knownDevices);
@@ -180,5 +182,30 @@ internal class HabitatService : MonoBehaviour
         }
 
         return null;
+    }
+
+    internal bool IsBaseManagerBuilt()
+    {
+        if (!Player.main?.IsInBase() ?? false) return false;
+        return GetPlayersCurrentBase()?.HasDevice(BaseManagerBuildable.PatchedTechType) ?? false;
+    }
+
+    internal bool IsRegisteredInBase(string prefabID,out  HabitatManager manager)
+    {
+        var g = knownBases.Where(x=>x.HasDevice(prefabID)).FirstOrDefault();
+
+        if (g != null)
+        {
+            manager = g;
+            return true;
+        }
+
+        manager = null;
+        return false;
+    }
+
+    internal HabitatManager GetBaseManager(FCSDevice baseManagerController)
+    {
+        return baseManagerController.GetComponentInParent<HabitatManager>();
     }
 }

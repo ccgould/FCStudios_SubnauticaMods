@@ -10,13 +10,11 @@ internal class CubeGeneratorPulleyController : MonoBehaviour
     private AnimationCurve _startUpAnimationCurve;
     [SerializeField]
     private IonCubeGeneratorController _controller;
-    private bool _isInitialize;
     [SerializeField]
     private AnimationCurve _coolDownAnimationCurve;
 
     private void Update()
     {
-        if (!_isInitialize) return;
         UpdatePulleyPosition();
     }
 
@@ -32,12 +30,5 @@ internal class CubeGeneratorPulleyController : MonoBehaviour
         {
             _ionCube.transform.localPosition = new Vector3(_ionCube.transform.localPosition.x, _coolDownAnimationCurve.Evaluate(_controller.CoolDownPercent), _ionCube.transform.localPosition.z);
         }
-    }
-
-    internal void Initialize(IonCubeGeneratorController controller)
-    {
-        _controller = controller;
-
-        _isInitialize = true;
     }
 }

@@ -16,7 +16,21 @@ internal class StoreItem : MonoBehaviour
 {
     private decimal _price;
     private int _returnAmount;
+    private Action<TechType, TechType, int> _callBack;
+    private FCSStoreEntry _storeEntry;
     private bool _forceUnlock;
+
+    [SerializeField]
+    private Text _itemAmount;
+
+    [SerializeField]
+    private uGUI_Icon _icon;
+    [SerializeField]
+    private FCSToolTip _returnToolTip;
+    [SerializeField]
+    private Text _returnAmountText;
+
+
 
     internal bool CheckIsUnlocked()
     {
@@ -31,6 +45,8 @@ internal class StoreItem : MonoBehaviour
 
     internal void Initialize(FCSStoreEntry storeEntry, Action<TechType, TechType, int> callback, StoreCategory category, Func<bool> toolTipPermission)
     {
+        _callBack = callback;
+        _storeEntry = storeEntry;
         _forceUnlock = storeEntry.ForcedUnlock;
         IsVisibleForced = storeEntry.ForcedUnlock;
         _price = storeEntry.Cost;
@@ -39,41 +55,30 @@ internal class StoreItem : MonoBehaviour
 
         _returnAmount = storeEntry.ReturnAmount;
 
-        var costObj = GameObjectHelpers.FindGameObject(gameObject, "ItemAmount").GetComponent<Text>();
-        costObj.text = _price.ToString("n0");
+        _itemAmount.text = _price.ToString("n0");
 
-        var addToCartBTN = gameObject.GetComponentInChildren<Button>();
-        addToCartBTN.onClick.AddListener(() =>
-        {
-            callback?.Invoke(TechType, storeEntry.ReceiveTechType, _returnAmount);
-        });
-
-        var icon = GameObjectHelpers.FindGameObject(gameObject, "Icon");
-
-        var returnAmountObj = GameObjectHelpers.FindGameObject(gameObject, "ReturnAmount");
-        var returnToolTip = returnAmountObj.AddComponent<FCSToolTip>();
-        returnToolTip.Tooltip = $"{LanguageService.Bulk()}: {_returnAmount} {Language.main.Get(storeEntry.ReceiveTechType)}";
-        returnToolTip.RequestPermission = toolTipPermission;
+        _returnToolTip.Tooltip = $"{LanguageService.Bulk()}: {_returnAmount} {Language.main.Get(storeEntry.ReceiveTechType)}";
+        _returnToolTip.RequestPermission = toolTipPermission;
 
 
         if (_returnAmount > 1)
         {
-            returnAmountObj.SetActive(true);
+            _returnToolTip.gameObject.SetActive(true);
         }
 
-        var returnAmountText = returnAmountObj.GetComponentInChildren<Text>();
-        if (returnAmountText != null)
-        {
-            returnAmountText.text = $"x{_returnAmount}";
-        }
+        _returnAmountText.text = $"x{_returnAmount}";
 
-        var toolTip = icon.AddComponent<FCSToolTip>();
+        var toolTip = _icon.GetComponent<FCSToolTip>();
         toolTip.Tooltip = ToolTipFormat(TechType, LanguageService.GetLanguage(TechType));
         toolTip.RequestPermission = toolTipPermission;
 
-        var uGUIIcon = icon.AddComponent<uGUI_Icon>();
-        uGUIIcon.sprite = SpriteManager.Get(TechType);
+        _icon.sprite = SpriteManager.Get(TechType);
 
+    }
+
+    public void OnAddToCartButtonClicked()
+    {
+        _callBack?.Invoke(TechType, _storeEntry.ReceiveTechType, _returnAmount);
     }
 
     private string ToolTipFormat(TechType techType, string objectName)

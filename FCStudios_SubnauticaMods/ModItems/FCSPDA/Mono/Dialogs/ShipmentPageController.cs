@@ -17,6 +17,8 @@ internal class ShipmentPageController : Page
     private FCSAlterraHubGUI _gui;
     private List<ShipmentTracker> _trackedShipments = new();
 
+    public override PDAPages PageType => PDAPages.Shipment;
+
     public void Awake()
     {
         var backButton = gameObject.FindChild("BackBTN").GetComponent<Button>();

@@ -1,7 +1,5 @@
-﻿using FCS_AlterraHub.ModItems.FCSPDA.Mono;
-using FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Interfaces;
+﻿using FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Interfaces;
 using FCSCommon.Utilities;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -62,13 +60,7 @@ internal class CubeGeneratorContainer : ICubeContainer
     {
         CoroutineHost.StartCoroutine(this.GetCubePrefab());
 
-        if (_containerRoot == null)
-        {
-            // Logger.Log(Logger.Level.Debug, "Initializing StorageRoot");
-            var storageRoot = new GameObject("StorageRoot");
-            storageRoot.transform.SetParent(cubeGenerator.transform, false);
-            _containerRoot = storageRoot.AddComponent<ChildObjectIdentifier>();
-        }
+        _containerRoot = cubeGenerator.GetComponentInChildren<ChildObjectIdentifier>();
 
         if (_cubeContainer == null)
         {
@@ -93,21 +85,33 @@ internal class CubeGeneratorContainer : ICubeContainer
         return true;
     }
 
-    public void OpenStorage()
+    public IEnumerator OpenStorage()
     {
         QuickLogger.Debug($"Storage Button Clicked", true);
 
         //Close FCSPDA so in game pda can open with storage
         FCSPDAController.Main.Close();
 
+        QuickLogger.Debug($"Closing FCS PDA", true);
+
+        QuickLogger.Debug("Attempting to open the In Game PDA", true);
         Player main = Player.main;
         PDA pda = main.GetPDA();
-        Inventory.main.SetUsedStorage(_cubeContainer, false);
-        pda.Open(PDATab.Inventory, null, (s)=>
+
+        while (pda != null && pda.isInUse || pda.isOpen)
         {
-            QuickLogger.Debug("Container Closed",true);            
+            QuickLogger.Debug("Waiting for In Game PDA Settings to reset", true);
+            yield return null;
+        }
+
+
+        Inventory.main.SetUsedStorage(_cubeContainer, false);
+        pda.Open(PDATab.Inventory, _cubeContainer.tr, (s) =>
+        {
+            QuickLogger.Debug("Container Closed", true);
         });
 
+        yield break;
     }
 
     private IEnumerator GetCubePrefab()
@@ -139,5 +143,19 @@ internal class CubeGeneratorContainer : ICubeContainer
     {
         IList<InventoryItem> cubes = _cubeContainer.GetItems(TechType.PrecursorIonCrystal);
         _cubeContainer.RemoveItem(cubes[0].item);
+    }
+
+    public void AttemptToOpenStorage(FCSPDAController fcspda)
+    {
+        //QuickLogger.Debug("Attempting to open the In Game PDA",true);
+
+
+        //Player main = Player.main;
+        //PDA pda = main.GetPDA();
+        //Inventory.main.SetUsedStorage(_cubeContainer, false);
+        //pda.Open(PDATab.Inventory, _cubeContainer.tr, (s)=>
+        //{
+        //    QuickLogger.Debug("Container Closed",true);            
+        //});
     }
 }

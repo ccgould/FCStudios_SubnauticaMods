@@ -1,4 +1,5 @@
 ﻿using FCS_AlterraHub.Models.Abstract;
+using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
 using TMPro;
 using UnityEngine;
@@ -11,10 +12,12 @@ internal class PDADeviceSettingsPage : Page
     [SerializeField]
     private Toggle _visiblityToggle;
     [SerializeField]
-    private TMP_InputField _friendlyNameInput;
+    private uGUI_InputField _friendlyNameInput;
     [SerializeField]
     private FCSAlterraHubGUI _gui;
     private FCSDevice _device;
+
+    public override PDAPages PageType => PDAPages.DeviceSettings;
 
     public void OnFriendlyNameChanged(string t)
     {

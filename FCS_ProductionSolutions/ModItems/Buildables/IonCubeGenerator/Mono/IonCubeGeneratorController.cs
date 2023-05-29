@@ -1,8 +1,8 @@
 ﻿using FCS_AlterraHub.API;
+using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.Models.Mono;
-using FCS_AlterraHub.ModItems.FCSPDA.Mono;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Enumerators;
 using FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Interfaces;
@@ -86,7 +86,9 @@ internal class IonCubeGeneratorController : FCSDevice, IFCSSave<SaveData>
     }
 
     public float StartUpPercent => Mathf.Max(0f, StartUpProgress / StartUpComplete);
+
     public float GenerationPercent => Mathf.Max(0f, GenerationProgress / CubeEnergyCost);
+
     public float CoolDownPercent => Mathf.Max(0f, CoolDownProgress / CooldownComplete);
 
     public int NumberOfCubes
@@ -108,9 +110,6 @@ internal class IonCubeGeneratorController : FCSDevice, IFCSSave<SaveData>
         {
             _cubeContainer = new CubeGeneratorContainer(this);
         }
-
-        var pulleyController = gameObject.EnsureComponent<CubeGeneratorPulleyController>();
-        pulleyController.Initialize(this);
 
         var interaction = gameObject.GetComponent<HoverInteraction>();
         interaction.onSettingsKeyPressed += onSettingsKeyPressed;
@@ -289,6 +288,13 @@ internal class IonCubeGeneratorController : FCSDevice, IFCSSave<SaveData>
     public override bool CanDeconstruct(out string reason)
     {
         reason = string.Empty;
+
+        if (_cubeContainer is not null)
+        {
+            reason = LanguageService.NotEmpty();
+            return _cubeContainer.NumberOfCubes == 0;
+        }
+
         return true;
     }
 
@@ -317,7 +323,7 @@ internal class IonCubeGeneratorController : FCSDevice, IFCSSave<SaveData>
 
     public void OpenStorage()
     {
-        _cubeContainer.OpenStorage();
+        StartCoroutine(_cubeContainer.OpenStorage());
     }
 
     internal void OnAddItemEvent(InventoryItem item)
@@ -363,7 +369,7 @@ internal class IonCubeGeneratorController : FCSDevice, IFCSSave<SaveData>
     internal void onSettingsKeyPressed()
     {
         QuickLogger.Debug("Opening Settings",true);
-        FCSPDAController.Main.OpenDeviceUI(GetTechType(), this);
+        FCSPDAController.Main.OpenDeviceUI(GetTechType(), this, _cubeContainer.AttemptToOpenStorage);
     }
 
     internal bool IsCrafting()
@@ -399,5 +405,18 @@ internal class IonCubeGeneratorController : FCSDevice, IFCSSave<SaveData>
 
         newSaveData.Data.Add(save);
         QuickLogger.Debug($"Saves Cube Gen {newSaveData.Data.Count}", true);
+    }
+
+    public override string[] GetDeviceStats()
+    {
+        return new string[]
+        {
+            $"[EPM: {EnergyConsumptionPerSecond * 60:F2}] [Running: {_currentMode}] [Percentage: {GenerationPercent:P0}]",
+        };
+    }
+
+    public override float GetPowerUsage()
+    {
+        return EnergyConsumptionPerSecond * 60;
     }
 }

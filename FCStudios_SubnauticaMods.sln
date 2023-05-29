@@ -11,6 +11,8 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "FCSCommon", "FCSCommon\FCSC
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{B036E928-011F-4FDE-A4AE-3CF2C029FE93}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCS_AlterraJobs", "FCS_AlterraJobs\FCS_AlterraJobs.csproj", "{EE24BC97-FF4C-4996-AD82-86E931BF6DA3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		BZ_Stable|Any CPU = BZ_Stable|Any CPU
@@ -35,6 +37,14 @@ Global
 		{80BC769B-72AB-4938-9AF1-E735928A3777}.Release|Any CPU.Build.0 = Release|Any CPU
 		{80BC769B-72AB-4938-9AF1-E735928A3777}.SN_Stable|Any CPU.ActiveCfg = SN_Stable|Any CPU
 		{80BC769B-72AB-4938-9AF1-E735928A3777}.SN_Stable|Any CPU.Build.0 = SN_Stable|Any CPU
+		{EE24BC97-FF4C-4996-AD82-86E931BF6DA3}.BZ_Stable|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE24BC97-FF4C-4996-AD82-86E931BF6DA3}.BZ_Stable|Any CPU.Build.0 = Debug|Any CPU
+		{EE24BC97-FF4C-4996-AD82-86E931BF6DA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE24BC97-FF4C-4996-AD82-86E931BF6DA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE24BC97-FF4C-4996-AD82-86E931BF6DA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE24BC97-FF4C-4996-AD82-86E931BF6DA3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE24BC97-FF4C-4996-AD82-86E931BF6DA3}.SN_Stable|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE24BC97-FF4C-4996-AD82-86E931BF6DA3}.SN_Stable|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

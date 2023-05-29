@@ -27,6 +27,7 @@ internal class AccountPageHandler : Page
     [SerializeField]
     private Toggle _deductionToggle;
 
+    public override PDAPages PageType => PDAPages.AccountPage;
 
     public void Awake()
     {              

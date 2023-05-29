@@ -1,5 +1,8 @@
 ﻿using FCS_AlterraHub.API;
+using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Mono;
+using FCS_AlterraHub.ModItems.Buildables.BaseManager.Buildable;
+using System;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Models.Abstract;
@@ -110,7 +113,23 @@ public abstract class FCSDevice : MonoBehaviour, IProtoEventListener, IConstruct
 
     public abstract bool IsDeconstructionObstacle();
 
-    public abstract void OnConstructedChanged(bool constructed);
+    public virtual void OnConstructedChanged(bool constructed)
+    {
+        IsConstructed = constructed;
+        if (constructed)
+        {
+            if (base.isActiveAndEnabled)
+            {
+                if (!this.IsInitialized)
+                {
+                    this.Initialize();
+                }
+
+                return;
+            }
+            _runStartUpOnEnable = true;
+        }
+    }
 
     public abstract void OnProtoDeserialize(ProtobufSerializer serializer);
 
@@ -125,6 +144,61 @@ public abstract class FCSDevice : MonoBehaviour, IProtoEventListener, IConstruct
 
     public virtual void Start() 
     {
-        FCSModsAPI.PublicAPI.RegisterDevice(this, GetTechType());
+        FCSModsAPI.PublicAPI.RegisterDevice(this);
+    }
+
+    public virtual void OnDestroy()
+    {
+        FCSModsAPI.PublicAPI.UnRegisterDevice(this);
+    }
+
+    /// <summary>
+    /// Used for the HoverInteration to display infromation about the device
+    /// </summary>
+    /// <returns></returns>
+    public virtual string[] GetDeviceStats()
+    {
+        if (!IsOperational())
+        {
+            return new string[]
+            {
+                LanguageService.NotConnectedToBaseManager(),
+            };
+        }
+
+        return null;
+    }
+
+    public HabitatManager CachedHabitatManager { get; private set; }
+
+    public bool IsConnectedToBaseManager()
+    {
+        if(CachedHabitatManager is not null)
+        {
+            return CachedHabitatManager.HasDevice(BaseManagerBuildable.PatchedTechType);
+        }
+
+        if (IsConstructed && FCSModsAPI.PublicAPI.IsRegisteredInBase(GetPrefabID(), out HabitatManager manager))
+        {
+            if (manager is not null && manager.HasDevice(BaseManagerBuildable.PatchedTechType))
+            {
+                CachedHabitatManager = manager;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public virtual bool IsOperational()
+    {
+        
+
+        return IsConnectedToBaseManager() && IsConstructed;
+    }
+
+    public virtual float GetPowerUsage()
+    {
+        return 0;
     }
 }

@@ -1,6 +1,8 @@
 ﻿using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Core.Services;
+using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
+using FCSCommon.Utilities;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -18,11 +20,13 @@ internal class DevicePageController : Page
     private GameObject _categoryPrefab;
     private Dictionary<string, DeviceCatergory> _groups = new();
 
+    public override PDAPages PageType => PDAPages.DevicePage;
+
     private void Awake()
     {
         _content = GameObjectHelpers.FindGameObject(gameObject.FindChild("Body"),"Content").transform;
 
-        //_showAllToggle.onValueChanged.AddListener((b) => 
+        //_showAllToggle.onValueChanged.AddListener((b) =>
         //{
         //    Enter(null);
         //});
@@ -31,6 +35,12 @@ internal class DevicePageController : Page
     internal bool GetShowAllState()
     {
         return _showAllToggle.isOn;
+    }
+
+    public void OnShowAllToggleChanged()
+    {
+        QuickLogger.Debug("OnShowAllToggleChanged");
+        Enter(null);
     }
 
     public override void Enter(object arg)

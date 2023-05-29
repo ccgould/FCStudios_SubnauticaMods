@@ -73,7 +73,7 @@ internal class StoreInventoryService
     internal static StoreItem CreateStoreItem(FCSStoreEntry entry, Action<TechType, TechType, int> addItemCallBack, Func<bool> toolTipPermission)
     {
         var item = GameObject.Instantiate(FCSAssetBundlesService.InternalAPI.GetLocalPrefab("StoreItem"));
-        var storeItem = item.AddComponent<StoreItem>();
+        var storeItem = item.GetComponent<StoreItem>();
         storeItem.Initialize(entry, addItemCallBack, entry.StoreCategory, toolTipPermission);
         AddNewStoreItem(entry);
         return storeItem;

@@ -2,10 +2,12 @@
 using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.ModItems.FCSPDA.Data.Models;
+using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
+using static ErrorMessage;
 
 namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;
 
@@ -27,6 +29,8 @@ internal class EncyclopediaMainTabController : Page
     private RectTransform _listCanvas;
     private bool _isInitialize;
     internal static EncyclopediaMainTabController Instance;
+
+    public override PDAPages PageType => PDAPages.EncyclopediaMain;
 
     private void Awake()
     {
@@ -71,7 +75,7 @@ internal class EncyclopediaMainTabController : Page
         }
 
 
-        foreach (var item in EncyclopediaService.EncyclopediaEntries)
+        foreach (var item in EncyclopediaService.GetEntries())
         {
             var prefab = GameObject.Instantiate(_itemPrefab);
             var listItem = prefab.GetComponent<EncyclopediaListItem>();
@@ -95,22 +99,23 @@ internal class EncyclopediaMainTabController : Page
     internal void Clear()
     {
         _title.text = string.Empty;
-        
+        _message.text = string.Empty;
+        _image.gameObject.SetActive(false);
     }
 
     internal void HoverTriggered(EncyclopediaData data)
     {
         if (data is null) return;
         _title.text = data.Title;
+        _message.text = data.Description;
         SetImage(data);
-        //FCSAssetBundlesService.PublicAPI.GetIconByName("HomeSolutionsIcon_W", PluginInfo.PLUGIN_NAME)
     }
 
     private void SetImage(EncyclopediaData entryData)
     {
-        if (_image != null) return;
+        if (_image is null) return;
 
-        var texture = EncyclopediaService.GetEncyclopediaTexture2D(entryData.ModPackID, ModRegistrationService.GetModPackData(entryData.ModPackID).GetBundleName());
+        var texture = EncyclopediaService.GetEncyclopediaTexture2D(entryData.Icon, ModRegistrationService.GetModPackData(entryData.ModPackID).GetBundleName());
         _image.texture = texture;
         if (texture != null)
         {

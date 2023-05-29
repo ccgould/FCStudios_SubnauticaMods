@@ -11,6 +11,7 @@ using FCS_AlterraHub.Core.Extensions;
 using FCS_AlterraHub.ModItems.FCSPDA.Data.Models;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono;
+using FCS_AlterraHub.Models.Abstract;
 
 namespace FCS_AlterraHub.Core.Services;
 
@@ -19,10 +20,11 @@ namespace FCS_AlterraHub.Core.Services;
 /// </summary>
 internal static class EncyclopediaService
 {
-    internal static Dictionary<string, EncyclopediaData> EncyclopediaEntries { get; set; } = new();
+    private static Dictionary<string, EncyclopediaData> _encyclopediaEntries = new();
     internal static bool IsRegisteringEncyclopedia { get; set; }
-    internal static Action<TechType> OnOpenEncyclopedia;
+    internal static Action<FCSDevice> OnOpenEncyclopedia;
     private static TechType _selectedEntry;
+    private static FCSDevice _currentDevice;
 
     public static Texture2D GetEncyclopediaTexture2D(string imageName, string bundleName = "")
     {
@@ -53,9 +55,9 @@ internal static class EncyclopediaService
                     QuickLogger.Debug("Encyclopedia Json Found");
                     var jsonData = JsonConvert.DeserializeObject<EncyclopediaData>(File.ReadAllText(encyclopediaJson));
 
-                    EncyclopediaEntries.Add(jsonData.ModPackID, jsonData);
+                    _encyclopediaEntries.Add(jsonData.ModPackID, jsonData);
 
-                    QuickLogger.Debug($"Count of Encyclopedia Entries: {EncyclopediaEntries.Count}");
+                    QuickLogger.Debug($"Count of Encyclopedia Entries: {_encyclopediaEntries.Count}");
                 }
                 else
                 {
@@ -76,22 +78,22 @@ internal static class EncyclopediaService
 
     internal static EncyclopediaData GetCategoryEntries(string category)
     {
-        return EncyclopediaEntries[category];
+        return _encyclopediaEntries[category];
     }
 
     internal static string GetModPackID(EncyclopediaEntryData entryData)
     {
-        return EncyclopediaEntries.First(x => x.Value.Data.Contains(entryData)).Value?.ModPackID ?? string.Empty;
+        return _encyclopediaEntries.First(x => x.Value.Data.Contains(entryData)).Value?.ModPackID ?? string.Empty;
     }
 
-    internal static void OpenEncyclopedia(TechType techType)
+    internal static void OpenEncyclopedia(FCSDevice device)
     {
-        OnOpenEncyclopedia?.Invoke(techType);
+        OnOpenEncyclopedia?.Invoke(device);
     }
 
     internal static EncyclopediaEntryData GetDataEntryByTechType(TechType techType)
     {
-        foreach (var item in EncyclopediaEntries)
+        foreach (var item in _encyclopediaEntries)
         {
             foreach (var data in item.Value.Data)
             {
@@ -106,7 +108,7 @@ internal static class EncyclopediaService
 
     internal static EncyclopediaData GetEntryByTechType(TechType techType)
     {
-        foreach (var item in EncyclopediaEntries)
+        foreach (var item in _encyclopediaEntries)
         {
             foreach (var data in item.Value.Data)
             {
@@ -134,5 +136,25 @@ internal static class EncyclopediaService
     internal static EncyclopediaTabController GetEncyclopediaTabController()
     {
         return FCSPDAController.Main.GetGUI().GetEncyclopediaTabController();
+    }
+
+    internal static Dictionary<string, EncyclopediaData> GetEntries()
+    {
+         return _encyclopediaEntries.OrderBy(x=>x.Value.Index).ToDictionary(pair => pair.Key, pair => pair.Value);
+    }
+
+    internal static FCSDevice GetCurrentDevice()
+    {
+        return _currentDevice;
+    }
+
+    internal static void SetCurrentDevice(FCSDevice device)
+    {
+        _currentDevice = device;
+    }
+
+    internal static void ClearCurrentDevice()
+    {
+        _currentDevice = null;
     }
 }

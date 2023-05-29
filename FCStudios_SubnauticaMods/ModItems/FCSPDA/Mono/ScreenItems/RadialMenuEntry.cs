@@ -13,7 +13,11 @@ public class RadialMenuEntry : MonoBehaviour, IPointerEnterHandler, IPointerExit
 {
     private Text _label;
     private string _buttonName;
+
+    [SerializeField]
     private GameObject Hover;
+
+    [SerializeField]
     private uGUI_Icon Icon;
     private PDAPages _page;
     private FCSAlterraHubGUI _controller;
@@ -21,8 +25,6 @@ public class RadialMenuEntry : MonoBehaviour, IPointerEnterHandler, IPointerExit
 
     internal void Initialize(FCSAlterraHubGUI controller, Text pLabel, Sprite pIcon, Text pageLabel, string buttonName, PDAPages page)
     {
-        Hover = GameObjectHelpers.FindGameObject(gameObject, "Backer");
-        Icon = gameObject.FindChild("Icon").AddComponent<uGUI_Icon>();
 #if SUBNAUTICA
         Icon.sprite = new Atlas.Sprite(pIcon);
 #else
@@ -45,19 +47,29 @@ public class RadialMenuEntry : MonoBehaviour, IPointerEnterHandler, IPointerExit
     public void OnPointerEnter(PointerEventData eventData)
     {
         SetLabel(_buttonName);
-        Hover.SetActive(true);
+        Select();
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         SetLabel(string.Empty);
-        Hover.SetActive(false);
+        Deselect();
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
         _controller.GoToPage(_page,_page);
-        Hover.SetActive(false);
+        Deselect();
         _label.text = string.Empty;
+    }
+
+    public void Select()
+    {
+        Hover.SetActive(true);
+    }
+
+    public void Deselect()
+    {
+        Hover.SetActive(false);
     }
 }

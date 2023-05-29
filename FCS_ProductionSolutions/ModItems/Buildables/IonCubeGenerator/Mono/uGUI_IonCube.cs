@@ -58,6 +58,8 @@ internal class uGUI_IonCube : Page, IuGUIAdditionalPage
     private const float DelayedStartTime = 0.5f;
     private const float RepeatingUpdateInterval = 1f;
 
+    public override PDAPages PageType => PDAPages.DevicePage;
+
     public event Action<PDAPages> onBackClicked;
     public event Action<FCSDevice> onSettingsClicked;
 

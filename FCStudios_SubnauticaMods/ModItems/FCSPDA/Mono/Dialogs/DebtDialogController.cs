@@ -1,6 +1,7 @@
 ﻿using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Core.Services;
 using FCSCommon.Utilities;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,15 +9,17 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;
 public class DebtDialogController : MonoBehaviour
 {
     [SerializeField]
-    private Text _newBalance;
+    private TMP_Text _newBalance;
     [SerializeField]
-    private Text _accountBalance;    
+    private TMP_Text _accountBalance;    
     [SerializeField]
-    private Text _paymentInputText;
+    private TMP_Text _paymentInputText;
     [SerializeField]
-    private Text _debtBalance;
+    private TMP_Text _debtBalance;
     [SerializeField]
     private FCSAlterraHubGUI _mono;
+    [SerializeField]
+    private TMP_InputField _inputField;
     private decimal _pendingPayment;
 
     public void OnPaymentInputChanged(string value)
@@ -79,5 +82,6 @@ public class DebtDialogController : MonoBehaviour
         _newBalance.text = LanguageService.AccountNewBalanceFormat(0);
         _accountBalance.text = LanguageService.AccountBalanceFormat(0);
         _debtBalance.text = LanguageService.DebtBalanceFormat(0);
+        _inputField.SetTextWithoutNotify(string.Empty);
     }
 }

@@ -52,7 +52,7 @@ public static class Player_Patches
 
                 if (Input.GetKey(KeyCode.RightControl) || Input.GetKey(KeyCode.LeftControl))
                 {
-                    //FCSPDA.Screen.GoToPage(PDAPages.Teleportation);
+                    FCSPDA.GetGUI().GoToPage(PDAPages.Teleportation);
                     FCSPDA.Open();
                 }
                 else
@@ -98,26 +98,17 @@ public static class Player_Patches
 
        
         var pda = GameObject.Instantiate(FCSAssetBundlesService.PublicAPI.GetLocalPrefab("fcsPDA"));
-        QuickLogger.Debug("1");
         var canvas = pda.GetComponentInChildren<Canvas>();
-        QuickLogger.Debug("2");
 
         if (canvas != null)
             canvas.sortingLayerID = 1479780821;
         var controller = pda.GetComponent<FCSPDAController>();
-        QuickLogger.Debug("3");
 
-        //controller.CreateScreen();
         FCSPDA = controller;
-        //controller.PDAObj = defPDA;
-        QuickLogger.Debug("4");
 
         controller.SetInstance();
-        QuickLogger.Debug("5");
-
         //AddUnlockedEncyclopediaEntries(FCSAlterraHubService.InternalAPI.EncyclopediaEntries);
         pda.SetActive(false);
-        QuickLogger.Debug("6");
 
         QuickLogger.Debug("FCS PDA Created");
         MoveFcsPdaIntoPosition(pda.gameObject);

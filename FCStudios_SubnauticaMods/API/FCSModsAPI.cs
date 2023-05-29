@@ -3,6 +3,7 @@ using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Enumerators;
 using FCS_AlterraHub.Models.Mono;
 using FCS_AlterraHub.Models.Structs;
+using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCSCommon.Utilities;
 using Nautilus.Assets;
 using System;
@@ -31,12 +32,15 @@ public interface IFCSModsAPIPublic
     bool IsInOreBuildMode();
     string GetModBundleName(string modName, string classID);
     Dictionary<TechType, FCSStoreEntry> GetRegisteredKits();
-    void RegisterDevice(FCSDevice fCSDevice, TechType techType);
+    void RegisterDevice(FCSDevice fCSDevice);
+    void UnRegisterDevice(FCSDevice fCSDevice);
     void CreateStoreEntry(TechType parentTechType, TechType receiveTechType,int returnAmount, decimal cost, StoreCategory energy);
     string GetModID(TechType techType);
     HashSet<FCSDevice> GetRegisteredDevices();
     HabitatManager GetHabitat(FCSDevice device);
     string GetModPackID(TechType techType);
+    void AddStoreCategory(string pLUGIN_GUID, string iconName, string pageName, PDAPages pdaPage);
+    bool IsRegisteredInBase(string prefabID, out HabitatManager manager);
 }
 public interface IFCSModsAPIInternal
 {
@@ -126,9 +130,14 @@ public class FCSModsAPI : IFCSModsAPIPublic, IFCSModsAPIInternal
         return StoreInventoryService.GetRegisteredKits();
     }
 
-    public void RegisterDevice(FCSDevice fcsDevice, TechType techType)
+    public void RegisterDevice(FCSDevice fcsDevice)
     {
-        HabitatService.main.RegisterDevice(fcsDevice,techType);
+        HabitatService.main.RegisterDevice(fcsDevice);
+    }
+
+    public void UnRegisterDevice(FCSDevice fcsDevice)
+    {
+        HabitatService.main.UnRegisterDevice(fcsDevice);
     }
 
     public void CreateStoreEntry(TechType parentTechType, TechType receiveTechType, int returnAmount, decimal cost, StoreCategory category)
@@ -154,5 +163,19 @@ public class FCSModsAPI : IFCSModsAPIPublic, IFCSModsAPIInternal
     public string GetModPackID(TechType techType)
     {
         return ModRegistrationService.GetModPackID(techType);
+    }
+
+    public void AddStoreCategory(string pLUGIN_GUID, string iconName, string pageName, PDAPages pdaPage) => StoreManager.RegisterStoreMod(pLUGIN_GUID, iconName, pageName, pdaPage);
+
+    public bool IsRegisteredInBase(string prefabID, out HabitatManager manager)
+    {
+        manager = null;
+
+        if(HabitatService.main.IsRegisteredInBase(prefabID, out HabitatManager result))
+        {
+            manager = result;
+            return true;
+        }
+        return false;
     }
 }

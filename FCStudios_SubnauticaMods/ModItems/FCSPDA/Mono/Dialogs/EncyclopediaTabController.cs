@@ -31,6 +31,7 @@ internal class EncyclopediaTabController : Page
     private RectTransform _listCanvas;
     private bool _isInitialize;
     private readonly List<EncyclopediaListItem> _trackedEntries = new();
+    public override PDAPages PageType => PDAPages.Encyclopedia;
 
     public override void Enter(object arg = null)
     {

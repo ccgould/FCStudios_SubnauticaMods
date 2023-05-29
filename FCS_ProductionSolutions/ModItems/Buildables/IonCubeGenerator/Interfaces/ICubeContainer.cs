@@ -1,4 +1,6 @@
-﻿namespace FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Interfaces;
+﻿using System.Collections;
+
+namespace FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Interfaces;
 
 /// <summary>
 /// Defines the rules of a CubeContainer
@@ -7,5 +9,7 @@ internal interface ICubeContainer
 {
     bool IsFull { get; }
     int NumberOfCubes { get; set; }
-    void OpenStorage();
+
+    void AttemptToOpenStorage(FCSPDAController fcspda);
+    IEnumerator OpenStorage();
 }

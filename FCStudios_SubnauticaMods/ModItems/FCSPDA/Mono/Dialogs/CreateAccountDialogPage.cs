@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Analytics;
 using UnityEngine.Events;
@@ -17,27 +18,27 @@ public class CreateAccountDialogPage : MonoBehaviour
 {
     [Header("Username Field Settings")]
     [SerializeField]
-    private Text _userNamePlaceholderText;
+    private TMP_Text _userNamePlaceholderText;
     [SerializeField]
-    private Text _userNameTitleText;
+    private TMP_Text _userNameTitleText;
 
     [Header("Pin Field Settings")]
     [SerializeField]
-    private Text _pinPlaceHolderText;
+    private TMP_Text _pinPlaceHolderText;
     [SerializeField]
-    private Text _pinTitleText;
+    private TMP_Text _pinTitleText;
 
     [Header("Password Field Settings")]
     [SerializeField]
-    private Text _passwordPlaceHolderText;
+    private TMP_Text _passwordPlaceHolderText;
     [SerializeField]
-    private Text _passwordTitleText;
+    private TMP_Text _passwordTitleText;
 
     [Header("Full Name Field Settings")]
     [SerializeField]
-    private Text _fullNameTitleText;
+    private TMP_Text _fullNameTitleText;
     [SerializeField]
-    private Text _fullNamePlaceHolderText;
+    private TMP_Text _fullNamePlaceHolderText;
 
     private string _fullName;
     private string _userName;

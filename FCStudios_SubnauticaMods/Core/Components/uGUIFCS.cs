@@ -11,6 +11,6 @@ internal class uGUIFCS : MonoBehaviour
 
     private void OnDestroy()
     {
-        ManagedUpdate.Unsubscribe(ManagedUpdate.Queue.UpdatePDA, new ManagedUpdate.OnUpdate(PDA.PerformUpdate));
+        ManagedUpdate.Unsubscribe(ManagedUpdate.Queue.UpdatePDA, new ManagedUpdate.OnUpdate(FCSPDAController.PerformUpdate));
     }
 }

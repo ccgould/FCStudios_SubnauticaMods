@@ -1,5 +1,6 @@
 ﻿using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Abstract;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -24,6 +25,11 @@ public class HabitatManager : MonoBehaviour
     internal bool HasDevice(string prefabID)
     {
         return _registeredDevices.Any(x => x.GetPrefabID().Equals(prefabID));
+    }
+
+    internal bool HasDevice(TechType techType)
+    {
+        return _registeredDevices.Any(x => x.GetTechType().Equals(techType));
     }
 
     internal void RegisterDevice(FCSDevice device)
@@ -103,5 +109,20 @@ public class HabitatManager : MonoBehaviour
         }
 
         return result;
+    }
+
+    internal float GetTotalPowerUsage()
+    {
+        return _registeredDevices.Sum(x => x.GetPowerUsage());
+    }
+
+    internal int GetTotalDevices()
+    {
+        return _registeredDevices.Count();
+    }
+
+    internal int GetConnectedDevices()
+    {
+        return 0;
     }
 }

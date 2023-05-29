@@ -8,5 +8,6 @@ public enum StoreCategory
     Production = 4,
     Vehicles = 5,
     Storage = 6,
-    Misc = 7
+    Misc = 7,
+    AlterraHub = 8
 }

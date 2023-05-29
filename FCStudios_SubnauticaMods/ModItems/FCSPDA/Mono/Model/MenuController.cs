@@ -1,5 +1,7 @@
 ﻿using FCSCommon.Utilities;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -93,5 +95,16 @@ internal class MenuController : MonoBehaviour
                 PopPage();
             }
         }
+    }
+
+    public Page GetPreviousPage()
+    {
+        if (PageStack.Count < 2) return null;
+        return PageStack.ElementAt(1);
+    }
+
+    internal Page GetCurrentPage()
+    {
+        return PageStack.Peek();
     }
 }

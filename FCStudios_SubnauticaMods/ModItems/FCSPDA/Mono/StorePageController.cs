@@ -1,11 +1,14 @@
-﻿using FCS_AlterraHub.API;
+﻿using BepInEx.Bootstrap;
+using FCS_AlterraHub.API;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models;
 using FCS_AlterraHub.Models.Enumerators;
+using FCS_AlterraHub.Models.Structs;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.ScreenItems;
+using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,6 +17,8 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono;
 internal class StorePageController : Page
 {
     protected override bool showHud => false;
+
+    public override PDAPages PageType => PDAPages.Store;
 
     [SerializeField]
     private Text _cartButtonNumber;
@@ -46,12 +51,20 @@ internal class StorePageController : Page
         if (_radialMenu is not null)
         {
             // TODO Figure out how to allor paths to icon FCSAssetBundlesService.PublicAPI.GetIconByName("Cart_Icon", PluginInfo.PLUGIN_NAME)
-            _radialMenu.AddEntry(_gui, FCSAssetBundlesService.PublicAPI.GetIconByName("HomeSolutionsIcon_W", PluginInfo.PLUGIN_NAME), _pageTextLabel, "Home Solutions", PDAPages.HomeSolutions);
-            _radialMenu.AddEntry(_gui, FCSAssetBundlesService.PublicAPI.GetIconByName("LifeSupportIcon_W", PluginInfo.PLUGIN_NAME), _pageTextLabel, "Life Solutions", PDAPages.LifeSolutions);
-            _radialMenu.AddEntry(_gui, FCSAssetBundlesService.PublicAPI.GetIconByName("EnergySolutionsIcon_W", PluginInfo.PLUGIN_NAME), _pageTextLabel, "Energy Solutions", PDAPages.EnergySolutions);
-            _radialMenu.AddEntry(_gui, FCSAssetBundlesService.PublicAPI.GetIconByName("ProductionSolutionsIcon_W", PluginInfo.PLUGIN_NAME), _pageTextLabel, "Production Solutions", PDAPages.ProductionSolutions);
-            _radialMenu.AddEntry(_gui, FCSAssetBundlesService.PublicAPI.GetIconByName("StoreSolutionsIcon_W", PluginInfo.PLUGIN_NAME), _pageTextLabel, "Storage Solutions", PDAPages.StorageSolutions);
-            _radialMenu.AddEntry(_gui, FCSAssetBundlesService.PublicAPI.GetIconByName("VehicleSolutionsIcon_W", PluginInfo.PLUGIN_NAME), _pageTextLabel, "Vehicle Solutions", PDAPages.VehicleSolutions);
+            //if(Mod)
+
+
+            foreach (StoreModCategory mod in StoreManager.main.GetRegisteredMods())
+            {
+                _radialMenu.AddEntry(_gui, FCSAssetBundlesService.PublicAPI.GetIconByName(mod.IconName, mod.ModPackGUID), _pageTextLabel, mod.PageName, mod.PDAPage);
+            }
+
+            //_radialMenu.AddEntry(_gui, FCSAssetBundlesService.PublicAPI.GetIconByName("HomeSolutionsIcon_W", PluginInfo.PLUGIN_NAME), _pageTextLabel, "Home Solutions", PDAPages.HomeSolutions);
+            //_radialMenu.AddEntry(_gui, FCSAssetBundlesService.PublicAPI.GetIconByName("LifeSupportIcon_W", PluginInfo.PLUGIN_NAME), _pageTextLabel, "Life Solutions", PDAPages.LifeSolutions);
+            //_radialMenu.AddEntry(_gui, FCSAssetBundlesService.PublicAPI.GetIconByName("EnergySolutionsIcon_W", PluginInfo.PLUGIN_NAME), _pageTextLabel, "Energy Solutions", PDAPages.EnergySolutions);
+            //_radialMenu.AddEntry(_gui, FCSAssetBundlesService.PublicAPI.GetIconByName("ProductionSolutionsIcon_W", PluginInfo.PLUGIN_NAME), _pageTextLabel, "Production Solutions", PDAPages.ProductionSolutions);
+            //_radialMenu.AddEntry(_gui, FCSAssetBundlesService.PublicAPI.GetIconByName("StoreSolutionsIcon_W", PluginInfo.PLUGIN_NAME), _pageTextLabel, "Storage Solutions", PDAPages.StorageSolutions);
+            //_radialMenu.AddEntry(_gui, FCSAssetBundlesService.PublicAPI.GetIconByName("VehicleSolutionsIcon_W", PluginInfo.PLUGIN_NAME), _pageTextLabel, "Vehicle Solutions", PDAPages.VehicleSolutions);
             _radialMenu.AddEntry(_gui, FCSAssetBundlesService.PublicAPI.GetIconByName("MiscIcon_W", PluginInfo.PLUGIN_NAME), _pageTextLabel, "Misc", PDAPages.MiscSolutions);
         }
         _radialMenu?.Rearrange();
@@ -116,5 +129,35 @@ internal class StorePageController : Page
     public override void OnBackButtonClicked()
     {
         _gui.GoBackAPage();
+    }
+
+    public override bool OnButtonDown(GameInput.Button button)
+    {
+        base.OnButtonDown(button);
+
+        if (button == GameInput.Button.UIUp || button == GameInput.Button.UIRight)
+        {
+            //QuickLogger.Debug("UP BUTTON PRESSED", true);
+            _radialMenu.SelectNextItem();
+        }
+
+        if (button == GameInput.Button.UIDown || button == GameInput.Button.UILeft)
+        {
+            //QuickLogger.Debug("UP BUTTON PRESSED", true);
+            _radialMenu.SelectPrevItem();
+        }
+
+        if (button == GameInput.Button.LeftHand)
+        {
+            _radialMenu.PressSelectedButton();
+        }
+
+        return false;
+    }
+
+    public override void Exit()
+    {
+        _radialMenu.ClearSelectedItem();
+        base.Exit();
     }
 }
