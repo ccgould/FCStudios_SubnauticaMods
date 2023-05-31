@@ -1,6 +1,7 @@
 ﻿using FCS_AlterraHub.API;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Abstract;
+using FCS_AlterraHub.Models.Enumerators;
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.Models.Mono;
 using FCS_ProductionSolutions.Configuration;
@@ -35,6 +36,7 @@ internal class IonCubeGeneratorController : FCSDevice, IFCSSave<SaveData>
     }
     private ICubeContainer _cubeContainer;
     private CubeGeneratorSaveData _saveData;
+    private float _lastConsumedEnergy;
     internal const float ProgressComplete = 100f;
     internal const IonCubeGenSpeedModes StartingMode = IonCubeGenSpeedModes.Off;
     internal const float StartUpComplete = 4f;
@@ -215,7 +217,9 @@ internal class IonCubeGeneratorController : FCSDevice, IFCSSave<SaveData>
         else if (GenerationProgress >= 0f)
         {
             if (requiresEnergy)
+            {
                 ConnectedRelay.ConsumeEnergy(energyToConsume, out float amountConsumed);
+            }
 
             // Is currently generating cube
             GenerationProgress = Mathf.Min(CubeEnergyCost, GenerationProgress + energyToConsume);
@@ -366,8 +370,9 @@ internal class IonCubeGeneratorController : FCSDevice, IFCSSave<SaveData>
         this.PauseUpdates = false;
     }
 
-    internal void onSettingsKeyPressed()
+    internal void onSettingsKeyPressed(TechType techType)
     {
+        if (techType != GetTechType()) return;
         QuickLogger.Debug("Opening Settings",true);
         FCSPDAController.Main.OpenDeviceUI(GetTechType(), this, _cubeContainer.AttemptToOpenStorage);
     }
@@ -411,12 +416,22 @@ internal class IonCubeGeneratorController : FCSDevice, IFCSSave<SaveData>
     {
         return new string[]
         {
-            $"[EPM: {EnergyConsumptionPerSecond * 60:F2}] [Running: {_currentMode}] [Percentage: {GenerationPercent:P0}]",
+            $"[EPM: {GetPowerUsage() * 60:F2}] [Running: {_currentMode}] [Percentage: {GenerationPercent:P0}]",
         };
     }
 
     public override float GetPowerUsage()
     {
-        return EnergyConsumptionPerSecond * 60;
+        if (CoolDownProgress > 0 || !GameModeUtils.RequiresPower()) return 0;
+        return EnergyConsumptionPerSecond;
+    }
+
+
+    public void AddDummyWaring()
+    {
+        AddWarning("0000", "Test Description", WarningType.High, FaultType.Fault);
+        AddWarning("0001", "Test Description", WarningType.Low, FaultType.Warning);
+        AddWarning("0002", "Test Description", WarningType.High, FaultType.Fault);
+
     }
 }

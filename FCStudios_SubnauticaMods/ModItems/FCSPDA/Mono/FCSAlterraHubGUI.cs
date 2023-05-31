@@ -42,6 +42,8 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI, uGUI_IButton
     [SerializeField]
     private EncyclopediaTabController _encyclopediaTabController;
 
+    [AssertNotNull]
+    public CanvasGroup content;
 
     private bool _isInitialized;
 
@@ -121,9 +123,6 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI, uGUI_IButton
         CreateStorePage();
 
         OnInfoButtonClicked += onInfoButtonClicked;
-        //MaterialHelpers.ApplyEmissionShader(AlterraHub.BasePrimaryCol, gameObject, Color.white, 0, 0.01f, 0.01f);
-        //MaterialHelpers.ApplySpecShader(AlterraHub.BasePrimaryCol, gameObject, 1, 6.15f);
-        //MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
         _isInitialized = true;
     }
 
@@ -171,6 +170,9 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI, uGUI_IButton
             if(page == PDAPages.DevicePage)
             {
                 var data = arg as Tuple<TechType, FCSDevice>;
+
+                QuickLogger.Debug($"{data.Item1} || {data.Item2}");
+
                 if (_additionalPagesCollection.TryGetValue(data.Item1, out var ui))
                 {
                     ui.Initialize(data.Item2);
@@ -341,8 +343,8 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI, uGUI_IButton
 
     public void OnPDAOpened()
     {
-        //this.content.interactable = true;
-        //this.content.blocksRaycasts = true;
+        this.content.interactable = true;
+        this.content.blocksRaycasts = true;
     }
 
     public void OnPDAClosed()
@@ -367,9 +369,9 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI, uGUI_IButton
     public void OnOpenPDA(PDATab tabId)
     {
         this.SetCanvasVisible(true);
-        //this.content.interactable = false;
-        //this.content.blocksRaycasts = false;
-        //this.content.alpha = 1f;
+        this.content.interactable = false;
+        this.content.blocksRaycasts = false;
+        this.content.alpha = 1f;
         //if (!this.introActive)
         //{
         //    RuntimeManager.PlayOneShot(this.soundOpen.path, default(Vector3));
@@ -423,7 +425,7 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI, uGUI_IButton
         //}
         base.Deselect();
         //this.SetTabs(uGUI_PDA.regularTabs);
-        //this.content.SetVisible(false);
+        this.content.SetVisible(false);
     }
 
     internal Page GetPreviousPage()

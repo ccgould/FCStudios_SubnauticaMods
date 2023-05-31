@@ -36,25 +36,7 @@ public class RadialMenu : MonoBehaviour
         return rme;
     }
 
-    private void Update()
-    {
-        if (_entries.Count == 0 || !_entries.ContainsKey(PDAPages.BaseDevices)) return;
 
-        if (HabitatService.main.IsBaseManagerBuilt())
-        {
-            if (!_entries[PDAPages.BaseDevices].gameObject.activeSelf)
-            {
-                EnableTab(PDAPages.BaseDevices);
-            }
-        }
-        else
-        {
-            if (_entries[PDAPages.BaseDevices].gameObject.activeSelf)
-            {
-                DisableTab(PDAPages.BaseDevices);
-            }
-        }
-    }
 
     internal void Rearrange()
     {
@@ -76,12 +58,14 @@ public class RadialMenu : MonoBehaviour
 
     internal void DisableTab(PDAPages page)
     {
+        if (!_entries[page].gameObject.activeSelf) return;
         _entries[page].gameObject.SetActive(false);
         Rearrange();
     }
 
     internal void EnableTab(PDAPages page)
     {
+        if (_entries[page].gameObject.activeSelf) return;
         _entries[page].gameObject.SetActive(true);
         Rearrange();
     }

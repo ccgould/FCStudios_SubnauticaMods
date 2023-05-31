@@ -322,6 +322,8 @@ public static class WorldHelpers
     }
 
     public static List<TechType> BlackList = new List<TechType>() { TechType.Titanium, TechType.Copper };
+    private static float _temperature;
+
     public enum DigitalClockFormat
     {
         TWELVE_HOUR,
@@ -567,6 +569,21 @@ public static class WorldHelpers
     public static float GetOceanDepth()
     {
         return Ocean.GetOceanLevel();
+    }
+
+    public static string QueryTemperature(Transform transform)
+    {
+        WaterTemperatureSimulation main = WaterTemperatureSimulation.main;
+
+        if (main)
+        {
+            _temperature = Mathf.Max(_temperature, main.GetTemperature(transform.position));
+            var temp = Language.main.GetFormat("ThermalPlantCelsius", _temperature);
+
+            return string.IsNullOrWhiteSpace(temp) ? "LOADING" : temp;
+        }
+
+        return "LOADING";
     }
 }
 

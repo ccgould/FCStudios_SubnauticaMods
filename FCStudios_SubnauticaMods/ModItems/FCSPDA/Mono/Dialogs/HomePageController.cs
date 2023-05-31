@@ -34,6 +34,18 @@ internal class HomePageController : Page
         _radialMenu.AddEntry(_gui, FCSAssetBundlesService.PublicAPI.GetIconByName("HomeSolutionsIcon_W"), _pageTextLabel, "Base Devices", PDAPages.BaseDevices, false);
     }
 
+    private void Update()
+    {
+        if (HabitatService.main.IsRemoteModuleInstalledInCurrentBase())
+        {
+            _radialMenu.EnableTab(PDAPages.BaseDevices);
+        }
+        else
+        {
+            _radialMenu.DisableTab(PDAPages.BaseDevices);
+        }
+    }
+
     public override bool OnButtonDown(GameInput.Button button)
     {
         base.OnButtonDown(button);

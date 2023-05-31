@@ -13,6 +13,7 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Patches;
 [HarmonyPatch]
 public static class Player_Patches
 {
+
     internal static bool ForceOpenPDA { get; set; }
     internal static FCSPDAController FCSPDA;
     private static GameObject defPDA;

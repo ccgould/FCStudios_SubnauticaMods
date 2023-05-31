@@ -16,7 +16,7 @@ public class HoverInteraction : HandTarget, IHandTarget
     [SerializeField]
     private Constructable _constructable;
 
-    public event Action onSettingsKeyPressed;
+    public event Action<TechType> onSettingsKeyPressed;
 
     private static readonly StringBuilder Sb = new();
 
@@ -59,7 +59,7 @@ public class HoverInteraction : HandTarget, IHandTarget
         }
         if (!_constructable || _constructable.constructed)
         {
-            onSettingsKeyPressed?.Invoke();
+            onSettingsKeyPressed?.Invoke(_controller.GetTechType());
         }
     }
 

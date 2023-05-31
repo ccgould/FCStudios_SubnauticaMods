@@ -1,9 +1,14 @@
 ﻿using FCS_AlterraHub.API;
 using FCS_AlterraHub.Core.Services;
+using FCS_AlterraHub.Models.Enumerators;
 using FCS_AlterraHub.Models.Mono;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Buildable;
+using RootMotion;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using static FCS_AlterraHub.Models.Mono.HabitatManager;
 
 namespace FCS_AlterraHub.Models.Abstract;
 
@@ -23,7 +28,10 @@ public abstract class FCSDevice : MonoBehaviour, IProtoEventListener, IConstruct
     protected bool _runStartUpOnEnable;
     protected bool IsFromSave;
     protected object _savedData;
-
+    private Dictionary<string, DeviceWarning> _warnings = new();
+    [SerializeField]
+    [Range(0f,1f)]
+    protected float energyPerSecond = 0f;
 
     /// <summary>
     /// Boolean that represents if the device is constructed and ready to operate
@@ -83,8 +91,13 @@ public abstract class FCSDevice : MonoBehaviour, IProtoEventListener, IConstruct
     /// <returns></returns>
     public virtual string GetPrefabID()
     {
-        return gameObject.GetComponent<PrefabIdentifier>()?.Id ??
+        if(string.IsNullOrEmpty(_prefabID))
+        {
+            _prefabID = gameObject.GetComponent<PrefabIdentifier>()?.Id ??
                gameObject.GetComponentInChildren<PrefabIdentifier>()?.Id;
+        }
+
+        return _prefabID;
     }
 
     public virtual Vector3 GetPosition()
@@ -109,7 +122,11 @@ public abstract class FCSDevice : MonoBehaviour, IProtoEventListener, IConstruct
     /// If true allows this device to be seen in the Base devices list in the FCSPDA"/>
     /// </summary>
     public bool IsVisibleInPDA = true;
+
+    public virtual bool BypassConnection { get; } = false;
+
     protected ColorManager _colorManager;
+    private string _prefabID;
 
     public abstract bool IsDeconstructionObstacle();
 
@@ -171,7 +188,7 @@ public abstract class FCSDevice : MonoBehaviour, IProtoEventListener, IConstruct
 
     public HabitatManager CachedHabitatManager { get; private set; }
 
-    public bool IsConnectedToBaseManager()
+    public virtual bool IsConnectedToBaseManager()
     {
         if(CachedHabitatManager is not null)
         {
@@ -200,5 +217,17 @@ public abstract class FCSDevice : MonoBehaviour, IProtoEventListener, IConstruct
     public virtual float GetPowerUsage()
     {
         return 0;
+    }
+
+    protected void AddWarning(string warningID, string description, WarningType warningType, FaultType faultType)
+    {
+        if (_warnings.ContainsKey(warningID)) return;
+
+        _warnings.Add(warningID, new DeviceWarning(GetPrefabID(), warningID, description, warningType, faultType));
+    }
+
+    public int GetWarningsCount(FaultType faultType)
+    { 
+        return _warnings.Count(x=>x.Value.FaultType == faultType); 
     }
 }

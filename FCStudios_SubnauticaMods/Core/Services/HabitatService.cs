@@ -208,4 +208,10 @@ internal class HabitatService : MonoBehaviour
     {
         return baseManagerController.GetComponentInParent<HabitatManager>();
     }
+
+    internal bool IsRemoteModuleInstalledInCurrentBase()
+    {
+        if (!Player.main?.IsInBase() ?? false) return false;
+        return GetPlayersCurrentBase()?.IsRemoteLinkConnected() ?? false;
+    }
 }

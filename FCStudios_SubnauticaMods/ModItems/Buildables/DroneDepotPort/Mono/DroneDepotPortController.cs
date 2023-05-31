@@ -1,10 +1,12 @@
+using FCS_AlterraHub.Configuation;
 using FCS_AlterraHub.Core.Components;
 using FCS_AlterraHub.Models.Abstract;
+using FCS_AlterraHub.Models.Interfaces;
 using UnityEngine;
 
 namespace FCS_AlterraHub.ModItems.Buildables.DroneDepotPort.Mono;
 
-internal class DroneDepotPortController : FCSDevice
+internal class DroneDepotPortController : FCSDevice, IFCSSave<SaveData>
 {
     [SerializeField]
     private DoorController _doorController;
@@ -72,6 +74,11 @@ internal class DroneDepotPortController : FCSDevice
     }
 
     public override void ReadySaveData()
+    {
+        
+    }
+
+    public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)
     {
         
     }

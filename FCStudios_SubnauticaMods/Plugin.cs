@@ -13,6 +13,7 @@ using FCSCommon.Utilities;
 using HarmonyLib;
 using Nautilus.Handlers;
 using System.Reflection;
+using static FCS_AlterraHub.Configuation.SaveData;
 
 namespace FCS_AlterraHub;
 
@@ -28,6 +29,7 @@ public class Plugin : BaseUnityPlugin
 
     public static IModSettingsBase ModSettings => new ModSettings();
     private static Assembly Assembly { get; } = Assembly.GetExecutingAssembly();
+    internal static AlterraHubSaveData AlterraHubSaveData { get; private set; }
 
     private void Awake()
     {
@@ -52,6 +54,7 @@ public class Plugin : BaseUnityPlugin
 
         FCSModsAPI.PublicAPI.AddStoreCategory(PluginInfo.PLUGIN_GUID, "HomeSolutionsIcon_W", "Alterra Hub", PDAPages.AlterraHub);
 
+        AlterraHubSaveData = SaveDataHandler.RegisterSaveDataCache<AlterraHubSaveData>();
 
         // register harmony patches, if there are any
         Harmony.CreateAndPatchAll(Assembly, $"{PluginInfo.PLUGIN_GUID}");
@@ -69,6 +72,10 @@ public class Plugin : BaseUnityPlugin
 
         //Add mod and patch.
         FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "DP", new DroneDepotPortBuildable());
+
+        //Add mod and patch.
+        FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "BMMR", new BaseManagerModuleRackBuildable());
+
 
         //Add mod and patch.
         FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "BM", new BaseManagerBuildable());

@@ -5,55 +5,56 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FCS_AlterraHub.Models
+namespace FCS_AlterraHub.Models;
+
+/// <summary>
+/// A class that represents an account for the card system
+/// </summary>
+public class AccountDetails
 {
-    /// <summary>
-    /// A class that represents an account for the card system
-    /// </summary>
-    public class AccountDetails
+    [JsonProperty] public string Version { get; set; } = "2.0";
+    [JsonProperty] public string FullName { get; set; }
+    [JsonProperty] public string Username { get; set; }
+    [JsonProperty] public string Password { get; set; }
+    [JsonProperty] public string PIN { get; set; }
+    public decimal Balance { internal get; set; }
+    [JsonProperty] public string AccountBalance { get; set; }
+    [JsonProperty] public decimal AlterraDebitPayed { get; set; }
+    [JsonProperty] public decimal AccountBeforeDebit { get; set; }
+    [JsonProperty]  public TechType techType { get; set; } = TechType.CookedPeeper;
+
+
+    [JsonProperty] public Dictionary<string, string> KnownCardNumbers = new Dictionary<string, string>();
+
+    public AccountDetails(AccountDetails accountDetails)
     {
-        [JsonProperty] public string Version { get; set; } = "2.0";
-        [JsonProperty] public string FullName { get; set; }
-        [JsonProperty] public string Username { get; set; }
-        [JsonProperty] public string Password { get; set; }
-        [JsonProperty] public string PIN { get; set; }
-        public decimal Balance { internal get; set; }
-        [JsonProperty] public string AccountBalance { get; set; }
-        [JsonProperty] public decimal AlterraDebitPayed { get; set; }
-        [JsonProperty] public decimal AccountBeforeDebit { get; set; }
+        if (accountDetails == null) return;
+        FullName = accountDetails.FullName;
+        Username = accountDetails.Username;
+        Password = accountDetails.Password;
+        PIN = accountDetails.PIN;
+        Balance = accountDetails.Balance;
+        KnownCardNumbers = accountDetails.KnownCardNumbers;
+        AccountBalance = accountDetails.AccountBalance;
+    }
 
-        [JsonProperty] public Dictionary<string, string> KnownCardNumbers = new Dictionary<string, string>();
+    public AccountDetails()
+    {
 
-        public AccountDetails(AccountDetails accountDetails)
-        {
-            if (accountDetails == null) return;
-            FullName = accountDetails.FullName;
-            Username = accountDetails.Username;
-            Password = accountDetails.Password;
-            PIN = accountDetails.PIN;
-            Balance = accountDetails.Balance;
-            KnownCardNumbers = accountDetails.KnownCardNumbers;
-            AccountBalance = accountDetails.AccountBalance;
-        }
+    }
+    public void ResetAccount()
+    {
+        FullName = string.Empty;
+        Username = string.Empty;
+        Password = string.Empty;
+        PIN = string.Empty;
+        Balance = 0;
+        AlterraDebitPayed = 0;
+        KnownCardNumbers.Clear();
+    }
 
-        public AccountDetails()
-        {
-
-        }
-        public void ResetAccount()
-        {
-            FullName = string.Empty;
-            Username = string.Empty;
-            Password = string.Empty;
-            PIN = string.Empty;
-            Balance = 0;
-            AlterraDebitPayed = 0;
-            KnownCardNumbers.Clear();
-        }
-
-        public void GetDebit()
-        {
-            throw new NotImplementedException();
-        }
+    public void GetDebit()
+    {
+        throw new NotImplementedException();
     }
 }
