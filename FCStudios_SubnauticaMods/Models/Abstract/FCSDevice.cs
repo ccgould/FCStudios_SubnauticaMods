@@ -1,6 +1,7 @@
 ﻿using FCS_AlterraHub.API;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Enumerators;
+using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.Models.Mono;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Buildable;
 using RootMotion;
@@ -21,7 +22,7 @@ namespace FCS_AlterraHub.Models.Abstract;
 [RequireComponent(typeof(HoverInteraction))]
 [RequireComponent(typeof(Constructable))]
 [RequireComponent(typeof(LargeWorldEntity))]
-public abstract class FCSDevice : MonoBehaviour, IProtoEventListener, IConstructable
+public abstract class FCSDevice : MonoBehaviour, IProtoEventListener, IConstructable,IPowerConsumer
 {
     
     private Constructable buildable;

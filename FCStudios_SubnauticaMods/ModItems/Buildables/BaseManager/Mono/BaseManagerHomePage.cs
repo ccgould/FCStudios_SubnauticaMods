@@ -1,6 +1,7 @@
 ﻿using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Mono;
+using FCS_AlterraHub.ModItems.Buildables.BaseManager.Mono.GUI.Dialogs;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
 using FCSCommon.Utilities;
@@ -32,11 +33,6 @@ internal class BaseManagerHomePage : Page
     [SerializeField]
     private GameObject basePowerListItemPrefab;
     private HabitatManager _baseManager;
-
-    private void Awake()
-    {
-        //InvokeRepeating(nameof(), 1, 1);
-    }
 
     private void Update()
     {
@@ -168,6 +164,7 @@ internal class BaseManagerHomePage : Page
         GetPowerSource<BaseNuclearReactor>(powerSources, "Nuclear Reactor");
         GetPowerSource<SolarPanel>(powerSources, "Solar Panel");
         GetPowerSource<BaseBioReactor>(powerSources, "Bio Reactor");
+        GetPowerSource<ThermalPlant>(powerSources, "Thermal Plant");
 
         foreach (var powerSource in powerSources)
         {
@@ -225,6 +222,7 @@ internal class BaseManagerHomePage : Page
 
     }
 
+    
 
     private static void GetPowerSource<T>(Dictionary<string, List<PowerSource>> powerSources, string key) where T :  Component
     {

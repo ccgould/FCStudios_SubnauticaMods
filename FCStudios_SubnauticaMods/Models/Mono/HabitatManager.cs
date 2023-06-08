@@ -192,11 +192,6 @@ public partial class HabitatManager : MonoBehaviour
 
     public string GetBasePrefabID() => _prefabID;
 
-    public override string ToString()
-    {
-        return _baseName;
-    }
-
     internal int GetBaseID() => _baseID;
 
     internal void SetBaseID(int id)
