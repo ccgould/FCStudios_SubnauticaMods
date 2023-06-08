@@ -1,6 +1,7 @@
 ﻿using FCS_AlterraHub.Core.Components;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -18,7 +19,7 @@ internal class BasePowerDetailsDialogController : Page
     private GameObject basePowerListItemPrefab;
     public override PDAPages PageType => PDAPages.None;
 
-    public static List<FCSPowerInterface> PowerConsumers { get; set; } = new();
+    private static List<FCSPowerInterface> _powerConsumers { get; set; } = new();
 
     private void Update()
     {
@@ -47,14 +48,14 @@ internal class BasePowerDetailsDialogController : Page
 
     public override void Enter(object arg = null)
     {
-        base.Enter(arg);
         RefreshPage();
-        RefreshConsumers();
+        base.Enter(arg);
     }
 
     private void RefreshPage()
     {
         RefreshProducers();
+        RefreshConsumers();
     }
 
     private void RefreshProducers()
@@ -62,6 +63,7 @@ internal class BasePowerDetailsDialogController : Page
         var powerSources = new Dictionary<string, List<PowerSource>>();
 
         var basePowerRelay = Player.main.GetCurrentSub()?.GetComponent<BasePowerRelay>();
+
         
         foreach (PowerSource item in basePowerRelay.inboundPowerSources)
         {
@@ -110,15 +112,33 @@ internal class BasePowerDetailsDialogController : Page
 
     private void RefreshConsumers()
     {
-        //var powerSources = new Dictionary<string, List<PowerSource>>();
-        //GetPowerSource<BaseNuclearReactor>(powerSources, "Nuclear Reactor");
-        //GetPowerSource<SolarPanel>(powerSources, "Solar Panel");
-        //GetPowerSource<BaseBioReactor>(powerSources, "Bio Reactor");
-        //GetPowerSource<ThermalPlant>(powerSources, "Thermal Plant");
+
+
+        foreach (Transform item in powerConsumersGrid)
+        {
+            Destroy(item);
+        }
 
         var dic = new Dictionary<string, List<FCSPowerInterface>>();
+        var dicChargers = new Dictionary<string, List<Charger>>();
 
-        foreach (var item in PowerConsumers)
+        var chargers = Player.main.GetCurrentSub()?.GetComponentsInChildren<Charger>();
+
+        foreach (Charger charger in chargers)
+        {
+            var name = charger.GetComponent<TechTag>()?.type.AsString() ?? "None";
+
+            if (dic.ContainsKey(name))
+            {
+                dicChargers[name].Add(charger);
+            }
+            else
+            {
+                dicChargers.Add(name, new List<Charger>() { charger });
+            }
+        }
+
+        foreach (var item in _powerConsumers)
         {
             if(dic.ContainsKey(item.DeviceFriendlyName))
             {
@@ -132,6 +152,13 @@ internal class BasePowerDetailsDialogController : Page
 
 
         foreach (var consumer in dic)
+        {
+            var h = GameObject.Instantiate(basePowerListItemPrefab, powerConsumersGrid, false);
+            var controller = h.GetComponent<BasePowerInfoListItem>();
+            controller.Initialize(consumer.Key, consumer.Value);
+        }
+
+        foreach (var consumer in dicChargers)
         {
             var h = GameObject.Instantiate(basePowerListItemPrefab, powerConsumersGrid, false);
             var controller = h.GetComponent<BasePowerInfoListItem>();
@@ -182,5 +209,15 @@ internal class BasePowerDetailsDialogController : Page
         {
             Destroy(item.gameObject);
         }
+    }
+
+    public static void Register(FCSPowerInterface powerInterface)
+    {
+        _powerConsumers.Add(powerInterface);
+    }
+
+    public static void UnRegister(FCSPowerInterface powerInterface)
+    {
+        _powerConsumers.Remove(powerInterface);
     }
 }

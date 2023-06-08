@@ -10,6 +10,8 @@ internal class uGUI_BaseManager : Page, IuGUIAdditionalPage
 {
     public override PDAPages PageType => PDAPages.DevicePage;
 
+    public event EventHandler OnMenuButtonAction;
+
     public event Action<PDAPages> onBackClicked;
     public event Action<FCSDevice> onSettingsClicked;
 
@@ -35,5 +37,10 @@ internal class uGUI_BaseManager : Page, IuGUIAdditionalPage
     public override void OnBackButtonClicked()
     {
 
+    }
+
+    public void OnMenuButtonClicked()
+    {
+        OnMenuButtonAction?.Invoke(this, EventArgs.Empty);
     }
 }

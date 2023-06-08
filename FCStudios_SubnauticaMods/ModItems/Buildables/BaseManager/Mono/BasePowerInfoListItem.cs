@@ -20,6 +20,7 @@ internal class BasePowerInfoListItem : MonoBehaviour
     private TMP_Text charge;
     private List<PowerSource> _powerSource;
     private List<FCSPowerInterface> _powerInterface;
+    private List<Charger> _charger;
 
     internal void Initialize(string key, List<PowerSource> value)
     {
@@ -38,9 +39,17 @@ internal class BasePowerInfoListItem : MonoBehaviour
         InvokeRepeating(nameof(RefreshPowerInterfaces), 1, 1);
     }
 
+    internal void Initialize(string deviceName, List<Charger> charger)
+    {
+        units.text = charger.Count.ToString();
+        epm.text = charger.FirstOrDefault()?.chargeSpeed.ToString() ?? "0";
+        powerSources.text = deviceName;
+        _charger = charger;
+        InvokeRepeating(nameof(RefreshChargers), 1, 1);
+    }
+
     private void RefreshPowerInterfaces()
     {
-        QuickLogger.Debug("RefreshPowerInterfaces");
         float chargeAmount = 0f;
 
 
@@ -49,6 +58,37 @@ internal class BasePowerInfoListItem : MonoBehaviour
             if(powerInterface.IsRunning())
             {
                 chargeAmount += powerInterface.GetPowerUsage();
+            }
+        }
+        charge.text = chargeAmount.ToString("F2");
+    }
+
+    private void RefreshChargers()
+    {
+        QuickLogger.Debug("Refresh Chargers");
+        float chargeAmount = 0f;
+
+        float num = 0;
+        foreach (var charger in _charger)
+        {
+            foreach (KeyValuePair<string, IBattery> keyValuePair in charger.batteries)
+            {
+                IBattery value = keyValuePair.Value;
+                if (value != null)
+                {
+                    float charge = value.charge;
+                    float capacity = value.capacity;
+                    if (charge < capacity)
+                    {
+                        num++;
+                        float num3 = DayNightCycle.main.deltaTime * charger.chargeSpeed * capacity;
+                        if (charge + num3 > capacity)
+                        {
+                            num3 = capacity - charge;
+                        }
+                        chargeAmount += num3;
+                    }
+                }
             }
         }
 

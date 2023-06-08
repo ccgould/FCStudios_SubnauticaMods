@@ -43,8 +43,16 @@ internal class PowerConsumer_Patches
             return false;
         });
 
-        BasePowerDetailsDialogController.PowerConsumers.Add(powerInterface);
+        BasePowerDetailsDialogController.Register(powerInterface);
 
 
+    }
+
+    [HarmonyPatch(typeof(FiltrationMachine), nameof(FiltrationMachine.OnDestroy))]
+    [HarmonyPostfix]
+    private static void OnDestroy_Postfix(FiltrationMachine __instance)
+    {
+        var powerInterface = __instance.gameObject.GetComponent<FCSPowerInterface>();
+        BasePowerDetailsDialogController.UnRegister(powerInterface);
     }
 }
