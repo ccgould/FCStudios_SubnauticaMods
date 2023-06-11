@@ -1,5 +1,6 @@
 ﻿using FCS_AlterraHub.API;
 using FCS_AlterraHub.Core.Services;
+using FCS_AlterraHub.Models;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Enumerators;
 using FCS_AlterraHub.Models.Interfaces;
@@ -15,9 +16,8 @@ using static FCS_ProductionSolutions.Configuration.SaveData;
 
 namespace FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Mono;
 
-internal class IonCubeGeneratorController : FCSDevice, IFCSSave<SaveData>
+internal class IonCubeGeneratorController : FCSDevice, IFCSSave<SaveData>, IWorkUnit
 {
-
     private const float CubeEnergyCost = 1500f;
     private IonCubeGenSpeedModes _currentMode = StartingMode;
     private PowerRelay _connectedRelay = null;
@@ -181,6 +181,9 @@ internal class IonCubeGeneratorController : FCSDevice, IFCSSave<SaveData>
 
     private void Update()
     {
+
+        ChangeState();
+
         if (NotAllowToGenerate)
             return;
                  
@@ -237,6 +240,30 @@ internal class IonCubeGeneratorController : FCSDevice, IFCSSave<SaveData>
         }
     }
 
+    private void ChangeState()
+    {
+
+        if(!IsConnectedToBase)
+        {
+            SetState(FCSDeviceState.NotConnected);
+            return;
+        }
+
+        if (CurrentSpeedMode == IonCubeGenSpeedModes.Off)
+        {
+            SetState(FCSDeviceState.Off);
+            return;
+        }
+
+        if(NotAllowToGenerate  || CoolDownProgress >= 0f)
+        {
+            SetState(FCSDeviceState.Idle);
+            return;
+        }
+
+        SetState(FCSDeviceState.Running);
+
+    }
 
     public override void OnEnable()
     {
@@ -374,7 +401,15 @@ internal class IonCubeGeneratorController : FCSDevice, IFCSSave<SaveData>
     {
         if (techType != GetTechType()) return;
         QuickLogger.Debug("Opening Settings",true);
-        FCSPDAController.Main.OpenDeviceUI(GetTechType(), this, _cubeContainer.AttemptToOpenStorage);
+        FCSPDAController.Main.OpenDeviceUI(GetTechType(), this, onPAClose);
+    }
+
+    private void onPAClose(FCSPDAController pda)
+    {
+        QuickLogger.Debug("IonCubeGen PDA Closed",true);
+        CachedHabitatManager?.OnDeviceUIClosed(this);
+
+        _cubeContainer.AttemptToOpenStorage(pda);
     }
 
     internal bool IsCrafting()
@@ -433,5 +468,37 @@ internal class IonCubeGeneratorController : FCSDevice, IFCSSave<SaveData>
         AddWarning("0001", "Test Description", WarningType.Low, FaultType.Warning);
         AddWarning("0002", "Test Description", WarningType.High, FaultType.Fault);
 
+    }
+
+    public void SyncDevice(object device)
+    {
+        QuickLogger.Debug($"Attempting to sync device {GetPrefabID()}");
+        QuickLogger.Debug($"Is Ion Cube: {device is IonCubeGeneratorController}");
+        if (device is IonCubeGeneratorController)
+        {
+            IonCubeGeneratorController masterDevice = device as IonCubeGeneratorController;
+            QuickLogger.Debug($"Is Master: {masterDevice == this}");
+            if (masterDevice == this) return;
+            QuickLogger.Debug($"Setting");
+            CurrentSpeedMode = masterDevice.CurrentSpeedMode;
+            IsVisibleInPDA = masterDevice.IsVisibleInPDA;
+        }
+    }
+
+    public void TestWorkGroup()
+    {
+        var guid = CachedHabitatManager.CreateWorkUnit(this);
+        QuickLogger.Debug($"Connected Devices Count: {CachedHabitatManager.GetConnectedDevices().Count}",true);
+        foreach (var item in CachedHabitatManager.GetConnectedDevices())
+        {
+            QuickLogger.Debug($" Cube Gen: {item.Value is IonCubeGeneratorController}",true);
+
+            if (item.Value is IonCubeGeneratorController)
+            {
+                IonCubeGeneratorController device = item.Value as IonCubeGeneratorController;
+                if (device == this) continue;
+                CachedHabitatManager.AddToWorkUnit(guid, device);
+            }
+        }
     }
 }

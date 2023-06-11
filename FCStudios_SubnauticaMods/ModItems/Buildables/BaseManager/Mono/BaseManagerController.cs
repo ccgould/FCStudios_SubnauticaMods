@@ -19,8 +19,6 @@ internal class BaseManagerController : FCSDevice, IFCSSave<SaveData>
     private GameObject statusInfoPrefab;
 
 
-    public override bool BypassConnection => true;
-
     public int MaxEPMStringLength { get; set; } = 24;
 
     //[SerializeField]
@@ -153,7 +151,7 @@ internal class BaseManagerController : FCSDevice, IFCSSave<SaveData>
         var friendlyName = !string.IsNullOrEmpty(_baseManager.GetBaseName()) ? _baseManager.GetBaseName() : "Base";
         baseName.text = $"{friendlyName} : BS{_baseManager.GetBaseID():D3}";
         infoItem1.text = DeterminePowerUsageString();
-        infoItem3.text = $"Connected Devices: {_baseManager.GetConnectedDevices()}/{_baseManager.DetermineDeviceLimit()}";
+        infoItem3.text = $"Connected Devices: {_baseManager.GetConnectedDevicesCount()}/{_baseManager.DetermineDeviceLimit()}";
         infoItem4.text = $"Remote Datalink: {IsRemoteDataLinkConnected()}";
         infoItem6.text = $"Installed Modules: {_baseManager.GetInstalledModulesCount()}/{_baseManager.DetermineModuleLimit()}";
         infoItem5.text = $"Fault: {DetermineFaults()}    Warn: {DetermineWarnings()}";

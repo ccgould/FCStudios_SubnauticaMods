@@ -37,7 +37,6 @@ internal class BaseManagerRackController : FCSDevice, IFCSSave<SaveData>
     [SerializeField]
     private uGUI_Icon _iconSlot6;
 
-    public override bool BypassConnection => true;
     private Equipment equipment
     {
         get
@@ -349,7 +348,7 @@ internal class BaseManagerRackController : FCSDevice, IFCSSave<SaveData>
     {
         return new string[]
         {
-            $"[EPM: {energyPerSecond * 60:F2}] [Is Connected: {IsConnectedToBaseManager()}] [Slots: {slotsFilled}/6]",
+            $"[EPM: {energyPerSecond * 60:F2}] [Is Connected: {IsRegisteredToBaseManager()}] [Slots: {slotsFilled}/6]",
         };
     }
 }

@@ -29,10 +29,12 @@ public abstract class FCSDevice : MonoBehaviour, IProtoEventListener, IConstruct
     protected bool _runStartUpOnEnable;
     protected bool IsFromSave;
     protected object _savedData;
+    private FCSDeviceState _deviceState;
     private Dictionary<string, DeviceWarning> _warnings = new();
-    [SerializeField]
-    [Range(0f,1f)]
-    protected float energyPerSecond = 0f;
+    protected ColorManager _colorManager;
+    private string _prefabID;
+
+    [SerializeField] [Range(0f,1f)] protected float energyPerSecond = 0f;
 
     /// <summary>
     /// Boolean that represents if the device is constructed and ready to operate
@@ -55,6 +57,17 @@ public abstract class FCSDevice : MonoBehaviour, IProtoEventListener, IConstruct
     public virtual string FriendlyName { get; set; } = string.Empty;
 
     /// <summary>
+    /// If true allows this device to be seen in the Base devices list in the FCSPDA"/>
+    /// </summary>
+    public bool IsVisibleInPDA = true;
+
+    [SerializeField]
+    private bool bypassConnection;
+
+    [SerializeField]
+    private bool affectsHabitatDeviceLimit;
+
+    /// <summary>
     /// The initializer of this device
     /// </summary>
     public virtual void Initialize() 
@@ -65,7 +78,6 @@ public abstract class FCSDevice : MonoBehaviour, IProtoEventListener, IConstruct
     public virtual void Awake() 
     { 
         _colorManager = gameObject.GetComponent<ColorManager>();
-        _colorManager?.Initialize(gameObject);
     }
 
     public virtual void OnEnable()
@@ -119,15 +131,32 @@ public abstract class FCSDevice : MonoBehaviour, IProtoEventListener, IConstruct
         }
     }
 
-    /// <summary>
-    /// If true allows this device to be seen in the Base devices list in the FCSPDA"/>
-    /// </summary>
-    public bool IsVisibleInPDA = true;
+    public bool GetBypassConnection()
+    {
+        return bypassConnection;
+    }
 
-    public virtual bool BypassConnection { get; } = false;
+    private void CheckConnection()
+    {
+        if(!GetBypassConnection() && IsRegisteredToBaseManager())
+        {
+            if(CachedHabitatManager is not null)
+            {
+                var result = CachedHabitatManager.IsDeviceConnected(GetPrefabID());
 
-    protected ColorManager _colorManager;
-    private string _prefabID;
+                if(result)
+                {
+                    IsConnectedToBase = true;
+                }
+                else
+                {
+                    IsConnectedToBase = CachedHabitatManager.AttemptToConnectDevice(this);
+                }
+
+                _colorManager?.ChangeBaseConnectionStatusLights(IsConnectedToBase);
+            }
+        }
+    }
 
     public abstract bool IsDeconstructionObstacle();
 
@@ -162,7 +191,9 @@ public abstract class FCSDevice : MonoBehaviour, IProtoEventListener, IConstruct
 
     public virtual void Start() 
     {
+        _colorManager?.Initialize(gameObject);
         FCSModsAPI.PublicAPI.RegisterDevice(this);
+        InvokeRepeating(nameof(CheckConnection), 1f, 1f);
     }
 
     public virtual void OnDestroy()
@@ -176,7 +207,7 @@ public abstract class FCSDevice : MonoBehaviour, IProtoEventListener, IConstruct
     /// <returns></returns>
     public virtual string[] GetDeviceStats()
     {
-        if (!IsOperational())
+        if (!IsConnectedToBase)
         {
             return new string[]
             {
@@ -188,8 +219,9 @@ public abstract class FCSDevice : MonoBehaviour, IProtoEventListener, IConstruct
     }
 
     public HabitatManager CachedHabitatManager { get; private set; }
+    public bool IsConnectedToBase { get; private set; }
 
-    public virtual bool IsConnectedToBaseManager()
+    public virtual bool IsRegisteredToBaseManager()
     {
         if(CachedHabitatManager is not null)
         {
@@ -198,9 +230,10 @@ public abstract class FCSDevice : MonoBehaviour, IProtoEventListener, IConstruct
 
         if (IsConstructed && FCSModsAPI.PublicAPI.IsRegisteredInBase(GetPrefabID(), out HabitatManager manager))
         {
+            CachedHabitatManager = manager;
+
             if (manager is not null && manager.HasDevice(BaseManagerBuildable.PatchedTechType))
             {
-                CachedHabitatManager = manager;
                 return true;
             }
         }
@@ -209,15 +242,14 @@ public abstract class FCSDevice : MonoBehaviour, IProtoEventListener, IConstruct
     }
 
     public virtual bool IsOperational()
-    {
-        
+    {       
 
-        return IsConnectedToBaseManager() && IsConstructed;
+        return IsRegisteredToBaseManager() && IsConstructed;
     }
 
     public virtual float GetPowerUsage()
     {
-        return 0;
+        return energyPerSecond;
     }
 
     protected void AddWarning(string warningID, string description, WarningType warningType, FaultType faultType)
@@ -231,4 +263,42 @@ public abstract class FCSDevice : MonoBehaviour, IProtoEventListener, IConstruct
     { 
         return _warnings.Count(x=>x.Value.FaultType == faultType); 
     }
+
+    internal bool AffectsHabitatDeviceLimit()
+    {
+        return affectsHabitatDeviceLimit;
+    }
+
+    public FCSDeviceState GetState()
+    {
+        return _deviceState;
+    }
+
+    public void SetState(FCSDeviceState state)
+    {
+        _deviceState = state;
+    }
+
+    public virtual void SetSpeed(FCSDeviceSpeedModes speed)
+    {
+        //Do Something
+    }
+
+    public virtual void TurnOffDevice()
+    {
+        //Do something
+    }
+
+    public virtual void TurnOnDevice()
+    {
+        //Do something
+    }
+}
+
+public enum FCSDeviceState
+{
+    Off = 0,
+    Idle = 1,
+    Running = 2,
+    NotConnected = 3,
 }

@@ -85,7 +85,7 @@ public class HoverInteraction : HandTarget, IHandTarget
         }
     }
 
-    private static void CreateText(FCSDevice controller, string[] strings)
+    private void CreateText(FCSDevice controller, string[] strings)
     {
         var pda = FCSPDAController.Main;
         var text = pda.GetGUI()?.CheckIfPDAHasEntry(controller.GetTechType()) ?? false ? LanguageService.ViewInPDA() : string.Empty;
@@ -102,6 +102,11 @@ public class HoverInteraction : HandTarget, IHandTarget
             Sb.Append(Environment.NewLine);
         }
         Sb.Append(Environment.NewLine);
+        if(!_controller.IsConnectedToBase)
+        {
+            Sb.Append(LanguageService.NotConnectedToBaseManager());
+            Sb.Append(Environment.NewLine);
+        }
         Sb.Append(text);
         //Sb.Append(LanguageService.PressToInteractWith(Plugin.Configuration.PDASettingsKeyCode));
     }

@@ -28,6 +28,25 @@ public static class ModPrefabService
     /// </summary>
     public const string BaseSecondaryCol = "fcsMainLights";
 
+    /// <summary>
+    /// Material for fcsFloor01_Ex
+    /// </summary>
+    public const string Floor01 = "fcsFloor01_Ex";
+    public const string Floor01Detail = "fcs01_Floor1_D";
+    public const string Floor01Normal = "fcs01_Floor01_N";
+    public const string Floor01Emission = "fcs01_Floor01_E";
+
+
+    /// <summary>
+    /// Material for fcsFloor02_Ex
+    /// </summary>
+    public const string Floor02 = "fcsFloor02_Ex";
+    public const string Floor02Detail = "fcs01_Floor2_D";
+    public const string Floor02Normal = "fcs01_Floor02_N";
+    public const string Floor02Spec = "fcs01_Floor02_S";
+    public const string Floor02Emission = "fcs01_Floor02_E";
+
+
     public const string TBaseDetail = "fcsCore_Tex_Trim_Base";
     public const string TBaseNormal = "fcsCore_Tex_Trim_N";
     public const string TBaseSpec = "fcsCore_Tex_Trim_S";
@@ -120,6 +139,14 @@ public static class ModPrefabService
         _v2Materials.Add(BaseSecondaryCol, baseSecondaryCol);
         #endregion
 
+        #region Floor01
+        Material floor01 = AssetBundleHelper.LoadAsset<Material>(globalBundle, Floor01);
+        floor01.shader = shader;
+        MaterialHelpers.CreateV2NormalMaterial(floor01, Floor01Normal, globalBundle, shader);
+        MaterialHelpers.CreateV2EmissionMaterial(floor01, Floor01Emission, globalBundle, shader, Color.white);
+        _v2Materials.Add(Floor01, floor01);
+        #endregion
+
         _v2MaterialsLoaded = true;
     }
 
@@ -127,6 +154,7 @@ public static class ModPrefabService
     {
         ReplaceShadersV2(prefab, BasePrimaryCol);
         ReplaceShadersV2(prefab, BaseSecondaryCol);
+        ReplaceShadersV2(prefab, Floor01);
     }
 
     private static void ReplaceShadersV2(GameObject prefab, string materialName)

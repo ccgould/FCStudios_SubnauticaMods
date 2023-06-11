@@ -26,6 +26,7 @@ internal class HabitatService : MonoBehaviour
     public Action<HabitatManager> onBaseCreated;
     private  readonly HashSet<FCSDevice> _globalFCSDevices = new();
 
+
     private void Awake()
     {
         // If there is an instance, and it's not me, delete myself.

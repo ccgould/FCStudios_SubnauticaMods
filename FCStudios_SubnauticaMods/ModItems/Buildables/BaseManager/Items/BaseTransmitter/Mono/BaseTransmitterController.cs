@@ -6,31 +6,32 @@ internal class BaseTransmitterController : FCSDevice
 {
     public override bool CanDeconstruct(out string reason)
     {
-        throw new NotImplementedException();
+        reason = string.Empty;
+        return true;
     }
 
     public override bool IsDeconstructionObstacle()
     {
-        throw new NotImplementedException();
+        return true;
     }
 
     public override void OnConstructedChanged(bool constructed)
     {
-        throw new NotImplementedException();
+        IsConstructed = constructed;   
     }
 
     public override void OnProtoDeserialize(ProtobufSerializer serializer)
     {
-        throw new NotImplementedException();
+
     }
 
     public override void OnProtoSerialize(ProtobufSerializer serializer)
     {
-        throw new NotImplementedException();
+
     }
 
     public override void ReadySaveData()
     {
-        throw new NotImplementedException();
+
     }
 }

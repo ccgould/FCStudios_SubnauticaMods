@@ -8,6 +8,7 @@ using UWE;
 using System.Collections;
 using Nautilus.Utility;
 using Nautilus.Utility.MaterialModifiers;
+using FCS_AlterraHub.API;
 
 namespace FCS_AlterraHub.Core.Helpers;
 
@@ -480,6 +481,21 @@ public static class MaterialHelpers
         }
     }
 
+    public static void ChangeEmissionTexture(GameObject gameObject, Material curMaterial)
+    {
+        Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
+        foreach (Renderer renderer in renderers)
+        {
+            foreach (Material material in renderer.materials)
+            {
+                if (material.name.StartsWith(curMaterial.name, StringComparison.OrdinalIgnoreCase))
+                {
+                    material.SetTexture("_Illum", curMaterial.mainTexture);
+                }
+            }
+        }
+    }
+
     /// <summary>
     /// Changed the tecture of the provided material by name.
     /// </summary>
@@ -572,6 +588,7 @@ public static class MaterialHelpers
     /// <returns></returns>
     public static Material GetMaterial(GameObject go, string materialName)
     {
+        if (go is null) return null;
         var m_Material = go.GetComponent<Renderer>();
         foreach (var material in m_Material.materials)
         {

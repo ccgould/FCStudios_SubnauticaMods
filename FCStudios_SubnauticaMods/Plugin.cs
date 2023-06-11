@@ -6,9 +6,11 @@ using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Buildable;
+using FCS_AlterraHub.ModItems.Buildables.BaseManager.Items.BaseTransmitter.Buildable;
 using FCS_AlterraHub.ModItems.Buildables.DroneDepotPort.Buildable;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_AlterraHub.ModItems.Spawnables.DebitCard.Spawnable;
+using FCS_AlterraHub.ModItems.TestObject.Buildable;
 using FCSCommon.Utilities;
 using HarmonyLib;
 using Nautilus.Handlers;
@@ -82,6 +84,12 @@ public class Plugin : BaseUnityPlugin
 
         //Add mod and patch.
         FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "DC", new DebitCardSpawnable());
+
+        //Add mod and patch.
+        FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "BMT", new BaseTransmitterBuildable());
+
+        //Add mod and patch.
+        FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "TO", new TestBuildable());
 
     }
 

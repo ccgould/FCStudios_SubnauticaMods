@@ -5,6 +5,7 @@ using FCS_AlterraHub.ModItems.Buildables.BaseManager.Buildable;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Items.BaseModuleRack.Mono;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Items.BaseTransmitter.Mono;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Mono;
+using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,8 +16,8 @@ public partial class HabitatManager : MonoBehaviour
 {
 
     private HashSet<FCSDevice> _registeredDevices = new();
-    private HashSet<string> _connectedDevices = new();
-    private Dictionary<string,List<object>> _workUnits = new();
+    private readonly Dictionary<string,FCSDevice> _connectedDevices = new();
+    private Dictionary<string,List<IWorkUnit>> _workUnits = new();
     private Dictionary<string,List<object>> _automatedOperations = new();
     private string _baseFriendlyID => GetBaseFriendlyName();
     private SubRoot _habitat;
@@ -27,23 +28,18 @@ public partial class HabitatManager : MonoBehaviour
     private float timeLeft;
     private const int _transceiverMaxCount = 5;
     private const int _transmitterMaxCount = 10;
-    private const int _baseManagerMaxCount = 10;
+    private const int _deviceLimitIncrement = 10;
 
-    private int conenctedDevicesLimit => DetermineDeviceLimit();
+    private int connectedDevicesLimit => DetermineDeviceLimit();
 
     internal int DetermineDeviceLimit()
     {
         int count = 0;
         foreach (var device in _registeredDevices)
         {
-            if(device is BaseManagerController)
+            if(device.AffectsHabitatDeviceLimit())
             {
-                count += _baseManagerMaxCount;
-            }
-
-            if(device is BaseTransmitterController)
-            {
-                count += _transmitterMaxCount;
+                count += _deviceLimitIncrement;
             }
         }
 
@@ -102,15 +98,15 @@ public partial class HabitatManager : MonoBehaviour
 
     private void Update()
     {
-        timeLeft -= Time.deltaTime;
-        if (timeLeft < 0)
-        {
-            foreach (var device in _registeredDevices)
-            {
-                AttemptToConnectDevice(device);
-            }
-            timeLeft = 1;
-        }
+        //timeLeft -= Time.deltaTime;
+        //if (timeLeft < 0)
+        //{
+        //    foreach (var device in _registeredDevices)
+        //    {
+        //        AttemptToConnectDevice(device);
+        //    }
+        //    timeLeft = 1;
+        //}
     }
 
     public string GetBaseFriendlyName()
@@ -135,35 +131,71 @@ public partial class HabitatManager : MonoBehaviour
         AttemptToConnectDevice(device);
     }
 
-    private void AttemptToConnectDevice(FCSDevice device)
+    internal bool AttemptToConnectDevice(FCSDevice device)
     {
-        var prefabID = device.GetPrefabID();
+        // return true because the device is in the list or bypasses the connection
+        if (_connectedDevices.ContainsKey(device.GetPrefabID()) || device.GetBypassConnection()) return true;
 
-        if (device.BypassConnection || _connectedDevices.Contains(prefabID)) return;
-        if(_connectedDevices.Count < conenctedDevicesLimit)
+        if(_connectedDevices.Count < connectedDevicesLimit)
         {
-            _connectedDevices.Add(prefabID);
+            _connectedDevices.Add(device.GetPrefabID(), device);
+            return true;
         }
+
+        return false;
     }
 
     internal void UnRegisterDevice(FCSDevice device)
     {
-        if(device.BypassConnection) return;
         _registeredDevices.Remove(device);
+        AdjustConnectedDevices(device);
         DisconnectDevice(device);
     }
-
+    
     private void DisconnectDevice(FCSDevice device)
     {
-        _connectedDevices.Remove(device.GetPrefabID());
+        if (device.GetBypassConnection()) return;
+        DisconnectDevice(device.GetPrefabID());
     }
+
+    private void DisconnectDevice(string devicePrefabID)
+    {        
+        _connectedDevices.Remove(devicePrefabID);
+    }
+
+    private void AdjustConnectedDevices(FCSDevice device)
+    {
+        if (device.AffectsHabitatDeviceLimit())
+        {
+            if(_connectedDevices.Count > connectedDevicesLimit)
+            {
+                var amountToRemove = _connectedDevices.Count - connectedDevicesLimit;
+
+                for (int i = 0; i < amountToRemove; i++)
+                {
+                    var currentDevicePrefabID = _connectedDevices.Last();
+                    DisconnectDevice(currentDevicePrefabID.Key);
+                }
+            }
+        }
+    }
+
+    public bool IsDeviceConnected(string deviceID)
+    {
+        return _connectedDevices.ContainsKey(deviceID);
+    }
+
 
     private void Awake()
     {
-        HabitatService.main.onBaseCreated?.Invoke(this);
         _habitat = gameObject.GetComponent<SubRoot>();
         _baseComponent = _habitat.GetComponent<Base>();
         _prefabID = _habitat.gameObject.gameObject?.GetComponentInChildren<PrefabIdentifier>()?.Id;
+    }
+
+    private void Start()
+    {
+        HabitatService.main.onBaseCreated?.Invoke(this);
     }
 
     private void OnDestroy()
@@ -231,9 +263,14 @@ public partial class HabitatManager : MonoBehaviour
         return _registeredDevices.Count();
     }
 
-    internal int GetConnectedDevices()
+    internal int GetConnectedDevicesCount()
     {
         return _connectedDevices.Count;
+    }
+
+    public Dictionary<string,FCSDevice> GetConnectedDevices()
+    {
+        return _connectedDevices;
     }
 
     public bool IsRemoteLinkConnected()
@@ -270,28 +307,47 @@ public partial class HabitatManager : MonoBehaviour
         return false; ;
     }
 
-    internal void CreateWorkUnit(object data)
+    public string CreateWorkUnit(IWorkUnit device)
     {
         var guid = Guid.NewGuid().ToString();
         
-        _workUnits.Add(guid, new List<object>
-        {
-            data
-        });
+        _workUnits.Add(guid, new List<IWorkUnit>());
+        AddToWorkUnit(guid, device);
+
+        return guid;
     }
 
-    internal bool AddToWorkUnit(string guid, string id)
+    public bool AddToWorkUnit(string guid, IWorkUnit workUnit)
     {
         if (_workUnits.ContainsKey(guid))
         {
-            _workUnits[guid].Add(guid);
+            var device = workUnit as FCSDevice;
+
+
+            _workUnits[guid].Add(workUnit);
             return true;
         }
 
         return false;
     }
 
-    internal bool DeleteFromWorkUnit(string guid, object device)
+    public void OnDeviceUIClosed(IWorkUnit obj)
+    {
+
+        var g = _workUnits.FirstOrDefault(x=>x.Value.Contains(obj));
+        QuickLogger.Debug($"Work Group {g.Key}", true);
+
+        if (g.Value is not null)
+        {
+            foreach (var device in g.Value)
+            {
+                QuickLogger.Debug("Syning Device",true);
+                device.SyncDevice(obj);
+            }
+        }
+    }
+
+    internal bool DeleteFromWorkUnit(string guid, IWorkUnit device)
     {
         if(_workUnits.ContainsKey(guid))
         {
@@ -316,12 +372,17 @@ public partial class HabitatManager : MonoBehaviour
         int count = 0;
         foreach (var device in _registeredDevices)
         {
-            if(_connectedDevices.Contains(device.GetPrefabID()))
+            if(_connectedDevices.ContainsKey(device.GetPrefabID()))
             {
                 count += device.GetWarningsCount(fault);
             }
         }
 
         return count;
+    }
+
+    internal bool HasDeviceSlotsAvailable()
+    {
+        return _connectedDevices.Count < connectedDevicesLimit;
     }
 }

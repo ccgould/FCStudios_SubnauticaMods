@@ -1,4 +1,6 @@
-﻿using FCS_AlterraHub.Models.Abstract;
+﻿using FCS_AlterraHub.Core.Helpers;
+using FCS_AlterraHub.Core.Services;
+using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.ModItems.TestObject.Mono;
 using FCSCommon.Helpers;
 using System.Collections;
@@ -8,7 +10,7 @@ namespace FCS_AlterraHub.ModItems.TestObject.Buildable;
 
 internal class TestBuildable : FCSBuildableModBase
 {
-    public TestBuildable() : base(PluginInfo.PLUGIN_NAME, "fcs_DummyTest", FileSystemHelper.ModDirLocation, "TestObject","Test Object")
+    public TestBuildable() : base(PluginInfo.PLUGIN_NAME, "fcsDemoTester", FileSystemHelper.ModDirLocation, "TestObject","Test Object")
     {
 
     }
@@ -16,23 +18,9 @@ internal class TestBuildable : FCSBuildableModBase
 
     protected override IEnumerator ModifyPrefab(GameObject prefab)
     {
-        prefab.AddComponent<TestController>();
-
+        //prefab.AddComponent<TestController>();
+        MaterialHelpers.ChangeEmissionColor(ModPrefabService.BasePrimaryCol, prefab, Color.cyan);
+        MaterialHelpers.ChangeEmissionStrength(ModPrefabService.BasePrimaryCol, prefab, 5f);
         yield break;
     }
-
-    //protected override TechData GetBlueprintRecipe()
-    //{
-    //    return new TechData()
-    //    {
-    //        craftAmount = 1,
-    //        Ingredients =
-    //        {      
-    //        new Ingredient(TechType.Glass, 2),
-    //        new Ingredient(TechType.TitaniumIngot, 1),
-    //        new Ingredient(TechType.WiringKit, 1),
-    //        new Ingredient(TechType.ComputerChip, 1)
-    //        }
-    //    };
-    //}
 }
