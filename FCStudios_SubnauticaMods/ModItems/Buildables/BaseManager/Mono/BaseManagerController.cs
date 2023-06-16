@@ -151,7 +151,10 @@ internal class BaseManagerController : FCSDevice, IFCSSave<SaveData>
         var friendlyName = !string.IsNullOrEmpty(_baseManager.GetBaseName()) ? _baseManager.GetBaseName() : "Base";
         baseName.text = $"{friendlyName} : BS{_baseManager.GetBaseID():D3}";
         infoItem1.text = DeterminePowerUsageString();
-        infoItem3.text = $"Connected Devices: {_baseManager.GetConnectedDevicesCount()}/{_baseManager.DetermineDeviceLimit()}";
+
+        var moreDevicesToConnect = _baseManager.GetFailedConnectionAttemptsCount() > 0 ? "*" : string.Empty;
+
+        infoItem3.text = $"Connected Devices: {_baseManager.GetConnectedDevicesCount()}/{_baseManager.DetermineDeviceLimit()}{moreDevicesToConnect}";
         infoItem4.text = $"Remote Datalink: {IsRemoteDataLinkConnected()}";
         infoItem6.text = $"Installed Modules: {_baseManager.GetInstalledModulesCount()}/{_baseManager.DetermineModuleLimit()}";
         infoItem5.text = $"Fault: {DetermineFaults()}    Warn: {DetermineWarnings()}";

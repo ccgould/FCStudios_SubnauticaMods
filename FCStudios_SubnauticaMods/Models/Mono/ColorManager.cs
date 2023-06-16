@@ -17,6 +17,7 @@ public class ColorManager : MonoBehaviour
     [SerializeField] private Color statusLightOff = Color.red;
     [SerializeField] private Color statusLightOn = Color.cyan;
     [SerializeField] private Color statusLightDisconnected = Color.yellow;
+    [SerializeField] private Color statusIdle = Color.white;
 
     [SerializeField][Range(0f, 1f)] private float lerpTime = .5f;
     [SerializeField] private Color[] lerpColors = new Color[] 
@@ -80,15 +81,14 @@ public class ColorManager : MonoBehaviour
                     material.SetVector("_GlowColor", statusLightOff);
                     break;
                 case FCSDeviceState.Idle:
-                    material.SetVector("_GlowColor", LerpLights(material));
+                    material.SetVector("_GlowColor", statusIdle);
                     break;
                 case FCSDeviceState.Running:
                     material.SetVector("_GlowColor", statusLightOn);
                     break;
                 case FCSDeviceState.NotConnected:
-                    material.SetVector("_GlowColor", statusLightDisconnected);
+                    //material.SetVector("_GlowColor", statusLightDisconnected);
                     break;
-
             }
         }
     }

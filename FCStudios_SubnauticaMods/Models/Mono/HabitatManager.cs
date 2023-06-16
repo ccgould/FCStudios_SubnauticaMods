@@ -26,11 +26,14 @@ public partial class HabitatManager : MonoBehaviour
     private int _baseID = -1;
     private string _baseName;
     private float timeLeft;
+    private int _failedConnectionAttempts;
     private const int _transceiverMaxCount = 5;
     private const int _transmitterMaxCount = 10;
     private const int _deviceLimitIncrement = 10;
 
-    private int connectedDevicesLimit => DetermineDeviceLimit();
+    internal int ConnectedDevicesLimit => DetermineDeviceLimit();
+
+    
 
     internal int DetermineDeviceLimit()
     {
@@ -133,17 +136,30 @@ public partial class HabitatManager : MonoBehaviour
 
     internal bool AttemptToConnectDevice(FCSDevice device)
     {
+        _failedConnectionAttempts = 0;
         // return true because the device is in the list or bypasses the connection
         if (_connectedDevices.ContainsKey(device.GetPrefabID()) || device.GetBypassConnection()) return true;
 
-        if(_connectedDevices.Count < connectedDevicesLimit)
+        if(_connectedDevices.Count < ConnectedDevicesLimit)
         {
             _connectedDevices.Add(device.GetPrefabID(), device);
             return true;
         }
 
+        _failedConnectionAttempts++;
         return false;
     }
+
+    public int GetFailedConnectionAttemptsCount()
+    {
+        return _failedConnectionAttempts;
+    }
+
+    public int DevicesThatCanConnectCount()
+    {
+        return _registeredDevices.Count(x=>x.GetBypassConnection() == false);
+    }
+
 
     internal void UnRegisterDevice(FCSDevice device)
     {
@@ -167,9 +183,9 @@ public partial class HabitatManager : MonoBehaviour
     {
         if (device.AffectsHabitatDeviceLimit())
         {
-            if(_connectedDevices.Count > connectedDevicesLimit)
+            if(_connectedDevices.Count > ConnectedDevicesLimit)
             {
-                var amountToRemove = _connectedDevices.Count - connectedDevicesLimit;
+                var amountToRemove = _connectedDevices.Count - ConnectedDevicesLimit;
 
                 for (int i = 0; i < amountToRemove; i++)
                 {
@@ -268,9 +284,30 @@ public partial class HabitatManager : MonoBehaviour
         return _connectedDevices.Count;
     }
 
-    public Dictionary<string,FCSDevice> GetConnectedDevices()
+    public Dictionary<string,FCSDevice> GetConnectedDevices(bool inWorkGroup = false)
     {
+        if(inWorkGroup)
+        {
+            var devices = new Dictionary<string,FCSDevice>();
+
+            foreach (var device in _connectedDevices)
+            {
+                if(!IsInWorkGroup(device.Value.GetPrefabID()))
+                {
+                    devices.Add(device.Key,device.Value);
+                }
+            }
+
+            return devices;
+        }
+
+
         return _connectedDevices;
+    }
+
+    private bool IsInWorkGroup(string prefabID)
+    {
+       return _workUnits.Any(x=>x.Value.Any(x=>x.GetPrefabID().Equals(prefabID)));
     }
 
     public bool IsRemoteLinkConnected()
@@ -307,12 +344,11 @@ public partial class HabitatManager : MonoBehaviour
         return false; ;
     }
 
-    public string CreateWorkUnit(IWorkUnit device)
+    public string CreateWorkUnit(List<IWorkUnit> devices)
     {
         var guid = Guid.NewGuid().ToString();
         
-        _workUnits.Add(guid, new List<IWorkUnit>());
-        AddToWorkUnit(guid, device);
+        _workUnits.Add(guid, devices);
 
         return guid;
     }
@@ -367,6 +403,11 @@ public partial class HabitatManager : MonoBehaviour
         return _workUnits.Count();
     }
 
+    internal Dictionary<string, List<IWorkUnit>> GetWorkUnits()
+    {
+        return _workUnits;
+    }
+
     internal int GetFaultsCount(FaultType fault)
     {
         int count = 0;
@@ -383,6 +424,11 @@ public partial class HabitatManager : MonoBehaviour
 
     internal bool HasDeviceSlotsAvailable()
     {
-        return _connectedDevices.Count < connectedDevicesLimit;
+        return _connectedDevices.Count < ConnectedDevicesLimit;
+    }
+
+    public bool HasDevicesNotConnected()
+    {
+        return GetFailedConnectionAttemptsCount() > 0;
     }
 }

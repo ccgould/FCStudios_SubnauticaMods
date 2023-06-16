@@ -1,5 +1,8 @@
-﻿namespace FCS_AlterraHub.ModItems.FCSPDA.Enums;
+﻿using System;
 
+namespace FCS_AlterraHub.ModItems.FCSPDA.Enums;
+
+[Serializable]
 public enum PDAPages
 {
     None = -1,

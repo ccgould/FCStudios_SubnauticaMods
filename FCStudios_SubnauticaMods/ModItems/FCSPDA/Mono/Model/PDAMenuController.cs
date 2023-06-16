@@ -7,7 +7,7 @@ using UnityEngine.EventSystems;
 
 namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
 
-internal class MenuController : MonoBehaviour
+internal class PDAMenuController : MonoBehaviour
 {
     [SerializeField]
     private Page InitialPage;

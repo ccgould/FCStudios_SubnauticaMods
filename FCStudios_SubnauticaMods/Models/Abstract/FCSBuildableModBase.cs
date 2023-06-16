@@ -77,20 +77,21 @@ public abstract class FCSBuildableModBase : ModBase, IModBase
         //========== Allows the building animation and material colors ==========// 
 
         var lw = prefab.GetComponent<LargeWorldEntity>();
-        lw.cellLevel = _settings.CellLevel;
+        if(lw is not null)
+            lw.cellLevel = _settings.CellLevel;
 
-        // Add constructible
-        var constructable = prefab.GetComponent<Constructable>();
+        //// Add constructible
+        //var constructable = prefab.GetComponent<Constructable>();
 
-        constructable.allowedOutside = _settings.AllowedOutside;
-        constructable.allowedInBase = _settings.AllowedInBase;
-        constructable.allowedOnGround = _settings.AllowedOnGround;
-        constructable.allowedOnWall = _settings.AllowedOnWall;
-        constructable.rotationEnabled = _settings.RotationEnabled;
-        constructable.allowedOnCeiling = _settings.AllowedOnCeiling;
-        constructable.allowedInSub = _settings.AllowedInSub;
-        constructable.allowedOnConstructables = _settings.AllowedOnConstructables;
-        constructable.techType = PrefabInfo.TechType;
+        //constructable.allowedOutside = _settings.AllowedOutside;
+        //constructable.allowedInBase = _settings.AllowedInBase;
+        //constructable.allowedOnGround = _settings.AllowedOnGround;
+        //constructable.allowedOnWall = _settings.AllowedOnWall;
+        //constructable.rotationEnabled = _settings.RotationEnabled;
+        //constructable.allowedOnCeiling = _settings.AllowedOnCeiling;
+        //constructable.allowedInSub = _settings.AllowedInSub;
+        //constructable.allowedOnConstructables = _settings.AllowedOnConstructables;
+        //constructable.techType = PrefabInfo.TechType;
 
         var hover = prefab.GetComponent<HoverInteraction>();
         

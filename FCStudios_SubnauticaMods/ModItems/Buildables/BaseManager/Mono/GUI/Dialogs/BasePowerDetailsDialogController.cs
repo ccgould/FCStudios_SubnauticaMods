@@ -7,7 +7,7 @@ using TMPro;
 using UnityEngine;
 
 namespace FCS_AlterraHub.ModItems.Buildables.BaseManager.Mono.GUI.Dialogs;
-internal class BasePowerDetailsDialogController : Page
+internal class BasePowerDetailsDialogController : MonoBehaviour
 {
     [SerializeField]
     private Transform powerProductersGrid;
@@ -17,7 +17,6 @@ internal class BasePowerDetailsDialogController : Page
     private TMP_Text basePowerInfo;
     [SerializeField]
     private GameObject basePowerListItemPrefab;
-    public override PDAPages PageType => PDAPages.None;
 
     private static List<FCSPowerInterface> _powerConsumers { get; set; } = new();
 
@@ -44,12 +43,6 @@ internal class BasePowerDetailsDialogController : Page
         }
 
         return "BASE POWER 000/000";
-    }
-
-    public override void Enter(object arg = null)
-    {
-        RefreshPage();
-        base.Enter(arg);
     }
 
     private void RefreshPage()
@@ -182,19 +175,13 @@ internal class BasePowerDetailsDialogController : Page
         }
     }
 
-    public override void OnBackButtonClicked()
-    {
-        throw new System.NotImplementedException();
-    }
-
     public void Enter()
     {
-        Enter(null);
+        RefreshPage();
     }
 
-    public override void Exit()
+    public  void Exit()
     {
-        base.Exit();
         ClearLists();
     }
 

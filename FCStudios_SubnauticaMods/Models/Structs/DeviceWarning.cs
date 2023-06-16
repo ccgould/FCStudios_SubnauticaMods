@@ -1,10 +1,10 @@
 ﻿using FCS_AlterraHub.Models.Enumerators;
 using System;
+using System.Collections.Generic;
 
 namespace FCS_AlterraHub.Models.Mono;
 public partial class HabitatManager
-{
-    internal struct DeviceWarning
+{    internal struct DeviceWarning
     {
         public DeviceWarning(string devicId, string warningID, string description, WarningType warningType, FaultType faultType)
         {

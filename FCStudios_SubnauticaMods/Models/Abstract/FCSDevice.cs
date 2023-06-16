@@ -21,7 +21,8 @@ namespace FCS_AlterraHub.Models.Abstract;
 [RequireComponent(typeof(TechTag))]
 [RequireComponent(typeof(HoverInteraction))]
 [RequireComponent(typeof(Constructable))]
-[RequireComponent(typeof(LargeWorldEntity))]
+[DisallowMultipleComponent]
+//[RequireComponent(typeof(LargeWorldEntity))] Removed to fix error with large world enitity
 public abstract class FCSDevice : MonoBehaviour, IProtoEventListener, IConstructable,IPowerConsumer
 {
     

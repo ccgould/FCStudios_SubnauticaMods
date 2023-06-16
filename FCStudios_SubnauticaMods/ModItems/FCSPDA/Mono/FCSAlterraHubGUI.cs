@@ -62,7 +62,7 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI, uGUI_IButton
     [SerializeField]
     private CartDropDownHandler _cartDropDownController;
     [SerializeField]
-    private MenuController _menuController;
+    private PDAMenuController _menuController;
     [SerializeField]
     private StorePageController _storePage;
     private List<RectMask2D> rectMasks = new List<RectMask2D>();
@@ -85,7 +85,7 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI, uGUI_IButton
 
     public void Initialize()
     {
-        _menuController = gameObject.GetComponent<MenuController>();
+        _menuController = gameObject.GetComponent<PDAMenuController>();
         _canvas = gameObject.GetComponent<Canvas>();
         _cartDropDownController.Initialize();
         SetInstance(FCSAlterraHubGUISender.PDA);

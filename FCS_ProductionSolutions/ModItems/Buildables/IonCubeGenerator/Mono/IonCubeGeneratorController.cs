@@ -484,21 +484,4 @@ internal class IonCubeGeneratorController : FCSDevice, IFCSSave<SaveData>, IWork
             IsVisibleInPDA = masterDevice.IsVisibleInPDA;
         }
     }
-
-    public void TestWorkGroup()
-    {
-        var guid = CachedHabitatManager.CreateWorkUnit(this);
-        QuickLogger.Debug($"Connected Devices Count: {CachedHabitatManager.GetConnectedDevices().Count}",true);
-        foreach (var item in CachedHabitatManager.GetConnectedDevices())
-        {
-            QuickLogger.Debug($" Cube Gen: {item.Value is IonCubeGeneratorController}",true);
-
-            if (item.Value is IonCubeGeneratorController)
-            {
-                IonCubeGeneratorController device = item.Value as IonCubeGeneratorController;
-                if (device == this) continue;
-                CachedHabitatManager.AddToWorkUnit(guid, device);
-            }
-        }
-    }
 }

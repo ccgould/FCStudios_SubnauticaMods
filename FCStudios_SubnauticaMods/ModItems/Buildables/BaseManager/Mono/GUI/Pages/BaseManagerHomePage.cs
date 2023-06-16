@@ -1,21 +1,14 @@
-﻿using FCS_AlterraHub.Core.Helpers;
-using FCS_AlterraHub.Core.Services;
+﻿using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Mono;
-using FCS_AlterraHub.ModItems.Buildables.BaseManager.Mono.GUI.Dialogs;
-using FCS_AlterraHub.ModItems.FCSPDA.Enums;
-using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
 using FCSCommon.Utilities;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
 
-namespace FCS_AlterraHub.ModItems.Buildables.BaseManager.Mono;
-internal class BaseManagerHomePage : Page
+namespace FCS_AlterraHub.ModItems.Buildables.BaseManager.Mono.GUI.Pages;
+internal class BaseManagerHomePage : MonoBehaviour
 {
-    public override PDAPages PageType => PDAPages.None;
-    
     [SerializeField]
     private TMP_Text clock;
     [SerializeField]
@@ -30,9 +23,16 @@ internal class BaseManagerHomePage : Page
     private TMP_Text basePowerLabel;
     [SerializeField]
     private Transform grid;
+
     [SerializeField]
     private GameObject basePowerListItemPrefab;
+
     private HabitatManager _baseManager;
+
+    private void Start()
+    {
+
+    }
 
     private void Update()
     {
@@ -52,9 +52,9 @@ internal class BaseManagerHomePage : Page
             PowerRelay powerRelay = currentSub.powerRelay;
             if (powerRelay != null)
             {
-               var power = Mathf.RoundToInt(powerRelay.GetPower());
-               var maxPower = Mathf.RoundToInt(powerRelay.GetMaxPower());
-               var status = powerRelay.GetPowerStatus();
+                var power = Mathf.RoundToInt(powerRelay.GetPower());
+                var maxPower = Mathf.RoundToInt(powerRelay.GetMaxPower());
+                var status = powerRelay.GetPowerStatus();
                 return $"BASE POWER {power}/{maxPower}";
             }
         }
@@ -68,7 +68,7 @@ internal class BaseManagerHomePage : Page
 
         var subRoot = Player.main.GetCurrentSub();
 
-       var bulkHeads =  subRoot.GetAllComponentsInChildren<BulkheadDoor>();
+        var bulkHeads = subRoot.GetAllComponentsInChildren<BulkheadDoor>();
 
         foreach (var bulkhead in bulkHeads)
         {
@@ -78,14 +78,14 @@ internal class BaseManagerHomePage : Page
 
     public void OnFilterationMachineToggle(bool value)
     {
-       var geo =  Player.main.GetCurrentSub().GetAllComponentsInChildren<BaseFiltrationMachineGeometry>();
+        var geo = Player.main.GetCurrentSub().GetAllComponentsInChildren<BaseFiltrationMachineGeometry>();
 
         QuickLogger.Debug($"Geo: {geo.Count()}", true);
 
         foreach (var filtrationMachine in geo)
         {
             var comp = filtrationMachine.GetModule();
-            if(!value)
+            if (!value)
             {
                 comp.CancelInvoke("UpdateFiltering");
                 filtrationMachine.workSound.Stop();
@@ -107,8 +107,6 @@ internal class BaseManagerHomePage : Page
             _baseManager.SetBaseName(s);
             UpdateBaseName();
         });
-
-
     }
 
     private void UpdateBaseName()
@@ -136,14 +134,8 @@ internal class BaseManagerHomePage : Page
         }
     }
 
-    public override void OnBackButtonClicked()
+    public void Enter()
     {
-
-    }
-
-    public override void Enter(object arg = null)
-    {
-        base.Enter(arg);
         RefreshPage();
     }
 
@@ -160,7 +152,6 @@ internal class BaseManagerHomePage : Page
 
         var powerSources = new Dictionary<string, List<PowerSource>>();
 
-
         GetPowerSource<BaseNuclearReactor>(powerSources, "Nuclear Reactor");
         GetPowerSource<SolarPanel>(powerSources, "Solar Panel");
         GetPowerSource<BaseBioReactor>(powerSources, "Bio Reactor");
@@ -168,9 +159,14 @@ internal class BaseManagerHomePage : Page
 
         foreach (var powerSource in powerSources)
         {
-            var h = GameObject.Instantiate(basePowerListItemPrefab, grid, false);
+            var h = Instantiate(basePowerListItemPrefab, grid, false);
             var controller = h.GetComponent<BasePowerInfoListItem>();
             controller.Initialize(powerSource.Key, powerSource.Value);
+        }
+
+        if (_baseManager.HasDevicesNotConnected())
+        {
+            uGUI_NotificationManager.Instance.AddNotification($"* Could not connect to all devices: {_baseManager.DevicesThatCanConnectCount()} devices detected for {_baseManager.GetConnectedDevicesCount()}  connection ports devices are built only  are connected!");
         }
     }
 
@@ -191,7 +187,7 @@ internal class BaseManagerHomePage : Page
 
         foreach (var item in floodLights)
         {
-            if(item.constructable.constructed)
+            if (item.constructable.constructed)
             {
 
                 if (value)
@@ -222,9 +218,7 @@ internal class BaseManagerHomePage : Page
 
     }
 
-    
-
-    private static void GetPowerSource<T>(Dictionary<string, List<PowerSource>> powerSources, string key) where T :  Component
+    private static void GetPowerSource<T>(Dictionary<string, List<PowerSource>> powerSources, string key) where T : Component
     {
         foreach (T nr in Player.main.GetCurrentSub().GetAllComponentsInChildren<T>())
         {
