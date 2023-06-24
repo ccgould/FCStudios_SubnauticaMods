@@ -10,7 +10,14 @@ internal class RemoteStorageController : FCSDevice, IFCSSave<SaveData>
     [SerializeField] private Transform grid;
     [SerializeField] private Transform uGUI_RemoteStorageItemTemplate;
     [SerializeField] private Text storageAmountLbl;
-    
+
+
+
+
+    public override bool CanDeconstruct(out string reason)
+    {
+        return base.CanDeconstruct(out reason);
+    }
 
     public override void ReadySaveData()
     {

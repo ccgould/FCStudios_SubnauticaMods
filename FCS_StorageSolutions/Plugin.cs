@@ -32,6 +32,7 @@ public class Plugin : BaseUnityPlugin
 
     private void Awake()
     {
+        
         // set project-scoped logger instance
         Logger = base.Logger;
         MaterialHelpers.GetIngameObjects();

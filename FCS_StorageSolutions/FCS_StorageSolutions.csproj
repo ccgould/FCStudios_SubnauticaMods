@@ -12,8 +12,22 @@
       https://api.nuget.org/v3/index.json;
       https://nuget.bepinex.dev/v3/index.json;
     </RestoreAdditionalProjectSources>
+
+        <Configurations>Debug;Release;SN_Stable;BZ_Stable</Configurations> 
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" /> 
+ 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'" /> 
+ 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SN_Stable|AnyCPU'"> 
+    <DefineConstants>$(DefineConstants);SUBNAUTICA;SUBNAUTICA_STABLE</DefineConstants> 
+  </PropertyGroup> 
+ 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BZ_Stable|AnyCPU'"> 
+    <DefineConstants>$(DefineConstants);BELOWZERO;BELOWZERO_STABLE</DefineConstants> 
+  </PropertyGroup> 
+  
   <ItemGroup>
     <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
     <PackageReference Include="BepInEx.Core" Version="5.4.21" />

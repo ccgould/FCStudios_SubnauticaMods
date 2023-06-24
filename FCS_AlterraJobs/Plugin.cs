@@ -1,4 +1,6 @@
-﻿using BepInEx;
+﻿
+
+using BepInEx;
 using BepInEx.Logging;
 using FCS_AlterraJobs.Items.Equipment;
 using HarmonyLib;

@@ -1,33 +1,25 @@
-﻿using BepInEx;
+﻿
+using BepInEx;
 using BepInEx.Logging;
 using FCS_AlterraHub.API;
 using FCS_AlterraHub.Configuation;
 using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Interfaces;
+using FCS_AlterraHub.Models.Mono;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Buildable;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Items.BaseTransmitter.Buildable;
 using FCS_AlterraHub.ModItems.Buildables.DroneDepotPort.Buildable;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_AlterraHub.ModItems.Spawnables.DebitCard.Spawnable;
+using FCS_AlterraHub.ModItems.Spawnables.PaintTool.Items;
 using FCS_AlterraHub.ModItems.TestObject.Buildable;
 using FCSCommon.Utilities;
 using HarmonyLib;
-using Nautilus.Assets.PrefabTemplates;
-using Nautilus.Assets;
-using Nautilus.Crafting;
 using Nautilus.Handlers;
-using System.Reflection;
-using static CraftData;
-using static FCS_AlterraHub.Configuation.SaveData;
-using static UWE.FreezeTime;
-using Nautilus.Assets.Gadgets;
-using UnityEngine;
-using FCS_AlterraHub.ModItems.Spawnables.PaintTool.Items;
-using System.Collections.Generic;
-using System;
-using FCS_AlterraHub.Models.Mono;
 using Nautilus.Json;
+using System.Reflection;
+using static FCS_AlterraHub.Configuation.SaveData;
 
 namespace FCS_AlterraHub;
 
@@ -36,6 +28,7 @@ namespace FCS_AlterraHub;
 public class Plugin : BaseUnityPlugin
 {
     public new static ManualLogSource Logger { get; private set; }
+
     /// <summary>
     /// Configuration of the AlterraHub Mod (For use in-game menu)
     /// </summary>
@@ -109,7 +102,7 @@ public class Plugin : BaseUnityPlugin
 
 
         //Add mod and patch.
-        FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "BM", new BaseManagerBuildable());
+        FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "BM", mod: new BaseManagerBuildable());
 
         //Add mod and patch.
         FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "DC", new DebitCardSpawnable());

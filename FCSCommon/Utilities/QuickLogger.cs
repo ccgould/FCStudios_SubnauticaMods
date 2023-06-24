@@ -2,13 +2,8 @@
 namespace FCSCommon.Utilities;
 
 using BepInEx.Logging;
-using FCS_AlterraHub;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Globalization;
-using System.IO;
 using System.Reflection;
 
 //Created by PrimeSonic GitHub repo: https://github.com/PrimeSonic/PrimeSonicSubnauticaMods
@@ -18,8 +13,9 @@ internal static class QuickLogger
     internal static bool DebugLogsEnabled = false;
     internal static string ModName = "";
     private static ManualLogSource _logger;
-
-
+    internal static bool HideAllFCSOnScreenMessages;
+    internal static bool ShowCreditMessages;
+    
     internal static void Initialize()
     {
         if (_logger == null)
@@ -30,7 +26,7 @@ internal static class QuickLogger
 
     internal static void Info(string msg, bool showOnScreen = false)
     {
-        if (Plugin.Configuration.HideAllFCSOnScreenMessages) return;
+        if (HideAllFCSOnScreenMessages) return;
         Initialize();
         string name = Assembly.GetCallingAssembly().GetName().Name;
 
@@ -42,7 +38,7 @@ internal static class QuickLogger
 
     internal static void Message(string msg, bool showOnScreen = false)
     {
-        if (Plugin.Configuration.HideAllFCSOnScreenMessages) return;
+        if (HideAllFCSOnScreenMessages) return;
         Initialize();
         string name = Assembly.GetCallingAssembly().GetName().Name;
 
@@ -104,7 +100,7 @@ internal static class QuickLogger
 
     internal static void Warning(string msg, bool showOnScreen = false)
     {
-        if (Plugin.Configuration.HideAllFCSOnScreenMessages) return;
+        if (HideAllFCSOnScreenMessages) return;
         Initialize();
         string name = Assembly.GetCallingAssembly().GetName().Name;
 
@@ -128,7 +124,7 @@ internal static class QuickLogger
 
     public static void CreditMessage(string msg)
     {
-        if (!Plugin.Configuration.ShowCreditMessages) return;
+        if (!ShowCreditMessages) return;
         Initialize();
         string name = Assembly.GetCallingAssembly().GetName().Name;
         _logger.LogMessage($"[{name}] {msg}");
@@ -137,7 +133,7 @@ internal static class QuickLogger
     
     public static void ModMessage(string msg)
     {
-        if (Plugin.Configuration.HideAllFCSOnScreenMessages) return;
+        if (HideAllFCSOnScreenMessages) return;
         Initialize();
         string name = Assembly.GetCallingAssembly().GetName().Name;
         _logger.LogMessage($"[{name}] {msg}");
