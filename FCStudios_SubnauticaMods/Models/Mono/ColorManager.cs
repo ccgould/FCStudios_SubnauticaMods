@@ -6,31 +6,69 @@ using FCS_AlterraHub.Models.Enumerators;
 using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Models.Mono;
 
 public class ColorManager : MonoBehaviour
 {
+
     [SerializeField] private FCSDevice controller;
 
+    [Header("Light Colors")]
     [SerializeField] private Color statusLightOff = Color.red;
     [SerializeField] private Color statusLightOn = Color.cyan;
     [SerializeField] private Color statusLightDisconnected = Color.yellow;
     [SerializeField] private Color statusIdle = Color.white;
+    [SerializeField] private Color controlledLightColor = Color.white;
 
-    [SerializeField][Range(0f, 1f)] private float lerpTime = .5f;
-    [SerializeField] private Color[] lerpColors = new Color[] 
-    {
-        Color.cyan,
-        Color.white
-    };
-
+    [Header("Target Meshes")]
     [SerializeField] private List<GameObject> _interiorMeshes;
-    [SerializeField][Range(-10, 10)] private float _interiorLumIntensity;
     [SerializeField] private List<GameObject> _primaryMeshes;
     [SerializeField] private List<GameObject> _secondaryMeshes;
+    [SerializeField] private GameObject[] _statusLightMeshes;
 
+    [Header("Target Materials")]
+    [SerializeField] private Material lightControllerMaterial;
+
+    public static List<ColorTemplate> colorTemplates;
+
+
+    #region Lerping Colors
+    //[Header("Color Lerping")]
+    //[SerializeField][Range(0f, 1f)] private float lerpTime = .5f;
+    //[SerializeField] private Color[] lerpColors = new Color[] 
+    //{
+    //    Color.cyan,
+    //    Color.white
+    //};
+
+    //private Color LerpLights(Material material)
+    //{
+    //    var time = lerpTime * Time.deltaTime;
+    //    var color = Color.Lerp(material.GetVector("_GlowColor"), lerpColors[colorIndex], time);
+
+    //    t = Mathf.Lerp(t, 1f, time);
+    //    if (t > .9f)
+    //    {
+    //        t = 0f;
+    //        colorIndex++;
+    //        colorIndex = (colorIndex >= len) ? 0 : colorIndex;
+    //    }
+
+    //    return color;
+    //}
+    #endregion
+
+
+    [Header("Light Settings")]
+    [SerializeField][Range(-10, 10)] private float _interiorLumIntensity;
+    [SerializeField] private bool changeMainLightsWithStatueChange = false;
+
+    private List<Material> _statusLightMaterials = new();
+    private List<Material> _mainLightMaterials = new();
     private string _bodyMaterial;
     private GameObject _gameObject;
     private string _bodySecondary;
@@ -38,33 +76,33 @@ public class ColorManager : MonoBehaviour
     private Color _currentSecondaryColor = Color.white;
     private Color _currentLumColor = Color.white;
     private string _lumMaterial;
+    private bool isConnectedToBase;
+    private int colorIndex;
+    private int len;
+    float t = 0;
 
-    [SerializeField] private GameObject[] _statusLightMeshes;
-    private List<Material> _statusLightMaterials = new();
     private ColorTemplate _currentTemplate = new ColorTemplate
     {
         PrimaryColor = Color.white,
         SecondaryColor = Color.white,
         EmissionColor = Color.cyan
     };
-    private bool isConnectedToBase;
-    private int colorIndex;
-    private int len;
 
-    float t = 0;
 
     private void Start()
     {
-        len = lerpColors.Length;
-
-
-        
+        //len = lerpColors.Length;
+        GetMainLightMaterials();
+        InvokeRepeating(nameof(UpdateStatusLights), UnityEngine.Random.value, 1);
     }
-    private void Update()
+
+    private void GetMainLightMaterials()
     {
-        if (controller is not null)
+        if (lightControllerMaterial == null) return;
+        var materials = MaterialHelpers.GetMaterials(gameObject, lightControllerMaterial.name);
+        foreach ( var material in materials )
         {
-            UpdateStatusLights();
+            _mainLightMaterials.Add(material);
         }
     }
 
@@ -86,29 +124,39 @@ public class ColorManager : MonoBehaviour
                 case FCSDeviceState.Running:
                     material.SetVector("_GlowColor", statusLightOn);
                     break;
-                case FCSDeviceState.NotConnected:
-                    //material.SetVector("_GlowColor", statusLightDisconnected);
+                case FCSDeviceState.NoPower:
+                    material.SetVector("_GlowColor", Color.black);
                     break;
             }
         }
-    }
 
-    private Color LerpLights(Material material)
-    {
-        var time = lerpTime * Time.deltaTime;
-        var color = Color.Lerp(material.GetVector("_GlowColor"), lerpColors[colorIndex], time);
-
-        t = Mathf.Lerp(t, 1f, time);
-        if (t > .9f)
+        if(changeMainLightsWithStatueChange)
         {
-            t = 0f;
-            colorIndex++;
-            colorIndex = (colorIndex >= len) ? 0 : colorIndex;
+            foreach (Material material in _mainLightMaterials)
+            {
+                switch (controller.GetState())
+                {
+                    default:
+                    case FCSDeviceState.Off:
+                        material.SetVector("_GlowColor", statusLightOff);
+                        break;
+                    case FCSDeviceState.Idle:
+                        material.SetVector("_GlowColor", statusIdle);
+                        break;
+                    case FCSDeviceState.Running:
+                        material.SetVector("_GlowColor", statusLightOn);
+                        break;
+                    case FCSDeviceState.NotConnected:
+                        material.SetVector("_GlowColor", statusLightDisconnected);
+                        break;
+                    case FCSDeviceState.NoPower:
+                        material.SetVector("_GlowColor", Color.black);
+                        break;
+                }
+            }
         }
-
-        return color;
     }
-
+     
     public void Initialize(GameObject gameObject)
     {
         _gameObject = gameObject;
@@ -188,12 +236,12 @@ public class ColorManager : MonoBehaviour
             _currentTemplate = template;
             foreach (GameObject item in _primaryMeshes)
             {
-                MaterialHelpers.ChangeMaterialColor(_bodyMaterial, _gameObject, template.PrimaryColor);
+                MaterialHelpers.ChangeMaterialColor(_bodyMaterial, _gameObject, Color.white, template.PrimaryColor);
             }
 
             foreach (GameObject item in _secondaryMeshes)
             {
-                MaterialHelpers.ChangeMaterialColor(_bodyMaterial, _gameObject, template.SecondaryColor);
+                MaterialHelpers.ChangeMaterialColor(_bodyMaterial, _gameObject, Color.white, template.SecondaryColor);
             }
 
             MaterialHelpers.ChangeEmissionColor(_lumMaterial, _gameObject, template.EmissionColor);

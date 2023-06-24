@@ -36,7 +36,7 @@ public class Plugin : BaseUnityPlugin
         MaterialHelpers.GetIngameObjects();
 
         //Register mod pack
-        FCSModsAPI.PublicAPI.RegisterModPack(PluginInfo.PLUGIN_NAME, Assembly.GetExecutingAssembly(), ModSettings.AssetBundleName);
+        FCSModsAPI.PublicAPI.RegisterModPack(PluginInfo.PLUGIN_NAME, Assembly.GetExecutingAssembly(), ModSettings.AssetBundleName, ModSaveManager.Save, ModSaveManager.LoadData);
         FCSModsAPI.PublicAPI.AddStoreCategory(PluginInfo.PLUGIN_GUID, "ProductionSolutionsIcon_W", "Production Solutions", PDAPages.ProductionSolutions);
         StartCoroutine(MaterialHelpers.GetGameBaseMaterial(() =>
         {

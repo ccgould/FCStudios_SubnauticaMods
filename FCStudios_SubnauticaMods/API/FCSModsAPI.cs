@@ -21,7 +21,7 @@ public interface IFCSModsAPIPublic
     /// <param name="modName">Name of the mod to add</param>
     /// <param name="assembly"><see cref="Assembly"/> to which the mod resides</param>
     /// <param name="assetBundleName">The name of the mod bundle if any</param>
-    void RegisterModPack(string modName, Assembly assembly, string assetBundleName);
+    void RegisterModPack(string modName, Assembly assembly, string assetBundleName, Action saveCallBack, Action loadCallBack);
     /// <summary>
     /// Adds a mod to the mod pack
     /// </summary>
@@ -59,7 +59,7 @@ public class FCSModsAPI : IFCSModsAPIPublic, IFCSModsAPIInternal
     internal static IFCSModsAPIInternal InternalAPI => singleton;
     public static IFCSModsAPIPublic PublicAPI => singleton;
     
-    public void RegisterModPack(string modName, Assembly assembly, string assetBundleName) => ModRegistrationService.Register(modName, assembly,assetBundleName);
+    public void RegisterModPack(string modName, Assembly assembly, string assetBundleName,Action saveCallBack, Action loadCallBack) => ModRegistrationService.Register(modName, assembly,assetBundleName,saveCallBack,loadCallBack);
     
     public void RegisterMod(string modPackName,string modID, ModBase mod) => ModRegistrationService.RegisterMod(modPackName, modID, mod);
 

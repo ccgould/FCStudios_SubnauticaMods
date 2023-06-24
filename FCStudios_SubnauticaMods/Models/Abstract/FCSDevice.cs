@@ -1,9 +1,11 @@
 ﻿using FCS_AlterraHub.API;
+using FCS_AlterraHub.Configuation;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Enumerators;
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.Models.Mono;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Buildable;
+using FCSCommon.Utilities;
 using RootMotion;
 using System;
 using System.Collections.Generic;
@@ -34,7 +36,7 @@ public abstract class FCSDevice : MonoBehaviour, IProtoEventListener, IConstruct
     private Dictionary<string, DeviceWarning> _warnings = new();
     protected ColorManager _colorManager;
     private string _prefabID;
-
+    protected PowerRelay powerRelay;
     [SerializeField] [Range(0f,1f)] protected float energyPerSecond = 0f;
 
     /// <summary>
@@ -137,6 +139,8 @@ public abstract class FCSDevice : MonoBehaviour, IProtoEventListener, IConstruct
         return bypassConnection;
     }
 
+
+
     private void CheckConnection()
     {
         if(!GetBypassConnection() && IsRegisteredToBaseManager())
@@ -159,7 +163,10 @@ public abstract class FCSDevice : MonoBehaviour, IProtoEventListener, IConstruct
         }
     }
 
-    public abstract bool IsDeconstructionObstacle();
+    public virtual bool IsDeconstructionObstacle()
+    {
+        return true;
+    }
 
     public virtual void OnConstructedChanged(bool constructed)
     {
@@ -179,11 +186,29 @@ public abstract class FCSDevice : MonoBehaviour, IProtoEventListener, IConstruct
         }
     }
 
-    public abstract void OnProtoDeserialize(ProtobufSerializer serializer);
+    public virtual void OnProtoDeserialize(ProtobufSerializer serializer)
+    {
+        QuickLogger.Debug($"In OnProtoDeserialize: {GetPrefabID()}", false);
+        ReadySaveData();
+        IsFromSave = true;
+    }
 
-    public abstract void OnProtoSerialize(ProtobufSerializer serializer);
+    public virtual void OnProtoSerialize(ProtobufSerializer serializer)
+    {
+        QuickLogger.Debug($"In OnProtoSerialize: {GetPrefabID()}", false);
+        if (!ModSaveManager.IsSaving())
+        {
+            QuickLogger.Info("Saving " + this.GetPrefabID(), false);
+            ModSaveManager.Save();
+            QuickLogger.Info("Saved " + this.GetPrefabID(), false);
+        }
+    }
 
-    public abstract bool CanDeconstruct(out string reason);
+    public virtual bool CanDeconstruct(out string reason)
+    {
+        reason = string.Empty;
+        return true;
+    }
 
     public string GetDeviceName()
     {
@@ -193,8 +218,10 @@ public abstract class FCSDevice : MonoBehaviour, IProtoEventListener, IConstruct
     public virtual void Start() 
     {
         _colorManager?.Initialize(gameObject);
+        FindBaseManager();
         FCSModsAPI.PublicAPI.RegisterDevice(this);
         InvokeRepeating(nameof(CheckConnection), 1f, 1f);
+        this.powerRelay = base.gameObject.GetComponentInParent<PowerRelay>();
     }
 
     public virtual void OnDestroy()
@@ -221,6 +248,17 @@ public abstract class FCSDevice : MonoBehaviour, IProtoEventListener, IConstruct
 
     public HabitatManager CachedHabitatManager { get; private set; }
     public bool IsConnectedToBase { get; private set; }
+
+
+
+    protected void FindBaseManager()
+    {
+        if (CachedHabitatManager is null && IsConstructed)
+        {
+            CachedHabitatManager = HabitatService.main.GetBaseManager(this);
+        }
+    }
+
 
     public virtual bool IsRegisteredToBaseManager()
     {
@@ -294,6 +332,26 @@ public abstract class FCSDevice : MonoBehaviour, IProtoEventListener, IConstruct
     {
         //Do something
     }
+
+    /// <summary>
+    /// Gets the body color of the device
+    /// </summary>
+    /// <param name="color"></param>
+    public virtual ColorTemplate GetBodyColor()
+    {
+        return _colorManager?.GetTemplate() ?? new ColorTemplate();
+    }
+
+    internal bool ChangeBodyColor(ColorTemplate currentTemplate)
+    {
+        return _colorManager.ChangeColor(currentTemplate);
+    }
+
+    public virtual bool OverrideCustomUseText(out string message)
+    {
+        message = string.Empty;
+        return false;
+    }
 }
 
 public enum FCSDeviceState
@@ -302,4 +360,5 @@ public enum FCSDeviceState
     Idle = 1,
     Running = 2,
     NotConnected = 3,
+    NoPower = 4
 }

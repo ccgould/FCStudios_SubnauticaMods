@@ -9,7 +9,7 @@ using UnityEngine.Events;
 namespace FCS_AlterraHub.Configuation;
 
 [Menu("FCS AlterraHub Menu")]
-public class Config : ConfigFile
+internal class Config : ConfigFile
 {
     public Config() : base("alterrahub-config", "Configurations")
     {
@@ -20,7 +20,7 @@ public class Config : ConfigFile
 
     internal UnityAction<int> onGameModeChanged;
 
-    [Keybind("Open/Close FCS PDA"), OnChange(nameof(PDAKeyCodeChangedEvent))]
+    [Keybind("Open/Reset FCS PDA"), OnChange(nameof(PDAKeyCodeChangedEvent))]
     public KeyCode FCSPDAKeyCode = KeyCode.F2;
 
     [Keybind("FCS PDA Information Button"), OnChange(nameof(PDAKeyCodeChangedEvent))]
@@ -31,6 +31,23 @@ public class Config : ConfigFile
 
     [Toggle("Play Sound Effects"), OnChange(nameof(PlaySoundToggleEvent))]
     public bool PlaySFX = true;
+
+    #region Paint Tool
+
+    [Toggle("[Paint Tool] Is Mod Enabled", Order = 4, Tooltip = "Enables/Disables Paint Tool from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+    public bool IsPaintToolEnabled = true;
+
+    [Keybind("[Paint Tool] Select Color Forward", Order = 4, Tooltip = "Selects the next color on the paint tool")]
+    public KeyCode PaintToolSelectColorForwardKeyCode = KeyCode.RightArrow;
+
+    [Keybind("[Paint Tool] Select Color Back", Order = 4, Tooltip = "Selects the previous color on the paint tool")]
+    public KeyCode PaintToolSelectColorBackKeyCode = KeyCode.LeftArrow;
+
+    [Keybind("[Paint Tool] Sample Color Template", Order = 4, Tooltip = "Gets the color template from the object in view.")]
+    public KeyCode PaintToolColorSampleKeyCode = KeyCode.P;
+
+    #endregion
+
 
     private void PlaySoundToggleEvent(ToggleChangedEventArgs e)
     {

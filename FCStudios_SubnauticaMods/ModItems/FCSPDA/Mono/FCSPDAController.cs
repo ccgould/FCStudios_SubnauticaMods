@@ -99,7 +99,7 @@ public class FCSPDAController : MonoBehaviour
 
     private static void UpdateTime(bool pausedByPDA)
     {
-        deltaTime = (pausedByPDA ? Time.unscaledDeltaTime : Time.deltaTime);
+        deltaTime = (pausedByPDA ? Time.unscaledDeltaTime : DayNightCycle.main.deltaTime);
         time += deltaTime;
         Shader.SetGlobalFloat(ShaderPropertyID._PDATime, time);
     }
@@ -335,7 +335,7 @@ public class FCSPDAController : MonoBehaviour
     /// </summary>
     /// <param name="id">Id of the UI to display</param>
     /// <param name="fcsDevice">The device to change the settings on.</param>
-    public void OpenDeviceUI(TechType id, FCSDevice fcsDevice,OnClose onClose = null)
+    public void OpenDeviceUI(TechType id, MonoBehaviour fcsDevice,OnClose onClose = null)
     {
         Open(PDATab.None,fcsDevice.transform,onClose);
         ui.PrepareDevicePage(id, fcsDevice);

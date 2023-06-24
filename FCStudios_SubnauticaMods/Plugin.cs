@@ -13,9 +13,21 @@ using FCS_AlterraHub.ModItems.Spawnables.DebitCard.Spawnable;
 using FCS_AlterraHub.ModItems.TestObject.Buildable;
 using FCSCommon.Utilities;
 using HarmonyLib;
+using Nautilus.Assets.PrefabTemplates;
+using Nautilus.Assets;
+using Nautilus.Crafting;
 using Nautilus.Handlers;
 using System.Reflection;
+using static CraftData;
 using static FCS_AlterraHub.Configuation.SaveData;
+using static UWE.FreezeTime;
+using Nautilus.Assets.Gadgets;
+using UnityEngine;
+using FCS_AlterraHub.ModItems.Spawnables.PaintTool.Items;
+using System.Collections.Generic;
+using System;
+using FCS_AlterraHub.Models.Mono;
+using Nautilus.Json;
 
 namespace FCS_AlterraHub;
 
@@ -27,7 +39,7 @@ public class Plugin : BaseUnityPlugin
     /// <summary>
     /// Configuration of the AlterraHub Mod (For use in-game menu)
     /// </summary>
-    public static Config Configuration { get; } = OptionsPanelHandler.RegisterModOptions<Config>();
+    internal static Config Configuration { get; } = OptionsPanelHandler.RegisterModOptions<Config>();
 
     public static IModSettingsBase ModSettings => new ModSettings();
     private static Assembly Assembly { get; } = Assembly.GetExecutingAssembly();
@@ -58,16 +70,33 @@ public class Plugin : BaseUnityPlugin
 
         AlterraHubSaveData = SaveDataHandler.RegisterSaveDataCache<AlterraHubSaveData>();
 
+        AlterraHubSaveData.OnFinishedLoading += OnFinishedLoading;
+
         // register harmony patches, if there are any
         Harmony.CreateAndPatchAll(Assembly, $"{PluginInfo.PLUGIN_GUID}");
         Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
+    }
+
+    public void OnFinishedLoading(object sender, JsonFileEventArgs e)
+    {
+        QuickLogger.Debug("Finished Loading", true);
+
+        AlterraHubSaveData data = e.Instance as AlterraHubSaveData;
+
+        if (data != null )
+        {
+            if(data.colorTemplate is not null)
+            {
+                ColorManager.colorTemplates = AlterraHubSaveData.colorTemplate;
+            }
+        }
     }
 
     private void InitializePrefabs()
     {
         //YeetKnifePrefab.Register();
         //Register mod pack
-        FCSModsAPI.PublicAPI.RegisterModPack(PluginInfo.PLUGIN_NAME, Assembly.GetExecutingAssembly(), ModSettings.AssetBundleName);
+        FCSModsAPI.PublicAPI.RegisterModPack(PluginInfo.PLUGIN_NAME, Assembly.GetExecutingAssembly(), ModSettings.AssetBundleName,ModSaveManager.Save,ModSaveManager.LoadData);
 
         ////Add mod           
         //FCSModsAPI.PublicAPI.RegisterMod(MODNAME,new TestBuildable());
@@ -86,10 +115,17 @@ public class Plugin : BaseUnityPlugin
         FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "DC", new DebitCardSpawnable());
 
         //Add mod and patch.
-        FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "BMT", new BaseTransmitterBuildable());
+        FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "CGE", new ConnectionGridExtensionBuildable());
+
+        //Add mod and patch.
+        FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "PC", new PaintCanSpawnable());
+
+        //Add mod and patch.
+        FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "PT", new PaintToolSpawnable());
 
         //Add mod and patch.
         FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "TO", new TestBuildable());
+
 
     }
 

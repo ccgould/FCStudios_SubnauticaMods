@@ -15,8 +15,16 @@ public class HoverInteraction : HandTarget, IHandTarget
     private FCSDevice _controller;
     [SerializeField]
     private Constructable _constructable;
+    [SerializeField]
+    private HandReticle.IconType icon = HandReticle.IconType.Hand;
+    [SerializeField]
+    private GameInput.Button button = GameInput.Button.LeftHand;
+    [SerializeField]
+    private string mainText = "Open Settings";
+
 
     public event Action<TechType> onSettingsKeyPressed;
+    public event Action<FCSPDAController> onPDAClosed;
 
     private static readonly StringBuilder Sb = new();
 
@@ -63,7 +71,7 @@ public class HoverInteraction : HandTarget, IHandTarget
         }
     }
 
-    private void HandHoverPDAHelper(FCSDevice controller, HandReticle.IconType icon = HandReticle.IconType.Hand, float progess = 0f)
+    private void HandHoverPDAHelper(FCSDevice controller, float progess = 0f)
     {
         var main = HandReticle.main;
         
@@ -73,7 +81,7 @@ public class HoverInteraction : HandTarget, IHandTarget
        
         CreateText(controller, strings);
 
-        main.SetText(HandReticle.TextType.Hand, "Open Settings", false, GameInput.Button.LeftHand);
+        main.SetText(HandReticle.TextType.Hand, mainText, false, button);
         main.SetText(HandReticle.TextType.HandSubscript, Sb.ToString(), false, GameInput.Button.None);
         main.SetIcon(icon, 1f);
 
@@ -102,7 +110,7 @@ public class HoverInteraction : HandTarget, IHandTarget
             Sb.Append(Environment.NewLine);
         }
         Sb.Append(Environment.NewLine);
-        if(!_controller.IsConnectedToBase)
+        if(!_controller.IsConnectedToBase && !_controller.GetBypassConnection())
         {
             Sb.Append(LanguageService.NotConnectedToBaseManager());
             Sb.Append(Environment.NewLine);

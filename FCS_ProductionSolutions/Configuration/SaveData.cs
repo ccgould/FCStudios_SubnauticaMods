@@ -16,8 +16,8 @@ internal class SaveData
         public string Id { get; set; }
         public string BaseId { get; set; }
         public ColorTemplateSave ColorTemplate { get; set; }
-        public IList<float> Progress { get; set; }
-        public float StartUpProgress { get; set; }
+        public float Progress { get; set; }
+        public int State { get; set; }
         public float GenerationProgress { get; set; }
         public float CoolDownProgress { get; set; }
         public IonCubeGenSpeedModes CurrentSpeedMode { get; set; }

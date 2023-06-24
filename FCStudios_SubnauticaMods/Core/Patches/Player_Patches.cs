@@ -1,5 +1,4 @@
-﻿using FCS_AlterraHub.Configuation;
-using FCS_AlterraHub.Core.Components;
+﻿using FCS_AlterraHub.Core.Components;
 using FCS_AlterraHub.Core.Services;
 using HarmonyLib;
 using UnityEngine;
@@ -27,13 +26,19 @@ internal class Player_Patches
     private static void OnProtoSerialize_Postfix()
     {
         //Mod.SaveGamePlaySettings();
-        ModSaveManager.Save();
+        foreach (var modPack in ModRegistrationService.GetRegisteredMods())
+        {
+            modPack.Value.Save();
+        }
     }
 
     [HarmonyPatch(typeof(Player), nameof(Player.OnProtoDeserialize))]
     [HarmonyPostfix]
     private static void OnProtoDeserialize_Postfix()
     {
-        ModSaveManager.LoadData();
+        foreach (var modPack in ModRegistrationService.GetRegisteredMods())
+        {
+            modPack.Value.Load();
+        }
     }
 }

@@ -169,7 +169,7 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI, uGUI_IButton
         {
             if(page == PDAPages.DevicePage)
             {
-                var data = arg as Tuple<TechType, FCSDevice>;
+                var data = arg as Tuple<TechType, MonoBehaviour>;
 
                 QuickLogger.Debug($"{data.Item1} || {data.Item2}");
 
@@ -271,7 +271,7 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI, uGUI_IButton
 
     public void ShowMessage(string message)
     {
-        _messageBox.Show(message, FCSMessageButton.OK);
+        _messageBox.ShowMessage(message, FCSMessageButton.OK);
     }
 
     internal void AddAdditionalPage(TechType id, GameObject uiPrefab)
@@ -299,9 +299,9 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI, uGUI_IButton
 
     }
 
-    internal void PrepareDevicePage(TechType id, FCSDevice fcsDevice)
+    internal void PrepareDevicePage(TechType id, MonoBehaviour fcsDevice)
     {
-        GoToPage(PDAPages.DevicePage,new Tuple<TechType,FCSDevice>(id, fcsDevice));
+        GoToPage(PDAPages.DevicePage,new Tuple<TechType,MonoBehaviour>(id, fcsDevice));
     }
 
     internal void PurgePages()

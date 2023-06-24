@@ -1,4 +1,5 @@
 ﻿using FCS_AlterraHub.API;
+using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.Models.Structs;
@@ -20,7 +21,7 @@ public abstract class FCSSpawnableModBase : ModBase,IModBase
     protected readonly string _friendlyName;
     private readonly string _prefabName;
     private protected GameObject _cachedPrefab;
-
+    protected CustomPrefab _customPrefab;
 
     public string AssetsFolder { get; }
 
@@ -42,14 +43,16 @@ public abstract class FCSSpawnableModBase : ModBase,IModBase
 
     public void Register()
     {
+
+        _customPrefab = new CustomPrefab(PrefabInfo);
+
         OnStartRegister?.Invoke();
-        var prefab = new CustomPrefab(PrefabInfo);
 
         // Set our prefab to a clone of the Seamoth electrical defense module
-        prefab.SetGameObject(GetGameObjectAsync);
+        _customPrefab.SetGameObject(GetGameObjectAsync);
 
         // register the coal to the game
-        prefab.Register();
+        _customPrefab.Register();
 
         OnFinishRegister?.Invoke();
     }
@@ -75,26 +78,31 @@ public abstract class FCSSpawnableModBase : ModBase,IModBase
 
         var prefab = GameObject.Instantiate(Prefab);
 
-        var placeTool = prefab.GetComponent<PlaceTool>();
-        if(placeTool != null )
+        //var placeTool = prefab.GetComponent<PlaceTool>();
+        //if(placeTool != null )
+        //{
+        //    placeTool.allowedInBase = _settings.AllowedInBase;
+        //    placeTool.allowedOnBase = _settings.AllowedOnBase;
+        //    placeTool.allowedOnCeiling = _settings.AllowedOnCeiling;
+        //    placeTool.allowedOnConstructable = _settings.AllowedOnConstructables;
+        //    placeTool.allowedOnGround = _settings.AllowedOnGround;
+        //    placeTool.allowedOnRigidBody = _settings.AllowOnRigidBody;
+        //    placeTool.allowedOnWalls = _settings.AllowedOnWall;
+        //    placeTool.allowedOutside = _settings.AllowedOutside;
+        //    placeTool.rotationEnabled = _settings.RotationEnabled;
+        //    placeTool.hasAnimations = _settings.HasAnimations;
+        //    placeTool.hasBashAnimation = _settings.HasBashAnimation;
+        //    placeTool.hasFirstUseAnimation = _settings.HasFirstAnimation;
+        //    placeTool.drawTime = _settings.DrawTime;
+        //    placeTool.dropTime = _settings.DropTime;
+        //    placeTool.holsterTime = _settings.HolsterTime;
+        //}
+
+        if (_settings.HasGlass)
         {
-            placeTool.allowedInBase = _settings.AllowedInBase;
-            placeTool.allowedOnBase = _settings.AllowedOnBase;
-            placeTool.allowedOnCeiling = _settings.AllowedOnCeiling;
-            placeTool.allowedOnConstructable = _settings.AllowedOnConstructables;
-            placeTool.allowedOnGround = _settings.AllowedOnGround;
-            placeTool.allowedOnRigidBody = _settings.AllowOnRigidBody;
-            placeTool.allowedOnWalls = _settings.AllowedOnWall;
-            placeTool.allowedOutside = _settings.AllowedOutside;
-            placeTool.rotationEnabled = _settings.RotationEnabled;
-            placeTool.hasAnimations = _settings.HasAnimations;
-            placeTool.hasBashAnimation = _settings.HasBashAnimation;
-            placeTool.hasFirstUseAnimation = _settings.HasFirstAnimation;
-            placeTool.drawTime = _settings.DrawTime;
-            placeTool.dropTime = _settings.DropTime;
-            placeTool.holsterTime = _settings.HolsterTime;
+            //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
+            MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Plugin.ModSettings.ModPackID);
         }
-               
 
         yield return ModifyPrefab(prefab);
 

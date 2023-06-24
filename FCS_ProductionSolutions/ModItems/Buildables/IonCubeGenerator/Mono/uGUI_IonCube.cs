@@ -13,8 +13,8 @@ using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-
-
+using UWE;
+using static FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Mono.StateMachine.CubeGeneratorStateManager;
 
 namespace FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Mono;
 
@@ -51,7 +51,7 @@ internal class uGUI_IonCube : Page, IuGUIAdditionalPage
     private readonly Color _cyan = new Color(0.13671875f, 0.7421875f, 0.8046875f);
     private readonly Color _green = new Color(0.0703125f, 0.92578125f, 0.08203125f);
     private readonly Color _orange = new Color(0.95703125f, 0.4609375f, 0f);
-    private const float MaxBar = IonCubeGeneratorController.ProgressComplete;
+    private const float MaxBar = 100;
     private const float BarMinValue = 0.087f;
     private const float BarMaxValue = 0.409f;
     private const int MaxContainerSpaces = CubeGeneratorContainer.MaxAvailableSpaces;
@@ -172,7 +172,7 @@ internal class uGUI_IonCube : Page, IuGUIAdditionalPage
 
     public void OnStorageButtonClicked()
     {
-        _controller.OpenStorage();
+        CoroutineHost.StartCoroutine(_controller.OpenStorage());
     }
 
     public void ProcessSpeedChange(string buttonID)
@@ -180,42 +180,42 @@ internal class uGUI_IonCube : Page, IuGUIAdditionalPage
         switch (buttonID)
         {
             case "LButton":
-                switch (_controller.CurrentSpeedMode)
+                switch (_controller.CurrentSpeedMode())
                 {
                     case IonCubeGenSpeedModes.Max:
-                        _controller.CurrentSpeedMode = IonCubeGenSpeedModes.High;
+                        _controller.SetCurrentSpeedMode(IonCubeGenSpeedModes.High);
                         break;
                     case IonCubeGenSpeedModes.High:
-                        _controller.CurrentSpeedMode = IonCubeGenSpeedModes.Low;
+                        _controller.SetCurrentSpeedMode(IonCubeGenSpeedModes.Low);
                         break;
                     case IonCubeGenSpeedModes.Low:
-                        _controller.CurrentSpeedMode = IonCubeGenSpeedModes.Min;
+                        _controller.SetCurrentSpeedMode(IonCubeGenSpeedModes.Min);
                         break;
                     case IonCubeGenSpeedModes.Min:
-                        _controller.CurrentSpeedMode = IonCubeGenSpeedModes.Off;
+                        _controller.SetCurrentSpeedMode(IonCubeGenSpeedModes.Off);
                         break;
                 }
                 break;
 
             case "RButton":
-                switch (_controller.CurrentSpeedMode)
+                switch (_controller.CurrentSpeedMode())
                 {
                     case IonCubeGenSpeedModes.High:
-                        _controller.CurrentSpeedMode = IonCubeGenSpeedModes.Max;
+                        _controller.SetCurrentSpeedMode(IonCubeGenSpeedModes.Max);
                         break;
                     case IonCubeGenSpeedModes.Low:
-                        _controller.CurrentSpeedMode = IonCubeGenSpeedModes.High;
+                        _controller.SetCurrentSpeedMode(IonCubeGenSpeedModes.High);
                         break;
                     case IonCubeGenSpeedModes.Min:
-                        _controller.CurrentSpeedMode = IonCubeGenSpeedModes.Low;
+                        _controller.SetCurrentSpeedMode(IonCubeGenSpeedModes.Low);
                         break;
                     case IonCubeGenSpeedModes.Off:
-                        _controller.CurrentSpeedMode = IonCubeGenSpeedModes.Min;
+                        _controller.SetCurrentSpeedMode(IonCubeGenSpeedModes.Min);
                         break;
                 }
                 break;
             default:
-                QuickLogger.Debug(_controller.CurrentSpeedMode.ToString(), true);
+                QuickLogger.Debug(_controller.CurrentSpeedMode().ToString(), true);
                 throw new ArgumentOutOfRangeException();
         }
 
@@ -224,7 +224,7 @@ internal class uGUI_IonCube : Page, IuGUIAdditionalPage
 
     private void UpdateSpeedText()
     {
-        switch (_controller.CurrentSpeedMode)
+        switch (_controller.CurrentSpeedMode())
         {
             case IonCubeGenSpeedModes.Off:
                 _speedMode.text = GetLanguage(DisplayLanguagePatching.OffKey);
@@ -251,7 +251,7 @@ internal class uGUI_IonCube : Page, IuGUIAdditionalPage
 
     private void UpdatePercentageText()
     {
-        _percentDisplay.text = $"{Mathf.RoundToInt(_controller.GenerationPercent * 100)}%";
+        _percentDisplay.text = $"{Mathf.RoundToInt(_controller.GetStateManager().GetState(CubeGeneratorStates.Generating).GetProgressNormalized() * 100)}%";
     }
 
     private void UpdatePercentageBar()
@@ -264,7 +264,7 @@ internal class uGUI_IonCube : Page, IuGUIAdditionalPage
 
         //float calcBar = _mono.GenerationPercent / MaxBar;
 
-        float outputBar = _controller.GenerationPercent * (BarMaxValue - BarMinValue) + BarMinValue;
+        float outputBar = _controller.GetStateManager().GetState(CubeGeneratorStates.Generating).GetProgressNormalized() * (BarMaxValue - BarMinValue) + BarMinValue;
 
         _percentageBar.fillAmount = Mathf.Clamp(outputBar, BarMinValue, BarMaxValue);
 
@@ -272,7 +272,7 @@ internal class uGUI_IonCube : Page, IuGUIAdditionalPage
 
     private void UpdateStoragePercentBar()
     {
-        float calcBar = (float)(_controller.NumberOfCubes * 1.0 / (MaxContainerSpaces * 1.0));
+        float calcBar = (float)(_controller.NumberOfCubes() * 1.0 / (MaxContainerSpaces * 1.0));
         float outputBar = calcBar * (BarMaxValue - BarMinValue) + BarMinValue;
         _storageBar.fillAmount = Mathf.Clamp(outputBar, BarMinValue, BarMaxValue);
 
@@ -280,26 +280,26 @@ internal class uGUI_IonCube : Page, IuGUIAdditionalPage
 
     private void UpdateStorageAmount()
     {
-        _storageAmount.text = $"{_controller.NumberOfCubes}/{MaxContainerSpaces}";
+        _storageAmount.text = $"{_controller.NumberOfCubes()}/{MaxContainerSpaces}";
 
-        float percent = (float)(_controller.NumberOfCubes * 1.0 / MaxContainerSpaces * 1.0) * 100.0f;
+        float percent = (float)(_controller.NumberOfCubes() * 1.0 / MaxContainerSpaces * 1.0) * 100.0f;
 
-        if (Math.Round(percent) <= 25)
+        if (Mathf.Round(percent) <= 25)
         {
             _storageBar.color = _cyan;
         }
 
-        if (Math.Round(percent) > 25 && percent <= 50)
+        if (Mathf.Round(percent) > 25 && percent <= 50)
         {
             _storageBar.color = _green;
         }
 
-        if (Math.Round(percent) > 50 && percent <= 75)
+        if (Mathf.Round(percent) > 50 && percent <= 75)
         {
             _storageBar.color = _orange;
         }
 
-        if (Math.Round(percent) > 75 && percent <= 100)
+        if (Mathf.Round(percent) > 75 && percent <= 100)
         {
             _storageBar.color = _fireBrick;
         }

@@ -22,17 +22,37 @@ internal class ModPackData
     private Dictionary<string, ModBase> _modItems = new();
     private Assembly _assembly;
     private string _assetBundleName;
+    private Action _saveCallBack;
+    private Action _loadCallBack;
 
     /// <summary>
     /// Create a new ModData.
     /// </summary>
     /// <param name="modName">Name of the mod</param>
     /// <param name="assembly">The executing assembly</param>
-    public ModPackData(string modName, Assembly assembly,string assetBundleName)
+    public ModPackData(string modName, Assembly assembly,string assetBundleName,Action saveCallBack,Action loadCallBack)
     {
         _modName = modName;
         _assembly = assembly;
         _assetBundleName = assetBundleName;
+        _saveCallBack = saveCallBack;
+        _loadCallBack = loadCallBack;
+    }
+
+    /// <summary>
+    /// Calls the function that handles saving the mod pack
+    /// </summary>
+    public void Save()
+    {
+        _saveCallBack?.Invoke();
+    }
+
+    /// <summary>
+    /// Calls the function that handles loading the mod pack
+    /// </summary>
+    public void Load()
+    {
+        _loadCallBack?.Invoke();
     }
 
     /// <summary>

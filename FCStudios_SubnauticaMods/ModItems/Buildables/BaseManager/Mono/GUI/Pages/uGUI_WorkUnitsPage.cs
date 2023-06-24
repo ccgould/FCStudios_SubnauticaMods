@@ -27,7 +27,7 @@ internal class uGUI_WorkUnitsPage : MonoBehaviour
         {
             var item = Instantiate(itemTemplate, grid);
             var controller = item.GetComponent<uGUI_WorkGroupListItem>();
-            controller.Initialize(device.Key, device.Value);
+            controller.Initialize(device.Value.FriendlyName, device.Value.Devices);
         }
     }
 

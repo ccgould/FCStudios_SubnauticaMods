@@ -1,5 +1,6 @@
 ﻿using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Core.Services;
+using FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Mono.StateMachine;
 using UnityEngine;
 
 namespace FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Mono;
@@ -9,8 +10,8 @@ namespace FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Mono;
 /// </summary>
 internal class CubeGeneratorFxController : MonoBehaviour
 {
-    [SerializeField]
-    private IonCubeGeneratorController _controller;
+    [SerializeField] private IonCubeGeneratorController _controller;
+    private CubeGeneratorStateManager _stateManager;
     private bool _isInitialized = false;
     public float Frequency = 4f;
     public float Magnitude = 5f;
@@ -21,6 +22,7 @@ internal class CubeGeneratorFxController : MonoBehaviour
     
     private void Awake()
     {
+        _stateManager = gameObject.GetComponent<CubeGeneratorStateManager>();
         _fx = gameObject.GetComponentInChildren<ParticleSystem>();
 
         if (_machineSound == null)
@@ -42,7 +44,7 @@ internal class CubeGeneratorFxController : MonoBehaviour
 
     private void UpdateSFX()
     {
-        if(!_controller.IsCrafting())
+        if(!_stateManager.IsCrafting())
         {
             if(_machineSound.playing)
             {
@@ -61,11 +63,11 @@ internal class CubeGeneratorFxController : MonoBehaviour
     private void UpdateFX()
     {
         ///TODO STOP if Power Cuts Off
-        if(_controller.CoolDownPercent > 0 && _fx.isPlaying)
+        if(_stateManager.IsCoolingDown() && _fx.isPlaying)
         {
             _fx.Stop();
         }
-        else if(_controller.GenerationPercent > 0f && !_fx.isPlaying)
+        else if(_stateManager.IsCrafting() && !_fx.isPlaying)
         {
             _fx.Play();
         }
@@ -74,7 +76,7 @@ internal class CubeGeneratorFxController : MonoBehaviour
     private void UpdateEmission()
     {
         ///TODO STOP if Power Cuts Off
-        float intensity = !_controller.IsCrafting() ? 5f : Mathf.Clamp(Magnitude + Mathf.Sin(Time.timeSinceLevelLoad * Frequency) * Magnitude, 1, 5f);
+        float intensity = !_stateManager.IsCrafting() ? 5f : Mathf.Clamp(Magnitude + Mathf.Sin(Time.timeSinceLevelLoad * Frequency) * Magnitude, 1, 5f);
         MaterialHelpers.ChangeEmissionStrength(ModPrefabService.BaseSecondaryCol, gameObject, intensity);
     }
 }

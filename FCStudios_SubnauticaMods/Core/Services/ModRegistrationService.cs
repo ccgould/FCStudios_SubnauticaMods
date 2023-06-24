@@ -64,7 +64,7 @@ internal static class ModRegistrationService
     /// <param name="modPackName">Name of the mod pack.</param>
     /// <param name="assembly">The executing assembly.</param>
     /// <param name="mods">All the mods spawnables for patching.</param>
-    internal static void Register(string modPackName, Assembly assembly,string assetBundleName)
+    internal static void Register(string modPackName, Assembly assembly,string assetBundleName,Action saveCallBack, Action loadCallBack)
     {
         if (Exist(modPackName))
         {
@@ -72,7 +72,7 @@ internal static class ModRegistrationService
             return;
         };
 
-        _registeredMods.Add(modPackName, new ModPackData(modPackName, assembly, assetBundleName));
+        _registeredMods.Add(modPackName, new ModPackData(modPackName, assembly, assetBundleName,saveCallBack,loadCallBack));
         EncyclopediaService.GetEncyclopediaEntries(modPackName);
         QuickLogger.Info($"Registered {modPackName}");
     }

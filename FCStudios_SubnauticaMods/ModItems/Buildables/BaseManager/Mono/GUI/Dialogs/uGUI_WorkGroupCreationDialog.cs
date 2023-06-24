@@ -3,27 +3,33 @@ using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Mono;
+using FCS_AlterraHub.Models.Mono.Handlers;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Mono.GUI.Pages;
+using FCS_AlterraHub.ModItems.FCSPDA.Enums;
+using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+
 namespace FCS_AlterraHub.ModItems.Buildables.BaseManager.Mono.GUI.Dialogs;
+
 internal class uGUI_WorkGroupCreationDialog : MonoBehaviour
 {
     [SerializeField] private Transform grid;
     [SerializeField] private Transform deviceTypesGrid;
     [SerializeField] private Transform itemTemplate;
     [SerializeField] private ToggleGroup toggleGroup;
-    [SerializeField] private ToggleGroup devicesToggleGroup;
+    [SerializeField] private uGUI_InputField workGroupInputField;
     [SerializeField] private uGUI_WorkUnitsPage uGUI_WorkUnitsPage;
     [SerializeField] private MenuController menuManager;
+
     private TechType selectedTechType;
     private HabitatManager _baseManager;
-    private string _unitName;
-    private TechType _currentTechType;
+    private HashSet<Toggle> selectedToggles = new();
 
     public event EventHandler<OnWorkGroupCreatedArg> OnWorkGroupCreated;
     public class OnWorkGroupCreatedArg : EventArgs
@@ -39,9 +45,7 @@ internal class uGUI_WorkGroupCreationDialog : MonoBehaviour
 
     private void CreateItems()
     {
-        if (selectedTechType == TechType.None || selectedTechType == _currentTechType) return;
-
-        _currentTechType = selectedTechType;
+        if (selectedTechType == TechType.None) return;
 
         ClearDevicesList();
 
@@ -52,7 +56,18 @@ internal class uGUI_WorkGroupCreationDialog : MonoBehaviour
             var item = Instantiate(itemTemplate, grid);
             var controller = item.GetComponent<uGUI_WorkGroupListItem>();
             var toggle = item.gameObject.GetComponent<Toggle>();
-            toggle.group = devicesToggleGroup;
+            toggle.onValueChanged.AddListener((x) =>
+            {
+                if(x)
+                {
+                    selectedToggles.Add(toggle);
+                }
+                else
+                {
+                    selectedToggles.Remove(toggle);
+                }
+            });
+            //toggle.group = devicesToggleGroup;
             controller.Initialize(currentDevice);
         }
     }
@@ -68,14 +83,13 @@ internal class uGUI_WorkGroupCreationDialog : MonoBehaviour
 
     public void RefreshUI()
     {
+        Reset();
         CreateDeviceTypeItems();
     }
 
     private void CreateDeviceTypeItems()
     {
         var techTypes = new HashSet<TechType>();
-
-        ClearDeviceTypesList();
 
         foreach (var device in _baseManager.GetConnectedDevices(true))
         {
@@ -107,39 +121,38 @@ internal class uGUI_WorkGroupCreationDialog : MonoBehaviour
 
     public void OnDone()
     {
-        if(string.IsNullOrEmpty(_unitName))
+        var groupName = workGroupInputField.text;
+        if (string.IsNullOrEmpty(groupName))
         {
+            //uGUI_NotificationManager.Instance.AddNotification($"");
+            MessageBoxHandler.Instance.ShowMessage("Work Unit Name Required", FCSAlterraHubGUISender.PDA);
             return;
         }
 
-        if(!devicesToggleGroup.AnyTogglesOn())
+        if (!selectedToggles.Any())
         {
             return;
         }
 
         var list = new List<IWorkUnit>();
-        var toggles = grid.GetAllComponentsInChildren<Toggle>();
 
-        foreach (Toggle toggle in toggles)
+        foreach (Toggle toggle in selectedToggles)
         {
             if (!toggle.isOn) continue;
             var listItem = toggle.GetComponent<uGUI_WorkGroupListItem>();
             list.Add((IWorkUnit)listItem.GetDevice());
         }
-
-        _baseManager.CreateWorkUnit(list);
-
+        _baseManager.CreateWorkUnit(list, groupName);
         uGUI_WorkUnitsPage.RefreshUI();
-
-        ClearDeviceTypesList();
-
-        ClearDevicesList();
-
         menuManager.PopPage();
     }
 
-    public void OnTextChanged(string value)
+    public void Reset()
     {
-        _unitName = value;
+        selectedTechType = TechType.None;
+        selectedToggles.Clear();
+        workGroupInputField.text = string.Empty;
+        ClearDeviceTypesList();
+        ClearDevicesList();
     }
 }

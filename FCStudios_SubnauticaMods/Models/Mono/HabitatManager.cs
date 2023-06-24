@@ -17,7 +17,7 @@ public partial class HabitatManager : MonoBehaviour
 
     private HashSet<FCSDevice> _registeredDevices = new();
     private readonly Dictionary<string,FCSDevice> _connectedDevices = new();
-    private Dictionary<string,List<IWorkUnit>> _workUnits = new();
+    private Dictionary<string, WorkUnit> _workUnits = new();
     private Dictionary<string,List<object>> _automatedOperations = new();
     private string _baseFriendlyID => GetBaseFriendlyName();
     private SubRoot _habitat;
@@ -307,7 +307,7 @@ public partial class HabitatManager : MonoBehaviour
 
     private bool IsInWorkGroup(string prefabID)
     {
-       return _workUnits.Any(x=>x.Value.Any(x=>x.GetPrefabID().Equals(prefabID)));
+       return _workUnits.Any(x=>x.Value.Devices.Any(x=>x.GetPrefabID().Equals(prefabID)));
     }
 
     public bool IsRemoteLinkConnected()
@@ -344,11 +344,11 @@ public partial class HabitatManager : MonoBehaviour
         return false; ;
     }
 
-    public string CreateWorkUnit(List<IWorkUnit> devices)
+    public string CreateWorkUnit(List<IWorkUnit> devices, string groupName)
     {
         var guid = Guid.NewGuid().ToString();
         
-        _workUnits.Add(guid, devices);
+        _workUnits.Add(guid, new WorkUnit(guid,groupName,devices));
 
         return guid;
     }
@@ -360,7 +360,7 @@ public partial class HabitatManager : MonoBehaviour
             var device = workUnit as FCSDevice;
 
 
-            _workUnits[guid].Add(workUnit);
+            _workUnits[guid].Devices.Add(workUnit);
             return true;
         }
 
@@ -370,12 +370,12 @@ public partial class HabitatManager : MonoBehaviour
     public void OnDeviceUIClosed(IWorkUnit obj)
     {
 
-        var g = _workUnits.FirstOrDefault(x=>x.Value.Contains(obj));
+        var g = _workUnits.FirstOrDefault(x=>x.Value.Devices.Contains(obj));
         QuickLogger.Debug($"Work Group {g.Key}", true);
 
-        if (g.Value is not null)
+        if (g.Value.Devices is not null)
         {
-            foreach (var device in g.Value)
+            foreach (var device in g.Value.Devices)
             {
                 QuickLogger.Debug("Syning Device",true);
                 device.SyncDevice(obj);
@@ -387,7 +387,7 @@ public partial class HabitatManager : MonoBehaviour
     {
         if(_workUnits.ContainsKey(guid))
         {
-            _workUnits[guid].Remove(device);
+            _workUnits[guid].Devices.Remove(device);
             return true;
         }
         return false;
@@ -403,7 +403,7 @@ public partial class HabitatManager : MonoBehaviour
         return _workUnits.Count();
     }
 
-    internal Dictionary<string, List<IWorkUnit>> GetWorkUnits()
+    internal Dictionary<string, WorkUnit> GetWorkUnits()
     {
         return _workUnits;
     }
@@ -431,4 +431,18 @@ public partial class HabitatManager : MonoBehaviour
     {
         return GetFailedConnectionAttemptsCount() > 0;
     }
+}
+
+public struct WorkUnit
+{
+    public WorkUnit(string guid, string friendlyName, List<IWorkUnit> devices)
+    {
+        FriendlyName = friendlyName;
+        Guid = guid;
+        Devices = devices;
+    }
+
+    public string FriendlyName { get; set; }
+    public string Guid { get; set; }
+    public List<IWorkUnit> Devices { get; set; }
 }

@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Mono.StateMachine;
+using UnityEngine;
+using static FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Mono.StateMachine.CubeGeneratorStateManager;
 
 namespace FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Mono;
 
@@ -13,6 +15,13 @@ internal class CubeGeneratorPulleyController : MonoBehaviour
     [SerializeField]
     private AnimationCurve _coolDownAnimationCurve;
 
+    private CubeGeneratorStateManager _stateManager;
+
+    private void Awake()
+    {
+        _stateManager = GetComponent<CubeGeneratorStateManager>();
+    }
+
     private void Update()
     {
         UpdatePulleyPosition();
@@ -20,15 +29,15 @@ internal class CubeGeneratorPulleyController : MonoBehaviour
 
     private void UpdatePulleyPosition()
     {
-        if(_controller.StartUpPercent > 0)
+        if(_stateManager.IsStartingUp())
         {
-            _ionCube.transform.localPosition = new Vector3(_ionCube.transform.localPosition.x, _startUpAnimationCurve.Evaluate(_controller.StartUpPercent), _ionCube.transform.localPosition.z);
+            _ionCube.transform.localPosition = new Vector3(_ionCube.transform.localPosition.x, _startUpAnimationCurve.Evaluate(_stateManager.GetState(CubeGeneratorStates.StartUp).GetProgressNormalized()), _ionCube.transform.localPosition.z);
 
         }
 
-        if (_controller.CoolDownPercent > 0)
+        if (_stateManager.IsCoolingDown())
         {
-            _ionCube.transform.localPosition = new Vector3(_ionCube.transform.localPosition.x, _coolDownAnimationCurve.Evaluate(_controller.CoolDownPercent), _ionCube.transform.localPosition.z);
+            _ionCube.transform.localPosition = new Vector3(_ionCube.transform.localPosition.x, _coolDownAnimationCurve.Evaluate(_stateManager.GetState(CubeGeneratorStates.CoolDown).GetProgressNormalized()), _ionCube.transform.localPosition.z);
         }
     }
 }

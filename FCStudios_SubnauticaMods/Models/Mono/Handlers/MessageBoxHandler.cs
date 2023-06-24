@@ -12,6 +12,9 @@ namespace FCS_AlterraHub.Models.Mono.Handlers;
 
 internal class MessageBoxHandler : MonoBehaviour
 {
+
+    internal static MessageBoxHandler Instance;
+
     private Action<FCSMessageResult> _result;
     [SerializeField]
     private FCSMessageBox _messageBox;
@@ -20,9 +23,9 @@ internal class MessageBoxHandler : MonoBehaviour
     private readonly Queue<MessageBoxData> _messageQueue = new Queue<MessageBoxData>();
     private static Dictionary<FCSAlterraHubGUISender, IFCSAlterraHubGUI> _registeredGUI = new();
 
-    private void TestMessagQueue()
+    private void Awake()
     {
-        _messageQueue.Enqueue(new MessageBoxData("Test", FCSMessageButton.OK, null));
+        Instance = this;
     }
 
     public void Initialize(GameObject go, FCSAlterraHubGUISender sender)
@@ -33,7 +36,7 @@ internal class MessageBoxHandler : MonoBehaviour
         }
     }
 
-    internal void Show(string message, FCSMessageButton button, Action<FCSMessageResult> result = null)
+    public void ShowMessage(string message, FCSMessageButton button, Action<FCSMessageResult> result = null)
     {
         if (_messageBox == null)
         {
@@ -50,6 +53,15 @@ internal class MessageBoxHandler : MonoBehaviour
 
         _result = result;
         _messageBox.Show(message, button, OnMessageResult);
+    }
+
+    public void ShowMessage(string message, FCSAlterraHubGUISender sender)
+    {
+        var guis = _registeredGUI.Where(x => x.Key == sender);
+        foreach (var gui in guis)
+        {
+            gui.Value.ShowMessage(message);
+        }
     }
 
     private void OnMessageResult(FCSMessageResult result)
@@ -76,14 +88,5 @@ internal class MessageBoxHandler : MonoBehaviour
         public FCSMessageButton Button { get; }
 
         public string Message { get; }
-    }
-
-    public static void ShowMessage(string message, FCSAlterraHubGUISender sender)
-    {
-        var guis = _registeredGUI.Where(x => x.Key == sender);
-        foreach (var gui in guis)
-        {
-            gui.Value.ShowMessage(message);
-        }
     }
 }

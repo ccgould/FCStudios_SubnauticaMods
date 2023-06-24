@@ -10,14 +10,14 @@ using System.Collections;
 using UnityEngine;
 
 namespace FCS_AlterraHub.ModItems.Buildables.BaseManager.Items.BaseTransmitter.Buildable;
-internal class BaseTransmitterBuildable : FCSBuildableModBase
+internal class ConnectionGridExtensionBuildable : FCSBuildableModBase
 {
     private TechType _kitTechType;
     public static TechType PatchedTechType { get; private set; }
     public static EnumBuilder<EquipmentType> BaseManagerEquipmentType { get; private set; }
 
 
-    public BaseTransmitterBuildable() : base(PluginInfo.PLUGIN_NAME, "fcsBaseManagerConnector", FileSystemHelper.ModDirLocation, "BaseManagerTransmitter", "Base Manager Transmitter")
+    public ConnectionGridExtensionBuildable() : base(PluginInfo.PLUGIN_NAME, "fcsBaseManagerConnector", FileSystemHelper.ModDirLocation, "ConnectionGridExtension", "Connection Grid Extension")
     {
         OnStartRegister += () =>
         {

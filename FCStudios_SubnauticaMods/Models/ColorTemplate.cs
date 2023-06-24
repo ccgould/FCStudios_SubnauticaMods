@@ -1,8 +1,10 @@
 ﻿using FCS_AlterraHub.Models.Structs;
+using System;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Models;
 
+[Serializable]
 public class ColorTemplate
 {
     public Color PrimaryColor { get; set; } = Color.white;

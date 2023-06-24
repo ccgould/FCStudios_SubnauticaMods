@@ -70,8 +70,8 @@ internal class CubeGeneratorContainer : ICubeContainer
             _cubeContainer.isAllowedToAdd += IsAllowedToAdd;
             _cubeContainer.isAllowedToRemove += IsAllowedToRemove;
 
-            _cubeContainer.onAddItem += cubeGenerator.OnAddItemEvent;
-            _cubeContainer.onRemoveItem += cubeGenerator.OnRemoveItemEvent;
+            //_cubeContainer.onAddItem += cubeGenerator.OnAddItemEvent;
+            //_cubeContainer.onRemoveItem += cubeGenerator.OnRemoveItemEvent;
         }
     }
 

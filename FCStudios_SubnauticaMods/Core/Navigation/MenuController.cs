@@ -73,6 +73,23 @@ public class MenuController : MonoBehaviour
         PageStack.Push(Page);
     }
 
+    public void PushPage(Page Page,object arg)
+    {
+        Page.Enter(true,arg);
+
+        if (PageStack.Count > 0)
+        {
+            Page currentPage = PageStack.Peek();
+
+            if (currentPage.ExitOnNewPagePush)
+            {
+                currentPage.Exit(false);
+            }
+        }
+
+        PageStack.Push(Page);
+    }
+
     public void TogglePage(Page Page)
     {
         if (Page.IsVisible())

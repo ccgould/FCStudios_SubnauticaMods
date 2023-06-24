@@ -446,17 +446,22 @@ public static class MaterialHelpers
     /// <param name="gameObject">The <see cref="GameObject"/> to search.</param>
     /// <param name="materialName">Name of the material to look for.</param>
     /// <returns></returns>
-    public static IEnumerable<Material> GetMaterials(GameObject gameObject, string materialName)
+    public static List<Material> GetMaterials(GameObject gameObject, string materialName)
     {
+        var list = new List<Material>();
         Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
-
         foreach (Renderer render in renderers)
         {
-            if (render.material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
+            foreach(Material material in render.materials)
             {
-                yield return render.material;
+                if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
+                {
+                    list.Add(material);
+                }
             }
         }
+
+        return list;
     }
 
     /// <summary>

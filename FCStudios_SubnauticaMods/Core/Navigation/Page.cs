@@ -47,7 +47,7 @@ public class Page : MonoBehaviour
 
     public bool ExitOnNewPagePush = false;
 
-    private void Awake()
+    public virtual void Awake()
     {
         audioSource = GetComponent<AudioSource>();
         rectTransform = GetComponent<RectTransform>();
@@ -61,7 +61,7 @@ public class Page : MonoBehaviour
         }
     }
 
-    public void Enter(bool PlayAudio)
+    public void Enter(bool PlayAudio, object arg = null)
     {
         prePushAction?.Invoke();
 
