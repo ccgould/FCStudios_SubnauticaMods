@@ -1,12 +1,8 @@
-﻿using FCS_AlterraHub.API;
-using FCS_AlterraHub.Core.Extensions;
-using FCS_AlterraHub.Core.Helpers;
+﻿using FCS_AlterraHub.Core.Extensions;
+using FCS_AlterraHub.Core.Navigation;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.ModItems.FCSPDA.Data.Models;
-using FCS_AlterraHub.ModItems.FCSPDA.Enums;
-using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
 using FCSCommon.Utilities;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -31,7 +27,6 @@ internal class EncyclopediaTabController : Page
     private RectTransform _listCanvas;
     private bool _isInitialize;
     private readonly List<EncyclopediaListItem> _trackedEntries = new();
-    public override PDAPages PageType => PDAPages.Encyclopedia;
 
     public override void Enter(object arg = null)
     {
@@ -153,10 +148,5 @@ internal class EncyclopediaTabController : Page
 
         QuickLogger.Debug("Doesnt Have Image");
         _image.gameObject.SetActive(false);
-    }
-
-    public override void OnBackButtonClicked()
-    {
-        FCSPDAController.Main.GetGUI().GoBackAPage();
     }
 }

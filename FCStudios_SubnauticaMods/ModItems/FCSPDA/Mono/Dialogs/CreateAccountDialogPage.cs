@@ -2,15 +2,8 @@
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_AlterraHub.ModItems.Spawnables.DebitCard.Spawnable;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Analytics;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;

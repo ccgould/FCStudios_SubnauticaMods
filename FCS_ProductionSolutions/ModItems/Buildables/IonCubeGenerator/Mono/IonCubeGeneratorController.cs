@@ -2,18 +2,15 @@
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models;
 using FCS_AlterraHub.Models.Abstract;
-using FCS_AlterraHub.Models.Enumerators;
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.Models.Mono;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Enumerators;
-using FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Interfaces;
 using FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Mono.StateMachine;
 using FCSCommon.Utilities;
 using Nautilus.Utility;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UWE;
 using static FCS_ProductionSolutions.Configuration.SaveData;
@@ -49,6 +46,7 @@ internal class IonCubeGeneratorController : FCSDevice, IFCSSave<SaveData>, IWork
     {
         QuickLogger.Debug($"Start: {GetPrefabID()}");
         base.Start();
+
         if (_runStartUpOnEnable)
         {
             if (!IsInitialized)

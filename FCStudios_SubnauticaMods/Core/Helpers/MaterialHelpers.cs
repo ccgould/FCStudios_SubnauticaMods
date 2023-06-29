@@ -6,9 +6,6 @@ using System.Text.RegularExpressions;
 using System.IO;
 using UWE;
 using System.Collections;
-using Nautilus.Utility;
-using Nautilus.Utility.MaterialModifiers;
-using FCS_AlterraHub.API;
 
 namespace FCS_AlterraHub.Core.Helpers;
 

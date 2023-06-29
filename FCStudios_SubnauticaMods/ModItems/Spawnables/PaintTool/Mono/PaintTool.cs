@@ -12,9 +12,10 @@ using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Mono;
 using Nautilus.Json;
 using static FCS_AlterraHub.Configuation.SaveData;
+using FCS_AlterraHub.Models.Interfaces;
 
 namespace FCS_AlterraHub.ModItems.Spawnables.PaintTool.Mono;
-internal class PaintToolController : PlayerTool
+internal class PaintToolController : PlayerTool, IFCSObject
 {
     [SerializeField] private Image _primaryColorRing;
     [SerializeField] private Text _amountLbl;
@@ -298,5 +299,17 @@ internal class PaintToolController : PlayerTool
         }
         _currentTemplates[templateIndex] = colorTemplate;
         RefreshUI();
+    }
+
+    public TechType GetTechType()
+    {
+        return gameObject.GetComponent<TechTag>()?.type ??
+               gameObject.GetComponentInChildren<TechTag>()?.type ??
+               TechType.None;
+    }
+
+    public Transform GetTransform()
+    {
+        return transform;
     }
 }

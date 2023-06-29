@@ -1,8 +1,8 @@
-﻿using FCS_AlterraHub.Models.Abstract;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace FCS_AlterraHub.Models.Interfaces;
+
 public interface IFCSStorage
 {
     int GetContainerFreeSpace { get; }
@@ -14,8 +14,8 @@ public interface IFCSStorage
     Pickupable RemoveItemFromContainer(TechType techType);
     Dictionary<TechType, int> GetItemsWithin();
     Action<int, int> OnContainerUpdate { get; set; }
-    Action<FCSDevice, TechType> OnContainerAddItem { get; set; }
-    Action<FCSDevice, TechType> OnContainerRemoveItem { get; set; }
+    //Action<FCSDevice, TechType> OnContainerAddItem { get; set; }
+    //Action<FCSDevice, TechType> OnContainerRemoveItem { get; set; }
     bool ContainsItem(TechType techType);
     ItemsContainer ItemsContainer { get; }
     int StorageCount();

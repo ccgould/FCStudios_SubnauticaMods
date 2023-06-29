@@ -29,7 +29,12 @@ internal class CubeGeneratorPulleyController : MonoBehaviour
 
     private void UpdatePulleyPosition()
     {
-        if(_stateManager.IsStartingUp())
+        if(_stateManager.IsCrafting() && _ionCube.transform.localPosition.y < _startUpAnimationCurve.Evaluate(1))
+        {
+            _ionCube.transform.localPosition = new Vector3(_ionCube.transform.localPosition.x, _startUpAnimationCurve.Evaluate(1), _ionCube.transform.localPosition.z);
+        }
+
+        if (_stateManager.IsStartingUp())
         {
             _ionCube.transform.localPosition = new Vector3(_ionCube.transform.localPosition.x, _startUpAnimationCurve.Evaluate(_stateManager.GetState(CubeGeneratorStates.StartUp).GetProgressNormalized()), _ionCube.transform.localPosition.z);
 

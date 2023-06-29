@@ -3,8 +3,6 @@ using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Enumerators;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Buildable;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Items.BaseModuleRack.Mono;
-using FCS_AlterraHub.ModItems.Buildables.BaseManager.Items.BaseTransmitter.Mono;
-using FCS_AlterraHub.ModItems.Buildables.BaseManager.Mono;
 using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;

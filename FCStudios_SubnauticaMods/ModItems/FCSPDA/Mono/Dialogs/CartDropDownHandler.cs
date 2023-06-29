@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using FCS_AlterraHub.API;
+﻿using System.Collections.Generic;
 using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Interfaces;

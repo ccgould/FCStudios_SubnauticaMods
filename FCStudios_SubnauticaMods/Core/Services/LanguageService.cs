@@ -1,11 +1,8 @@
 ﻿using FCS_AlterraHub.Models.Abstract;
 using FCSCommon.Utilities;
 using Nautilus.Handlers;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
-using static HandReticle;
-using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 namespace FCS_AlterraHub.Core.Services;
 
@@ -95,6 +92,7 @@ public static class LanguageService
         { $"{ModKey}_PressToInteractWith", "Press {0} to interact." },
         { $"{ModKey}_DeviceNameStructure", "{0} [{1}] {2}" },
         { $"{ModKey}_NotConnectedToBaseManager", "Not Connected To Base Manager" },
+        { $"{ModKey}_StorageAmountFormat","{0}/{1} Items"},
     };
 
     /// <summary>
@@ -571,6 +569,11 @@ public static class LanguageService
     public static string NotConnectedToBaseManager()
     {
         return GetLanguage("NotConnectedToBaseManager");
+    }
+
+    public static string StorageCountFormat(int amount, int maxStorage)
+    {
+        return string.Format(GetLanguage("StorageAmountFormat"), amount, maxStorage);
     }
 
     internal static string DebitCardDescription => "This card lets you access your Alterra Account. You must have this card with you to make Alterra Hub purchases.";

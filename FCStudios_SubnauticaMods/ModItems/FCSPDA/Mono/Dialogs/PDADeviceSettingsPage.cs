@@ -1,7 +1,6 @@
-﻿using FCS_AlterraHub.Models.Abstract;
+﻿using FCS_AlterraHub.Core.Navigation;
+using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
-using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,11 +12,8 @@ internal class PDADeviceSettingsPage : Page
     private Toggle _visiblityToggle;
     [SerializeField]
     private uGUI_InputField _friendlyNameInput;
-    [SerializeField]
-    private FCSAlterraHubGUI _gui;
     private FCSDevice _device;
 
-    public override PDAPages PageType => PDAPages.DeviceSettings;
 
     public void OnFriendlyNameChanged(string t)
     {
@@ -41,10 +37,5 @@ internal class PDADeviceSettingsPage : Page
 
         _visiblityToggle?.SetIsOnWithoutNotify(_device.IsVisibleInPDA);
         _friendlyNameInput.SetTextWithoutNotify(_device.GetDeviceName());
-    }
-
-    public override void OnBackButtonClicked()
-    {
-        _gui.GoBackAPage();
     }
 }

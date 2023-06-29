@@ -6,7 +6,6 @@ using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.Models.Mono;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Buildable;
 using FCSCommon.Utilities;
-using RootMotion;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +24,7 @@ namespace FCS_AlterraHub.Models.Abstract;
 [RequireComponent(typeof(Constructable))]
 [DisallowMultipleComponent]
 //[RequireComponent(typeof(LargeWorldEntity))] Removed to fix error with large world enitity
-public abstract class FCSDevice : MonoBehaviour, IProtoEventListener, IConstructable,IPowerConsumer
+public abstract class FCSDevice : MonoBehaviour, IFCSObject, IProtoEventListener, IConstructable,IPowerConsumer
 {
     
     private Constructable buildable;
@@ -351,6 +350,11 @@ public abstract class FCSDevice : MonoBehaviour, IProtoEventListener, IConstruct
     {
         message = string.Empty;
         return false;
+    }
+
+    public Transform GetTransform()
+    {
+        return transform;
     }
 }
 

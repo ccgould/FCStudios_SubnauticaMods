@@ -1,10 +1,8 @@
-﻿using FCS_AlterraHub.API;
-using FCS_AlterraHub.Configuation;
+﻿using FCS_AlterraHub.Configuation;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Buildable;
 using FCSCommon.Utilities;
-using System;
 
 namespace FCS_AlterraHub.ModItems.Buildables.BaseManager.Items.BaseTransmitter.Mono;
 internal class ConnectedGridExtensionController : FCSDevice, IFCSSave<SaveData>

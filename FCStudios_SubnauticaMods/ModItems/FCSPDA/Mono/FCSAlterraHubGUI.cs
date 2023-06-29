@@ -12,14 +12,13 @@ using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;
 using FCS_AlterraHub.ModItems.FCSPDA.Interfaces;
 using FCS_AlterraHub.Models.Abstract;
-using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
+using FCS_AlterraHub.Core.Navigation;
+using FCS_AlterraHub.ModItems.FCSPDA.Mono.uGUIComponents;
 
 namespace FCS_AlterraHub.ModItems.FCSPDA.Mono;
 
-public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI, uGUI_IButtonReceiver
+public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI
 {
-
-
     [SerializeField]
     private Text _clock;
 
@@ -31,7 +30,7 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI, uGUI_IButton
 
     [SerializeField]
     private AccountPageHandler _accountPageHandler;
-
+    
     [SerializeField]
     private TeleportationPageController _teleportationPageController;
     [SerializeField]
@@ -62,7 +61,7 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI, uGUI_IButton
     [SerializeField]
     private CartDropDownHandler _cartDropDownController;
     [SerializeField]
-    private PDAMenuController _menuController;
+    private MenuController _menuController;
     [SerializeField]
     private StorePageController _storePage;
     private List<RectMask2D> rectMasks = new List<RectMask2D>();
@@ -72,6 +71,10 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI, uGUI_IButton
 
     [AssertNotNull]
     public CanvasGroup canvasGroup;
+
+    [SerializeField]
+    private uGUI_PDANavigationController _uGUI_PDANavigationController;
+
     public bool IsOpen { get; set; }
     public FCSAlterraHubGUISender SenderType { get; set; }
 
@@ -81,11 +84,21 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI, uGUI_IButton
         base.GetComponentsInChildren<RectMask2D>(true, this.rectMasks);
         base.GetComponentsInChildren<ScrollRect>(true, this.scrollRects);
         this.SetCanvasVisible(false);
+        _menuController.OnMenuContollerPop += _menuController_OnMenuContollerChange;
+        _menuController.OnMenuContollerPush += _menuController_OnMenuContollerChange;
+        _uGUI_PDANavigationController.onSettingsClicked += (device) =>
+        {
+            GoToPage(PDAPages.DeviceSettings, device);
+        };
+    }
+
+    private void _menuController_OnMenuContollerChange(object sender, MenuController.OnMenuControllerEventArg e)
+    {
+        _uGUI_PDANavigationController.SetNavigationButtons(e.Page);
     }
 
     public void Initialize()
     {
-        _menuController = gameObject.GetComponent<PDAMenuController>();
         _canvas = gameObject.GetComponent<Canvas>();
         _cartDropDownController.Initialize();
         SetInstance(FCSAlterraHubGUISender.PDA);
@@ -158,24 +171,23 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI, uGUI_IButton
         QuickLogger.Debug($"Goto Page: {page} Is Arg null =  {arg is null}");
 
         Page currentPage = null;
+        object resultArg = arg;
 
         _currentPage = page;
 
-        if (page == PDAPages.None)
-        {
-           currentPage =  _menuController.PopPage();
-        }
-        else
+        if(page != PDAPages.None)
         {
             if(page == PDAPages.DevicePage)
             {
-                var data = arg as Tuple<TechType, MonoBehaviour>;
+                var data = arg as Tuple<TechType, IFCSObject>;
 
                 QuickLogger.Debug($"{data.Item1} || {data.Item2}");
 
                 if (_additionalPagesCollection.TryGetValue(data.Item1, out var ui))
                 {
-                    ui.Initialize(data.Item2);
+                    //ui.Enter(data.Item2);
+                    resultArg = data.Item2;
+                    _uGUI_PDANavigationController.RegisterPage(ui);
                     currentPage = (Page)ui;
                 }
             }
@@ -183,10 +195,16 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI, uGUI_IButton
             {
                 currentPage = _pages[page].GetComponent<Page>();
             }
-            _menuController.PushPage(currentPage,arg);
+
+            _menuController.PushPage(currentPage, resultArg);
+        }
+        else
+        {
+            currentPage  = _menuController.PopPage();
+            _currentPage = currentPage.PDAGetPageType();
         }
 
-        _toggleHud.gameObject.SetActive(currentPage.ShowHud());
+        _toggleHud.gameObject.SetActive(currentPage?.ShowHud() ?? false);
     }
 
     internal PDAPages CurrentPage() => _currentPage;
@@ -222,7 +240,6 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI, uGUI_IButton
         OpenEncyclopedia(device.GetTechType());
     }
 
-
     internal void OpenEncyclopedia(TechType techType)
     {
         if (CheckIfPDAHasEntry(techType))
@@ -257,6 +274,8 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI, uGUI_IButton
     {
         _accountPageHandler = null;
         OnInfoButtonClicked -= _encyclopediaTabController.OpenEntry;
+        _menuController.OnMenuContollerPop -= _menuController_OnMenuContollerChange;
+        _menuController.OnMenuContollerPush -= _menuController_OnMenuContollerChange;
     }
 
     internal void LoadFromSave(ShipmentInfo shipmentInfo)
@@ -285,23 +304,19 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI, uGUI_IButton
         var ui = Instantiate(uiPrefab);
         ui.SetActive(false);
         ui.transform.SetParent(_additionalPages.gameObject.transform, false);
+
         var interf = ui.GetComponent<IuGUIAdditionalPage>();
-        
-        interf.onBackClicked += (s) => {
-            GoToPage(s);
-        };
-        
-        interf.onSettingsClicked += (device)=> {
-            GoToPage(PDAPages.DeviceSettings, device);
-        };
+
+        interf.SetMenuController(_menuController);
+
         _additionalPagesCollection.Add(id, interf);
         QuickLogger.Info("Added Additional Page");
 
     }
 
-    internal void PrepareDevicePage(TechType id, MonoBehaviour fcsDevice)
+    internal void PrepareDevicePage(TechType id, IFCSObject fcsDevice)
     {
-        GoToPage(PDAPages.DevicePage,new Tuple<TechType,MonoBehaviour>(id, fcsDevice));
+        GoToPage(PDAPages.DevicePage,new Tuple<TechType,IFCSObject>(id, fcsDevice));
     }
 
     internal void PurgePages()
@@ -340,7 +355,6 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI, uGUI_IButton
         return _encyclopediaTabController;
     }
 
-
     public void OnPDAOpened()
     {
         this.content.interactable = true;
@@ -354,7 +368,7 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI, uGUI_IButton
 
     private void SetCanvasVisible(bool visible)
     {
-        this.canvasGroup.SetVisible(visible);
+        //this.canvasGroup.SetVisible(visible);
         this.canvasScaler.active = visible;
         foreach (RectMask2D rectMask2D in this.rectMasks)
         {
@@ -372,70 +386,16 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI, uGUI_IButton
         this.content.interactable = false;
         this.content.blocksRaycasts = false;
         this.content.alpha = 1f;
-        //if (!this.introActive)
-        //{
-        //    RuntimeManager.PlayOneShot(this.soundOpen.path, default(Vector3));
-        //}
-        //bool flag = tabId == PDATab.None;
-        //if (flag)
-        //{
-        //    uGUI_PopupNotification main = uGUI_PopupNotification.main;
-        //    if (main.isShowingMessage && !string.IsNullOrEmpty(main.id))
-        //    {
-        //        string id = main.id;
-        //        if (id == "PDAEncyclopediaTab")
-        //        {
-        //            tabId = PDATab.Encyclopedia;
-        //        }
-        //    }
-        //    if (tabId == PDATab.None && this.tabOpen == PDATab.None)
-        //    {
-        //        tabId = this.tabPrev;
-        //    }
-        //}
-        //if (tabId == PDATab.TimeCapsule)
-        //{
-        //    this.SetTabs(null);
-        //    Inventory.main.SetUsedStorage(PlayerTimeCapsule.main.container, false);
-        //    uGUI_GalleryTab uGUI_GalleryTab = this.GetTab(PDATab.Gallery) as uGUI_GalleryTab;
-        //    uGUI_TimeCapsuleTab @object = this.GetTab(PDATab.TimeCapsule) as uGUI_TimeCapsuleTab;
-        //    uGUI_GalleryTab.SetSelectListener(new uGUI_GalleryTab.ImageSelectListener(@object.SelectImage), "ScreenshotSelect", "ScreenshotSelectTooltip");
-        //}
-        //foreach (KeyValuePair<PDATab, uGUI_PDATab> keyValuePair in this.tabs)
-        //{
-        //    keyValuePair.Value.OnOpenPDA(tabId, flag);
-        //}
-        //this.OpenTab(tabId);
-        //ManagedUpdate.Subscribe(ManagedUpdate.Queue.UpdateAfterInput, new ManagedUpdate.OnUpdate(this.OnUpdate));
-        //ManagedUpdate.Subscribe(ManagedUpdate.Queue.LateUpdateAfterInput, new ManagedUpdate.OnUpdate(this.OnLateUpdate));
     }
+
     public void OnClosePDA()
     {
-        //ManagedUpdate.Unsubscribe(ManagedUpdate.Queue.UpdateAfterInput, new ManagedUpdate.OnUpdate(this.OnUpdate));
-        //ManagedUpdate.Unsubscribe(ManagedUpdate.Queue.LateUpdateAfterInput, new ManagedUpdate.OnUpdate(this.OnLateUpdate));
-        //RuntimeManager.PlayOneShot(this.soundClose.path, default(Vector3));
-        //if (this.tabOpen != PDATab.None)
-        //{
-        //    this.tabs[this.tabOpen].Close();
-        //    this.tabOpen = PDATab.None;
-        //}
-        //foreach (KeyValuePair<PDATab, uGUI_PDATab> keyValuePair in this.tabs)
-        //{
-        //    keyValuePair.Value.OnClosePDA();
-        //}
         base.Deselect();
-        //this.SetTabs(uGUI_PDA.regularTabs);
         this.content.SetVisible(false);
     }
 
-    internal Page GetPreviousPage()
+    public void SetPDAAdditionalLabel(string value)
     {
-        return _menuController.GetPreviousPage();
-    }
-
-    public bool OnButtonDown(GameInput.Button button)
-    {
-        Page page = _menuController.GetCurrentPage();
-        return page != null && page.OnButtonDown(button);
+        _uGUI_PDANavigationController.SetLabel(value);
     }
 }

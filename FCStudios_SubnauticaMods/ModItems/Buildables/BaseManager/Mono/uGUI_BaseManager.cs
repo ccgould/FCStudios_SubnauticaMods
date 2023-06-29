@@ -1,52 +1,47 @@
-﻿using FCS_AlterraHub.Models.Abstract;
-using FCS_AlterraHub.Models.Mono;
+﻿using FCS_AlterraHub.Core.Navigation;
+using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Mono.GUI;
-using FCS_AlterraHub.ModItems.Buildables.BaseManager.Mono.GUI.Pages;
-using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_AlterraHub.ModItems.FCSPDA.Interfaces;
-using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
+using FCSCommon.Utilities;
 using System;
 using UnityEngine;
 
 namespace FCS_AlterraHub.ModItems.Buildables.BaseManager.Mono;
+
 internal class uGUI_BaseManager : Page, IuGUIAdditionalPage
 {
     public static uGUI_BaseManager Instance;
-    public override PDAPages PageType => PDAPages.DevicePage;
 
     public event EventHandler OnUGUIBaseManagerOpened;
 
-    public event Action<PDAPages> onBackClicked;
-
-    public event Action<FCSDevice> onSettingsClicked;
 
     [SerializeField]
     private BaseManagerSideMenu baseManagerSideMenu;
 
-    private void Awake()
+    [SerializeField]
+    private Page initialPage;
+
+    private IFCSObject _fcsObject;
+    private MenuController _menuController;
+
+    public TechType patchedTechType { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+    public override void Awake()
     {
+        base.Awake();
         Instance = this;
     }
 
     public override void Enter(object arg = null)
     {
+        QuickLogger.Debug($"BaseManager Enter Called {arg is IFCSObject}",true);
+        QuickLogger.Debug($"BaseManager Enter Called {arg?.GetType()}", true);
         base.Enter(arg);
+
+        _fcsObject = arg as IFCSObject;
+        initialPage?.Enter(this);
+        FCSPDAController.Main.ui.SetPDAAdditionalLabel(Language.main.Get(_fcsObject.GetTechType()));
         OnUGUIBaseManagerOpened?.Invoke(this, EventArgs.Empty);
-    }
-
-    public void Hide()
-    {
-
-    }
-
-    public void Initialize(object obj)
-    {
-
-    }
-
-    public override void OnBackButtonClicked()
-    {
-
     }
 
     public void OnMenuButtonClicked()
@@ -60,4 +55,22 @@ internal class uGUI_BaseManager : Page, IuGUIAdditionalPage
             baseManagerSideMenu.Show();
         }
     }
+
+    public IFCSObject GetController() => _fcsObject;
+
+    public void SetMenuController(MenuController menuController)
+    {
+        _menuController = menuController;        
+    }
+
+    public void PushPage(Page page)
+    {
+        _menuController.PushPage(page);
+    }
+
+    public void PopPage()
+    {
+        _menuController.PopPage();
+    }
+
 }

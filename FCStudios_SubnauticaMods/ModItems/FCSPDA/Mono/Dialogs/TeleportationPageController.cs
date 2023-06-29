@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
-using FCS_AlterraHub.ModItems.FCSPDA.Enums;
-using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
+using FCS_AlterraHub.Core.Navigation;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -11,8 +10,6 @@ internal class TeleportationPageController : Page
     [SerializeField]
     private GameObject _grid;
     private List<ShipmentTracker> _trackedShipments = new();
-
-    public override PDAPages PageType => PDAPages.Teleportation;
 
     internal void Refresh()
     {
@@ -41,10 +38,5 @@ internal class TeleportationPageController : Page
     {
         base.Enter();
         Refresh();
-    }
-
-    public override void OnBackButtonClicked()
-    {
-        FCSPDAController.Main.GetGUI().GoBackAPage();
     }
 }

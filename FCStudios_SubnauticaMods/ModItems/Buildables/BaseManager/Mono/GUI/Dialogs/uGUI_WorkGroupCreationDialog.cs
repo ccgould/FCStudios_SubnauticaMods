@@ -6,11 +6,9 @@ using FCS_AlterraHub.Models.Mono;
 using FCS_AlterraHub.Models.Mono.Handlers;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Mono.GUI.Pages;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
-using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -25,7 +23,7 @@ internal class uGUI_WorkGroupCreationDialog : MonoBehaviour
     [SerializeField] private ToggleGroup toggleGroup;
     [SerializeField] private uGUI_InputField workGroupInputField;
     [SerializeField] private uGUI_WorkUnitsPage uGUI_WorkUnitsPage;
-    [SerializeField] private MenuController menuManager;
+
 
     private TechType selectedTechType;
     private HabitatManager _baseManager;
@@ -37,7 +35,6 @@ internal class uGUI_WorkGroupCreationDialog : MonoBehaviour
         public List<FCSDevice> devices = new();
     }
 
-
     private void Start()
     {
         _baseManager = HabitatService.main.GetPlayersCurrentBase();
@@ -48,6 +45,8 @@ internal class uGUI_WorkGroupCreationDialog : MonoBehaviour
         if (selectedTechType == TechType.None) return;
 
         ClearDevicesList();
+
+        selectedToggles.Clear();
 
         foreach (var device in _baseManager.GetConnectedDevices(true))
         {
@@ -93,7 +92,10 @@ internal class uGUI_WorkGroupCreationDialog : MonoBehaviour
 
         foreach (var device in _baseManager.GetConnectedDevices(true))
         {
-            techTypes.Add(device.Value.GetTechType());
+            if(device.Value is IWorkUnit)
+            {
+                techTypes.Add(device.Value.GetTechType());
+            }
         }
 
         foreach (var techType in techTypes)
@@ -144,7 +146,7 @@ internal class uGUI_WorkGroupCreationDialog : MonoBehaviour
         }
         _baseManager.CreateWorkUnit(list, groupName);
         uGUI_WorkUnitsPage.RefreshUI();
-        menuManager.PopPage();
+
     }
 
     public void Reset()

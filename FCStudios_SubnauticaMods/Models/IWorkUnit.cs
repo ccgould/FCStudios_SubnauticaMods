@@ -1,7 +1,4 @@
-﻿using FCS_AlterraHub.Models.Mono;
-using System;
-
-namespace FCS_AlterraHub.Models;
+﻿namespace FCS_AlterraHub.Models;
 public interface IWorkUnit
 {
 

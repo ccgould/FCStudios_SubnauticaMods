@@ -1,14 +1,11 @@
-﻿using BepInEx.Bootstrap;
-using FCS_AlterraHub.API;
+﻿using FCS_AlterraHub.API;
+using FCS_AlterraHub.Core.Navigation;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models;
-using FCS_AlterraHub.Models.Enumerators;
 using FCS_AlterraHub.Models.Structs;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;
-using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.ScreenItems;
-using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,10 +13,6 @@ namespace FCS_AlterraHub.ModItems.FCSPDA.Mono;
 
 internal class StorePageController : Page
 {
-    protected override bool showHud => false;
-
-    public override PDAPages PageType => PDAPages.Store;
-
     [SerializeField]
     private Text _cartButtonNumber;
     [SerializeField]
@@ -40,8 +33,9 @@ internal class StorePageController : Page
     private Button _shipmentButton;
 
 
-    private void Awake()
+    public override void Awake()
     {
+        base.Awake();
         var returnsBTN = gameObject.FindChild("Returns").GetComponent<Button>();
         returnsBTN.onClick.AddListener(() =>
         {
@@ -124,40 +118,5 @@ internal class StorePageController : Page
     internal void LoadSave(ShipmentInfo shipmentInfo)
     {
         _cartDropDownManager.LoadShipmentInfo(shipmentInfo);
-    }
-
-    public override void OnBackButtonClicked()
-    {
-        _gui.GoBackAPage();
-    }
-
-    public override bool OnButtonDown(GameInput.Button button)
-    {
-        base.OnButtonDown(button);
-
-        if (button == GameInput.Button.UIUp || button == GameInput.Button.UIRight)
-        {
-            //QuickLogger.Debug("UP BUTTON PRESSED", true);
-            _radialMenu.SelectNextItem();
-        }
-
-        if (button == GameInput.Button.UIDown || button == GameInput.Button.UILeft)
-        {
-            //QuickLogger.Debug("UP BUTTON PRESSED", true);
-            _radialMenu.SelectPrevItem();
-        }
-
-        if (button == GameInput.Button.LeftHand)
-        {
-            _radialMenu.PressSelectedButton();
-        }
-
-        return false;
-    }
-
-    public override void Exit()
-    {
-        _radialMenu.ClearSelectedItem();
-        base.Exit();
     }
 }

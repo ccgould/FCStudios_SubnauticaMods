@@ -1,8 +1,8 @@
-﻿using FCS_AlterraHub.Models.Abstract;
-using FCS_AlterraHub.Models.Interfaces;
+﻿using FCS_AlterraHub.Models.Interfaces;
 using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using UnityEngine;
 
@@ -10,13 +10,11 @@ namespace FCS_AlterraHub.Models.Mono;
 public class FCSStorage : StorageContainer, IFCSStorage
 {
     [SerializeField] private string classID;
-
+    [SerializeField] [Description("Allows storage default click to open storage")] private bool isAllowedToClickStorage = true;
     public bool IsAllowedToRemove { get; set; } = true;
     public Action OnContainerOpened { get; set; }
     public int SlotsAssigned;
     public Action<int, int> OnContainerUpdate { get; set; }
-    public Action<FCSDevice, TechType> OnContainerAddItem { get; set; }
-    public Action<FCSDevice, TechType> OnContainerRemoveItem { get; set; }
     public int GetContainerFreeSpace => SlotsAssigned - GetCount();
     public bool IsFull => GetCount() >= SlotsAssigned;
     public List<TechType> InvalidTechTypes = new List<TechType>();
@@ -38,6 +36,18 @@ public class FCSStorage : StorageContainer, IFCSStorage
         storageRoot.classId = classID;
         base.Awake();
         Subscribe();
+    }
+
+    private void Start()
+    {
+        if(isAllowedToClickStorage)
+        {
+            Activate();
+        }
+        else
+        {
+            Deactivate();
+        }
     }
 
     private void Subscribe()

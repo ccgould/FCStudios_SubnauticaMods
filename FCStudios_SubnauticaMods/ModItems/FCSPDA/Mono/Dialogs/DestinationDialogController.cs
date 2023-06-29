@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using FCS_AlterraHub.Core.Navigation;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
-using FCS_AlterraHub.ModItems.FCSPDA.Mono;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;
-using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,8 +15,6 @@ internal class DestinationDialogController : Page
     private readonly List<AlterraHubDepotItemController> _toggles = new List<AlterraHubDepotItemController>();
     private CheckOutPopupDialogWindow _checkoutWindow;
     public Action OnClose { get; set; }
-
-    public override PDAPages PageType => PDAPages.None;
 
     internal  void Initialize(CheckOutPopupDialogWindow checkoutWindow)
     {
@@ -87,10 +84,5 @@ internal class DestinationDialogController : Page
     {
         RefreshAlterraHubDepotList();
         gameObject.SetActive(true);
-    }
-
-    public override void OnBackButtonClicked()
-    {
-       FCSPDAController.Main.GetGUI().GoBackAPage();
     }
 }

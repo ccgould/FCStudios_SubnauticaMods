@@ -1,21 +1,15 @@
 ﻿using FCS_AlterraHub.Configuation;
-using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.Models.Mono;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Buildable;
-using FCS_AlterraHub.ModItems.Buildables.BaseManager.Spawnable;
 using FCSCommon.Utilities;
-using Nautilus.Assets.Gadgets;
-using Nautilus.Json;
-using Nautilus.Json.ExtensionMethods;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UWE;
 using static FCS_AlterraHub.Configuation.SaveData;
-using static HandReticle;
 
 namespace FCS_AlterraHub.ModItems.Buildables.BaseManager.Items.BaseModuleRack.Mono;
 internal class BaseManagerRackController : FCSDevice, IFCSSave<SaveData>

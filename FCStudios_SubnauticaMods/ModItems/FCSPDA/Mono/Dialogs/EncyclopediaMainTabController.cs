@@ -1,13 +1,10 @@
-﻿using FCS_AlterraHub.API;
-using FCS_AlterraHub.Core.Helpers;
+﻿using FCS_AlterraHub.Core.Navigation;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.ModItems.FCSPDA.Data.Models;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
-using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
-using static ErrorMessage;
 
 namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;
 
@@ -24,16 +21,13 @@ internal class EncyclopediaMainTabController : Page
     [SerializeField]
     private LayoutElement _imageLayout;
     [SerializeField]
-    private ScrollRect _listScrollRect;
-    [SerializeField]
     private RectTransform _listCanvas;
     private bool _isInitialize;
     internal static EncyclopediaMainTabController Instance;
 
-    public override PDAPages PageType => PDAPages.EncyclopediaMain;
-
-    private void Awake()
+    public override void Awake()
     {
+        base.Awake();
         QuickLogger.Debug("Set Encyclopedia Instance");
         Instance = this;
     }
@@ -128,10 +122,5 @@ internal class EncyclopediaMainTabController : Page
         }
 
         _image.gameObject.SetActive(false);
-    }
-
-    public override void OnBackButtonClicked()
-    {
-        FCSPDAController.Main.GetGUI().GoBackAPage();
     }
 }

@@ -1,4 +1,5 @@
-﻿using FCS_AlterraHub.Core.Services;
+﻿using FCS_AlterraHub.Core.Navigation;
+using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Mono;
 using FCSCommon.Utilities;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using TMPro;
 using UnityEngine;
 
 namespace FCS_AlterraHub.ModItems.Buildables.BaseManager.Mono.GUI.Pages;
-internal class BaseManagerHomePage : MonoBehaviour
+internal class BaseManagerHomePage : Page
 {
     [SerializeField]
     private TMP_Text clock;
@@ -134,8 +135,9 @@ internal class BaseManagerHomePage : MonoBehaviour
         }
     }
 
-    public void Enter()
+    public override void Enter(object arg = null)
     {
+        base.Enter(arg);
         RefreshPage();
     }
 

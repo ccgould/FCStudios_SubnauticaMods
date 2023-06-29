@@ -8,19 +8,20 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;
 using System.Linq;
+using FCS_AlterraHub.Core.Navigation;
+using FCS_AlterraHub.Models.Interfaces;
 
 namespace FCS_AlterraHub.ModItems.Spawnables.PaintTool.Mono.UI;
 
-internal class uGUI_PaintTool : FCSPDA.Mono.Model.Page, IuGUIAdditionalPage
+internal class uGUI_PaintTool : Page, IuGUIAdditionalPage
 {
     [SerializeField] private ToggleGroup _toggleGroup;
     [SerializeField] private List<uGUI_ColorPickerTemplateItem> _colorItems = new();
     private PaintToolController _controller;
-
-    public override PDAPages PageType => PDAPages.DevicePage;
     public event Action<PDAPages> onBackClicked;
     public event Action<FCSDevice> onSettingsClicked;
     public static uGUI_PaintTool Main;
+    private MenuController _menuController;
 
     public void UpdatePaintTool(bool value)
     {
@@ -43,13 +44,10 @@ internal class uGUI_PaintTool : FCSPDA.Mono.Model.Page, IuGUIAdditionalPage
     {
     }
 
-    public override void OnBackButtonClicked()
+    public override void Awake()
     {
+        base.Awake();
 
-    }
-
-    private void Awake()
-    {
         if (Main == null)
         {
             Main = this;
@@ -91,8 +89,13 @@ internal class uGUI_PaintTool : FCSPDA.Mono.Model.Page, IuGUIAdditionalPage
         }
     }
 
-    public void Hide()
+    public IFCSObject GetController()
     {
+        return _controller;
+    }
 
+    public void SetMenuController(MenuController menuController)
+    {
+        _menuController = menuController;
     }
 }

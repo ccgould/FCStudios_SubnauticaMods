@@ -4,7 +4,6 @@ using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;
 

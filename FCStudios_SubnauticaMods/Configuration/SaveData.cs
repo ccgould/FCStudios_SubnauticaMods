@@ -6,7 +6,6 @@ using Nautilus.Json.Attributes;
 using Nautilus.Json;
 using Newtonsoft.Json;
 using System.Collections.Generic;
-using System;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Configuation;
@@ -15,19 +14,17 @@ internal class SaveData
 {
     [JsonProperty]
     public HashSet<object> Data { get; set; } = new();
-
-
     public GSPSaveData GamePlayService { get; set; } = new();
     public AccountDetails AccountDetails { get;  set; }
     public StoreManagerSaveData StoreManagerSaveData { get; set; }
 
-    public class PDASaveData : ISaveDataEntry
+    public class PDASaveData : BaseSaveData
     {
-        public string Id { get; set; }
-        public string BaseId { get; set; }
-        public ColorTemplateSave ColorTemplate { get; set; }
+
 
     }
+
+    
 
     [FileName("AlterraHub")]
     public class AlterraHubSaveData : SaveDataCache
@@ -93,4 +90,11 @@ internal class SaveData
         public int Amount { get; set; }
         public int CurrentTemplateIndex { get; set; }
     }
+}
+
+public class BaseSaveData : ISaveDataEntry
+{
+    public string Id { get; set; }
+    public string BaseId { get; set; }
+    public ColorTemplateSave ColorTemplate { get; set; }
 }

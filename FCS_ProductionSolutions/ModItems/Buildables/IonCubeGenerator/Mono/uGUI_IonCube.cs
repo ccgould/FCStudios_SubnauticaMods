@@ -1,11 +1,6 @@
-﻿using FCS_AlterraHub.Core.Helpers;
-using FCS_AlterraHub.Core.Services;
-using FCS_AlterraHub.Models.Abstract;
-using FCS_AlterraHub.ModItems.FCSPDA.Enums;
+﻿using FCS_AlterraHub.Core.Navigation;
+using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.ModItems.FCSPDA.Interfaces;
-using FCS_AlterraHub.ModItems.FCSPDA.Mono;
-using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
-using FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Buildable;
 using FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Enumerators;
 using FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Languages;
 using FCSCommon.Utilities;
@@ -40,13 +35,12 @@ internal class uGUI_IonCube : Page, IuGUIAdditionalPage
     private bool _initialized;
     private bool _coroutineStarted;
     [SerializeField]
-    private Text _deviceName;
-    [SerializeField]
     private TMP_Text _overclocking;
     [SerializeField]
     private TMP_Text _storageLBL;
     [SerializeField]
     private TMP_Text _completedTxt;
+    private MenuController _menuController;
     private readonly Color _fireBrick = new Color(0.6953125f, 0.1328125f, 0.1328125f);
     private readonly Color _cyan = new Color(0.13671875f, 0.7421875f, 0.8046875f);
     private readonly Color _green = new Color(0.0703125f, 0.92578125f, 0.08203125f);
@@ -58,30 +52,30 @@ internal class uGUI_IonCube : Page, IuGUIAdditionalPage
     private const float DelayedStartTime = 0.5f;
     private const float RepeatingUpdateInterval = 1f;
 
-    public override PDAPages PageType => PDAPages.DevicePage;
-
-    public event Action<PDAPages> onBackClicked;
-    public event Action<FCSDevice> onSettingsClicked;
-
-    public void Initialize(object obj)
+    public override void Enter(object obj)
     {
+        QuickLogger.Debug($"Ion Cube UI : {obj}", true);
+        base.Enter(obj);
+
         FindAllComponents();
 
-        _controller = (IonCubeGeneratorController)obj;
+
+
+        _controller = obj as IonCubeGeneratorController;
 
         _initialized = true;
 
         //Set data before screen is shown.
-        UpdateDisplay();
+        //UpdateDisplay();
 
         //Update the speed text. I dont want this to be updates every second
         UpdateSpeedText();
-
-        Show();
     }
 
-    private void Awake()
+    public override void Awake()
     {
+        base.Awake();
+
         if (!_coroutineStarted)
             InvokeRepeating(nameof(UpdateDisplay), DelayedStartTime * 3f, RepeatingUpdateInterval);
 
@@ -108,16 +102,17 @@ internal class uGUI_IonCube : Page, IuGUIAdditionalPage
 
     private void UpdateDeviceName()
     {
+        
 
         var isNameSimlar = _controller.GetDeviceName().Equals(_controller.UnitID);
 
         if(isNameSimlar)
         {
-            _deviceName.text = _controller.GetDeviceName();
+            FCSPDAController.Main.ui.SetPDAAdditionalLabel(_controller.GetDeviceName());
         }
         else
         {
-            _deviceName.text = $"{_controller.GetDeviceName()} [{_controller.UnitID}]";
+            FCSPDAController.Main.ui.SetPDAAdditionalLabel($"{_controller.GetDeviceName()} [{_controller.UnitID}]");
         }
 
     }
@@ -153,21 +148,6 @@ internal class uGUI_IonCube : Page, IuGUIAdditionalPage
         _storageLBL.text = GetLanguage(DisplayLanguagePatching.StorageKey);
         _overclocking.text = GetLanguage(DisplayLanguagePatching.OverClockKey);
         return true;
-    }
-
-    public override void OnSettingsButtonClicked()
-    {
-        onSettingsClicked?.Invoke(_controller);
-    }
-
-    public override void OnBackButtonClicked()
-    {
-        onBackClicked?.Invoke(PDAPages.None);
-    }
-
-    public override void OnInfoButtonClicked()
-    {
-        FCSPDAController.Main.GetGUI().OnInfoButtonClicked?.Invoke(IonCubeGeneratorBuildable.PatchedTechType);
     }
 
     public void OnStorageButtonClicked()
@@ -305,13 +285,13 @@ internal class uGUI_IonCube : Page, IuGUIAdditionalPage
         }
     }
 
-    public void Hide()
+    public IFCSObject GetController()
     {
-        gameObject.SetActive(false);
+        return _controller;
     }
 
-    public void Show()
+    public void SetMenuController(MenuController menuController)
     {
-        gameObject.SetActive(true);
+        _menuController = menuController;
     }
 }

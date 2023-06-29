@@ -5,7 +5,6 @@ using FCS_AlterraHub.Models.Mono;
 using FCS_AlterraHub.Models.Structs;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCSCommon.Utilities;
-using Nautilus.Assets;
 using System;
 using System.Collections.Generic;
 using System.Reflection;

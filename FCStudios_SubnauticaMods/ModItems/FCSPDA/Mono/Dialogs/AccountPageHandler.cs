@@ -1,10 +1,7 @@
 ﻿using FCS_AlterraHub.Core.Helpers;
+using FCS_AlterraHub.Core.Navigation;
 using FCS_AlterraHub.Core.Services;
-using FCS_AlterraHub.Models.Interfaces;
-using FCS_AlterraHub.ModItems.FCSPDA.Enums;
-using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
 using FCS_AlterraHub.ModItems.Spawnables.DebitCard.Spawnable;
-using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -27,10 +24,10 @@ internal class AccountPageHandler : Page
     [SerializeField]
     private Toggle _deductionToggle;
 
-    public override PDAPages PageType => PDAPages.AccountPage;
-
-    public void Awake()
+    public override void Awake()
     {              
+        base.Awake();
+
         CreateWelcomePage();
     }    
 
@@ -107,10 +104,5 @@ internal class AccountPageHandler : Page
     public void Close()
     {
 
-    }
-
-    public override void OnBackButtonClicked()
-    {
-        _mono.GoBackAPage();
     }
 }

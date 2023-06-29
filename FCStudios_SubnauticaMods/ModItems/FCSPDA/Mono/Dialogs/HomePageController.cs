@@ -1,9 +1,8 @@
 ﻿using FCS_AlterraHub.API;
+using FCS_AlterraHub.Core.Navigation;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
-using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.ScreenItems;
-using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,15 +16,10 @@ internal class HomePageController : Page
     [SerializeField]
     private FCSAlterraHubGUI _gui;
 
-    public override PDAPages PageType => PDAPages.Home;
 
-    public override void OnBackButtonClicked()
+    public override void Awake()
     {
-        _gui.GoBackAPage();
-    }
-
-    private void Awake()
-    {
+        base.Awake();
         if (_radialMenu is null) return;
         _radialMenu.AddEntry(_gui, FCSAssetBundlesService.PublicAPI.GetIconByName("Cart_Icon"), _pageTextLabel, "Store", PDAPages.Store);
         _radialMenu.AddEntry(_gui, FCSAssetBundlesService.PublicAPI.GetIconByName("EncyclopediaIcon"), _pageTextLabel, "Encyclopedia", PDAPages.EncyclopediaMain);
@@ -44,30 +38,6 @@ internal class HomePageController : Page
         {
             _radialMenu.DisableTab(PDAPages.BaseDevices);
         }
-    }
-
-    public override bool OnButtonDown(GameInput.Button button)
-    {
-        base.OnButtonDown(button);
-
-        if (button == GameInput.Button.UIUp || button == GameInput.Button.UIRight)
-        {
-            //QuickLogger.Debug("UP BUTTON PRESSED", true);
-            _radialMenu.SelectNextItem();
-        }
-
-        if (button == GameInput.Button.UIDown || button == GameInput.Button.UILeft)
-        {
-            //QuickLogger.Debug("UP BUTTON PRESSED", true);
-            _radialMenu.SelectPrevItem();
-        }
-
-        if(button == GameInput.Button.LeftHand)
-        {
-            _radialMenu.PressSelectedButton();
-        }
-
-        return false;
     }
 
     public override void Exit()

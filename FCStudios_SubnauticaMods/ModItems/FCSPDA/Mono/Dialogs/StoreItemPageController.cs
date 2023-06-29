@@ -1,9 +1,8 @@
 ﻿using FCS_AlterraHub.API;
-using FCS_AlterraHub.Core.Helpers;
+using FCS_AlterraHub.Core.Navigation;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Enumerators;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
-using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.ScreenItems;
 using FCSCommon.Utilities;
 using System;
@@ -17,10 +16,6 @@ internal class StoreItemPageController : Page
 {
     [SerializeField]
     private FCSAlterraHubGUI _gui;
-    protected override bool showHud => false;
-
-    public override PDAPages PageType => PDAPages.StorePage;
-
     [SerializeField]
     private GameObject _storePageGrid;
     private Dictionary<StoreCategory, List<StoreItem>> _storeItems = new();
@@ -31,8 +26,9 @@ internal class StoreItemPageController : Page
     [SerializeField]
     private Text _cartTotalLabel;
 
-    private void Awake()
+    public override void Awake()
     {
+        base.Awake();
         LoadStore();
     }     
 
@@ -169,10 +165,5 @@ internal class StoreItemPageController : Page
     {
         CartDropDownHandler.main.AddItem(techType, receiveTechType, returnAmount);
         UpdateCartValues();
-    }
-
-    public override void OnBackButtonClicked()
-    {
-        _gui.GoBackAPage();
     }
 }

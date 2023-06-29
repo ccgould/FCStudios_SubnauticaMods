@@ -1,7 +1,4 @@
 ﻿using FCS_AlterraHub.Core.Components;
-using FCS_AlterraHub.ModItems.FCSPDA.Enums;
-using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
-using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;

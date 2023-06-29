@@ -1,4 +1,4 @@
-﻿using FCS_AlterraHub.Core.Helpers;
+﻿using FCS_AlterraHub.Core.Components;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Abstract;
 using FCSCommon.Utilities;
@@ -21,6 +21,9 @@ public class HoverInteraction : HandTarget, IHandTarget
     private GameInput.Button button = GameInput.Button.LeftHand;
     [SerializeField]
     private string mainText = "Open Settings";
+    [SerializeField]
+    [Description("This component is for use on canvas where the HoverInteraction needs to be ignored to allow UI clicking")]
+    private InterfaceInteraction interfaceInteraction;
 
 
     public event Action<TechType> onSettingsKeyPressed;
@@ -65,6 +68,14 @@ public class HoverInteraction : HandTarget, IHandTarget
         {
             return;
         }
+
+        var main = HandReticle.main;
+
+        if (interfaceInteraction is not null && interfaceInteraction.IsInRange)
+        {
+            return;
+        }
+
         if (!_constructable || _constructable.constructed)
         {
             onSettingsKeyPressed?.Invoke(_controller.GetTechType());
@@ -75,6 +86,13 @@ public class HoverInteraction : HandTarget, IHandTarget
     {
         var main = HandReticle.main;
         
+        if(interfaceInteraction is not null && interfaceInteraction.IsInRange)
+        {
+            main.SetIcon(HandReticle.IconType.Default);
+            return;
+        }
+
+
         var strings = controller.GetDeviceStats();
 
         if (strings == null || main == null) return;

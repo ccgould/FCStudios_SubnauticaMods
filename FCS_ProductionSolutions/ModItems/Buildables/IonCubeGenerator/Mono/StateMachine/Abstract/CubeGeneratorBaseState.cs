@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Mono.StateMachine.Abstract;
+﻿namespace FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Mono.StateMachine.Abstract;
 
 internal abstract class CubeGeneratorBaseState
 {

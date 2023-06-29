@@ -1,7 +1,7 @@
 ﻿using FCS_AlterraHub.Core.Helpers;
+using FCS_AlterraHub.Core.Navigation;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
-using FCS_AlterraHub.ModItems.FCSPDA.Mono.Model;
 using FCSCommon.Utilities;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,10 +20,9 @@ internal class DevicePageController : Page
     private GameObject _categoryPrefab;
     private Dictionary<string, DeviceCatergory> _groups = new();
 
-    public override PDAPages PageType => PDAPages.DevicePage;
-
-    private void Awake()
+    public override void Awake()
     {
+        base.Awake();
         _content = GameObjectHelpers.FindGameObject(gameObject.FindChild("Body"),"Content").transform;
 
         //_showAllToggle.onValueChanged.AddListener((b) =>
@@ -65,10 +64,5 @@ internal class DevicePageController : Page
             deviceCat.gameObject.transform.SetParent(_content, false);
             _groups.Add(device.Key, deviceCat);
         }
-    }
-
-    public override void OnBackButtonClicked()
-    {
-        FCSPDAController.Main.GetGUI().GoBackAPage();
     }
 }

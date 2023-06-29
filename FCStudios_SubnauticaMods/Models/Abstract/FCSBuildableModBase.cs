@@ -8,7 +8,6 @@ using FCSCommon.Utilities;
 using Nautilus.Assets;
 using Nautilus.Assets.Gadgets;
 using Nautilus.Utility;
-using System;
 using System.Collections;
 using System.IO;
 using UnityEngine;

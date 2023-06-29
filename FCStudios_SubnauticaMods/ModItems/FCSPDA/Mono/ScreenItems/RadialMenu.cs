@@ -1,10 +1,6 @@
-﻿using FCS_AlterraHub.API;
-using FCS_AlterraHub.Core.Services;
-using FCS_AlterraHub.ModItems.FCSPDA.Enums;
-using System;
+﻿using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEngine;
 using UnityEngine.UI;
 //#if SUBNAUTICA

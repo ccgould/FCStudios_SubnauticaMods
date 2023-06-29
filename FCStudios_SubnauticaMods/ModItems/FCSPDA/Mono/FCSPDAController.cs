@@ -2,12 +2,12 @@
 using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Abstract;
+using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono;
 using FCS_AlterraHub.ModItems.FCSPDA.Patches;
 using FCSCommon.Utilities;
 using FMOD.Studio;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -335,9 +335,9 @@ public class FCSPDAController : MonoBehaviour
     /// </summary>
     /// <param name="id">Id of the UI to display</param>
     /// <param name="fcsDevice">The device to change the settings on.</param>
-    public void OpenDeviceUI(TechType id, MonoBehaviour fcsDevice,OnClose onClose = null)
+    public void OpenDeviceUI(TechType id, IFCSObject fcsDevice,OnClose onClose = null)
     {
-        Open(PDATab.None,fcsDevice.transform,onClose);
+        Open(PDATab.None,fcsDevice.GetTransform(),onClose);
         ui.PrepareDevicePage(id, fcsDevice);
     }
 

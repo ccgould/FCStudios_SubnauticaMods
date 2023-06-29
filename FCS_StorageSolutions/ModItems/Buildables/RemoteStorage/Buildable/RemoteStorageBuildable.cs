@@ -4,6 +4,7 @@ using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Enumerators;
+using FCS_StorageSolutions.ModItems.Buildables.RemoteStorage.Mono;
 using FCSCommon.Helpers;
 using Nautilus.Crafting;
 using System.Collections;
@@ -26,6 +27,8 @@ internal class RemoteStorageBuildable : FCSBuildableModBase
             var bundleName = FCSModsAPI.PublicAPI.GetModBundleName(PluginInfo.PLUGIN_NAME, ClassID);
 
             PatchedTechType = TechType;
+            FCSPDAController.AddAdditionalPage<uGUI_RemoteStorage>(TechType, FCSAssetBundlesService.PublicAPI.GetPrefabByName("uGUI_RemoteStorage", bundleName, FileSystemHelper.ModDirLocation, false));
+
             FCSModsAPI.PublicAPI.CreateStoreEntry(TechType, _kitTechType, 1, _settings.ItemCost, StoreCategory.Storage);
         };
     }

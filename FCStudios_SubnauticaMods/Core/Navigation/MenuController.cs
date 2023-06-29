@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using FCS_AlterraHub.ModItems.FCSPDA.Mono.uGUIComponents;
+using FCSCommon.Utilities;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -16,6 +19,14 @@ public class MenuController : MonoBehaviour
     private Canvas RootCanvas;
 
     private Stack<Page> PageStack = new Stack<Page>();
+
+    public event EventHandler<OnMenuControllerEventArg> OnMenuContollerPop;
+    public event EventHandler<OnMenuControllerEventArg> OnMenuContollerPush;
+    public class OnMenuControllerEventArg : EventArgs
+    {
+        public Page Page { get; set; }
+    }
+
 
     private void Awake()
     {
@@ -56,9 +67,9 @@ public class MenuController : MonoBehaviour
         return PageStack.Count > 0 && Page == PageStack.Peek();
     }
 
-    public void PushPage(Page Page)
+    public void PushPage(Page Page,object arg = null)
     {
-        Page.Enter(true);
+        Page.Enter(arg);
 
         if (PageStack.Count > 0)
         {
@@ -66,59 +77,37 @@ public class MenuController : MonoBehaviour
 
             if (currentPage.ExitOnNewPagePush)
             {
-                currentPage.Exit(false);
+                currentPage.Exit();
             }
+
+            OnMenuContollerPush?.Invoke(this, new OnMenuControllerEventArg { Page = Page });
         }
 
         PageStack.Push(Page);
     }
 
-    public void PushPage(Page Page,object arg)
-    {
-        Page.Enter(true,arg);
-
-        if (PageStack.Count > 0)
-        {
-            Page currentPage = PageStack.Peek();
-
-            if (currentPage.ExitOnNewPagePush)
-            {
-                currentPage.Exit(false);
-            }
-        }
-
-        PageStack.Push(Page);
-    }
-
-    public void TogglePage(Page Page)
-    {
-        if (Page.IsVisible())
-        {
-            Page.Exit(false);
-        }
-        else
-        {
-            Page.Enter(true);
-        }
-    }
-
-    public void PopPage()
+    public Page PopPage()
     {
         if (PageStack.Count > 1)
         {
             Page page = PageStack.Pop();
-            page.Exit(true);
+            page.Exit();
 
             Page newCurrentPage = PageStack.Peek();
             if (newCurrentPage.ExitOnNewPagePush)
             {
-                newCurrentPage.Enter(false);
+                QuickLogger.Debug("Pop Page : Exit On New Page Enter");
+                newCurrentPage.Enter();
             }
+
+            OnMenuContollerPop?.Invoke(this, new OnMenuControllerEventArg { Page = newCurrentPage });
         }
         else
         {
             Debug.LogWarning("Trying to pop a page but only 1 page remains in the stack!");
         }
+
+        return PageStack.Peek();
     }
 
     public void PopAllPages()
