@@ -112,8 +112,10 @@ public class MenuController : MonoBehaviour
 
     public void PopAllPages()
     {
-        for (int i = 1; i < PageStack.Count; i++)
+        QuickLogger.Debug($"PopAllPages: {PageStack.Count}",true);
+        for (int i = PageStack.Count - 1; i >= 0; i--)
         {
+            QuickLogger.Debug($"PopAllPages  Index: {i}", true);
             PopPage();
         }
     }
