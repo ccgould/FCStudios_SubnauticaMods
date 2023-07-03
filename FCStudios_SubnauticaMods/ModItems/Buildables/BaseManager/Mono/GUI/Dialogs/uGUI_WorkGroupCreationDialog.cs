@@ -3,9 +3,9 @@ using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Mono;
-using FCS_AlterraHub.Models.Mono.Handlers;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Mono.GUI.Pages;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
+using FCS_AlterraHub.ModItems.FCSPDA.Mono.uGUIComponents;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -127,7 +127,7 @@ internal class uGUI_WorkGroupCreationDialog : MonoBehaviour
         if (string.IsNullOrEmpty(groupName))
         {
             //uGUI_NotificationManager.Instance.AddNotification($"");
-            MessageBoxHandler.Instance.ShowMessage("Work Unit Name Required", FCSAlterraHubGUISender.PDA);
+            uGUI_MessageBoxHandler.Instance.ShowMessage("Work Unit Name Required", FCSAlterraHubGUISender.PDA);
             return;
         }
 

@@ -228,7 +228,7 @@ public class FCSPDAController : MonoBehaviour
     private void ResetToHome()
     {
         if (ui.CurrentPage() == PDAPages.DevicePage || ui.CurrentPage() == PDAPages.DeviceSettings)
-            ui.PurgePages();
+            ui.PurgeData();
     }
 
     public void Activated()

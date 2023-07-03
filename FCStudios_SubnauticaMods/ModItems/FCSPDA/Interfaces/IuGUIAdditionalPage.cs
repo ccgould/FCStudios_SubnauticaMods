@@ -7,5 +7,4 @@ public interface IuGUIAdditionalPage
 {
     IFCSObject GetController();
     void Enter(object obj);
-    void SetMenuController(MenuController menuController);
 }

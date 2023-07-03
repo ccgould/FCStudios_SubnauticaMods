@@ -10,6 +10,7 @@ public class ColorTemplate
     public Color PrimaryColor { get; set; } = Color.white;
     public Color SecondaryColor { get; set; } = Color.white;
     public Color EmissionColor { get; set; } = Color.white;
+    public string TemplateName { get; set; } = "New Template";
 }
 
 public struct ColorTemplateSave

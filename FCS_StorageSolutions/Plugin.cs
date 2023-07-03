@@ -39,7 +39,7 @@ public class Plugin : BaseUnityPlugin
 
         //Register mod pack
         FCSModsAPI.PublicAPI.RegisterModPack(PluginInfo.PLUGIN_NAME, Assembly.GetExecutingAssembly(), ModSettings.AssetBundleName, ModSaveManager.Save, ModSaveManager.LoadData);
-        FCSModsAPI.PublicAPI.AddStoreCategory(PluginInfo.PLUGIN_GUID, "StorageSolutionsIcon_W", "Storage Solutions", PDAPages.ProductionSolutions);
+        FCSModsAPI.PublicAPI.AddStoreCategory(PluginInfo.PLUGIN_GUID, "StoreSolutionsIcon_W", "Storage Solutions", PDAPages.StorageSolutions);
         StartCoroutine(MaterialHelpers.GetGameBaseMaterial(() =>
         {
             QuickLogger.Info($"Started patching [{PluginInfo.PLUGIN_NAME}]. Version: {QuickLogger.GetAssemblyVersion(Assembly)}");

@@ -54,14 +54,14 @@ internal class uGUI_IonCube : Page, IuGUIAdditionalPage
 
     public override void Enter(object obj)
     {
-        QuickLogger.Debug($"Ion Cube UI : {obj}", true);
         base.Enter(obj);
 
         FindAllComponents();
 
-
-
-        _controller = obj as IonCubeGeneratorController;
+        if(obj is not null) 
+        {
+            _controller = obj as IonCubeGeneratorController;
+        }
 
         _initialized = true;
 
@@ -70,6 +70,11 @@ internal class uGUI_IonCube : Page, IuGUIAdditionalPage
 
         //Update the speed text. I dont want this to be updates every second
         UpdateSpeedText();
+    }
+
+    private void Start()
+    {
+        _menuController = FCSPDAController.Main.GetGUI().GetMenuController();
     }
 
     public override void Awake()
@@ -290,8 +295,9 @@ internal class uGUI_IonCube : Page, IuGUIAdditionalPage
         return _controller;
     }
 
-    public void SetMenuController(MenuController menuController)
+    public override void Exit()
     {
-        _menuController = menuController;
+        base.Exit();
+
     }
 }

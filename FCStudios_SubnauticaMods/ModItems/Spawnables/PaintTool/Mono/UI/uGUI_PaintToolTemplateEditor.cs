@@ -12,6 +12,7 @@ internal class uGUI_PaintToolTemplateEditor : Page
     [SerializeField]private uGUI_HSVControl _primary;
     [SerializeField]private uGUI_HSVControl _secondary;
     [SerializeField]private uGUI_HSVControl _emission;
+    [SerializeField]private uGUI_InputField _templateNameInputField;
     [SerializeField]private Button _doneBTN;
     private uGUI_ColorPickerTemplateItem _template;
     public static uGUI_PaintToolTemplateEditor Main;
@@ -40,7 +41,8 @@ internal class uGUI_PaintToolTemplateEditor : Page
                 {
                     PrimaryColor = _primary.GetColor(),
                     SecondaryColor = _secondary.GetColor(),
-                    EmissionColor = _emission.GetColor()
+                    EmissionColor = _emission.GetColor(),
+                    TemplateName = _templateNameInputField.text
                 });
                 uGUI_PaintTool.NotifyItemChanged(_template.GetIndex(), _template.GetTemplate());
                 Close();
@@ -65,6 +67,7 @@ internal class uGUI_PaintToolTemplateEditor : Page
         _primary.SetColors(colors.PrimaryColor);
         _secondary.SetColors(colors.SecondaryColor);
         _emission.SetColors(colors.EmissionColor);
+        _templateNameInputField.SetTextWithoutNotify(colors.TemplateName);
     }
 
     public void Close()
@@ -72,5 +75,15 @@ internal class uGUI_PaintToolTemplateEditor : Page
         _primary?.SetColors(Color.white);
         _secondary?.SetColors(Color.white);
         _emission?.SetColors(Color.white);
+    }
+
+    public void OnCopyBTNClicked()
+    {
+
+    }
+
+    public void OnDeleteBTNClicked()
+    {
+
     }
 }

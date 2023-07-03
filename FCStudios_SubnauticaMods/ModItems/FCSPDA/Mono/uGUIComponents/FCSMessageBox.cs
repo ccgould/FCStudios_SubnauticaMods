@@ -1,11 +1,13 @@
-﻿using FCSCommon.Utilities;
+﻿using FCS_AlterraHub.Core.Navigation;
+using FCS_AlterraHub.ModItems.FCSPDA.ScriptableObjects;
+using FCSCommon.Utilities;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace FCS_AlterraHub.Models.Mono;
+namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.uGUIComponents;
 
-public class FCSMessageBox : MonoBehaviour
+public class FCSMessageBox : Page
 {
     [SerializeField]
     private Text _message;
@@ -18,23 +20,38 @@ public class FCSMessageBox : MonoBehaviour
     [SerializeField]
     private Button _cancelBTN;
     private Action<FCSMessageResult> _result;
-    private bool _initialize;
 
-    private void Initialize()
+    public override void Enter(object arg = null)
     {
-        if (_initialize) return;
-        _initialize = true;
+        base.Enter(arg);
+
+        var data = arg as Tuple<string,FCSMessageButton,Action<FCSMessageResult>>;
+
+        if(data is not null)
+        {
+            Show(data.Item1, data.Item2, data.Item3);
+        }
     }
 
-    public void SendResponse(int result)
+    public override void Exit()
     {
-        _result?.Invoke((FCSMessageResult)result);
-        Close();
+        base.Exit();
+
+        _message.text = string.Empty;
+        _cancelBTN.gameObject.SetActive(false);
+        _yesBTN.gameObject.SetActive(false);
+        _okBTN.gameObject.SetActive(false);
+        _noBTN.gameObject.SetActive(false);
     }
 
-    public void Show(string message, FCSMessageButton button, Action<FCSMessageResult> result)
+    //Called by Unity Button
+    public void SendResponse(MessageBoxResultSO messageBoxResultSO)
     {
-        Initialize();
+        _result?.Invoke(messageBoxResultSO.Result);
+    }
+
+    private void Show(string message, FCSMessageButton button, Action<FCSMessageResult> result)
+    {
         _message.text = message;
         _result = result;
 
@@ -61,23 +78,6 @@ public class FCSMessageBox : MonoBehaviour
         }
 
         QuickLogger.Debug($"MessageBox Message: {message}");
-        gameObject.SetActive(true);
-    }
-
-    public void Close()
-    {
-        Initialize();
-        _message.text = string.Empty;
-        _cancelBTN.gameObject.SetActive(false);
-        _yesBTN.gameObject.SetActive(false);
-        _okBTN.gameObject.SetActive(false);
-        _noBTN.gameObject.SetActive(false);
-        gameObject.SetActive(false);
-    }
-
-    public bool IsVisible()
-    {
-        return gameObject.activeSelf;
     }
 }
 
@@ -91,6 +91,7 @@ public enum FCSMessageButton
     YESNO
 }
 
+[Serializable]
 public enum FCSMessageResult
 {
     NO = -1,

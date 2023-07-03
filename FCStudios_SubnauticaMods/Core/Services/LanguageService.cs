@@ -93,6 +93,7 @@ public static class LanguageService
         { $"{ModKey}_DeviceNameStructure", "{0} [{1}] {2}" },
         { $"{ModKey}_NotConnectedToBaseManager", "Not Connected To Base Manager" },
         { $"{ModKey}_StorageAmountFormat","{0}/{1} Items"},
+        { $"{ModKey}_ToFarFromDevice","You are to far from this device to open the storage container."},
     };
 
     /// <summary>

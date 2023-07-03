@@ -1,6 +1,4 @@
 ﻿using FCS_AlterraHub.Core.Helpers;
-using FCS_AlterraHub.Models.Mono.Handlers;
-using FCS_AlterraHub.Models.Mono;
 using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
@@ -37,6 +35,7 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI
     private GameObject _404;
 
     public Action<TechType> OnInfoButtonClicked;
+    public Action OnStorageButtonClicked;
 
     [SerializeField]
     private EncyclopediaTabController _encyclopediaTabController;
@@ -52,7 +51,7 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI
     private GameObject _toggleHud;
 
     [SerializeField]
-    private MessageBoxHandler _messageBox;
+    private uGUI_MessageBoxHandler _messageBox;
     [SerializeField]
     private GameObject _additionalPages;
 
@@ -74,6 +73,7 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI
 
     [SerializeField]
     private uGUI_PDANavigationController _uGUI_PDANavigationController;
+    private IFCSObject _currentDevice;
 
     public bool IsOpen { get; set; }
     public FCSAlterraHubGUISender SenderType { get; set; }
@@ -189,6 +189,7 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI
                     resultArg = data.Item2;
                     _uGUI_PDANavigationController.RegisterPage(ui);
                     currentPage = (Page)ui;
+                    _currentDevice = data.Item2;
                 }
             }
             else
@@ -200,7 +201,7 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI
         }
         else
         {
-            currentPage  = _menuController.PopPage();
+            currentPage  = _menuController.PopAndPeek();
             _currentPage = currentPage.PDAGetPageType();
         }
 
@@ -233,7 +234,7 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI
 
     internal void OpenEncyclopedia(FCSDevice device)
     {
-        PurgePages();
+        PurgeData();
         EncyclopediaService.SetCurrentDevice(device);
         GoToPage(PDAPages.BaseDevices);
         PrepareDevicePage(device.GetTechType(),device);
@@ -306,9 +307,6 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI
         ui.transform.SetParent(_additionalPages.gameObject.transform, false);
 
         var interf = ui.GetComponent<IuGUIAdditionalPage>();
-
-        interf.SetMenuController(_menuController);
-
         _additionalPagesCollection.Add(id, interf);
         QuickLogger.Info("Added Additional Page");
 
@@ -319,9 +317,18 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI
         GoToPage(PDAPages.DevicePage,new Tuple<TechType,IFCSObject>(id, fcsDevice));
     }
 
-    internal void PurgePages()
+    /// <summary>
+    /// Purges the current device and closes all pages to home.
+    /// </summary>
+    internal void PurgeData()
     {
         _menuController.PopAllPages();
+        _currentDevice = null;
+    }
+
+    public IFCSObject GetCurrentDevice()
+    {
+        return _currentDevice;
     }
 
     /// <summary>
@@ -397,5 +404,10 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI
     public void SetPDAAdditionalLabel(string value)
     {
         _uGUI_PDANavigationController.SetLabel(value);
+    }
+
+    public MenuController GetMenuController()
+    {
+        return _menuController;
     }
 }

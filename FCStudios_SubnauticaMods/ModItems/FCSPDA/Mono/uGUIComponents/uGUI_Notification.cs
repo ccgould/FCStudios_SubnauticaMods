@@ -2,8 +2,8 @@
 using TMPro;
 using UnityEngine;
 
-namespace FCS_AlterraHub.ModItems.Buildables.BaseManager.Mono.GUI;
-internal class uGUI_Notification :MonoBehaviour
+namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.uGUIComponents;
+internal class uGUI_Notification : MonoBehaviour
 {
     private const string POPUP = "Popup";
     [SerializeField] private TextMeshProUGUI messageText;

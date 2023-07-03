@@ -52,7 +52,7 @@ public class MenuController : MonoBehaviour
         {
             if (PageStack.Count != 0)
             {
-                PopPage();
+                PopAndPeek();
             }
         }
     }
@@ -86,7 +86,12 @@ public class MenuController : MonoBehaviour
         PageStack.Push(Page);
     }
 
-    public Page PopPage()
+    public void PushPage(Page page)
+    {
+        PushPage(page,null);
+    }
+
+    public Page PopAndPeek()
     {
         if (PageStack.Count > 1)
         {
@@ -110,13 +115,18 @@ public class MenuController : MonoBehaviour
         return PageStack.Peek();
     }
 
+    public void PopPage()
+    {
+        PopAndPeek();
+    }
+
     public void PopAllPages()
     {
         QuickLogger.Debug($"PopAllPages: {PageStack.Count}",true);
         for (int i = PageStack.Count - 1; i >= 0; i--)
         {
             QuickLogger.Debug($"PopAllPages  Index: {i}", true);
-            PopPage();
+            PopAndPeek();
         }
     }
 }

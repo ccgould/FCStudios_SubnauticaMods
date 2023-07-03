@@ -51,6 +51,7 @@
   <ItemGroup>
     <Folder Include="Configuration\" />
     <Folder Include="Core\Systems\" />
+    <Folder Include="Models\Mono\Handlers\" />
   </ItemGroup>
 
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />

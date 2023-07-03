@@ -34,18 +34,6 @@ internal class uGUI_RemoteStorage : Page, IuGUIAdditionalPage
     public event Action<PDAPages> onBackClicked;
     public event Action<FCSDevice> onSettingsClicked;
 
-    public void Initialize(object obj)
-    {
-
-        _controller = (RemoteStorageController)obj;
-
-        //Set data before screen is shown.
-        RefreshDevice();
-
-        Show();
-
-        InvokeRepeating(nameof(RefreshDeviceName), 1f, 1f);
-    }
 
     public override void Awake()
     {
@@ -53,8 +41,15 @@ internal class uGUI_RemoteStorage : Page, IuGUIAdditionalPage
         _paginatorController.OnPageChanged += PaginatorController_OnPageChanged;
         _inventoryGrid.OnLoadDisplay += GridHelper_OnLoadDisplay;
         RefreshDevice();
-
     }
+
+    private void Start()
+    {
+        _menuController = FCSPDAController.Main.GetGUI().GetMenuController();
+    }
+
+    
+
 
     private void RefreshDevice()
     {
@@ -153,16 +148,27 @@ internal class uGUI_RemoteStorage : Page, IuGUIAdditionalPage
         yield break;
     }
 
-    public void RefreshDeviceName()
+    public override void Enter(object arg = null)
     {
-        if (_controller is null) return;
-        _deviceNameLbl.text = _controller.GetDeviceName();
+        base.Enter(arg);
+        QuickLogger.Debug("Remote Storage Enter", true);
+        if (arg is not null)
+        {
+            _controller = (RemoteStorageController)arg;
+        }
+
+        //Set data before screen is shown.
+        RefreshDevice();
+
+        Show();
+
+        FCSPDAController.Main.GetGUI().OnStorageButtonClicked += AlterraHubGUIOnStorageButtonClicked;
     }
 
     public override void Exit()
     {
         base.Exit();
-        _controller = null;
+        FCSPDAController.Main.GetGUI().OnStorageButtonClicked -= AlterraHubGUIOnStorageButtonClicked;
     }
 
     public void Show()
@@ -172,8 +178,8 @@ internal class uGUI_RemoteStorage : Page, IuGUIAdditionalPage
 
     public IFCSObject GetController() => _controller;
 
-    public void SetMenuController(MenuController menuController)
+    private void AlterraHubGUIOnStorageButtonClicked()
     {
-        _menuController = menuController;
+        OpenDumpContainer();
     }
 }

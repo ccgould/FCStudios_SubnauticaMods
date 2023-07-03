@@ -1,6 +1,8 @@
 ﻿using FCS_AlterraHub.Core.Navigation;
+using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.ModItems.FCSPDA.Interfaces;
+using FCSCommon.Utilities;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,8 +16,10 @@ public class uGUI_PDANavigationController : MonoBehaviour
     [SerializeField] private GameObject infoButton;
     [SerializeField] private GameObject storageButton;
     private IuGUIAdditionalPage _page;
-    private bool _retrieveNameFromDevice = true;
+    private Page _additionalPageAsPage;
+    private FCSDevice _IFCSObjectAsFCSDevice;
     internal Action<IFCSObject> onSettingsClicked;
+    private string _customLabel;
 
     private void Awake()
     {
@@ -24,8 +28,31 @@ public class uGUI_PDANavigationController : MonoBehaviour
 
     private void UpdateLabel()
     {
-        if (!_retrieveNameFromDevice || _page?.GetController() is null) return;
-        pageLabel.text = Language.main.Get(_page.GetController().GetTechType());
+        if (_page?.GetController() is null || Time.time == 0 || !isActiveAndEnabled) return;
+
+        switch (_additionalPageAsPage.NavigationLabelState)
+        {
+            case NavigationLabelState.None:
+                pageLabel.text = string.Empty;
+                break;
+            case NavigationLabelState.DeviceName:
+                pageLabel.text = Language.main.Get(_page.GetController().GetTechType());
+                break;
+            case NavigationLabelState.FriendlyName:
+                if(_IFCSObjectAsFCSDevice is not null)
+                {
+                    pageLabel.text = Language.main.Get(_IFCSObjectAsFCSDevice.FriendlyName);
+                }
+                else
+                {
+                    pageLabel.text = Language.main.Get(_page.GetController().GetTechType());
+                }
+
+                break;
+            case NavigationLabelState.Custom:
+                pageLabel.text = _customLabel;
+                break;
+        }
     }
 
     public void OnBackButtonClicked()
@@ -43,9 +70,17 @@ public class uGUI_PDANavigationController : MonoBehaviour
         FCSPDAController.Main.GetGUI().OnInfoButtonClicked?.Invoke(_page.GetController().GetTechType());
     }
 
+    public void OnStorageButtonClicked()
+    {
+        QuickLogger.Debug("PDA Navigation on Storage Button Clicked" ,true);
+        FCSPDAController.Main.GetGUI().OnStorageButtonClicked?.Invoke();
+    }
+
     public void RegisterPage(IuGUIAdditionalPage page)
     {
         this._page = page;
+        this._additionalPageAsPage = page as Page;
+        this._IFCSObjectAsFCSDevice = page.GetController() as FCSDevice;
     }
 
     public void SetNavigationButtons(Page currentPage)
@@ -59,7 +94,14 @@ public class uGUI_PDANavigationController : MonoBehaviour
 
     internal void SetLabel(string value)
     {
-        _retrieveNameFromDevice = false;
-        pageLabel.text = value;
+        _customLabel = value; 
+    }
+
+    public enum NavigationLabelState
+    {
+        None = 0,
+        DeviceName = 1,
+        FriendlyName = 2,
+        Custom = 3
     }
 }

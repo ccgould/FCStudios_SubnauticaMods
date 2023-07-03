@@ -1,8 +1,8 @@
 ﻿using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Models;
 using FCS_AlterraHub.Models.Interfaces;
-using FCS_AlterraHub.Models.Mono.Handlers;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
+using FCS_AlterraHub.ModItems.FCSPDA.Mono.uGUIComponents;
 using FCS_AlterraHub.ModItems.Spawnables.DebitCard.Spawnable;
 using FCSCommon.Utilities;
 using System;
@@ -153,7 +153,7 @@ internal class AccountService : MonoBehaviour
         {
             QuickLogger.Error($"[AddFinances]: {e.Message}");
             QuickLogger.Error($"[AddFinances]: {e.StackTrace}");
-            MessageBoxHandler.Instance.ShowMessage(LanguageService.ErrorHasOccurred("0x0002"), sender);
+            uGUI_MessageBoxHandler.Instance.ShowMessage(LanguageService.ErrorHasOccurred("0x0002"), sender);
             return false;
         }
         return true;
@@ -318,7 +318,7 @@ internal class AccountService : MonoBehaviour
 
             if (HasBeenRegistered())
             {
-                MessageBoxHandler.Instance.ShowMessage(LanguageService.AccountCreated(GetAccountBalance().ToString("N0")), sender);
+                uGUI_MessageBoxHandler.Instance.ShowMessage(LanguageService.AccountCreated(GetAccountBalance().ToString("N0")), sender);
                 if (!PlayerInteractionHelper.HasCard())
                 {
                     PlayerInteractionHelper.GivePlayerItem(DebitCardSpawnable.PatchedTechType);
@@ -357,7 +357,7 @@ internal class AccountService : MonoBehaviour
             sb.Append(",");
         }
 
-        MessageBoxHandler.Instance.ShowMessage(LanguageService.AccountSetupError(sb.ToString()), sender);
+        uGUI_MessageBoxHandler.Instance.ShowMessage(LanguageService.AccountSetupError(sb.ToString()), sender);
 
         return false;
         //Main.MissionManagerGM.NotifyDeviceAction(Mod.AlterraHubTechType,Mod.DebitCardTechType,DeviceActionType.CREATEITEM);

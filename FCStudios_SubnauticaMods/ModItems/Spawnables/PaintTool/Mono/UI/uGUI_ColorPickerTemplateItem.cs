@@ -1,5 +1,6 @@
 ﻿using FCS_AlterraHub.Models;
 using FCSCommon.Utilities;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,6 +12,7 @@ public class uGUI_ColorPickerTemplateItem : MonoBehaviour
     [SerializeField]private Image _secondaryCircle;
     [SerializeField]private Image _emissionCircle;
     [SerializeField]private Toggle _toggle;
+    [SerializeField]private TextMeshProUGUI _text;
 
     private ColorTemplate _colorTemplate = new();
     private bool _isInitialized;
@@ -33,6 +35,7 @@ public class uGUI_ColorPickerTemplateItem : MonoBehaviour
         _primaryCircle.color = template.PrimaryColor;
         _secondaryCircle.color = template.SecondaryColor;
         _emissionCircle.color = template.EmissionColor;
+        _text.text = template.TemplateName;
     }
 
     public ColorTemplate GetTemplate()

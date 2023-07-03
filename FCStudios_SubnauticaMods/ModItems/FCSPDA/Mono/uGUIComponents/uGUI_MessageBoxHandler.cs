@@ -1,18 +1,19 @@
 ﻿using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
+using FCS_AlterraHub.ModItems.FCSPDA.Mono;
 using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace FCS_AlterraHub.Models.Mono.Handlers;
+namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.uGUIComponents;
 
-internal class MessageBoxHandler : MonoBehaviour
+internal class uGUI_MessageBoxHandler : MonoBehaviour
 {
 
-    internal static MessageBoxHandler Instance;
+    internal static uGUI_MessageBoxHandler Instance;
 
     private Action<FCSMessageResult> _result;
     [SerializeField]
@@ -28,7 +29,9 @@ internal class MessageBoxHandler : MonoBehaviour
     }
 
     public void Initialize(GameObject go, FCSAlterraHubGUISender sender)
-    {       
+    {
+
+
         if (_gui is not null && !_registeredGUI.ContainsValue(_gui))
         {
             _registeredGUI.Add(sender, _gui);
@@ -51,7 +54,10 @@ internal class MessageBoxHandler : MonoBehaviour
         }
 
         _result = result;
-        _messageBox.Show(message, button, OnMessageResult);
+
+        var data = new Tuple<string, FCSMessageButton, Action<FCSMessageResult>>(message, button, OnMessageResult);
+        FCSPDAController.Main.GetGUI().GetMenuController().PushPage(_messageBox, data);
+        //_messageBox.Show(message, button, OnMessageResult);
     }
 
     public void ShowMessage(string message, FCSAlterraHubGUISender sender)
@@ -65,11 +71,17 @@ internal class MessageBoxHandler : MonoBehaviour
 
     private void OnMessageResult(FCSMessageResult result)
     {
+        QuickLogger.Debug($"Message Bod Response {result}", true);
+
+        _result?.Invoke(result);
+
         if (_messageQueue.Any())
         {
             var data = _messageQueue.Dequeue();
             _result = data.Result;
-            _messageBox.Show(data.Message, data.Button, OnMessageResult);
+
+            var messageData = new Tuple<string, FCSMessageButton, Action<FCSMessageResult>>(data.Message, data.Button, OnMessageResult);
+            FCSPDAController.Main.GetGUI().GetMenuController().PushPage(_messageBox, messageData);
         }
     }
 

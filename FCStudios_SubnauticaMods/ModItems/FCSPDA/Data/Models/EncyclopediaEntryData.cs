@@ -40,7 +40,7 @@ public class EncyclopediaEntryData
             _techType = TechTypeString.ToTechType();
         }
 
-        QuickLogger.Debug($"Current TechType{_techType} || Comparison {techType}");
+        QuickLogger.Debug($"Current techType{_techType} || Comparison {techType}");
 
         if(_techType == TechType.None)
         {

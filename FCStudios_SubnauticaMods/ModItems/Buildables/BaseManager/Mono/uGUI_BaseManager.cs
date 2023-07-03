@@ -32,6 +32,11 @@ internal class uGUI_BaseManager : Page, IuGUIAdditionalPage
         Instance = this;
     }
 
+    private void Start()
+    {
+        _menuController = FCSPDAController.Main.GetGUI().GetMenuController();
+    }
+
     public override void Enter(object arg = null)
     {
         QuickLogger.Debug($"BaseManager Enter Called {arg is IFCSObject}",true);
@@ -58,11 +63,6 @@ internal class uGUI_BaseManager : Page, IuGUIAdditionalPage
 
     public IFCSObject GetController() => _fcsObject;
 
-    public void SetMenuController(MenuController menuController)
-    {
-        _menuController = menuController;        
-    }
-
     public void PushPage(Page page)
     {
         _menuController.PushPage(page);
@@ -70,7 +70,7 @@ internal class uGUI_BaseManager : Page, IuGUIAdditionalPage
 
     public void PopPage()
     {
-        _menuController.PopPage();
+        _menuController.PopAndPeek();
     }
 
 }

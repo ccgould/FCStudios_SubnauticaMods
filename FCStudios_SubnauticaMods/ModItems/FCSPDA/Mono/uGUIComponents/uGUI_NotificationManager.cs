@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
+using FCS_AlterraHub.ModItems.Buildables.BaseManager.Mono;
 using UnityEngine;
 
-namespace FCS_AlterraHub.ModItems.Buildables.BaseManager.Mono.GUI;
+namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.uGUIComponents;
 internal class uGUI_NotificationManager : MonoBehaviour
 {
     public static uGUI_NotificationManager Instance;
     [SerializeField] private Transform notificationTemplate;
+    [SerializeField] private Transform grid;
     [SerializeField] private int notificationMessageMax = 3;
 
     private Queue<string> pendingMessages = new();
@@ -23,7 +25,7 @@ internal class uGUI_NotificationManager : MonoBehaviour
 
     private void UguiBaseManager_OnUGUIBaseManagerOpened(object sender, System.EventArgs e)
     {
-        
+
     }
 
     public void AddNotification(string message)
@@ -39,7 +41,7 @@ internal class uGUI_NotificationManager : MonoBehaviour
 
     private void CreateNotification(string message)
     {
-        var template = Instantiate(notificationTemplate, transform);
+        var template = Instantiate(notificationTemplate, grid);
         var notification = template.GetComponent<uGUI_Notification>();
         notification.SetMessage(message);
         notification.OnDeleted += Notification_OnDeleted;

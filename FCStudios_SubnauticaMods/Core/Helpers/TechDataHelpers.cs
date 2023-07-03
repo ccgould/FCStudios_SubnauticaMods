@@ -58,7 +58,7 @@ public static class TechDataHelpers
         var data = CraftData.techData[techType];
         if (data == null || data.craftAmount > 1)
         {
-            QuickLogger.Debug($"TechType '{techType}' has no valid recipe for recycling.");
+            QuickLogger.Debug($"techType '{techType}' has no valid recipe for recycling.");
             return false;
         }
 

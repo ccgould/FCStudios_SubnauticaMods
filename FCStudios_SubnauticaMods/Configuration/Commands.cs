@@ -1,5 +1,6 @@
 ﻿using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Core.Services;
+using FCS_AlterraHub.ModItems.FCSPDA.Mono.uGUIComponents;
 using FCSCommon.Utilities;
 using Nautilus.Commands;
 using System.Linq;
@@ -85,6 +86,14 @@ internal class Commands
         }
         QuickLogger.Message($"Account already exist {AccountService.main.GetUserName()}", true);
         return $"Parameters: {nameof(amount)} Amount to put in account";
+    }
+
+    [ConsoleCommand("TestNF")]
+    public static string TestNF(string message)
+    {
+        uGUI_MessageBoxHandler.Instance.ShowMessage(message, FCSMessageButton.OK);
+        uGUI_NotificationManager.Instance.AddNotification(message);
+        return $"Message: {message} was sent to PDA";
     }
 
     //[ConsoleCommand("WarpStation")]

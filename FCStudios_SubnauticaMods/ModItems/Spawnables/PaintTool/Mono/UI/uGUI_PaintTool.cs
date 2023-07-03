@@ -16,6 +16,8 @@ namespace FCS_AlterraHub.ModItems.Spawnables.PaintTool.Mono.UI;
 internal class uGUI_PaintTool : Page, IuGUIAdditionalPage
 {
     [SerializeField] private ToggleGroup _toggleGroup;
+    [SerializeField] private Transform _grid;
+    [SerializeField] private Transform _colorItemTemplate;
     [SerializeField] private List<uGUI_ColorPickerTemplateItem> _colorItems = new();
     private PaintToolController _controller;
     public event Action<PDAPages> onBackClicked;
@@ -29,13 +31,16 @@ internal class uGUI_PaintTool : Page, IuGUIAdditionalPage
         _controller.OnTemplateChanged(selectedTemplate.GetTemplate(), selectedTemplate.GetIndex());
     }
 
+    private void Start()
+    {
+        _menuController = FCSPDAController.Main.GetGUI().GetMenuController();
+    }
+
     public override void Enter(object arg = null)
     {
         base.Enter(arg);
 
-       var data  = arg as Tuple<TechType, MonoBehaviour>;
-
-        _controller = data.Item2 as PaintToolController;
+        _controller = arg as PaintToolController;
         LoadTemplates(_controller.GetTemplates());
         SelectTemplate(_controller.GetCurrentSelectedTemplateIndex());
     }
@@ -69,10 +74,27 @@ internal class uGUI_PaintTool : Page, IuGUIAdditionalPage
 
     private void LoadTemplates(List<ColorTemplate> colorTemplates)
     {
+        
+        if(colorTemplates.Count > _colorItems.Count())
+        {
+            var difference = colorTemplates.Count - _colorItems.Count();
+
+            for (int i = 0; i < difference; i++)
+            {
+                AddNewTemplate();
+            }
+        }
         for (var index = 0; index < colorTemplates.Count; index++)
         {
             _colorItems.ElementAt(index).SetColors(colorTemplates[index]);
         }
+    }
+
+    private void AddNewTemplate()
+    {
+       var template = Instantiate(_colorItemTemplate, _grid);
+        template.gameObject.SetActive(true);
+        _colorItems.Add(template.gameObject.GetComponent<uGUI_ColorPickerTemplateItem>());
     }
 
     internal uGUI_ColorPickerTemplateItem GetSelectedTemplate()
@@ -87,6 +109,12 @@ internal class uGUI_PaintTool : Page, IuGUIAdditionalPage
         {
             UpdatePaintTool(false);
         }
+
+        if(templateIndex.Equals(_colorItems.Last().GetIndex()))
+        {
+            //since this is the last Item in the list add a new item
+            AddNewTemplate();
+        }
     }
 
     public IFCSObject GetController()
@@ -94,8 +122,13 @@ internal class uGUI_PaintTool : Page, IuGUIAdditionalPage
         return _controller;
     }
 
-    public void SetMenuController(MenuController menuController)
+    public void PushPage(Page page)
     {
-        _menuController = menuController;
+        _menuController.PushPage(page);
+    }
+
+    public void PopPage()
+    {
+        _menuController.PopAndPeek();
     }
 }

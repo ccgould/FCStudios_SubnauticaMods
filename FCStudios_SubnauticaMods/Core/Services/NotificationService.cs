@@ -36,4 +36,5 @@ public static class NotificationService
     }
 
     private static List<FCSLog> _logs = new();
+
 }

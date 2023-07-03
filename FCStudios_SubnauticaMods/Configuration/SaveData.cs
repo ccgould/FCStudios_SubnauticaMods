@@ -36,46 +36,50 @@ internal class SaveData
                 {
                     PrimaryColor = Color.white,
                     SecondaryColor = new Color(0.1882353f, 0.1843137f, 0.1803922f, 1f),
-                    EmissionColor = Color.cyan
+                    EmissionColor = Color.cyan,
+                    TemplateName = "Template 1"
                 },
                 new ColorTemplate
                 {
                     PrimaryColor = new Color(0.1882353f, 0.1843137f, 0.1803922f, 1f),
                     SecondaryColor = new Color(0.1882353f, 0.1843137f, 0.1803922f, 1f),
-                    EmissionColor = Color.red
+                    EmissionColor = Color.red,
+                    TemplateName = "Template 2"
                 },
                 new ColorTemplate
                 {
                     PrimaryColor = new Color(0.1882353f, 0.1843137f, 0.1803922f, 1f),
                     SecondaryColor = new Color(0.1882353f, 0.1843137f, 0.1803922f, 1f),
-                    EmissionColor = Color.magenta
+                    EmissionColor = Color.magenta,
+                    TemplateName = "Template 3"
                 },
                 new ColorTemplate
                 {
                     PrimaryColor = Color.white,
                     SecondaryColor = new Color(0.8941177f,0.6784314f,0.01960784f,1f),
-                    EmissionColor = Color.cyan
+                    EmissionColor = Color.cyan,
+                    TemplateName = "Template 4"
                 },
-                new ColorTemplate(),
-                new ColorTemplate(),
-                new ColorTemplate(),
-                new ColorTemplate(),
-                new ColorTemplate(),
-                new ColorTemplate(),
-                new ColorTemplate(),
-                new ColorTemplate(),
-                new ColorTemplate(),
-                new ColorTemplate(),
-                new ColorTemplate(),
-                new ColorTemplate(),
-                new ColorTemplate(),
-                new ColorTemplate(),
-                new ColorTemplate(),
-                new ColorTemplate(),
-                new ColorTemplate(),
-                new ColorTemplate(),
-                new ColorTemplate(),
-                new ColorTemplate(),
+                new ColorTemplate{ TemplateName = "Template 5" },
+                new ColorTemplate{ TemplateName = "Template 6" },
+                new ColorTemplate{ TemplateName = "Template 7" },
+                new ColorTemplate{ TemplateName = "Template 8" },
+                new ColorTemplate{ TemplateName = "Template 9" },
+                new ColorTemplate{ TemplateName = "Template 10" },
+                new ColorTemplate{ TemplateName = "Template 11" },
+                new ColorTemplate{ TemplateName = "Template 12" },
+                new ColorTemplate{ TemplateName = "Template 13" },
+                new ColorTemplate{ TemplateName = "Template 14" },
+                new ColorTemplate{ TemplateName = "Template 15" },
+                new ColorTemplate{ TemplateName = "Template 16" },
+                new ColorTemplate{ TemplateName = "Template 17" },
+                new ColorTemplate{ TemplateName = "Template 18" },
+                new ColorTemplate{ TemplateName = "Template 19" },
+                new ColorTemplate{ TemplateName = "Template 20" },
+                new ColorTemplate{ TemplateName = "Template 21" },
+                new ColorTemplate{ TemplateName = "Template 22" },
+                new ColorTemplate{ TemplateName = "Template 23" },
+                new ColorTemplate{ TemplateName = "Template 24" }
             };
         public Dictionary<string, PaintToolDataEntry> paintTools = new();
     }

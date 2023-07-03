@@ -4,6 +4,7 @@ using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using System;
 using UnityEngine;
 using UnityEngine.Events;
+using static FCS_AlterraHub.ModItems.FCSPDA.Mono.uGUIComponents.uGUI_PDANavigationController;
 
 namespace FCS_AlterraHub.Core.Navigation;
 
@@ -29,6 +30,9 @@ public class Page : MonoBehaviour
 
     [SerializeField]
     private PDAPages PageType;
+
+    public NavigationLabelState NavigationLabelState;
+
     [SerializeField]
     private float animationSpeed  = 4f;
     [SerializeField]
@@ -191,4 +195,6 @@ public class Page : MonoBehaviour
     internal PDAPages PDAGetPageType() => PageType;
 
 }
+
+
 
