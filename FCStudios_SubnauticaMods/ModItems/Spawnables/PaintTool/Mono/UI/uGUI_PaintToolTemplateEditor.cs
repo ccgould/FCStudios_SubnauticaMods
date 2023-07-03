@@ -1,5 +1,7 @@
 ﻿using FCS_AlterraHub.Core.Navigation;
 using FCS_AlterraHub.Models;
+using FCS_AlterraHub.Models.Mono;
+using FCS_AlterraHub.ModItems.FCSPDA.Mono.uGUIComponents;
 using FCSCommon.Utilities;
 using System;
 using UnityEngine;
@@ -16,7 +18,7 @@ internal class uGUI_PaintToolTemplateEditor : Page
     [SerializeField]private Button _doneBTN;
     private uGUI_ColorPickerTemplateItem _template;
     public static uGUI_PaintToolTemplateEditor Main;
-
+    private bool _nameIsDirty;
 
     public override void Awake()
     {
@@ -33,18 +35,27 @@ internal class uGUI_PaintToolTemplateEditor : Page
             return;
         }
 
+        _templateNameInputField.onEndEdit.AddListener((value) =>
+        {
+            _nameIsDirty = true;
+        });
+
         _doneBTN.onClick.AddListener((() =>
         {
             try
             {
-                _template.SetColors(new ColorTemplate
+                if(_primary.IsDirty() || _secondary.IsDirty() || _emission.IsDirty() || _nameIsDirty)
                 {
-                    PrimaryColor = _primary.GetColor(),
-                    SecondaryColor = _secondary.GetColor(),
-                    EmissionColor = _emission.GetColor(),
-                    TemplateName = _templateNameInputField.text
-                });
-                uGUI_PaintTool.NotifyItemChanged(_template.GetIndex(), _template.GetTemplate());
+                    _template.SetColors(new ColorTemplate
+                    {
+                        PrimaryColor = _primary.GetColor(),
+                        SecondaryColor = _secondary.GetColor(),
+                        EmissionColor = _emission.GetColor(),
+                        TemplateName = _templateNameInputField.text
+                    });
+                    uGUI_PaintTool.NotifyItemChanged(uGUI_PaintTool.GetIndex(_template), _template.GetTemplate());
+                }
+
                 Close();
             }
             catch (Exception e)
@@ -75,15 +86,27 @@ internal class uGUI_PaintToolTemplateEditor : Page
         _primary?.SetColors(Color.white);
         _secondary?.SetColors(Color.white);
         _emission?.SetColors(Color.white);
+        _nameIsDirty = false;
     }
 
     public void OnCopyBTNClicked()
     {
-
+        uGUI_PaintTool.AddNewTemplate(new ColorTemplate(_template.GetTemplate()),true,true);
+        Open();
     }
 
     public void OnDeleteBTNClicked()
     {
-
+        uGUI_MessageBoxHandler.Instance.ShowMessage($"Are you sure you want to delete {_templateNameInputField.text}?", FCSMessageButton.YESNO,(result) =>
+        {
+            if(result == FCSMessageResult.OKYES)
+            {
+                ColorManager.colorTemplates.Remove(_template.GetTemplate());
+                uGUI_PaintTool.RefreshuGUI();
+                uGUI_PaintTool.PopPage();
+                Close();
+                
+            }
+        });
     }
 }

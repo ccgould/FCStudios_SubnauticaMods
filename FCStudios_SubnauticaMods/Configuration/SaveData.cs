@@ -61,25 +61,6 @@ internal class SaveData
                     TemplateName = "Template 4"
                 },
                 new ColorTemplate{ TemplateName = "Template 5" },
-                new ColorTemplate{ TemplateName = "Template 6" },
-                new ColorTemplate{ TemplateName = "Template 7" },
-                new ColorTemplate{ TemplateName = "Template 8" },
-                new ColorTemplate{ TemplateName = "Template 9" },
-                new ColorTemplate{ TemplateName = "Template 10" },
-                new ColorTemplate{ TemplateName = "Template 11" },
-                new ColorTemplate{ TemplateName = "Template 12" },
-                new ColorTemplate{ TemplateName = "Template 13" },
-                new ColorTemplate{ TemplateName = "Template 14" },
-                new ColorTemplate{ TemplateName = "Template 15" },
-                new ColorTemplate{ TemplateName = "Template 16" },
-                new ColorTemplate{ TemplateName = "Template 17" },
-                new ColorTemplate{ TemplateName = "Template 18" },
-                new ColorTemplate{ TemplateName = "Template 19" },
-                new ColorTemplate{ TemplateName = "Template 20" },
-                new ColorTemplate{ TemplateName = "Template 21" },
-                new ColorTemplate{ TemplateName = "Template 22" },
-                new ColorTemplate{ TemplateName = "Template 23" },
-                new ColorTemplate{ TemplateName = "Template 24" }
             };
         public Dictionary<string, PaintToolDataEntry> paintTools = new();
     }

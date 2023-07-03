@@ -10,6 +10,8 @@ using UnityEngine;
 using System.Linq;
 using FCS_AlterraHub.Core.Navigation;
 using FCS_AlterraHub.Models.Interfaces;
+using FCS_AlterraHub.Models.Mono;
+using System.Collections;
 
 namespace FCS_AlterraHub.ModItems.Spawnables.PaintTool.Mono.UI;
 
@@ -18,17 +20,22 @@ internal class uGUI_PaintTool : Page, IuGUIAdditionalPage
     [SerializeField] private ToggleGroup _toggleGroup;
     [SerializeField] private Transform _grid;
     [SerializeField] private Transform _colorItemTemplate;
-    [SerializeField] private List<uGUI_ColorPickerTemplateItem> _colorItems = new();
+    private List<uGUI_ColorPickerTemplateItem> _colorItems = new();
     private PaintToolController _controller;
     public event Action<PDAPages> onBackClicked;
     public event Action<FCSDevice> onSettingsClicked;
     public static uGUI_PaintTool Main;
     private MenuController _menuController;
 
-    public void UpdatePaintTool(bool value)
+    public void UpdatePaintTool()
     {
         var selectedTemplate = GetSelectedTemplate();
-        _controller.OnTemplateChanged(selectedTemplate.GetTemplate(), selectedTemplate.GetIndex());
+        _controller.OnTemplateChanged(selectedTemplate.GetTemplate(), GetIndex(selectedTemplate));
+    }
+
+    public int GetIndex(uGUI_ColorPickerTemplateItem item)
+    {
+        return _colorItems.IndexOf(item);
     }
 
     private void Start()
@@ -41,8 +48,32 @@ internal class uGUI_PaintTool : Page, IuGUIAdditionalPage
         base.Enter(arg);
 
         _controller = arg as PaintToolController;
-        LoadTemplates(_controller.GetTemplates());
+        LoadTemplates();
         SelectTemplate(_controller.GetCurrentSelectedTemplateIndex());
+    }
+
+    public override void Exit()
+    {
+        base.Exit();
+
+        ClearuGUI();
+    }
+
+    public void RefreshuGUI()
+    {
+        ClearuGUI();
+        LoadTemplates();
+    }
+
+    private void ClearuGUI()
+    {
+        foreach (Transform child in _grid.transform)
+        {
+            if (child == _colorItemTemplate) continue;
+            Destroy(child.gameObject);
+        }
+
+        _colorItems.Clear();
     }
 
     public void Initialize(object obj)
@@ -72,29 +103,49 @@ internal class uGUI_PaintTool : Page, IuGUIAdditionalPage
         _colorItems.ElementAt(index).Select();
     }
 
-    private void LoadTemplates(List<ColorTemplate> colorTemplates)
+    private void LoadTemplates()
     {
-        
-        if(colorTemplates.Count > _colorItems.Count())
-        {
-            var difference = colorTemplates.Count - _colorItems.Count();
+        var colorTemplates = ColorManager.colorTemplates;
 
-            for (int i = 0; i < difference; i++)
-            {
-                AddNewTemplate();
-            }
-        }
         for (var index = 0; index < colorTemplates.Count; index++)
         {
-            _colorItems.ElementAt(index).SetColors(colorTemplates[index]);
+            AddNewTemplate(colorTemplates[index]);
         }
     }
 
-    private void AddNewTemplate()
+    public void AddNewTemplate(ColorTemplate colorTemplate = null,bool addToColorList = false,bool isCopy = false)
     {
-       var template = Instantiate(_colorItemTemplate, _grid);
-        template.gameObject.SetActive(true);
-        _colorItems.Add(template.gameObject.GetComponent<uGUI_ColorPickerTemplateItem>());
+        if (isCopy)
+        {
+            int index = ColorManager.colorTemplates.Count - 1;
+
+            if (index == -1)
+            {
+                index = 0;
+            }
+
+            ColorManager.colorTemplates.Insert(index, colorTemplate);
+            RefreshuGUI();
+            SelectTemplate(index);
+        }
+        else
+        {
+            var template = Instantiate(_colorItemTemplate, _grid);
+            template.gameObject.SetActive(true);
+            var uGUI_ColorPickerTemplateItem = template.gameObject.GetComponent<uGUI_ColorPickerTemplateItem>();
+
+            if (colorTemplate is not null)
+            {
+                uGUI_ColorPickerTemplateItem.SetColors(colorTemplate);
+            }
+
+            _colorItems.Add(uGUI_ColorPickerTemplateItem);
+
+            if (addToColorList)
+            {
+                ColorManager.colorTemplates.Add(colorTemplate);
+            }
+        }        
     }
 
     internal uGUI_ColorPickerTemplateItem GetSelectedTemplate()
@@ -107,13 +158,13 @@ internal class uGUI_PaintTool : Page, IuGUIAdditionalPage
         _controller.UpdateTemplates(templateIndex, colorTemplate);
         if(_controller.GetCurrentSelectedTemplateIndex() == templateIndex)
         {
-            UpdatePaintTool(false);
+            UpdatePaintTool();
         }
 
-        if(templateIndex.Equals(_colorItems.Last().GetIndex()))
+        if(templateIndex.Equals(_colorItems.Count - 1))
         {
             //since this is the last Item in the list add a new item
-            AddNewTemplate();
+            AddNewTemplate(null,true);
         }
     }
 

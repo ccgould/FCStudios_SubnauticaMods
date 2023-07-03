@@ -18,6 +18,7 @@ internal class uGUI_HSVControl : MonoBehaviour
     [SerializeField]private uGUI_InputField _hInputField;
     [SerializeField]private uGUI_InputField _sInputField;
     [SerializeField]private uGUI_InputField _vInputField;
+    private bool _isDirty;
 
     void Awake()
     {
@@ -100,6 +101,7 @@ internal class uGUI_HSVControl : MonoBehaviour
         _colorOutput.color = rgb;
         _sBarOverlay.color = Color.HSVToRGB(_h, 1, _v);
         _vBarOverlay.color = Color.HSVToRGB(_h, _s, 1);
+        _isDirty = true;
     }
 
     public void SetColors(Color color)
@@ -108,7 +110,10 @@ internal class uGUI_HSVControl : MonoBehaviour
         _hSlider.value = h;
         _sSlider.value = s;
         _vSlider.value = v;
+        _isDirty = false;
     }
+
+    public bool IsDirty() => _isDirty;
 
     public Color GetColor()
     {

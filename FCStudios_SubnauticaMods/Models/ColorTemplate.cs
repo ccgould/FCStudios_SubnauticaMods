@@ -11,6 +11,19 @@ public class ColorTemplate
     public Color SecondaryColor { get; set; } = Color.white;
     public Color EmissionColor { get; set; } = Color.white;
     public string TemplateName { get; set; } = "New Template";
+
+    public ColorTemplate()
+    {
+        
+    }
+
+    public ColorTemplate(ColorTemplate colorTemplate)
+    {
+        PrimaryColor = colorTemplate.PrimaryColor;
+        SecondaryColor = colorTemplate.SecondaryColor;
+        EmissionColor = colorTemplate.EmissionColor;
+        TemplateName = $"{colorTemplate.TemplateName} (Copy)";
+    }
 }
 
 public struct ColorTemplateSave
