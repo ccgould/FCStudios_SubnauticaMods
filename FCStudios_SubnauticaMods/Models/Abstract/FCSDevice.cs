@@ -137,9 +137,7 @@ public abstract class FCSDevice : MonoBehaviour, IFCSObject, IProtoEventListener
     {
         return bypassConnection;
     }
-
-
-
+    
     private void CheckConnection()
     {
         if(!GetBypassConnection() && IsRegisteredToBaseManager())
@@ -247,8 +245,6 @@ public abstract class FCSDevice : MonoBehaviour, IFCSObject, IProtoEventListener
 
     public HabitatManager CachedHabitatManager { get; private set; }
     public bool IsConnectedToBase { get; private set; }
-
-
 
     protected void FindBaseManager()
     {

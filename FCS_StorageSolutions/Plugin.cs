@@ -56,5 +56,6 @@ public class Plugin : BaseUnityPlugin
     {
         //Add mod and patch.
         FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "RS", new RemoteStorageBuildable());
+        FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "SSAT", new DSSAntennaBuildable());
     }
 }
