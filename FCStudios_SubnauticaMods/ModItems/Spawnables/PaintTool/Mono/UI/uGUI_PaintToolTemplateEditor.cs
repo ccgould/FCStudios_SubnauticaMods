@@ -4,6 +4,7 @@ using FCS_AlterraHub.Models.Mono;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.uGUIComponents;
 using FCSCommon.Utilities;
 using System;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,6 +17,7 @@ internal class uGUI_PaintToolTemplateEditor : Page
     [SerializeField]private uGUI_HSVControl _emission;
     [SerializeField]private uGUI_InputField _templateNameInputField;
     [SerializeField]private Button _doneBTN;
+    [SerializeField]private GameObject _deleteBTN;
     private uGUI_ColorPickerTemplateItem _template;
     public static uGUI_PaintToolTemplateEditor Main;
     private bool _nameIsDirty;
@@ -75,6 +77,7 @@ internal class uGUI_PaintToolTemplateEditor : Page
     {
         _template = uGUI_PaintTool.GetSelectedTemplate();
         var colors = _template.GetTemplate();
+        _deleteBTN.SetActive(ColorManager.colorTemplates.Last() != colors);
         _primary.SetColors(colors.PrimaryColor);
         _secondary.SetColors(colors.SecondaryColor);
         _emission.SetColors(colors.EmissionColor);
