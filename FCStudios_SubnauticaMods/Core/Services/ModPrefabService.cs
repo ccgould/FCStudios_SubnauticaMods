@@ -106,7 +106,16 @@ public static class ModPrefabService
 
         if (_v2MaterialsLoaded) return;
 
-        var shader = MaterialHelpers._Renderer.materials[0].shader;
+        if(MaterialUtils.IsReady)
+        {
+            QuickLogger.Debug("Shader Is Ready");
+        }
+        else
+        {
+            QuickLogger.Error("Shader Is NOT Ready");
+        }
+
+        var shader = Nautilus.Utility.MaterialUtils.Shaders.MarmosetUBER; //MaterialHelpers._Renderer.materials[0].shader;
 
         var globalBundle = FCSAssetBundlesService.PublicAPI.GetAssetBundleByName(FCSAssetBundlesService.PublicAPI.GlobalBundleName);
 

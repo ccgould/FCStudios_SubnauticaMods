@@ -7,10 +7,12 @@ using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_StorageSolutions.Configuation;
 using FCS_StorageSolutions.Configuration;
 using FCS_StorageSolutions.ModItems.Buildables.RemoteStorage.Buildable;
+using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using HarmonyLib;
 using Nautilus.Handlers;
 using System.Reflection;
+using UnityEngine;
 
 namespace FCS_StorageSolutions;
 
@@ -50,6 +52,8 @@ public class Plugin : BaseUnityPlugin
         // register harmony patches, if there are any
         Harmony.CreateAndPatchAll(Assembly, $"{PluginInfo.PLUGIN_GUID}");
         Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
+
+       
     }
 
     private void InitializePrefabs()

@@ -160,4 +160,11 @@ internal class Commands
 
         return $"Time Set to Evening";
     }
+
+    [ConsoleCommand("TestTrack")]
+    public static void TestTrack()
+    {
+        PDALog.Add("Mentus", true);
+        
+    }
 }

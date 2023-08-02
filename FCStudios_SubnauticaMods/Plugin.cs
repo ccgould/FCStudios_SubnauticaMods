@@ -14,11 +14,17 @@ using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_AlterraHub.ModItems.Spawnables.DebitCard.Spawnable;
 using FCS_AlterraHub.ModItems.Spawnables.PaintTool.Items;
 using FCS_AlterraHub.ModItems.TestObject.Buildable;
+using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using HarmonyLib;
+using Nautilus.Assets;
+using Nautilus.Assets.Gadgets;
 using Nautilus.Handlers;
 using Nautilus.Json;
+using Nautilus.Utility;
 using System.Reflection;
+using Unity.Audio;
+using UnityEngine;
 using static FCS_AlterraHub.Configuation.SaveData;
 
 namespace FCS_AlterraHub;
@@ -67,6 +73,11 @@ public class Plugin : BaseUnityPlugin
 
         // register harmony patches, if there are any
         Harmony.CreateAndPatchAll(Assembly, $"{PluginInfo.PLUGIN_GUID}");
+
+        LanguageHandler.SetLanguageLine("Subtitles_Mentus", "It Works");
+
+        PDAHandler.AddLogEntry("Mentus", "Subtitles_Mentus", AssetBundleHelper.LoadAsset<AudioClip>(FCSAssetBundlesService.PublicAPI.GetAssetBundleByName(FCSAssetBundlesService.PublicAPI.GlobalBundleName), "PDAMetious"));
+        //Utils.PlayFMODAsset("")
         Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
     }
 
@@ -119,7 +130,12 @@ public class Plugin : BaseUnityPlugin
         //Add mod and patch.
         FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "TO", new TestBuildable());
 
-
+        var sinkDecoration = new CustomPrefab("MaterialsShowcaseDemo", "Materials Showcase Demo", "FCS Demo.");
+        var model = FCSAssetBundlesService.InternalAPI.GetLocalPrefab("MaterialsShowcaseDemo");
+        MaterialUtils.ApplySNShaders(model,1);
+        sinkDecoration.SetGameObject(model);
+        sinkDecoration.SetPdaGroupCategory(TechGroup.ExteriorModules, TechCategory.ExteriorModule);
+        sinkDecoration.Register();
     }
 
     private static void RegisterCommands()
