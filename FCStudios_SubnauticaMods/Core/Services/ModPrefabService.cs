@@ -83,9 +83,9 @@ public static class ModPrefabService
             if (applyShaders)
             {
                 //Lets apply the material shader
-                //MaterialUtils.ApplySNShaders(prefab, 4, 1, 1);
+                MaterialUtils.ApplySNShaders(prefab, 4, 1, 1);
 
-                ReplaceShadersV2(prefab);
+                //ReplaceShadersV2(prefab);
             }
 
             go = prefab;

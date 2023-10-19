@@ -2,6 +2,7 @@
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Mono;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Buildable;
+using FCS_AlterraHub.ModItems.Buildables.BaseManager.Mono;
 using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ namespace FCS_AlterraHub.Core.Services;
 /// <summary>
 /// This class handles all habitat data for the FCStudios Mods
 /// </summary>
-internal class HabitatService : MonoBehaviour
+public class HabitatService : MonoBehaviour
 {
     public static HabitatService main { get; private set; }
     private HashSet<KnownDevice> knownDevices  = new();
@@ -209,6 +210,17 @@ internal class HabitatService : MonoBehaviour
         return baseManagerController.GetComponentInParent<HabitatManager>();
     }
 
+    public HabitatManager GetBaseManager(GameObject gameObject)
+    {
+        var subRoot = gameObject?.GetComponentInParent<SubRoot>() ?? gameObject?.GetComponentInChildren<SubRoot>();
+
+        if (subRoot == null)
+        {
+            QuickLogger.Debug($"[BaseManager] SubRoot Returned null");
+            return null;
+        }
+        return subRoot.GetComponentInChildren<HabitatManager>();
+    }
     internal bool IsRemoteModuleInstalledInCurrentBase()
     {
         if (!Player.main?.IsInBase() ?? false) return false;

@@ -32,7 +32,7 @@
     <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
     <PackageReference Include="BepInEx.Core" Version="5.4.21" />
     <PackageReference Include="BepInEx.PluginInfoProps" Version="1.1.0" />
-    <PackageReference Include="Subnautica.Nautilus" Version="1.0.0-pre.12" />
+    <PackageReference Include="Subnautica.Nautilus" Version="1.0.0-pre.21" />
     <PackageReference Include="UnityEngine.Modules" Version="2019.4.36" IncludeAssets="compile" />
     <PackageReference Include="Subnautica.GameLibs" Version="71288.0.0-r.0" />
     <PackageReference Include="PolySharp" Version="1.13.1" />
@@ -49,6 +49,6 @@
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="mkdir &quot;$(GameDir)\BepInEx\plugins\$(ProjectName)&quot;&#xD;&#xA;xcopy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;$(GameDir)\BepInEx\plugins\$(ProjectName)\&quot; /Y /I&#xD;&#xA;xcopy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;C:\FCSThunderkitProject\Packages\Subnautica\&quot; /Y /I&#xD;&#xA;xcopy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;C:\Program Files (x86)\Steam\steamapps\common\Subnautica\BepInEx\plugins\FCS_StorageSolutions\&quot; /Y /I" />
+    <Exec Command="mkdir &quot;$(GameDir)\BepInEx\plugins\$(ProjectName)&quot;&#xD;&#xA;xcopy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;$(GameDir)\BepInEx\plugins\$(ProjectName)\&quot; /Y /I&#xD;&#xA;xcopy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;C:\FCSThunderkitProject\Assets\&quot; /Y /I&#xD;&#xA;xcopy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;C:\Program Files (x86)\Steam\steamapps\common\Subnautica\BepInEx\plugins\FCStudios\FCS_StorageSolutions\&quot; /Y /I" />
   </Target>
 </Project>

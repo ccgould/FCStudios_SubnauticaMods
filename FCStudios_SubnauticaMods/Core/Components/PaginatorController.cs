@@ -19,18 +19,28 @@ public class PaginatorController : MonoBehaviour
     {
         if (_isInitalized) return;
 
-        _paginatorBTNs = gameObject.GetChildren();
+        _paginatorBTNs = gameObject?.GetChildren();
 
-        for (var i = 0; i < _paginatorBTNs.Length; i++)
+        if(_paginatorBTNs is not null)
         {
-            GameObject child = _paginatorBTNs[i];
-            var paginator = child.GetComponent<PaginatorToggle>();
-            paginator.SetPageIndex(i + 1);
-            paginator.onValueChanged.AddListener((isChecked) =>
+            for (var i = 0; i < _paginatorBTNs.Length; i++)
             {
-                GotoPage(paginator.GetPageIndex());
-            });           
+                GameObject child = _paginatorBTNs[i];
+
+                var paginator = child.GetComponent<PaginatorToggle>();
+
+                if(paginator is not null)
+                {
+                    paginator.SetPageIndex(i + 1);
+                    paginator.onValueChanged.AddListener((isChecked) =>
+                    {
+                        GotoPage(paginator.GetPageIndex());
+                    });
+                }
+            }
         }
+
+        
         _isInitalized = true;
     }
 

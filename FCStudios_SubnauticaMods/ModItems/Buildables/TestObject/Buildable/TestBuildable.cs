@@ -9,7 +9,7 @@ namespace FCS_AlterraHub.ModItems.TestObject.Buildable;
 
 internal class TestBuildable : FCSBuildableModBase
 {
-    public TestBuildable() : base(PluginInfo.PLUGIN_NAME, "fcsBuildingDemo", FileSystemHelper.ModDirLocation, "TestObject","Test Object")
+    public TestBuildable() : base(PluginInfo.PLUGIN_NAME, "MaterialsShowcaseDemo", FileSystemHelper.ModDirLocation, "MaterialsShowcaseDemo", "Materials Showcase Demo")
     {
 
     }

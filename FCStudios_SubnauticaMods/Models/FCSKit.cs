@@ -8,7 +8,7 @@ namespace FCS_AlterraHub.Models;
 
 public class FCSKit : FCSSpawnableModBase
 {
-    public FCSKit(string classID,string friendlyName, string modName) : base(modName, "MainConstructionKit", FileSystemHelper.ModDirLocation,classID, $"{friendlyName} Kit")
+    public FCSKit(string classID,string friendlyName, string modName) : base(modName, "MainConstructionKit", FileSystemHelper.ModDirLocation,classID, $"{friendlyName} Kit", true)
     {
       
     }

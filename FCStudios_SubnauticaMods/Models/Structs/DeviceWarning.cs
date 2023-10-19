@@ -1,8 +1,16 @@
 ﻿using FCS_AlterraHub.Models.Enumerators;
+using System;
 
 namespace FCS_AlterraHub.Models.Mono;
 public partial class HabitatManager
-{    internal struct DeviceWarning
+{
+
+    public void OpenItemTransfer()
+    {
+        _dumpContainer.OpenStorage();
+    }
+
+    internal struct DeviceWarning
     {
         public DeviceWarning(string devicId, string warningID, string description, WarningType warningType, FaultType faultType)
         {

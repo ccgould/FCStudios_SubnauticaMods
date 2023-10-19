@@ -45,6 +45,6 @@
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" /> 
  
   <Target Name="PostBuild" AfterTargets="PostBuildEvent"> 
-    <Exec Command="mkdir &quot;$(GameDir)\BepInEx\plugins\$(ProjectName)&quot;&#xD;&#xA;xcopy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;$(GameDir)\BepInEx\plugins\$(ProjectName)\&quot; /Y /I&#xD;&#xA;xcopy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;C:\FCSThunderkitProject\Packages\Subnautica\&quot; /Y /I&#xD;&#xA;xcopy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;C:\Program Files (x86)\Steam\steamapps\common\Subnautica\BepInEx\plugins\FCS_ProductionSolutions\&quot; /Y /I" /> 
+    <Exec Command="mkdir &quot;$(GameDir)\BepInEx\plugins\$(ProjectName)&quot;&#xD;&#xA;xcopy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;$(GameDir)\BepInEx\plugins\$(ProjectName)\&quot; /Y /I&#xD;&#xA;xcopy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;C:\FCSThunderkitProject\Assets\&quot; /Y /I&#xD;&#xA;xcopy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;C:\Program Files (x86)\Steam\steamapps\common\Subnautica\BepInEx\plugins\FCStudios\FCS_ProductionSolutions\&quot; /Y /I" /> 
   </Target> 
 </Project>

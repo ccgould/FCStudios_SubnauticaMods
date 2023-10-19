@@ -40,6 +40,7 @@ public interface IFCSModsAPIPublic
     string GetModPackID(TechType techType);
     void AddStoreCategory(string pLUGIN_GUID, string iconName, string pageName, PDAPages pdaPage);
     bool IsRegisteredInBase(string prefabID, out HabitatManager manager);
+    HabitatManager GetPlayerHabitat();
 }
 public interface IFCSModsAPIInternal
 {
@@ -176,5 +177,10 @@ public class FCSModsAPI : IFCSModsAPIPublic, IFCSModsAPIInternal
             return true;
         }
         return false;
+    }
+
+    public HabitatManager GetPlayerHabitat()
+    {
+        return HabitatService.main.GetPlayersCurrentBase();
     }
 }

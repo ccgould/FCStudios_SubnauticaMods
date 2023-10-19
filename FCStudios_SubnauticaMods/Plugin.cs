@@ -130,12 +130,6 @@ public class Plugin : BaseUnityPlugin
         //Add mod and patch.
         FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "TO", new TestBuildable());
 
-        var sinkDecoration = new CustomPrefab("MaterialsShowcaseDemo", "Materials Showcase Demo", "FCS Demo.");
-        var model = FCSAssetBundlesService.InternalAPI.GetLocalPrefab("MaterialsShowcaseDemo");
-        MaterialUtils.ApplySNShaders(model,1);
-        sinkDecoration.SetGameObject(model);
-        sinkDecoration.SetPdaGroupCategory(TechGroup.ExteriorModules, TechCategory.ExteriorModule);
-        sinkDecoration.Register();
     }
 
     private static void RegisterCommands()

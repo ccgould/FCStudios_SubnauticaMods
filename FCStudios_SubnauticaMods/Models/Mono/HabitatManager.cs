@@ -1,23 +1,30 @@
-﻿using FCS_AlterraHub.Core.Services;
+﻿using FCS_AlterraHub.Core.Components;
+using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Enumerators;
+using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Buildable;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Items.BaseModuleRack.Mono;
 using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using UnityEngine;
+using static HandReticle;
 
 namespace FCS_AlterraHub.Models.Mono;
-public partial class HabitatManager : MonoBehaviour
+public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
 {
 
     private HashSet<FCSDevice> _registeredDevices = new();
     private readonly Dictionary<string,FCSDevice> _connectedDevices = new();
     private Dictionary<string, WorkUnit> _workUnits = new();
     private Dictionary<string,List<object>> _automatedOperations = new();
+
     private string _baseFriendlyID => GetBaseFriendlyName();
+
+    private DumpContainerSimplified _dumpContainer;
     private SubRoot _habitat;
     private Base _baseComponent;
     private string _prefabID;
@@ -30,8 +37,7 @@ public partial class HabitatManager : MonoBehaviour
     private const int _deviceLimitIncrement = 10;
 
     internal int ConnectedDevicesLimit => DetermineDeviceLimit();
-
-    
+    public Action<InventoryItem> OnItemTransferedToBase;
 
     internal int DetermineDeviceLimit()
     {
@@ -96,7 +102,6 @@ public partial class HabitatManager : MonoBehaviour
         return count * _transceiverMaxCount;
     }
 
-
     private void Update()
     {
         //timeLeft -= Time.deltaTime;
@@ -158,7 +163,6 @@ public partial class HabitatManager : MonoBehaviour
         return _registeredDevices.Count(x=>x.GetBypassConnection() == false);
     }
 
-
     internal void UnRegisterDevice(FCSDevice device)
     {
         _registeredDevices.Remove(device);
@@ -199,9 +203,14 @@ public partial class HabitatManager : MonoBehaviour
         return _connectedDevices.ContainsKey(deviceID);
     }
 
-
     private void Awake()
     {
+        if (_dumpContainer == null)
+        {
+            _dumpContainer = gameObject.EnsureComponent<DumpContainerSimplified>();
+            _dumpContainer.Initialize(gameObject.transform, $"Add item to base: {GetBaseName()}", this, 6, 8, gameObject.name);
+        }
+
         _habitat = gameObject.GetComponent<SubRoot>();
         _baseComponent = _habitat.GetComponent<Base>();
         _prefabID = _habitat.gameObject.gameObject?.GetComponentInChildren<PrefabIdentifier>()?.Id;
@@ -428,6 +437,36 @@ public partial class HabitatManager : MonoBehaviour
     public bool HasDevicesNotConnected()
     {
         return GetFailedConnectionAttemptsCount() > 0;
+    }
+
+    public bool AddItemToContainer(InventoryItem item)
+    {
+        OnItemTransferedToBase?.Invoke(item);
+        return true;
+    }
+
+    public bool IsAllowedToAdd(TechType techType, bool verbose)
+    {        
+        return IsAllowedToAddToBase?.Invoke(techType) ?? false;
+    }
+
+    public bool IsAllowedToAdd(TechType techType, int containerTotal)
+    {
+        return (IsAllowedToAddToBase?.Invoke(techType) ?? false) && (HasSpace?.Invoke(containerTotal) ?? false);
+    }
+
+
+    public Func<TechType,bool> IsAllowedToAddToBase;
+    public Func<int,bool> HasSpace;
+
+    public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
+    {
+        return IsAllowedToAddToBase?.Invoke(pickupable.GetTechType()) ?? false;
+    }
+
+    public SubRoot GetSubRoot()
+    {
+        return _habitat;
     }
 }
 

@@ -11,6 +11,7 @@ namespace FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Mono;
 internal class DSSAntennaController : FCSDevice, IFCSSave<SaveData>
 {
     [SerializeField] private MotorHandler motorHandler;
+
     public override void Start()
     {
         base.Start();

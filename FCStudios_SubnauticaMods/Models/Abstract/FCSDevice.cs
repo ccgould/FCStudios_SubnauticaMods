@@ -12,6 +12,7 @@ using System.Linq;
 using UnityEngine;
 using static FCS_AlterraHub.Models.Mono.HabitatManager;
 
+
 namespace FCS_AlterraHub.Models.Abstract;
 
 /// <summary>
@@ -32,6 +33,7 @@ public abstract class FCSDevice : MonoBehaviour, IFCSObject, IProtoEventListener
     protected bool IsFromSave;
     protected object _savedData;
     private FCSDeviceState _deviceState;
+    
     private Dictionary<string, DeviceWarning> _warnings = new();
     protected ColorManager _colorManager;
     private string _prefabID;

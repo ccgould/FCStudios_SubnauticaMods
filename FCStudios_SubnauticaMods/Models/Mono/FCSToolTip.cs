@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace FCS_AlterraHub.Mono.Tools;
 
+[Obsolete("Please use FCSToolTip in namespace FCS_AlterraHub.Core.Components.uGUIComponents", false)]
 public class FCSToolTip : MonoBehaviour, ITooltip
 {
     public string Tooltip;
@@ -12,6 +13,7 @@ public class FCSToolTip : MonoBehaviour, ITooltip
     public TechType TechType { get; set; }
     public Func<bool> RequestPermission { get; set; }
     public bool Description { get; set; } = false;
+    
     void Awake() => Destroy(GetComponent<LayoutElement>());
 
     public bool showTooltipOnDrag => true;

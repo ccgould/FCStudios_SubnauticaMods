@@ -25,14 +25,15 @@ public abstract class FCSSpawnableModBase : ModBase,IModBase
 
     public string AssetsFolder { get; }
 
-    protected FCSSpawnableModBase(string modName, string prefabName, string modDir, string classId, string friendlyName) : base(friendlyName)
+    protected FCSSpawnableModBase(string modName, string prefabName, string modDir, string classId, string friendlyName,bool isKit = false) : base(friendlyName)
     {
         AssetsFolder = ModRegistrationService.GetModPackData(modName)?.GetAssetPath();
 
         QuickLogger.Debug($"FCSSpawnable :{AssetsFolder} | {modName}");
 
         _modName = modName;
-        _classID = $"{classId}_kit";
+        var postFix = isKit ? "_kit" : string.Empty;
+        _classID = $"{classId}{postFix}";
         _iconName = classId;
         _friendlyName = friendlyName;
         _prefabName = prefabName;

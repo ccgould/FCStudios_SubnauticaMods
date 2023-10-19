@@ -92,8 +92,6 @@ public class DumpContainer : MonoBehaviour
             _storage.AddItemToContainer(item);
         }
 
-
         OnDumpContainerClosed?.Invoke();
-
     }
 }

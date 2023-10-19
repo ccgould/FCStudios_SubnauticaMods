@@ -50,7 +50,7 @@ public abstract class FCSBuildableModBase : ModBase, IModBase
         var prefab = new CustomPrefab(PrefabInfo);
 
         // Set our prefab to a clone of the Seamoth electrical defense module
-        prefab.SetGameObject(GetGameObjectAsync);
+        prefab.SetGameObject(SetGameObjectAsync);
 
         // Make the Vehicle upgrade console a requirement for our item's blueprint
         ScanningGadget scanning = prefab.SetUnlock(TechType.None);
@@ -66,33 +66,37 @@ public abstract class FCSBuildableModBase : ModBase, IModBase
         OnFinishRegister?.Invoke();
     }
 
-    public IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
+
+    
+
+    public IEnumerator SetGameObjectAsync(IOut<GameObject> gameObject)
     {
-        QuickLogger.Debug($"GetGameObjectAsync Prefab: {Prefab?.name}");
+        QuickLogger.Debug($"SetGameObjectAsync Prefab: {Prefab?.name}");
         var prefab = GameObject.Instantiate(Prefab);
-                    
+
         //========== Allows the building animation and material colors ==========//
         //GameObjectHelpers.SetDefaultSkyApplier(prefab);
         //========== Allows the building animation and material colors ==========// 
 
+
+        var constructable = prefab.GetComponent<Constructable>();
+        var pid = prefab.GetComponent<PrefabIdentifier>();
+
+        QuickLogger.Info($"==================== PID {pid.Id} Name: {prefab.name} ===================================");
+
+        QuickLogger.Info($"In Base: {prefab.GetComponentInParent<SubRoot>() is null}");
+
+        QuickLogger.Info($"Constructed: {constructable._constructed}");
+        QuickLogger.Info($"IsNew: {constructable.isNew}");
+        QuickLogger.Info($"IsInside: {constructable.isInside}");
+        QuickLogger.Info($"Constructed Amount: {constructable.constructedAmount}");
+
+        QuickLogger.Info($"==================== PID {pid.Id} ===================================");
+
+
         var lw = prefab.GetComponent<LargeWorldEntity>();
         if(lw is not null)
             lw.cellLevel = _settings.CellLevel;
-
-        //// Add constructible
-        //var constructable = prefab.GetComponent<Constructable>();
-
-        //constructable.allowedOutside = _settings.AllowedOutside;
-        //constructable.allowedInBase = _settings.AllowedInBase;
-        //constructable.allowedOnGround = _settings.AllowedOnGround;
-        //constructable.allowedOnWall = _settings.AllowedOnWall;
-        //constructable.rotationEnabled = _settings.RotationEnabled;
-        //constructable.allowedOnCeiling = _settings.AllowedOnCeiling;
-        //constructable.allowedInSub = _settings.AllowedInSub;
-        //constructable.allowedOnConstructables = _settings.AllowedOnConstructables;
-        //constructable.techType = PrefabInfo.TechType;
-
-        var hover = prefab.GetComponent<HoverInteraction>();
         
         if (_settings.HasGlass)
         {
@@ -101,6 +105,8 @@ public abstract class FCSBuildableModBase : ModBase, IModBase
         }
 
         yield return ModifyPrefab(prefab);
+
+        //MaterialUtils.ApplySNShaders(prefab);
 
         gameObject.Set(prefab);
         yield break;

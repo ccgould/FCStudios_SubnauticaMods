@@ -20,7 +20,10 @@ internal class uGUI_NotificationManager : MonoBehaviour
 
     private void Start()
     {
-        uGUI_BaseManager.Instance.OnUGUIBaseManagerOpened += UguiBaseManager_OnUGUIBaseManagerOpened;
+        if (uGUI_BaseManager.Instance is not null)
+        {
+            uGUI_BaseManager.Instance.OnUGUIBaseManagerOpened += UguiBaseManager_OnUGUIBaseManagerOpened;
+        }
     }
 
     private void UguiBaseManager_OnUGUIBaseManagerOpened(object sender, System.EventArgs e)

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using UnityEngine;
+using static RendererMaterialsStorageManager;
 
 namespace FCS_AlterraHub.Models.Mono;
 public class FCSStorage : StorageContainer, IFCSStorage
@@ -19,6 +20,9 @@ public class FCSStorage : StorageContainer, IFCSStorage
     public bool IsFull => GetCount() >= SlotsAssigned;
     public List<TechType> InvalidTechTypes = new List<TechType>();
     private bool _isSubscribed;
+    [SerializeField] private List<TechType> AllowedTech;
+    [Description("Allows storage to be visible in DSS Network")] public bool IsVisibleInNetwork;
+
 
     public ItemsContainer ItemsContainer
     {
@@ -56,7 +60,20 @@ public class FCSStorage : StorageContainer, IFCSStorage
         container.isAllowedToAdd += IsAllowedToAdd;
         container.isAllowedToRemove += IsAllowedToRemoveItems;
         container.onRemoveItem += OnRemoveItem;
+        foreach (var item in AllowedTech)
+        {
+            AddAllowedTech(item);
+        }
         _isSubscribed = true;
+    }
+
+    public void AddAllowedTech(TechType item)
+    {
+        if (container.allowedTech is null)
+        {
+            container.allowedTech = new();
+        }
+        container.allowedTech.Add(item);
     }
 
     private void OnRemoveItem(InventoryItem item)
@@ -66,11 +83,6 @@ public class FCSStorage : StorageContainer, IFCSStorage
 
 
     public Action OnContainerClosed { get; set; }
-
-    public int StorageCount()
-    {
-        return GetCount();
-    }
 
     public int GetCount()
     {

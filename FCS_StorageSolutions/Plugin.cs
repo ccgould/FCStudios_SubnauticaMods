@@ -6,13 +6,12 @@ using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_StorageSolutions.Configuation;
 using FCS_StorageSolutions.Configuration;
+using FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Spawnable;
 using FCS_StorageSolutions.ModItems.Buildables.RemoteStorage.Buildable;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using HarmonyLib;
 using Nautilus.Handlers;
 using System.Reflection;
-using UnityEngine;
 
 namespace FCS_StorageSolutions;
 
@@ -34,7 +33,8 @@ public class Plugin : BaseUnityPlugin
 
     private void Awake()
     {
-        
+        RegisterCommands();
+
         // set project-scoped logger instance
         Logger = base.Logger;
         MaterialHelpers.GetIngameObjects();
@@ -61,5 +61,16 @@ public class Plugin : BaseUnityPlugin
         //Add mod and patch.
         FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "RS", new RemoteStorageBuildable());
         FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "SSAT", new DSSAntennaBuildable());
+        FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "SSFR", new DSSFloorRackBuildable());
+        FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "SSWR", new DSSWallRackBuildable());
+        FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "SST", new DSSTerminalBuildable());
+        FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "SSID", new DSSItemDisplayBuildable());
+        FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "SSSD", new DSSServerSpawnable());
+    }
+
+    private static void RegisterCommands()
+    {
+        //Register Info commands
+        ConsoleCommandsHandler.RegisterConsoleCommands(typeof(Commands));
     }
 }
