@@ -11,6 +11,7 @@ namespace FCS_StorageSolutions.Services;
 internal class DSSService : MonoBehaviour
 {
     private Dictionary<string, DSSManager> _managers = new();
+    internal Action<DSSManager, bool> NotifyNetworkConnectionChanged;
     public static DSSService main { get; private set; }
 
     private void Awake()
@@ -34,7 +35,17 @@ internal class DSSService : MonoBehaviour
 
     private void UnRegisterBase(HabitatManager baseManager)
     {
-        _managers.Remove(baseManager.GetBasePrefabID());
+        if(_managers.TryGetValue(baseManager.GetBasePrefabID(),out var dssManager))
+        {
+            dssManager.OnNetworkConnectionChanged -= OnNetworkConnectionChanged;
+            _managers.Remove(baseManager.GetBasePrefabID());
+        }
+
+    }
+
+    private void OnNetworkConnectionChanged(DSSManager dssManager,bool value)
+    {
+        NotifyNetworkConnectionChanged?.Invoke(dssManager, value);
     }
 
     private void RegisterBase(HabitatManager root)
@@ -62,6 +73,8 @@ internal class DSSService : MonoBehaviour
                 {
                     manager.AddItem(item);
                 };
+
+                manager.OnNetworkConnectionChanged += OnNetworkConnectionChanged;
 
                 QuickLogger.Debug($"Base: {root.GetBaseFriendlyName()} registered in DSSManager",true);
             }

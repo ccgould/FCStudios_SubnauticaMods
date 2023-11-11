@@ -12,9 +12,8 @@ using UnityEngine;
 using FCS_AlterraHub.Configuation;
 using FCS_AlterraHub.Core.Components;
 using System.Collections.Generic;
-using System.Linq;
-using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Core.Services;
+using UnityEngine.UI;
 
 namespace FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Mono.Base;
 internal class RackBase : FCSDevice, IFCSSave<SaveData>
@@ -50,7 +49,11 @@ internal class RackBase : FCSDevice, IFCSSave<SaveData>
     public override void Start()
     {
         QuickLogger.Debug("Rack Start",true);
+
         base.Start();
+
+        InvokeRepeating(nameof(CheckTeleportationComplete), 0.2f, 0.2f);
+
         _habitatManager = FCSModsAPI.PublicAPI.GetHabitat(this);
         _dssManager = DSSService.main.GetDSSManager(_habitatManager?.GetBasePrefabID());
         _fcsStorage.container.onAddItem += RackContainer_onAddItem;
@@ -85,7 +88,22 @@ internal class RackBase : FCSDevice, IFCSSave<SaveData>
     {
         QuickLogger.Debug("Rack Enabled", true);
 
+        
+
         base.OnEnable();
+    }
+
+    private void CheckTeleportationComplete()
+    {
+        if (LargeWorldStreamer.main.IsWorldSettled() && gameObject.activeSelf)
+        {
+            if (CachedHabitatManager is null)
+            {
+                StartCoroutine(AttemptConnection());
+            }
+
+            CancelInvoke(nameof(CheckTeleportationComplete));
+        }
     }
 
     private IEnumerator AttemptConnection()
@@ -133,7 +151,7 @@ internal class RackBase : FCSDevice, IFCSSave<SaveData>
         var serverStorage = item.item.gameObject.GetComponent<FCSStorage>();
         serverStorage.ItemsContainer.onAddItem -= _uGUI_DSSRackProgressBar.Refresh;
         serverStorage.ItemsContainer.onRemoveItem -= _uGUI_DSSRackProgressBar.Refresh;
-        _dssManager.UnRegisterStorage(this,serverStorage);
+        _dssManager.UnRegisterServer(this,serverStorage);
     }
 
     private void RackContainer_onAddItem(InventoryItem item)
@@ -164,7 +182,7 @@ internal class RackBase : FCSDevice, IFCSSave<SaveData>
             return;
         }
 
-        _dssManager.RegisterStorage(this, serverStorage);
+        _dssManager.RegisterServer(this, serverStorage);
 
         QuickLogger.Debug("Registered Server",true);
 
@@ -315,5 +333,10 @@ internal class RackBase : FCSDevice, IFCSSave<SaveData>
     {
         QuickLogger.Debug("GetStorageAmountFormat",true);
         return LanguageService.StorageCountFormat(CalculateStorageTotal(), CalculateMaxStorage());
+    }
+
+    internal int GetServerInSlotCount()
+    {
+        return _fcsStorage.GetCount();
     }
 }

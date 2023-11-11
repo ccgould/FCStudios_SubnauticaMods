@@ -47,6 +47,7 @@ internal class BaseManagerBuildable : FCSBuildableModBase
         remoteConnectionModulePrefab.SetEquipment(BaseManagerModuleRackBuildable.BaseManagerEquipmentType);
         remoteConnectionModulePrefab.Register();
         RemoteModuleTechType = remoteConnectionModuleInfo.TechType;
+        FCSModsAPI.PublicAPI.CreateStoreEntry(RemoteModuleTechType, RemoteModuleTechType, 1, _settings.ItemCost, StoreCategory.AlterraHub);
 
         // Transceiver Module.
         var transceiverModuleInfo = PrefabInfo.WithTechType("TransceiverModule", "Tranceiver", "N/A").WithIcon(SpriteManager.Get(TechType.MapRoomUpgradeScanRange));
@@ -55,6 +56,7 @@ internal class BaseManagerBuildable : FCSBuildableModBase
         transceiverModulePrefab.SetEquipment(BaseManagerModuleRackBuildable.BaseManagerEquipmentType);
         transceiverModulePrefab.Register();
         TranceiverModuleTechType = transceiverModuleInfo.TechType;
+        FCSModsAPI.PublicAPI.CreateStoreEntry(TranceiverModuleTechType, TranceiverModuleTechType, 1, _settings.ItemCost, StoreCategory.AlterraHub);
 
         // DSS Integration Module.
         var dssIntegrationModuleInfo = PrefabInfo.WithTechType("DSSIntegrationModule", "DSS Integration", "N/A").WithIcon(SpriteManager.Get(TechType.MapRoomUpgradeScanRange));
@@ -63,6 +65,8 @@ internal class BaseManagerBuildable : FCSBuildableModBase
         dssIntegerationModulePrefab.SetEquipment(BaseManagerModuleRackBuildable.BaseManagerEquipmentType);
         dssIntegerationModulePrefab.Register();
         DSSIntegrationModuleTechType = dssIntegrationModuleInfo.TechType;
+        FCSModsAPI.PublicAPI.CreateStoreEntry(DSSIntegrationModuleTechType, DSSIntegrationModuleTechType, 1, _settings.ItemCost, StoreCategory.AlterraHub);
+
 
 
     }

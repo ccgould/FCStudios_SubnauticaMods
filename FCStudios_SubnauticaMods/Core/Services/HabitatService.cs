@@ -4,6 +4,7 @@ using FCS_AlterraHub.Models.Mono;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Buildable;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Mono;
 using FCSCommon.Utilities;
+using Nautilus.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +31,15 @@ public class HabitatService : MonoBehaviour
     private void Awake()
     {
         // If there is an instance, and it's not me, delete myself.
+
+        SaveUtils.RegisterOnFinishLoadingEvent(() =>
+        {
+            QuickLogger.Debug("On Finished Loading RegisterOnFinishLoadingEvent");
+            foreach(var device in knownDevices)
+            {
+                QuickLogger.Debug($"{device.ID}");
+            }
+        });
 
 
         if (main != null && main != this)

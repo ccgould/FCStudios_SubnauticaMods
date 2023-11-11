@@ -1,4 +1,5 @@
 ﻿using FCS_AlterraHub.Core.Components;
+using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Enumerators;
@@ -6,6 +7,7 @@ using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Buildable;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Items.BaseModuleRack.Mono;
 using FCSCommon.Utilities;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -256,6 +258,19 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
         _baseID = id;
     }
 
+    internal bool HasEnoughPower(float power)
+    {
+        if (_habitat.powerRelay == null)
+        {
+            //QuickLogger.DebugError("Habitat is null");
+        }
+
+        if (!UWEHelpers.RequiresPower()) return true;
+
+        if (_habitat.powerRelay == null || _habitat.powerRelay.GetPower() < power) return false;
+        return true;
+    }
+
     internal Dictionary<string, List<FCSDevice>> GetDevicesList()
     {
         var result = new Dictionary<string, List<FCSDevice>>();
@@ -288,7 +303,7 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
 
     internal int GetConnectedDevicesCount()
     {
-        return _connectedDevices.Count;
+        return _connectedDevices.Count();
     }
 
     public Dictionary<string,FCSDevice> GetConnectedDevices(bool inWorkGroup = false)
@@ -310,6 +325,11 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
 
 
         return _connectedDevices;
+    }
+
+    public IEnumerable<FCSDevice> GetCount<T>() where T : new()
+    {
+        return _registeredDevices.Where(x => x is T);
     }
 
     private bool IsInWorkGroup(string prefabID)
@@ -455,6 +475,14 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
         return (IsAllowedToAddToBase?.Invoke(techType) ?? false) && (HasSpace?.Invoke(containerTotal) ?? false);
     }
 
+    internal PowerSystem.Status GetPowerState()
+    {
+        if (_habitat?.powerRelay?.GetPowerStatus() == null)
+        {
+            QuickLogger.DebugError("GetPowerState returned null");
+        }
+        return _habitat?.powerRelay?.GetPowerStatus() ?? PowerSystem.Status.Offline;
+    }
 
     public Func<TechType,bool> IsAllowedToAddToBase;
     public Func<int,bool> HasSpace;

@@ -4,12 +4,12 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace FCS_AlterraHub.Core.Components.uGUIComponents;
-internal class FCSToolTip : MonoBehaviour, ITooltip
+public class FCSToolTip : MonoBehaviour, ITooltip
 {
     [SerializeField] private string tooltip;
     [SerializeField] private TechType techType;
-    [SerializeField] private Func<bool> requestPermission;
-    [SerializeField] private Func<string> toolTipStringDelegate;
+    public Func<bool> RequestPermission;
+    public Func<string> ToolTipStringDelegate;
     [SerializeField] private bool isDescription  = false;
 
     public bool showTooltipOnDrag => true;
@@ -19,11 +19,11 @@ internal class FCSToolTip : MonoBehaviour, ITooltip
 
     public void GetTooltip(TooltipData tooltip)
     {
-        var result = requestPermission?.Invoke() ?? false;
+        var result = RequestPermission?.Invoke() ?? false;
 
-        if (toolTipStringDelegate != null)
+        if (ToolTipStringDelegate != null)
         {
-            this.tooltip = toolTipStringDelegate?.Invoke();
+            this.tooltip = ToolTipStringDelegate?.Invoke();
         }
 
         if (techType != TechType.None)

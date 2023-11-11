@@ -10,6 +10,7 @@ using FCS_AlterraHub.Models.Mono;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Buildable;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Items.BaseTransmitter.Buildable;
 using FCS_AlterraHub.ModItems.Buildables.DroneDepotPort.Buildable;
+using FCS_AlterraHub.ModItems.Buildables.OreCrusher.Buildable;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_AlterraHub.ModItems.Spawnables.DebitCard.Spawnable;
 using FCS_AlterraHub.ModItems.Spawnables.PaintTool.Items;
@@ -111,6 +112,8 @@ public class Plugin : BaseUnityPlugin
         //Add mod and patch.
         FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "BMMR", new BaseManagerModuleRackBuildable());
 
+        //Add mod and patch.
+        FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "OC", new OreCrusherBuildable());
 
         //Add mod and patch.
         FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "BM", mod: new BaseManagerBuildable());

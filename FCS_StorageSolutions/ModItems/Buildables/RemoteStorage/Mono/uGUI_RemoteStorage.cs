@@ -39,7 +39,7 @@ internal class uGUI_RemoteStorage : Page, IuGUIAdditionalPage
     {
         base.Awake();
         _paginatorController.OnPageChanged += PaginatorController_OnPageChanged;
-        //_inventoryGrid.OnLoadDisplay += GridHelper_OnLoadDisplay;
+        _inventoryGrid.OnLoadDisplay += GridHelper_OnLoadDisplay;
         RefreshDevice();
     }
 
@@ -61,7 +61,7 @@ internal class uGUI_RemoteStorage : Page, IuGUIAdditionalPage
     private void OnDestroy()
     {
         _paginatorController.OnPageChanged -= PaginatorController_OnPageChanged;
-        //_inventoryGrid.OnLoadDisplay -= GridHelper_OnLoadDisplay;
+        _inventoryGrid.OnLoadDisplay -= GridHelper_OnLoadDisplay;
     }
 
     private void PaginatorController_OnPageChanged(object sender, PaginatorController.OnPageChangedArgs e)

@@ -1,5 +1,7 @@
 ﻿using FCS_AlterraHub.Core.Components;
 using FCS_StorageSolutions.Models;
+using FCS_StorageSolutions.Models.Enumerator;
+using FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Spawnable;
 using FCS_StorageSolutions.Services;
 using FCSCommon.Utilities;
 using System;
@@ -23,6 +25,16 @@ internal class uGUI_TerminalBaseList : MonoBehaviour
         _paginatorController = gameObject.GetComponentInChildren<PaginatorController>();
     }
 
+    private void Start()
+    {
+        DSSService.main.NotifyNetworkConnectionChanged += OnNetworkStateChanged;
+    }
+
+    private void OnNetworkStateChanged(DSSManager manager, bool isConnectedToNetwork)
+    {
+        RefreshGrid();
+    }
+
     private void RefreshGrid()
     {
         _gridHelper.DrawPage();
@@ -35,7 +47,10 @@ internal class uGUI_TerminalBaseList : MonoBehaviour
 
             if (DSSService.main is not null)
             {
-                var grouped = DSSService.main.GetManagers();
+
+
+
+                var grouped = DSSService.main.GetManagers().OrderByDescending(x => x.Value.GetSubRoot() == terminalController.CachedHabitatManager.GetSubRoot()).ToList();
 
                 if (grouped is null) return;
 
@@ -48,6 +63,9 @@ internal class uGUI_TerminalBaseList : MonoBehaviour
                 {
                     listItems[i].Reset();
                 }
+
+
+                
 
                 int w = 0;
 
@@ -82,5 +100,10 @@ internal class uGUI_TerminalBaseList : MonoBehaviour
         {
             RefreshGrid();
         }
+    }
+
+    private void OnDestroy()
+    {
+        DSSService.main.NotifyNetworkConnectionChanged -= OnNetworkStateChanged;
     }
 }

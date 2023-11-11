@@ -1,4 +1,5 @@
 ﻿using FCS_StorageSolutions.Models;
+using FCS_StorageSolutions.Services;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -21,13 +22,15 @@ internal class uGUI_TerminalBaseListItem : MonoBehaviour
         dssManager = null;
     }
 
-    internal void Set(KeyValuePair<string, DSSManager> dssManager,DSSTerminalController terminalController)
+    internal void Set(KeyValuePair<string, DSSManager> dssManager, DSSTerminalController terminalController)
     {
+
         this.terminalController = terminalController;
         this.dssManager = dssManager.Value;
         nameLbl.text = dssManager.Value.GetBaseName();
         SetIcon();
-        gameObject.SetActive(true);
+
+        gameObject.SetActive((this.dssManager.IsConnectedToNetwork() && terminalController.GetDSSManager().IsConnectedToNetwork()) || IsCurrentSub());
     }
 
     public void OnClick()
@@ -43,7 +46,7 @@ internal class uGUI_TerminalBaseListItem : MonoBehaviour
         {
             icons[3].gameObject.SetActive(true);
         }
-        else if (dssManager.GetSubRoot() == Player.main.currentSub)
+        else if (IsCurrentSub())
         {
             icons[0].gameObject.SetActive(true);
         }
@@ -51,6 +54,11 @@ internal class uGUI_TerminalBaseListItem : MonoBehaviour
         {
             icons[1].gameObject.SetActive(true);
         }
+    }
+
+    private bool IsCurrentSub()
+    {
+        return dssManager.GetSubRoot() == terminalController.CachedHabitatManager.GetSubRoot();
     }
 
     private void ResetIcons()

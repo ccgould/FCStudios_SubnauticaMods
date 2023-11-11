@@ -36,7 +36,6 @@ internal class IonCubeGeneratorController : FCSDevice, IFCSSave<SaveData>, IWork
     {
         QuickLogger.Debug("Awake");
         base.Awake();
-
         _cubeContainer = GetComponent<FCSStorage>();
         cubeGeneratorStateManager = GetComponent<CubeGeneratorStateManager>();
         _interaction = gameObject.GetComponent<HoverInteraction>();

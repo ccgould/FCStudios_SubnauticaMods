@@ -10,7 +10,9 @@ using FCS_AlterraHub.Models.Mono;
 using FCS_StorageSolutions.Configuation;
 using FCS_StorageSolutions.Models;
 using FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Enumerators;
+using FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Mono.Base;
 using FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Mono.C40Terminal.Enumerator;
+using FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Spawnable;
 using FCS_StorageSolutions.Services;
 using FCSCommon.Utilities;
 using System;
@@ -30,6 +32,7 @@ internal class DSSTerminalController : FCSDevice, IFCSSave<SaveData>
     [SerializeField] private Text currentBaseLabel;
     [SerializeField] private Text serverCountLabel;
     [SerializeField] private Text rackCountLabel;
+    [SerializeField] private Text totalCountLabel;
     [SerializeField] private TMP_InputField inputField;
     public BulkMultipliers BulkMultiplier;
     private DSSManager _dssManager;
@@ -183,12 +186,13 @@ internal class DSSTerminalController : FCSDevice, IFCSSave<SaveData>
 
             if (_dssManager is not null)
             {
-                Dictionary<TechType,int> grouped;
+                UpdateValuesOnScreen();
 
-                if(!string.IsNullOrEmpty(_currentSearch))
+                Dictionary<TechType, int> grouped;
+
+                if (!string.IsNullOrEmpty(_currentSearch))
                 {
                     grouped = _dssManager.GetBaseItems(filter).Where(i => i.Key.AsString(true).Contains(_currentSearch.ToLower())).ToDictionary(i => i.Key, i => i.Value);
-
                 }
                 else
                 {
@@ -217,12 +221,12 @@ internal class DSSTerminalController : FCSDevice, IFCSSave<SaveData>
 
                 _inventoryGrid?.UpdaterPaginator(grouped.Count);
 
-                if(_inventoryGrid is not null)
+                if (_inventoryGrid is not null)
                 {
                     _paginatorController?.ResetCount(_inventoryGrid.GetMaxPages());
 
                 }
-            }            
+            }
         }
         catch (Exception e)
         {
@@ -230,6 +234,50 @@ internal class DSSTerminalController : FCSDevice, IFCSSave<SaveData>
             QuickLogger.Error($"Error Message: {e.Message}");
             QuickLogger.Error($"Error StackTrace: {e.StackTrace}");
         }
+    }
+
+    private void UpdateValuesOnScreen()
+    {
+        
+        //terminalController.GetDSSManager().GetDeviceTotal()
+        var serverTotal = GetDSSManager().GetDeviceItemTotal(DSSServerSpawnable.PatchedTechType);
+        var lockerTotal = GetDSSManager().GetDeviceItemTotal(TechType.Locker);
+        var smallLockerTotal = GetDSSManager().GetDeviceItemTotal(TechType.SmallLocker);
+        //var seaBreezeTotal = _currentBase.GetTotal(StorageType.SeaBreeze);
+        //var harvesterTotal = _currentBase.GetTotal(StorageType.Harvester);
+        //var replicatorTotal = _currentBase.GetTotal(StorageType.Replicator);
+        //var remoteStorageTotal = _currentBase.GetTotal(StorageType.RemoteStorage);
+        //var storageLockerTotal = _currentBase.GetTotal(StorageType.StorageLockers);
+
+        //var alterraStorageCapacity = _currentBase?.BaseFcsStorage.Sum(x => x.GetMaxStorage()) ?? 0;
+        //var seaBreezeCapacity = _currentBase.GetDevicesCount("SB") * 100;
+        //var harvesterCapacity = _currentBase.GetDevicesCount("HH") * 150;
+        //var replicatorCapacity = _currentBase.GetDevicesCount("RM") * 25;
+
+        var devices = CachedHabitatManager.GetCount<RackBase>();
+
+        if (devices is not null)
+        {
+            int rackCount = 0;
+
+            foreach (var device in devices)
+            {
+                var rack = device as RackBase;
+                rackCount += rack.GetServerInSlotCount();
+            }
+
+            var serverCapacity = rackCount * 48;
+
+            totalCountLabel.text = $"{serverTotal.ToString("D4")}/{serverCapacity.ToString("D4")}";
+            serverCountLabel.text = $"Servers: {_dssManager.GetServerCount():D3}";
+            rackCountLabel.text = $"Racks: {_dssManager.GetRackCount():D3}";
+            QuickLogger.Debug($"Server Capacity: {serverCapacity}", true);
+
+        }
+
+        QuickLogger.Debug($"Server Total: {serverTotal}", true);
+        QuickLogger.Debug($"Locker Total: {lockerTotal}", true);
+        QuickLogger.Debug($"Small Locker Total: {smallLockerTotal}", true);
     }
 
     private void GetManager()
@@ -274,8 +322,7 @@ internal class DSSTerminalController : FCSDevice, IFCSSave<SaveData>
     private void RefreshDisplay()
     {
         RefreshGrid();
-        serverCountLabel.text = $"Servers: {_dssManager.GetServerCount():D3}";
-        rackCountLabel.text = $"Racks: {_dssManager.GetRackCount():D3}";
+        UpdateValuesOnScreen();
     }
 
     private IEnumerator AttemptConnection()
@@ -357,5 +404,10 @@ internal class DSSTerminalController : FCSDevice, IFCSSave<SaveData>
     {
         this.filter = filter;
         RefreshDisplay();
+    }
+
+    internal DSSManager GetDSSManager()
+    {
+        return _dssManager;
     }
 }

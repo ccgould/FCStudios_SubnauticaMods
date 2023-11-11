@@ -1,4 +1,5 @@
-﻿using FCS_AlterraHub.Models.Mono;
+﻿using FCS_AlterraHub.Core.Helpers;
+using FCS_AlterraHub.Models.Mono;
 using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
@@ -12,12 +13,14 @@ public class DumpContainer : MonoBehaviour
     [SerializeField] private int containerWidth;
     [SerializeField] private int containerHeight;
     [SerializeField] private string storageLabel = "Storage";
+    [SerializeField] private bool returnToPlayerOnDrop;
     private ItemsContainer _dumpContainer;
 
     [SerializeField] private FCSStorage _storage;
 
     public event Action OnDumpContainerClosed;
     public event Action<InventoryItem> OnDumpContainerAddItem;
+    public event Action<Pickupable> OnDumpContainerItemSample;
 
     public void Start()
     {
@@ -49,6 +52,17 @@ public class DumpContainer : MonoBehaviour
 
     private void DumpContainerOnOnAddItem(InventoryItem item)
     {
+        if (returnToPlayerOnDrop)
+        {
+            _dumpContainer.RemoveItem(item.item.GetTechType());
+            Player main = Player.main;
+            PDA pda = main.GetPDA();
+            pda.Close();
+            PlayerInteractionHelper.GivePlayerItem(item);
+            OnDumpContainerItemSample?.Invoke(item.item);
+            return;
+        }
+
         OnDumpContainerAddItem?.Invoke(item);
     }
 
@@ -59,6 +73,8 @@ public class DumpContainer : MonoBehaviour
 
     private bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
     {
+        if (returnToPlayerOnDrop) return true;
+
         var result = _storage.IsAllowedToAdd(pickupable, verbose);
         return result;
     }
@@ -81,6 +97,8 @@ public class DumpContainer : MonoBehaviour
 
     internal virtual void OnDumpClose(PDA pda)
     {
+        if (returnToPlayerOnDrop) return;
+
         QuickLogger.Debug($"Store Items Dump Count: {_dumpContainer.count}");
         var amount = _dumpContainer.count;
 

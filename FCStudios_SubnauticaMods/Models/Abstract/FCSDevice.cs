@@ -8,8 +8,10 @@ using FCS_AlterraHub.ModItems.Buildables.BaseManager.Buildable;
 using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 using static FCS_AlterraHub.Models.Mono.HabitatManager;
 
 
@@ -33,7 +35,7 @@ public abstract class FCSDevice : MonoBehaviour, IFCSObject, IProtoEventListener
     protected bool IsFromSave;
     protected object _savedData;
     private FCSDeviceState _deviceState;
-    
+    [SerializeField] private Text unitIDText;
     private Dictionary<string, DeviceWarning> _warnings = new();
     protected ColorManager _colorManager;
     private string _prefabID;
@@ -53,8 +55,18 @@ public abstract class FCSDevice : MonoBehaviour, IFCSObject, IProtoEventListener
     /// <summary>
     /// The unit identifier that will be unique to this device like a prefab identifier.
     /// </summary>
-    public virtual string UnitID { get; set; } = string.Empty;
+    public virtual string UnitID
+    {
+        get => unitID; set
+        {
+            unitID = value;
 
+            if(unitIDText is not null)
+            {
+                unitIDText.text = $"Unit ID : {unitID}";
+            }
+        }
+    }
     /// <summary>
     /// The firendly name of this device.
     /// </summary>
@@ -66,10 +78,13 @@ public abstract class FCSDevice : MonoBehaviour, IFCSObject, IProtoEventListener
     public bool IsVisibleInPDA = true;
 
     [SerializeField]
+    [Description("Bypasses Base Connection")]
     private bool bypassConnection;
 
     [SerializeField]
+    [Description("Allows you to add tem more slots to the Base Connection Limit")]
     private bool affectsHabitatDeviceLimit;
+    private string unitID = string.Empty;
 
     /// <summary>
     /// The initializer of this device
@@ -181,7 +196,10 @@ public abstract class FCSDevice : MonoBehaviour, IFCSObject, IProtoEventListener
 
                 return;
             }
-            _runStartUpOnEnable = true;
+            else
+            {
+                _runStartUpOnEnable = true;
+            }
         }
     }
 

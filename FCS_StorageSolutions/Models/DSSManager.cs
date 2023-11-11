@@ -1,6 +1,9 @@
-﻿using FCS_AlterraHub.Models.Mono;
+﻿using FCS_AlterraHub.Models.Abstract;
+using FCS_AlterraHub.Models.Mono;
+using FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Mono;
 using FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Mono.Base;
 using FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Mono.C40Terminal.Enumerator;
+using FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Spawnable;
 using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
@@ -11,13 +14,15 @@ namespace FCS_StorageSolutions.Models;
 internal class DSSManager : MonoBehaviour
 {
     private Dictionary<RackBase,HashSet<FCSStorage>> dssRacks = new();
-    private HashSet<StorageContainer> storageContainers = new();
+    private HashSet<DSSAntennaController> dssAntennas = new();
+    //private HashSet<StorageContainer> storageContainers = new();
 
-    private    readonly Dictionary<TechType, TrackedResource> TrackedResources = new();
+    private    readonly Dictionary<TechType, TrackedResource> trackedResources = new();
 
     internal Action OnServerAdded;
     internal Action OnServerRemoved;
     internal Action OnRackRemoved;
+    internal Action<DSSManager, bool> OnNetworkConnectionChanged;
     private HabitatManager habitatManager;
 
     internal void Initialize(HabitatManager habitatManager)
@@ -36,7 +41,30 @@ internal class DSSManager : MonoBehaviour
         return true;
     }
 
-    internal void RegisterStorage(RackBase parentRack, FCSStorage storage)
+    internal bool IsVisible()
+    {
+        return dssAntennas.Any();
+    }
+
+    internal void RegisterAntenna(DSSAntennaController antenna)
+    {
+        dssAntennas.Add(antenna);
+        if(dssAntennas.Count == 1)
+        {
+            OnNetworkConnectionChanged?.Invoke(this,true);
+        }
+    }
+
+    internal void UnRegisterAntenna(DSSAntennaController antenna)
+    {
+        dssAntennas.Remove(antenna);
+        if (dssAntennas.Count == 0)
+        {
+            OnNetworkConnectionChanged?.Invoke(this,false);
+        }
+    }
+
+    internal void RegisterServer(RackBase parentRack, FCSStorage storage)
     {
         if (dssRacks.ContainsKey(parentRack))
         {
@@ -47,41 +75,99 @@ internal class DSSManager : MonoBehaviour
             dssRacks.Add(parentRack, new HashSet<FCSStorage>() { storage });
         }
 
+        RegisterStorage(DSSServerSpawnable.PatchedTechType, storage.ItemsContainer);
+
+
         OnServerAdded?.Invoke();
     }
 
-    internal void UnRegisterStorage(RackBase parentRack,FCSStorage storage)
+    internal void UnRegisterServer(RackBase parentRack,FCSStorage storage)
     {
         if(dssRacks.ContainsKey(parentRack))
         {
             dssRacks[parentRack].Remove(storage);
+            UnRegisterStorage(DSSServerSpawnable.PatchedTechType, storage.ItemsContainer);
             OnServerRemoved?.Invoke();
         }
     }
 
-    internal void RegisterStorage(StorageContainer storage)
+    internal void RegisterStorage(TechType deviceTechType, ItemsContainer storage)
     {
-        storageContainers.Add(storage);
-        storage.container.onAddItem += StorageContainer_ItemAdded;
-        storage.container.onRemoveItem += StorageContainer_ItemRemoved;
+        //storageContainers.Add(storage);
+
+
+        foreach (var item in storage)
+        {
+            TrackResource(deviceTechType, item);
+        }
+        storage.onAddItem += StorageContainer_ItemAdded;
+        storage.onRemoveItem += StorageContainer_ItemRemoved;
         OnServerAdded?.Invoke();
+    }
+
+    private void TrackResource(TechType deviceTechType, InventoryItem item)
+    {
+        var techType = item.item.GetTechType();
+
+        if (trackedResources.TryGetValue(techType, out var resource))
+        {
+            resource.TrackItem(deviceTechType, item);
+        }
+        else
+        {
+            trackedResources.Add(techType, new TrackedResource(deviceTechType, item));
+        }
+    }
+
+    private void UnTrackResource(TechType deviceTechType, InventoryItem item)
+    {
+        var techType = item.item.GetTechType();
+
+        if (trackedResources.TryGetValue(techType, out var resource))
+        {
+            resource.UnTrackItem(deviceTechType, item);
+            if(resource.GetCount(DSSTerminalFilterOptions.ShowAll) <= 0)
+            {
+                trackedResources.Remove(techType);
+            }
+        }
     }
 
     private void StorageContainer_ItemRemoved(InventoryItem item)
     {
-        OnServerAdded?.Invoke();
+        var techTag = item.item.gameObject.GetComponentInParent<TechTag>(true);
+        QuickLogger.Debug($"StorageContainer_ItemRemoved: {item.item.GetTechName()}", true);
+        if (techTag is not null)
+        {
+            UnTrackResource(techTag.type, item);
+            OnServerAdded?.Invoke();
+        }
     }
 
     private void StorageContainer_ItemAdded(InventoryItem item)
     {
-        OnServerRemoved?.Invoke();
+        var techTag = item.item.gameObject.GetComponentInParent<TechTag>(true);
+        QuickLogger.Debug($"StorageContainer_ItemAdded: {item.item.GetTechName()} |  Item Parent Type:  {techTag?.type.AsString()}", true);
+
+        if (techTag is not null)
+        {
+            TrackResource(techTag.type, item);
+            OnServerRemoved?.Invoke();
+        }
     }
 
-    internal void UnRegisterStorage(StorageContainer storage)
+
+    internal void UnRegisterStorage(TechType deviceTechType, ItemsContainer storage)
     {
-        storageContainers.Remove(storage);
-        storage.container.onAddItem -= StorageContainer_ItemAdded;
-        storage.container.onRemoveItem -= StorageContainer_ItemRemoved;
+        //storageContainers.Remove(storage);
+
+        foreach (var item in storage)
+        {
+            UnTrackResource(deviceTechType, item);
+        }
+
+        storage.onAddItem -= StorageContainer_ItemAdded;
+        storage.onRemoveItem -= StorageContainer_ItemRemoved;
         OnServerRemoved?.Invoke();
     }
 
@@ -91,14 +177,15 @@ internal class DSSManager : MonoBehaviour
         OnRackRemoved?.Invoke();
     }
 
-    private bool Any()
+    private bool AnyItemsInNetwork()
     {
-        return dssRacks.Any() || storageContainers.Any();
+        return trackedResources.Any(); //dssRacks.Any() || storageContainers.Any();
     }
 
     internal bool HasSpace(int amount)
     {
-        if(Any())
+
+        if(dssRacks.Any())
         {
             return SpaceAvaliable() >= amount + 1;
         }
@@ -108,30 +195,28 @@ internal class DSSManager : MonoBehaviour
 
     internal int SpaceAvaliable()
     {
-        if(Any())
+        int sum = 0;
+        foreach (var storage in dssRacks.Values)
         {
-            int sum = 0;
-            foreach (var storage in dssRacks.Values)
+            foreach (var server in storage)
             {
-                foreach (var server in storage)
-                {
-                    sum += server.GetFreeSpace();
-                }
+                sum += server.GetFreeSpace();
             }
-            return sum;
         }
-
-        return 0;
+        return sum;
     }
 
+
     internal bool AddItem(InventoryItem inventoryItem)
-    {
+    { 
         foreach (var result in from storage in dssRacks.Values
                                from server in storage
                                where server.GetFreeSpace() >= 1
                                let result = server.AddItemToContainer(inventoryItem)
                                select result)
         {
+
+            //TrackResource(DSSServerSpawnable.PatchedTechType, inventoryItem);
             OnServerAdded?.Invoke();
             return result;
         }
@@ -141,7 +226,7 @@ internal class DSSManager : MonoBehaviour
 
     internal Pickupable RemoveItem(TechType techType)
     {
-        if(Any())
+        if(AnyItemsInNetwork())
         {
             foreach (var result in from servers in dssRacks.Values
                                    from server in servers
@@ -149,18 +234,36 @@ internal class DSSManager : MonoBehaviour
                                    let result = server.RemoveItemFromContainer(techType)
                                    select result)
             {
+                UnTrackResource(DSSServerSpawnable.PatchedTechType, result.inventoryItem);
                 OnServerRemoved?.Invoke();
                 return result;
             }
 
-           foreach (var storage in storageContainers)
+            var pickupable = UnTrackResourceAndReturn(TechType.None, techType);
+            OnServerRemoved?.Invoke();
+
+            return pickupable;
+        }
+
+        return null;
+    }
+
+    private Pickupable UnTrackResourceAndReturn(TechType patchedTechType, TechType techType)
+    {
+        if (trackedResources.TryGetValue(techType, out var resource))
+        {
+            QuickLogger.Debug($"[UnTrackResourceAndReturn] Retreive Pickable. {resource is null}");
+
+            var pickupable = resource.UnTrackItemAndReturn(patchedTechType).item;
+
+            if (resource.GetCount(DSSTerminalFilterOptions.ShowAll) <= 0)
             {
-                if(storage.container.Contains(techType))
-                {
-                    var item = storage.container.RemoveItem(techType);
-                    return item;
-                }
+                trackedResources.Remove(techType);
             }
+
+            QuickLogger.Debug($"[UnTrackResourceAndReturn] Received Pickable: {pickupable is not null}");
+
+            return pickupable;
         }
 
         return null;
@@ -193,6 +296,7 @@ internal class DSSManager : MonoBehaviour
         }        
     }
 
+
     internal Dictionary<TechType,int> GetBaseItems(DSSTerminalFilterOptions filter)
     {
         var dict = new Dictionary<TechType, int>();
@@ -202,8 +306,12 @@ internal class DSSManager : MonoBehaviour
             case DSSTerminalFilterOptions.Other:
                 break;
             case DSSTerminalFilterOptions.ShowAll:
-                GetServerItems(dict);
-                GetStorageContainerItems(dict);
+                foreach (var item in trackedResources)
+                {
+                    dict.Add(item.Key, item.Value.GetCount(filter));
+                }
+                //GetServerItems(dict);
+                //GetStorageContainerItems(dict);
                 break;
             case DSSTerminalFilterOptions.Servers:
                 GetServerItems(dict);
@@ -211,7 +319,7 @@ internal class DSSManager : MonoBehaviour
             case DSSTerminalFilterOptions.AlterraStorage:
                 break;
             case DSSTerminalFilterOptions.StorageLocker:
-                GetStorageContainerItems(dict);
+                //GetStorageContainerItems(dict);
                 break;
             case DSSTerminalFilterOptions.SeaBreeze:
                 break;
@@ -227,21 +335,21 @@ internal class DSSManager : MonoBehaviour
 
     private void GetStorageContainerItems(Dictionary<TechType, int> dict)
     {
-        foreach (var storageContainer in storageContainers)
-        {
-            foreach (var item in storageContainer.container)
-            {
-                var techType = item.item.GetTechType();
-                if (dict.ContainsKey(techType))
-                {
-                    dict[techType] += 1;
-                }
-                else
-                {
-                    dict.Add(techType, 1);
-                }
-            }
-        }
+        //foreach (var storageContainer in storageContainers)
+        //{
+        //    foreach (var item in storageContainer.container)
+        //    {
+        //        var techType = item.item.GetTechType();
+        //        if (dict.ContainsKey(techType))
+        //        {
+        //            dict[techType] += 1;
+        //        }
+        //        else
+        //        {
+        //            dict.Add(techType, 1);
+        //        }
+        //    }
+        //}
     }
 
     private void GetServerItems(Dictionary<TechType, int> dict)
@@ -295,5 +403,35 @@ internal class DSSManager : MonoBehaviour
     internal HabitatManager GetHabitatManager()
     {
         return habitatManager;
+    }
+
+    internal bool IsConnectedToNetwork()
+    {
+        return dssAntennas.Any(x => x.IsOperational());
+    }
+
+    internal int GetDeviceItemTotal(TechType techType)
+    {
+        int amount = 0;
+        
+        foreach (var item in trackedResources)
+        {
+            if(item.Value.HasDevice(techType,out int result))
+            {
+                amount += result;
+            }
+        }
+        
+        return amount;
+    }
+
+    internal int GetItemTotal(TechType currentItem)
+    {
+        if(trackedResources.TryGetValue(currentItem, out var result))
+        {
+            return result.GetCount(DSSTerminalFilterOptions.ShowAll);
+        }
+
+        return 0;
     }
 }

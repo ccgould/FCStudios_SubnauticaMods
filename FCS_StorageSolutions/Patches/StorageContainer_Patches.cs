@@ -7,6 +7,9 @@ using FCS_StorageSolutions.Models.Enumerator;
 using FCS_StorageSolutions.Services;
 using FCSCommon.Utilities;
 using HarmonyLib;
+using System;
+using UnityEngine;
+using static VFXParticlesPool;
 
 namespace FCS_StorageSolutions.Patches;
 internal class StorageContainer_Patches
@@ -23,10 +26,12 @@ internal class StorageContainer_Patches
         internal static void Postfix(StorageContainer __instance)
         {
             QuickLogger.Debug($"StorageContainer_Awake: 1 {__instance.gameObject.name}");
-            if (__instance == null)
+            
+            if (__instance == null || InvalidComponent(__instance.gameObject))
             {
                 return;
             }
+
             QuickLogger.Debug($"StorageContainer_Awake: 2 {__instance.gameObject.name}");
 
 
@@ -68,10 +73,31 @@ internal class StorageContainer_Patches
                 return;
             }
 
-            dssManager.RegisterStorage(__instance);
+            var techTag = __instance.gameObject.GetComponentInParent<TechTag>();
+
+            if(techTag is not null)
+            {
+                dssManager.RegisterStorage(techTag.type, __instance.container);
+            }
+            else
+            {
+                QuickLogger.DebugError($"StorageContainer_Awake: TechTag was not found on {__instance.gameObject.name}");
+            }
+
+
 
             QuickLogger.Debug($"StorageContainer_Awake: 8 {__instance.gameObject.name}");
 
+        }
+
+        internal static bool InvalidComponent(GameObject __instance)
+        {
+            if(__instance.GetComponentInParent<Planter>() ||
+                __instance.GetComponentInParent<Aquarium>())
+            {
+                return true;
+            }
+            return false;
         }
 
         internal static bool IsInvalidStorageType(StorageType storageType)
@@ -90,7 +116,7 @@ internal class StorageContainer_Patches
         [HarmonyPostfix]
         internal static void Postfix(bool constructed, Constructable __instance)
         {
-            if (__instance == null || !constructed /*|| __instance.gameObject.GetComponentInParent<FcsDevice>()*/)
+            if (__instance == null || !constructed || StorageContainerAwakePatcher.InvalidComponent(__instance.gameObject))
             {
                 return;
             }
@@ -98,6 +124,7 @@ internal class StorageContainer_Patches
             var fcsdevice = __instance.gameObject.GetComponentInChildren<FCSDevice>();
             var fcsStorage = __instance.gameObject.GetComponentInChildren<FCSStorage>();
             var storageContainer = __instance.gameObject.GetComponentInChildren<StorageContainer>(true);
+            var planter = __instance.gameObject.GetComponentInChildren<Planter>(true);
 
             var manager = HabitatService.main.GetBaseManager(__instance.gameObject);
 
@@ -115,7 +142,17 @@ internal class StorageContainer_Patches
             }
 
             var dssManager = DSSService.main.GetDSSManager(manager);
-            dssManager.RegisterStorage(storageContainer);
+
+            var techTag = __instance.gameObject.GetComponentInParent<TechTag>();
+
+            if (techTag is not null)
+            {
+                dssManager.RegisterStorage(techTag.type, storageContainer.container);
+            }
+            else
+            {
+                QuickLogger.DebugError($"StorageContainer_Awake: TechTag was not found on {__instance.gameObject.name}");
+            }
         }
     }
 }

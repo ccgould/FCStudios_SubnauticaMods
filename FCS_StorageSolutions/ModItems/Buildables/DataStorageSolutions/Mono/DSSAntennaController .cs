@@ -4,13 +4,17 @@ using FCS_AlterraHub.Core.Components;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_StorageSolutions.Configuation;
+using FCS_StorageSolutions.Models;
+using FCS_StorageSolutions.Services;
 using FCSCommon.Utilities;
+using System.Collections;
 using UnityEngine;
 
 namespace FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Mono;
 internal class DSSAntennaController : FCSDevice, IFCSSave<SaveData>
 {
     [SerializeField] private MotorHandler motorHandler;
+    private DSSManager _dssManager;
 
     public override void Start()
     {
@@ -44,6 +48,10 @@ internal class DSSAntennaController : FCSDevice, IFCSSave<SaveData>
             }
             _runStartUpOnEnable = false;
         }
+
+        StartCoroutine(AttemptConnection());
+
+        motorHandler.StartMotor();
     }
 
     public override void ReadySaveData()
@@ -80,5 +88,39 @@ internal class DSSAntennaController : FCSDevice, IFCSSave<SaveData>
         {
             $"[EPM: {energyPerSecond * 60:F2}] [Is Connected: {IsRegisteredToBaseManager()}]",
         };
+    }
+
+    private IEnumerator AttemptConnection()
+    {
+        while (CachedHabitatManager is null)
+        {
+            yield return new WaitForSeconds(1);
+            Start();
+            yield return null;
+        }
+
+        while (_dssManager is null)
+        {
+            yield return new WaitForSeconds(1);
+            _dssManager = DSSService.main.GetDSSManager(CachedHabitatManager?.GetBasePrefabID());
+            yield return null;
+        }
+
+        _dssManager.RegisterAntenna(this);
+    }
+
+    public override void OnDestroy()
+    {
+        base.OnDestroy();
+
+        if(_dssManager is not null)
+        {
+            _dssManager.UnRegisterAntenna(this);
+        }
+    }
+
+    public override bool IsOperational()
+    {
+        return IsConstructed;
     }
 }

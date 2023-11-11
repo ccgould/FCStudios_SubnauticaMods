@@ -1,13 +1,10 @@
-﻿using FCS_AlterraHub.API;
-using FCS_AlterraHub.Configuation;
-using FCS_AlterraHub.Models.Abstract;
+﻿using FCS_AlterraHub.Configuation;
 using FCS_AlterraHub.Models.Interfaces;
-using FCS_StorageSolutions.Configuation;
+using FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Mono.Base;
 using FCSCommon.Utilities;
-using UnityEngine;
 
 namespace FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Mono;
-internal class DSSWallRackController : FCSDevice, IFCSSave<SaveData>
+internal class DSSWallRackController : RackBase
 {
 
     public override void Start()
@@ -44,39 +41,4 @@ internal class DSSWallRackController : FCSDevice, IFCSSave<SaveData>
         }
     }
 
-    public override void ReadySaveData()
-    {
-        string id = (base.GetComponentInParent<PrefabIdentifier>() ?? base.GetComponent<PrefabIdentifier>()).Id;
-        _savedData = ModSaveManager.GetSaveData<BaseSaveData>(id);
-        QuickLogger.Debug($"Prefab Id : {GetPrefabID()} || SaveData Is Null: {_savedData is null}");
-    }
-
-    public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)
-    {
-        QuickLogger.Debug("Saving DSS Antenna", true);
-
-        if (!IsInitialized || !IsConstructed) return;
-
-        if (_savedData == null)
-        {
-            _savedData = new BaseSaveData();
-        }
-
-        var save = _savedData as BaseSaveData;
-
-        save.Id = GetPrefabID();
-        save.BaseId = FCSModsAPI.PublicAPI.GetHabitat(this)?.GetBasePrefabID();
-        save.ColorTemplate = _colorManager.SaveTemplate();
-
-        newSaveData.Data.Add(save);
-        QuickLogger.Debug($"Saves DSS Antenna {newSaveData.Data.Count}", true);
-    }
-
-    public override string[] GetDeviceStats()
-    {
-        return new string[]
-        {
-            $"[EPM: {energyPerSecond * 60:F2}] [Is Connected: {IsRegisteredToBaseManager()}]",
-        };
-    }
 }
