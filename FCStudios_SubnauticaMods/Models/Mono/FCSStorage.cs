@@ -23,6 +23,7 @@ public class FCSStorage : StorageContainer, IFCSStorage
     [SerializeField] private List<TechType> AllowedTech;
     [Description("Allows storage to be visible in DSS Network")] public bool IsVisibleInNetwork;
 
+    public IsAllowedToAdd isAllowedToAdd;
 
     public ItemsContainer ItemsContainer
     {
@@ -143,7 +144,7 @@ public class FCSStorage : StorageContainer, IFCSStorage
 
     public virtual bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
     {
-        return !NotAllowedToAddItems && CanBeStored(1, pickupable.GetTechType());
+        return !NotAllowedToAddItems && CanBeStored(1, pickupable.GetTechType()) && (isAllowedToAdd is  null ||  isAllowedToAdd.Invoke(pickupable,verbose));
     }
 
     public bool NotAllowedToAddItems { get; set; }

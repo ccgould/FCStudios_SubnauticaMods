@@ -39,20 +39,26 @@ internal class OreCrusherController : FCSDevice, IFCSSave<SaveData>
     [SerializeField] private DumpContainer _dumpContainer;
     [SerializeField] private FCSStorage _storage;
     private OreCrusherEffectsManager effectsManager;
-    private OreConsumerSpeedModes _currentSpeedMode = OreConsumerSpeedModes.Low;
-    private OreConsumerSpeedModes _pendingSpeedMode = OreConsumerSpeedModes.Low;
+    private OreConsumerSpeedModes _currentSpeedMode = OreConsumerSpeedModes.Min;
+    private OreConsumerSpeedModes _pendingSpeedMode = OreConsumerSpeedModes.Min;
 
 
     public override void Awake()
     {
-        base.Awake();
-        effectsManager = gameObject.GetComponent<OreCrusherEffectsManager>();
-        _storage.container.onAddItem += AddItemToContainer;
-        _storage.container.isAllowedToAdd += IsAllowedToAdd;
+        base.Awake();           
+    }
+
+    public override float GetPowerUsage()
+    {
+        return _oreQueue != null && _oreQueue?.Count > 0 && !_isBreakerTripped ? energyPerSecond * (int)_currentSpeedMode : 0;
     }
 
     public override void Start()
     {
+        effectsManager = gameObject.GetComponent<OreCrusherEffectsManager>();
+
+        _storage.ItemsContainer.onAddItem += AddItemToContainer;
+        _storage.isAllowedToAdd = new IsAllowedToAdd(IsAllowedToAdd);
 
         base.Start();
     }
@@ -198,8 +204,7 @@ internal class OreCrusherController : FCSDevice, IFCSSave<SaveData>
 
         base.Initialize();
     }
-
-   
+      
 
     internal void onSettingsKeyPressed(TechType techType)
     {

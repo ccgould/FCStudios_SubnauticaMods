@@ -4,10 +4,11 @@ using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.ModItems.Buildables.OreCrusher.Enums;
 using FCS_AlterraHub.ModItems.FCSPDA.Interfaces;
 using FCSCommon.Utilities;
+using System.Collections;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-
+using UWE;
 
 namespace FCS_AlterraHub.ModItems.Buildables.OreCrusher.Mono;
 
@@ -52,7 +53,34 @@ internal class uGUI_OreCrusher : Page, IuGUIAdditionalPage
 
     public void OpenStorage()
     {
+        QuickLogger.Debug("Attempting to open storage",true);
+        
+        CoroutineHost.StartCoroutine(OpenStorageContainer());
+    }
+
+    public IEnumerator OpenStorageContainer()
+    {
+        QuickLogger.Debug($"Storage Button Clicked", true);
+
+        //Close FCSPDA so in game pda can open with storage
+        FCSPDAController.Main.Close();
+
+        QuickLogger.Debug($"Closing FCS PDA", true);
+
+        QuickLogger.Debug("Attempting to open the In Game PDA", true);
+        Player main = Player.main;
+        PDA pda = main.GetPDA();
+
+        while (pda != null && pda.isInUse || pda.isOpen)
+        {
+            QuickLogger.Debug("Waiting for In Game PDA Settings to reset", true);
+            yield return null;
+        }
+
+        QuickLogger.Debug("Gettings Reset", true);
         _sender.OpenStorage();
+
+        yield break;
     }
 
     public IFCSObject GetController() => _sender;
