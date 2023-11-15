@@ -9,11 +9,13 @@ using FCS_AlterraHub.ModItems.Buildables.OreCrusher.Buildable;
 using FCS_AlterraHub.ModItems.Buildables.OreCrusher.Enums;
 using FCS_AlterraHub.ModItems.Buildables.OreCrusher.Managers;
 using FCSCommon.Utilities;
+using HarmonyLib;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static FCS_AlterraHub.Configuation.SaveData;
 using static RootMotion.FinalIK.InteractionTrigger.Range;
 
 namespace FCS_AlterraHub.ModItems.Buildables.OreCrusher.Mono;
@@ -22,22 +24,24 @@ internal class OreCrusherController : FCSDevice, IFCSSave<SaveData>
 {
 
     private const int MAXITEMLIMIT = 10;
-    [SerializeField] private AudioSource _drillSound;
-    [SerializeField] private AudioLowPassFilter _lowPassFilter;
+
     private bool _wasDrillSoundPlaying;
-    [SerializeField] private List<PistonBobbing> _pistons;
     private Queue<TechType> _oreQueue = new();
     private float _timeLeft;
     private bool _isBreakerTripped;
     private OreConsumerStatus _status = OreConsumerStatus.None;
     public Action OnProcessingCompleted { get; set; }
-    //public TransferHandler TransferHandler { get; private set; }
 
+    [SerializeField] private List<PistonBobbing> _pistons;
     [SerializeField] private MotorHandler crusherMotorHandler;
     [SerializeField] private MotorHandler antennaMotorHandler;
     [SerializeField] private HoverInteraction _interaction;
     [SerializeField] private DumpContainer _dumpContainer;
     [SerializeField] private FCSStorage _storage;
+    [SerializeField] private AudioSource _drillSound;
+    [SerializeField] private AudioLowPassFilter _lowPassFilter;
+
+
     private OreCrusherEffectsManager effectsManager;
     private OreConsumerSpeedModes _currentSpeedMode = OreConsumerSpeedModes.Min;
     private OreConsumerSpeedModes _pendingSpeedMode = OreConsumerSpeedModes.Min;
@@ -46,6 +50,11 @@ internal class OreCrusherController : FCSDevice, IFCSSave<SaveData>
     public override void Awake()
     {
         base.Awake();           
+    }
+
+    internal OreConsumerSpeedModes GetPendingSpeedMode()
+    { 
+        return _pendingSpeedMode; 
     }
 
     public override float GetPowerUsage()
@@ -61,6 +70,49 @@ internal class OreCrusherController : FCSDevice, IFCSSave<SaveData>
         _storage.isAllowedToAdd = new IsAllowedToAdd(IsAllowedToAdd);
 
         base.Start();
+    }
+
+    public override void OnEnable()
+    {
+        if (_runStartUpOnEnable)
+        {
+            if (!IsInitialized)
+            {
+                Initialize();
+            }
+
+            if (IsFromSave)
+            {
+                if (_savedData == null)
+                {
+                    ReadySaveData();
+
+
+                }
+
+
+                var save = _savedData as OreConsumerDataEntry;
+
+
+                if (save.OreQueue != null)
+                {
+                    _oreQueue = save.OreQueue;
+                    _timeLeft = save.TimeLeft;
+                }
+
+                if (save.IsBreakerTripped)
+                {
+                    _isBreakerTripped = true;
+                }
+
+                _currentSpeedMode = save.CurrentSpeedMode == OreConsumerSpeedModes.Off ? OreConsumerSpeedModes.Low : save.CurrentSpeedMode;
+                _pendingSpeedMode = save.PendingSpeedMode == OreConsumerSpeedModes.Off ? OreConsumerSpeedModes.Low : save.PendingSpeedMode;
+                crusherMotorHandler.SpeedByPass(save.RPM);
+               // _colorManager.LoadTemplate(save.ColorTemplate);
+            }
+
+            _runStartUpOnEnable = false;
+        }
     }
 
     private void Update()
@@ -112,7 +164,7 @@ internal class OreCrusherController : FCSDevice, IFCSSave<SaveData>
             }
         }
 
-        if (WorldHelpers.CheckIfInRange(gameObject, Player.main.gameObject, 5f) && IsOperational() && _oreQueue.Any())
+        if (WorldHelpers.CheckIfInRange(gameObject, Player.main.gameObject, 5f) && IsOperational() && _oreQueue.Any() && Plugin.Configuration.OreCrusherCameraShake)
         {
             MainCameraControl.main.ShakeCamera(.3f);
         }
@@ -199,6 +251,8 @@ internal class OreCrusherController : FCSDevice, IFCSSave<SaveData>
         InvokeRepeating(nameof(UpdateVisibleElements), 1, 1);
 
         InvokeRepeating(nameof(UpdateAnimation), 1f, 1f);
+
+        antennaMotorHandler.StartMotor();
 
         _interaction.onSettingsKeyPressed += onSettingsKeyPressed;
 
@@ -315,12 +369,34 @@ internal class OreCrusherController : FCSDevice, IFCSSave<SaveData>
 
     public override void ReadySaveData()
     {
-        
+        string id = (base.GetComponentInParent<PrefabIdentifier>() ?? base.GetComponent<PrefabIdentifier>()).Id;
+        _savedData = ModSaveManager.GetSaveData<OreConsumerDataEntry>(id);
+        QuickLogger.Debug($"Prefab Id : {GetPrefabID()} || SaveData Is Null: {_savedData is null}");
     }
 
     public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)
     {
-        
+        if (!IsInitialized || !IsConstructed) return;
+
+        if (_savedData == null)
+        {
+            _savedData = new OreConsumerDataEntry();
+        }
+
+        var save = _savedData as OreConsumerDataEntry;
+
+
+        save.Id = GetPrefabID();
+        save.OreQueue = _oreQueue;
+        save.TimeLeft = _timeLeft;
+        save.RPM = crusherMotorHandler.GetRPM();
+        //save.ColorTemplate = _colorManager.SaveTemplate();
+        save.BaseId = CachedHabitatManager.GetBaseID().ToString();
+        save.IsBreakerTripped = _isBreakerTripped;
+        save.CurrentSpeedMode = _currentSpeedMode;
+        save.PendingSpeedMode = _pendingSpeedMode;
+        QuickLogger.Debug($"Saving ID {save.Id}", true);
+        newSaveData.Data.Add(_savedData);
     }
 
     public void Test()

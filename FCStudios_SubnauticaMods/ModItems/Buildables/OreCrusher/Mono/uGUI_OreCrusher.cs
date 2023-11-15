@@ -28,7 +28,7 @@ internal class uGUI_OreCrusher : Page, IuGUIAdditionalPage
         QuickLogger.Debug($"OreCrusher Enter Called {arg is IFCSObject}", true);
         QuickLogger.Debug($"OreCrusher Enter Called {arg?.GetType()}", true);
 
-        OnLoadDisplay();
+        
 
         base.Enter(arg);
 
@@ -38,6 +38,9 @@ internal class uGUI_OreCrusher : Page, IuGUIAdditionalPage
         {
             _sender.OnProcessingCompleted += OnLoadDisplay;
             FCSPDAController.Main.ui.SetPDAAdditionalLabel(Language.main.Get(_sender.GetTechType()));
+            OnLoadDisplay();
+            speedSlider.SetValueWithoutNotify((float)_sender.GetPendingSpeedMode());
+
         }
         else
         {
@@ -91,11 +94,15 @@ internal class uGUI_OreCrusher : Page, IuGUIAdditionalPage
 
         speedSlider.onValueChanged.AddListener((value =>
         {
-            var asInt = Mathf.RoundToInt(value);
-            var speedMode = (OreConsumerSpeedModes)asInt;
-            _sender?.ChangeSpeedMultiplier(speedMode);
-            ChangeSpeedLabelText(speedMode.ToString());
+            ChangeSpeedValue(Mathf.RoundToInt(value));
         }));
+    }
+
+    private void ChangeSpeedValue(int value)
+    {
+        var speedMode = (OreConsumerSpeedModes)value;
+        _sender?.ChangeSpeedMultiplier(speedMode);
+        ChangeSpeedLabelText(speedMode.ToString());
     }
 
     private void UpdateScreen()

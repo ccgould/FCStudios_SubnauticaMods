@@ -7,6 +7,7 @@ using Nautilus.Json;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using UnityEngine;
+using FCS_AlterraHub.ModItems.Buildables.OreCrusher.Enums;
 
 namespace FCS_AlterraHub.Configuation;
 
@@ -24,7 +25,17 @@ internal class SaveData
 
     }
 
-    
+    public class OreConsumerDataEntry : BaseSaveData
+    {
+        public Queue<TechType> OreQueue { get;  set; }
+        public float TimeLeft { get;  set; }
+        public float RPM { get; set; }
+        public bool IsBreakerTripped { get;  set; }
+        public OreConsumerSpeedModes CurrentSpeedMode { get; set; }
+        public OreConsumerSpeedModes PendingSpeedMode { get; set; }
+    }
+
+
 
     [FileName("AlterraHub")]
     public class AlterraHubSaveData : SaveDataCache

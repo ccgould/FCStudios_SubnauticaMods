@@ -56,6 +56,9 @@ internal class Config : ConfigFile
 
     internal Action<bool> OnPlaySoundToggleEvent { get; set; }
 
+    [Toggle("[Ore Crusher] Camera Shake", Order = 1, Tooltip = "Enables/Disables the camera shaking for ore crusher when in use.")]
+    public bool OreCrusherCameraShake { get;  set; }
+
     [Keybind("FCS DevicePage Interface Information Button")]
     public KeyCode PDASettingsKeyCode = KeyCode.F2;
 

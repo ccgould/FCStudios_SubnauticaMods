@@ -88,6 +88,7 @@ internal class IonCubeGeneratorController : FCSDevice, IFCSSave<SaveData>, IWork
         _energyToConsume = energyPerSecond * DayNightCycle.main.deltaTime;
     }
 
+
     private void ChangeState()
     {
 

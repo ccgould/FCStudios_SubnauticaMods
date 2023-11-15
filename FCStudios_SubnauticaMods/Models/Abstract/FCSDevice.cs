@@ -1,5 +1,6 @@
 ﻿using FCS_AlterraHub.API;
 using FCS_AlterraHub.Configuation;
+using FCS_AlterraHub.Core.Components;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Enumerators;
 using FCS_AlterraHub.Models.Interfaces;
@@ -101,7 +102,15 @@ public abstract class FCSDevice : MonoBehaviour, IFCSObject, IProtoEventListener
 
     public virtual void OnEnable()
     {
-        
+        if (_runStartUpOnEnable)
+        {
+            if (!IsInitialized)
+            {
+                Initialize();
+            }
+
+            _runStartUpOnEnable = false;
+        }
     }
 
     public abstract void ReadySaveData();
@@ -185,6 +194,7 @@ public abstract class FCSDevice : MonoBehaviour, IFCSObject, IProtoEventListener
     public virtual void OnConstructedChanged(bool constructed)
     {
         IsConstructed = constructed;
+
         if (constructed)
         {
             if (base.isActiveAndEnabled)

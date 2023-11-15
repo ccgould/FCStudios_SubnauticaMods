@@ -1,4 +1,5 @@
-﻿using FCS_AlterraHub.Core.Services;
+﻿using FCS_AlterraHub.Core.Navigation;
+using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;
 using FCS_AlterraHub.ModItems.FCSPDA.Struct;
@@ -7,7 +8,7 @@ using UnityEngine.UI;
 
 namespace FCS_AlterraHub.ModItems.FCSPDA.Mono;
 
-internal class ShipmentTracker : MonoBehaviour
+internal class ShipmentTracker : Page
 {
     private Text _orderName;
     private Slider _slider;
