@@ -1,4 +1,6 @@
-﻿namespace FCS_AlterraHub.Models.Interfaces;
+﻿using System;
+
+namespace FCS_AlterraHub.Models.Interfaces;
 
 public interface IFCSAlterraHubGUI
     {

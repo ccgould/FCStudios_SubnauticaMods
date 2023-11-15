@@ -291,7 +291,8 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI
 
     public void ShowMessage(string message)
     {
-        _messageBox.ShowMessage(message, FCSMessageButton.OK);
+        uGUI_MessageBoxHandler.Instance.ShowMessage(message,FCSMessageButton.OK);
+
     }
 
     internal void AddAdditionalPage(TechType id, GameObject uiPrefab)

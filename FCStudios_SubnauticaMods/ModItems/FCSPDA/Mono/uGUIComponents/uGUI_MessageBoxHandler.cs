@@ -2,6 +2,7 @@
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono;
+using FCS_AlterraHub.ModItems.FCSPDA.Struct;
 using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
@@ -85,19 +86,5 @@ internal class uGUI_MessageBoxHandler : MonoBehaviour
         }
     }
 
-    private struct MessageBoxData
-    {
-        public MessageBoxData(string message, FCSMessageButton button, Action<FCSMessageResult> result)
-        {
-            Message = message;
-            Button = button;
-            Result = result;
-        }
 
-        public Action<FCSMessageResult> Result { get; }
-
-        public FCSMessageButton Button { get; }
-
-        public string Message { get; }
-    }
 }

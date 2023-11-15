@@ -22,7 +22,7 @@ internal class CartDropDownHandler : MonoBehaviour, IStoreClient
     private UnityEvent<decimal> onTotalChanged;
     [SerializeField]
     private ShipmentInfo _shipmentInfo;
-    [SerializeField]
+
     private IFCSAlterraHubGUI _mono;
     [SerializeField]
     private GameObject _cartItemPrefab;
