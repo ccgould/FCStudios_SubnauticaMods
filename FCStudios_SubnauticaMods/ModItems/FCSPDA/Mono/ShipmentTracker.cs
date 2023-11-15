@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 namespace FCS_AlterraHub.ModItems.FCSPDA.Mono;
 
-internal class ShipmentTracker : Page
+internal class ShipmentTracker : MonoBehaviour
 {
     private Text _orderName;
     private Slider _slider;
