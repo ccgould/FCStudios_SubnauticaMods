@@ -163,7 +163,7 @@ internal class CheckOutPopupDialogWindow : MonoBehaviour
     private void CreateDestinationPopup()
     {
         var destinationPopDiag = GameObjectHelpers.FindGameObject(gameObject.transform.parent.gameObject, "DestinationPopUp");
-        _destinationDialogController = destinationPopDiag.AddComponent<DestinationDialogController>();
+        _destinationDialogController = destinationPopDiag.GetComponent<DestinationDialogController>();
         _destinationDialogController.Initialize(this);
         _destinationDialogController.OnClose += () =>
         {
