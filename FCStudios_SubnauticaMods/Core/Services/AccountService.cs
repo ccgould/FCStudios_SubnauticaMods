@@ -268,7 +268,13 @@ internal class AccountService : MonoBehaviour
     /// <returns></returns>
     public bool HasEnough(decimal cost)
     {
-        if (!UWEHelpers.RequiresPower()) return true;
+        QuickLogger.Debug("Checking is account has enough");
+        if (!UWEHelpers.RequiresPower())
+        {
+            QuickLogger.Debug("Is in creative mode returning true since credit isnt used");
+            return true;
+        }
+        QuickLogger.Debug($"Result: {AccountDetails.Balance >= cost}");
         return AccountDetails.Balance >= cost;
     }
 
@@ -319,6 +325,7 @@ internal class AccountService : MonoBehaviour
             if (HasBeenRegistered())
             {
                 uGUI_MessageBoxHandler.Instance.ShowMessage(LanguageService.AccountCreated(GetAccountBalance().ToString("N0")), sender);
+                
                 if (!PlayerInteractionHelper.HasCard())
                 {
                     PlayerInteractionHelper.GivePlayerItem(DebitCardSpawnable.PatchedTechType);

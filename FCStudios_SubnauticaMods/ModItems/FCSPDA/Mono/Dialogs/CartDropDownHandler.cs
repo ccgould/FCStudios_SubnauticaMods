@@ -8,6 +8,7 @@ using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using static UWE.Utils;
 
 namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;
 
@@ -22,6 +23,8 @@ internal class CartDropDownHandler : MonoBehaviour, IStoreClient
     private UnityEvent<decimal> onTotalChanged;
     [SerializeField]
     private ShipmentInfo _shipmentInfo;
+    [SerializeField]
+    private StorePageController _storePageController;
 
     private IFCSAlterraHubGUI _mono;
     [SerializeField]
@@ -48,6 +51,8 @@ internal class CartDropDownHandler : MonoBehaviour, IStoreClient
             SendMessageFromDialog(LanguageService.NoItemsInCart());
             return;
         }
+
+        _storePageController.OnBuyAllBtnClick();
     }
 
     private void SendMessageFromDialog(string message)

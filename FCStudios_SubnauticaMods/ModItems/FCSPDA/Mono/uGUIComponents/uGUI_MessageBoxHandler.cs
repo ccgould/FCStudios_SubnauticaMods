@@ -84,6 +84,8 @@ internal class uGUI_MessageBoxHandler : MonoBehaviour
             var messageData = new Tuple<string, FCSMessageButton, Action<FCSMessageResult>>(data.Message, data.Button, OnMessageResult);
             FCSPDAController.Main.GetGUI().GetMenuController().PushPage(_messageBox, messageData);
         }
+
+        _messageBox.Exit();
     }
 
 
