@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using FCS_AlterraHub.Core.Navigation;
+using FCS_AlterraHub.Models.Mono;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;
 using UnityEngine;
@@ -12,6 +13,7 @@ internal class DestinationDialogController : Page
 {
     private ToggleGroup _toggleGroup;
     private Transform _list;
+    [SerializeField] private GameObject alterraHubDepotItemPrefab;
     private readonly List<AlterraHubDepotItemController> _toggles = new List<AlterraHubDepotItemController>();
     private CheckOutPopupDialogWindow _checkoutWindow;
     public Action OnClose { get; set; }
@@ -51,23 +53,23 @@ internal class DestinationDialogController : Page
             _toggles.Remove(item);
         }
 
-       // var portManagers = FindObjectsOfType<PortManager>();
+        var portManagers = FindObjectsOfType<PortManager>();
 
 
-        //foreach (var portManager in portManagers)
-        //{
-        //    if(!portManager.HasAccessPoint()) continue;
-        //    var depotPrefab = GameObject.Instantiate(Buildables.AlterraHub.AlterraHubDepotItemPrefab);
-        //    var controller = depotPrefab.AddComponent<AlterraHubDepotItemController>();
-        //    if (controller.Initialize(portManager, _toggleGroup, _list))
-        //    {
-        //        _toggles.Add(controller);
-        //    }
-        //    else
-        //    {
-        //        Destroy(depotPrefab);
-        //    }
-        //}
+        foreach (var portManager in portManagers)
+        {
+            if (!portManager.HasAccessPoint()) continue;
+            var depotPrefab = GameObject.Instantiate(alterraHubDepotItemPrefab);
+            var controller = depotPrefab.AddComponent<AlterraHubDepotItemController>();
+            if (controller.Initialize(portManager, _toggleGroup, _list))
+            {
+                _toggles.Add(controller);
+            }
+            else
+            {
+                Destroy(depotPrefab);
+            }
+        }
     }
     
     private void Close(bool isCancel = false)

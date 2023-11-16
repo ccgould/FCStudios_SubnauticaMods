@@ -16,7 +16,10 @@ internal class SubRoot_Awake
         QuickLogger.Debug($"Awake Called on {__instance.gameObject.activeSelf} | {__instance.gameObject.transform.position != Vector3.zero}");
         if (__instance.gameObject.activeSelf && __instance.gameObject.transform.position != Vector3.zero)
         {
-            __instance.gameObject.EnsureComponent<HabitatManager>();
+            var habitatManager = __instance.gameObject.EnsureComponent<HabitatManager>();
+            var portManager = __instance.gameObject.EnsureComponent<PortManager>();
+            portManager.Manager = habitatManager;
+
         }
     }
 }
