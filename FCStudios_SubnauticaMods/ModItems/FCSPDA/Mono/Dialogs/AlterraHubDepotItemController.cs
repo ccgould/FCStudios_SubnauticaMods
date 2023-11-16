@@ -23,7 +23,7 @@ internal class AlterraHubDepotItemController : MonoBehaviour
 
 
             Destination = depot;
-            gameObject.FindChild("ItemName").GetComponent<Text>().text = $"Name: {depot.Manager.GetBaseName()}\nStatus: N/A";
+            text.text = $"Name: {depot.Manager.GetBaseName()}\nStatus: N/A";
             _toggleGroup = toggleGroup;
             _toggle = gameObject.GetComponentInChildren<Toggle>();
             _toggle.group = toggleGroup;
