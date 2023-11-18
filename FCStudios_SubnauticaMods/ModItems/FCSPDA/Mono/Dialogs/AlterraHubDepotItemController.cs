@@ -15,25 +15,30 @@ internal class AlterraHubDepotItemController : MonoBehaviour
     [SerializeField] private Text text;
     [SerializeField] private ToggleGroup _toggleGroup;
 
-    internal bool Initialize(PortManager depot, ToggleGroup toggleGroup, Transform list)
+    internal bool Initialize(PortManager depot)
     {
         try
         {
-            if (depot?.Manager == null || toggleGroup == null || list == null) return false;
-
+            if (depot?.Manager == null) return false;
 
             Destination = depot;
+
             text.text = $"Name: {depot.Manager.GetBaseName()}\nStatus: N/A";
-            _toggleGroup = toggleGroup;
-            _toggle = gameObject.GetComponentInChildren<Toggle>();
-            _toggle.group = toggleGroup;
+            
+            //_toggleGroup = toggleGroup;
+            //_toggle = gameObject.GetComponentInChildren<Toggle>();
+            //_toggle.group = toggleGroup;
+
             //if (depot.IsFull)
             //{
             //    _toggle.enabled = false;
             //    _toggle.isOn = false;
             //}
+
             gameObject.transform.localScale = Vector3.one;
-            gameObject.transform.SetParent(list, false);
+            gameObject.transform.SetParent(_toggleGroup.gameObject.transform, false);
+
+            gameObject.SetActive(true);
             return true;
         }
         catch (Exception e)

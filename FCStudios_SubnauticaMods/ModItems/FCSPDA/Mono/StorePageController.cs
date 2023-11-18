@@ -92,7 +92,7 @@ internal class StorePageController : Page
 
     public void OnBuyAllBtnClick()
     {
-        _checkoutDialog.ShowDialog(_gui, _cartDropDownManager);
+        _checkoutDialog.Enter();
         _cartDropDownManager.ToggleVisibility();
     }
 

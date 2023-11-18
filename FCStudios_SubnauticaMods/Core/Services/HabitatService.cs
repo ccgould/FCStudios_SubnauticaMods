@@ -236,4 +236,9 @@ public class HabitatService : MonoBehaviour
         if (!Player.main?.IsInBase() ?? false) return false;
         return GetPlayersCurrentBase()?.IsRemoteLinkConnected() ?? false;
     }
+
+    internal HabitatManager GetHabitat(string destinationID)
+    {
+        return knownBases.FirstOrDefault(x => x.GetBasePrefabID() == destinationID);
+    }
 }

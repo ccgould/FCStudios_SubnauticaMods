@@ -11,37 +11,39 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs;
 
 internal class DestinationDialogController : Page
 {
-    private ToggleGroup _toggleGroup;
-    private Transform _list;
+    //private ToggleGroup _toggleGroup;
+    //private Transform _list;
     [SerializeField] private GameObject alterraHubDepotItemPrefab;
     private readonly List<AlterraHubDepotItemController> _toggles = new List<AlterraHubDepotItemController>();
-    private CheckOutPopupDialogWindow _checkoutWindow;
+    [SerializeField] private CheckOutPopupDialogWindow _checkoutWindow;
     public Action OnClose { get; set; }
 
-    internal  void Initialize(CheckOutPopupDialogWindow checkoutWindow)
+    internal  void Initialize()
     {
-        _checkoutWindow = checkoutWindow;
-        var cancelBTN = gameObject.FindChild("Content").FindChild("GameObject").FindChild("CancelBTN")
-            .GetComponent<Button>();
-        cancelBTN.onClick.AddListener((() => { Close(true); }));
+        //var cancelBTN = gameObject.FindChild("Content").FindChild("GameObject").FindChild("CancelBTN")
+        //    .GetComponent<Button>();
+        //cancelBTN.onClick.AddListener((() => { Close(true); }));
 
-        var doneBTN = gameObject.FindChild("Content").FindChild("GameObject").FindChild("DoneBTN")
-            .GetComponent<Button>();
-        doneBTN.onClick.AddListener((() =>
-        {
-            foreach (AlterraHubDepotItemController toggle in _toggles)
-            {
-                if (toggle.IsChecked)
-                {
-                    //_checkoutWindow.SelectedDestination = toggle.Destination;
-                    break;
-                }
-            }
-            Close();
-        }));
+        //var doneBTN = gameObject.FindChild("Content").FindChild("GameObject").FindChild("DoneBTN")
+        //    .GetComponent<Button>();
 
-        _toggleGroup = gameObject.GetComponentInChildren<ToggleGroup>();
-        _list = _toggleGroup.gameObject.transform;
+
+
+        //doneBTN.onClick.AddListener((() =>
+        //{
+        //    foreach (AlterraHubDepotItemController toggle in _toggles)
+        //    {
+        //        if (toggle.IsChecked)
+        //        {
+        //            //_checkoutWindow.SelectedDestination = toggle.Destination;
+        //            break;
+        //        }
+        //    }
+        //    Close();
+        //}));
+
+        //_toggleGroup = gameObject.GetComponentInChildren<ToggleGroup>();
+        //_list = _toggleGroup.gameObject.transform;
     }
 
     private void RefreshAlterraHubDepotList()
@@ -60,8 +62,8 @@ internal class DestinationDialogController : Page
         {
             if (!portManager.HasAccessPoint()) continue;
             var depotPrefab = GameObject.Instantiate(alterraHubDepotItemPrefab);
-            var controller = depotPrefab.AddComponent<AlterraHubDepotItemController>();
-            if (controller.Initialize(portManager, _toggleGroup, _list))
+            var controller = depotPrefab.GetComponent<AlterraHubDepotItemController>();
+            if (controller.Initialize(portManager))
             {
                 _toggles.Add(controller);
             }

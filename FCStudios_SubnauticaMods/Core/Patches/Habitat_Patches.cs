@@ -19,6 +19,7 @@ internal class SubRoot_Awake
             var habitatManager = __instance.gameObject.EnsureComponent<HabitatManager>();
             var portManager = __instance.gameObject.EnsureComponent<PortManager>();
             portManager.Manager = habitatManager;
+            habitatManager.SetPortManager(portManager);
 
         }
     }

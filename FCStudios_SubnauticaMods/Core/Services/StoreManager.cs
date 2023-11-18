@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FCS_AlterraHub.API;
 using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Models;
+using FCS_AlterraHub.Models.Mono;
 using FCS_AlterraHub.Models.Structs;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.ScreenItems;
@@ -22,8 +24,7 @@ internal class StoreManager : MonoBehaviour
     public static StoreManager main;
     private static HashSet<StoreModCategory> _registerStoreMods = new();
 
-    //TODO Drone System
-    //public DroneDeliveryService DeliveryService;
+    public DroneDeliveryService DeliveryService;
 
     public void Awake()
     {
@@ -35,126 +36,125 @@ internal class StoreManager : MonoBehaviour
         bool wasOrderSuccessfull = false;
 
 
-        //TODO Drone System
-        //if (string.IsNullOrWhiteSpace(shipmentInfo?.OrderNumber) || !HasShipment(shipmentInfo)) return false;
-        //QuickLogger.Debug("Complete Order 1");
+        if (string.IsNullOrWhiteSpace(shipmentInfo?.OrderNumber) || !HasShipment(shipmentInfo)) return false;
 
-        //var cart = GetCartItems(shipmentInfo);
+        QuickLogger.Debug("Complete Order 1");
 
-        //var totalCash = GetCartTotal(shipmentInfo);
+        var cart = GetCartItems(shipmentInfo);
 
-        //shipmentInfo.TotalCash = totalCash;
+        var totalCash = GetCartTotal(shipmentInfo);
 
-        //if (FCSModsAPI.PublicAPI.IsInOreBuildMode())
-        //{
-        //    foreach (CartItemSaveData cartItem in GetCartItems(shipmentInfo))
-        //    {
-        //        if (!KnownTech.Contains(cartItem.TechType))
-        //        {
-        //            if (CraftData.IsAllowed(cartItem.TechType) && KnownTech.Add(cartItem.TechType, true))
-        //            {
-        //                ErrorMessage.AddDebug("Unlocked " + Language.main.Get(cartItem.TechType.AsString()));
-        //            }
-        //        }
-        //    }
+        shipmentInfo.TotalCash = totalCash;
 
-        //    RemovePendingItem(shipmentInfo);
-        //}
-        //else
-        //{
-        //    QuickLogger.Debug("Complete Order 2");
-        //    var sizes = GetSizes(shipmentInfo);
-        //    shipmentInfo.Sizes = sizes;
-        //    var portManager = FCSAlterraHubService.PublicAPI.GetRegisteredBaseOfId(shipmentInfo.DestinationID)
-        //        .GetPortManager();
-        //    switch (sender.ClientType)
-        //    {
-        //        case StoreClientType.PDA:
-        //        case StoreClientType.Hub:
-        //            if (portManager.HasContructor)
-        //            {
-        //                if (portManager.SendItemsToConstructor(GetCartItems(shipmentInfo)))
-        //                {
-        //                    RemovePendingItem(shipmentInfo);
-        //                    wasOrderSuccessfull = true;
-        //                }
-        //            }
-        //            else if (portManager.HasDronePort)
-        //            {
-        //                QuickLogger.Debug("Complete Order 3");
-        //                wasOrderSuccessfull = Ship(sender, shipmentInfo, portManager, cart);
-        //            }
-        //            break;
-        //        case StoreClientType.Vehicle:
-        //            wasOrderSuccessfull = true;
-        //            break;
-        //        default:
-        //            throw new ArgumentOutOfRangeException();
-        //    }
-
-
-
-
-        /*
-
-        //Not sure if this was disabled before changes
-
-        if (depot == null || !depot.HasRoomFor(sizes))
+        if (FCSModsAPI.PublicAPI.IsInOreBuildMode())
         {
-            MessageBoxHandler.main.Show(depot == null ? AlterraHub.DepotNotFound() : AlterraHub.DepotFull(), FCSMessageButton.OK);
-            return false;
-        }
-
-        if (DroneDeliveryService.Main == null)
-        {
-            QuickLogger.Error("FCSStation Main is null!");
-            QuickLogger.ModMessage("The FCSStation cannot be found please contact FCSStudios for help with this issue. Order will be sent to your inventory");
-            MakeAPurchase(cart, null, true);
-            return true;
-        }
+            foreach (CartItemSaveData cartItem in GetCartItems(shipmentInfo))
+            {
+                if (!KnownTech.Contains(cartItem.TechType))
+                {
+                    if (CraftData.IsAllowed(cartItem.TechType) && KnownTech.Add(cartItem.TechType, true))
+                    {
+                        ErrorMessage.AddDebug("Unlocked " + Language.main.Get(cartItem.TechType.AsString()));
+                    }
+                }
             }
-        */
+
+            RemovePendingItem(shipmentInfo);
+        }
+        else
+        {
+            QuickLogger.Debug("Complete Order 2");
+            var sizes = GetSizes(shipmentInfo);
+            shipmentInfo.Sizes = sizes;
+            var portManager = HabitatService.main.GetHabitat(shipmentInfo.DestinationID).GetPortManager();
+
+            switch (sender.ClientType)
+            {
+                case StoreClientType.PDA:
+                case StoreClientType.Hub:
+                    if (portManager.HasContructor)
+                    {
+                        if (portManager.SendItemsToConstructor(GetCartItems(shipmentInfo)))
+                        {
+                            RemovePendingItem(shipmentInfo);
+                            wasOrderSuccessfull = true;
+                        }
+                    }
+                    else if (portManager.HasDronePort)
+                    {
+                        QuickLogger.Debug("Complete Order 3");
+                        wasOrderSuccessfull = Ship(sender, shipmentInfo, portManager, cart);
+                    }
+                    break;
+                case StoreClientType.Vehicle:
+                    wasOrderSuccessfull = true;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
 
 
-        //AccountService.main.RemoveFinances(totalCash);
-        //sender.OnOrderComplete(wasOrderSuccessfull);
-        return wasOrderSuccessfull;
+
+
+            /*
+
+            //Not sure if this was disabled before changes
+
+            if (depot == null || !depot.HasRoomFor(sizes))
+            {
+                MessageBoxHandler.main.Show(depot == null ? AlterraHub.DepotNotFound() : AlterraHub.DepotFull(), FCSMessageButton.OK);
+                return false;
+            }
+
+            if (DroneDeliveryService.Main == null)
+            {
+                QuickLogger.Error("FCSStation Main is null!");
+                QuickLogger.ModMessage("The FCSStation cannot be found please contact FCSStudios for help with this issue. Order will be sent to your inventory");
+                MakeAPurchase(cart, null, true);
+                return true;
+            }
+            */
+        }
+
+        AccountService.main.RemoveFinances(totalCash);
+            sender.OnOrderComplete(wasOrderSuccessfull);
+            return wasOrderSuccessfull;
+        
     }
 
-    //TODO Drone System
-    //private bool Ship(IStoreClient sender, ShipmentInfo shipmentInfo, PortManager portManager, List<CartItemSaveData> cart)
-    //{
-        //bool wasOrderSuccessfull = false;
+        private bool Ship(IStoreClient sender, ShipmentInfo shipmentInfo, PortManager portManager, List<CartItemSaveData> cart)
+        {
+            bool wasOrderSuccessfull = false;
 
 
-        //DroneDeliveryService.Main.ShipOrder(portManager, shipmentInfo.OrderNumber, (result) =>
-        //{
-        //    if (!result) //If failed to ship Item give player items in inventory
-        //    {
-        //        if (AccountService.main.HasEnough(shipmentInfo.TotalCash) && Inventory.main.container.HasRoomFor(shipmentInfo.Sizes))
-        //        {
-        //            foreach (CartItemSaveData item in cart)
-        //            {
-        //                for (int i = 0; i < item.ReturnAmount; i++)
-        //                {
-        //                    QuickLogger.Debug($"{item.ReceiveTechType}", true);
-        //                    PlayerInteractionHelper.GivePlayerItem(item.ReceiveTechType);
-        //                }
-        //            }
-        //        }
-        //    }
-        //    else
-        //    {
-        //        QuickLogger.Debug("Complete Order 5");
-        //        CreateOrder(sender, shipmentInfo);
-        //        RemovePendingItem(shipmentInfo);
-        //        wasOrderSuccessfull = true;
-        //    }
-        //});
-       // return wasOrderSuccessfull;
-    //}
+            DroneDeliveryService.Main.ShipOrder(portManager, shipmentInfo.OrderNumber, (result) =>
+            {
+                if (!result) //If failed to ship Item give player items in inventory
+                {
+                    if (AccountService.main.HasEnough(shipmentInfo.TotalCash) && Inventory.main.container.HasRoomFor(shipmentInfo.Sizes))
+                    {
+                        foreach (CartItemSaveData item in cart)
+                        {
+                            for (int i = 0; i < item.ReturnAmount; i++)
+                            {
+                                QuickLogger.Debug($"{item.ReceiveTechType}", true);
+                                PlayerInteractionHelper.GivePlayerItem(item.ReceiveTechType);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    QuickLogger.Debug("Complete Order 5");
+                    CreateOrder(sender, shipmentInfo);
+                    RemovePendingItem(shipmentInfo);
+                    wasOrderSuccessfull = true;
+                }
+            });
+            return wasOrderSuccessfull;
+        }
 
-    public ShipmentInfo AddItemToCart(IStoreClient sender, ShipmentInfo shipmentInfo, CartItem cartItemComponent)
+        public ShipmentInfo AddItemToCart(IStoreClient sender, ShipmentInfo shipmentInfo, CartItem cartItemComponent)
     {
         QuickLogger.Debug($"Shippment Info: OrderNumber:{shipmentInfo?.OrderNumber}",true);
         if (string.IsNullOrEmpty(shipmentInfo?.OrderNumber))

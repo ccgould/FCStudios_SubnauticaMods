@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using FCS_AlterraHub.Core.Helpers;
+using FCS_AlterraHub.Core.Interfaces;
+using FCS_AlterraHub.Core.Navigation;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.ModItems.FCSPDA.Struct;
@@ -9,77 +11,79 @@ using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using Button = UnityEngine.UI.Button;
 #if SUBNAUTICA
 using TechData = CraftData;
 #endif
 
 namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;
 
-internal class CheckOutPopupDialogWindow : MonoBehaviour
+internal class CheckOutPopupDialogWindow : Page
 {
-    private Text _accountBalance;
-    private Text _total;
-    private Text _newBalance;
+    [SerializeField] private Text _accountBalance;
+    [SerializeField] private Text _total;
+    [SerializeField] private Text _newBalance;
+    [SerializeField] private Text _destinationText;
+    [SerializeField] private CartDropDownHandler _cartDropDownHandler;
+    [SerializeField] private FCSAlterraHubGUI _gui;
 
     private bool _isInitialized;
-    private IFCSAlterraHubGUI _mono;
 
-    public CartDropDownHandler _cartDropDownHandler;
+
+
     public UnityEvent onCheckOutPopupDialogClosed = new UnityEvent();
     private DestinationDialogController _destinationDialogController;
-    private Text _destinationText;
-    //internal IShippingDestination SelectedDestination { get; set; }
+
+    internal IShippingDestination SelectedDestination { get; set; }
 
 
-    private void Initialize(FCSAlterraHubGUI mono)
+    public override void Enter(object arg = null)
+    {
+        base.Enter(arg);
+
+        Initialize();
+
+        //gameObject.SetActive(true);
+    }
+
+    private void Initialize()
     {
         if (_isInitialized) return;
 
-        _mono = mono;
-
-        _accountBalance = GameObjectHelpers.FindGameObject(gameObject, "AccountBalance").GetComponent<Text>();
-
-        _total = GameObjectHelpers.FindGameObject(gameObject, "Total").GetComponent<Text>();
-
-        _newBalance = GameObjectHelpers.FindGameObject(gameObject, "NewBalance").GetComponent<Text>();
-
-        _destinationText = GameObjectHelpers.FindGameObject(gameObject, "Destination").GetComponent<Text>();
-
-        CreatePurchaseButton();
-        CreatePurchaseExitButton();
+        //CreatePurchaseButton();
+        //CreatePurchaseExitButton();
         CreateDestinationPopup();
-        CreateDestinationButton();
-        CreateBackButton();
+        //CreateDestinationButton();
+        //CreateBackButton();
         AccountService.main.onBalanceUpdated += UpdateScreen;
+        ResetScreen();
+        UpdateScreen();
 
         _isInitialized = true;
     }
 
-    private void CreateBackButton()
-    {
-        var backBtn = GameObjectHelpers.FindGameObject(gameObject, "CloseBTN").GetComponent<Button>();
+    //private void CreateBackButton()
+    //{
+    //    var backBtn = GameObjectHelpers.FindGameObject(gameObject, "CloseBTN").GetComponent<Button>();
 
-        backBtn.onClick.AddListener(() => { HideDialog(); });
+    //    backBtn.onClick.AddListener(() => { HideDialog(); });
+    //}
+
+    public void OnDestinationBtnClicked()
+    {
+        _destinationDialogController.Open();
     }
 
-    private void CreateDestinationButton()
-    {
-        var destinationButton = GameObjectHelpers.FindGameObject(gameObject, "DestinationBTN").GetComponent<Button>();
-        destinationButton.onClick.AddListener(() => { _destinationDialogController.Open(); });
-    }
+    //private void CreatePurchaseButton()
+    //{
+    //    //var purchaseBTN = GameObjectHelpers.FindGameObject(gameObject, "PurchaseBTN").GetComponent<Button>();
+    //    //purchaseBTN.onClick.AddListener(() =>
+    //    //{
+    //    //    QuickLogger.Debug("Purchase Button Clicked", true);
+    //    //    MakePurchase();
+    //    //});
+    //}
 
-    private void CreatePurchaseButton()
-    {
-        var purchaseBTN = GameObjectHelpers.FindGameObject(gameObject, "PurchaseBTN").GetComponent<Button>();
-        purchaseBTN.onClick.AddListener(() =>
-        {
-            QuickLogger.Debug("Purchase Button Clicked", true);
-            MakePurchase();
-        });
-    }
-
-    private bool MakePurchase()
+    public void MakePurchase()
     {
         var totalSize = new List<Vector2int>();
         foreach (CartItemSaveData cartItem in _cartDropDownHandler.GetItems())
@@ -90,90 +94,86 @@ internal class CheckOutPopupDialogWindow : MonoBehaviour
             }
         }
 
-        //if (!Inventory.main.container.HasRoomFor(totalSize))
-        //{
-        //    QuickLogger.ModMessage(Buildables.AlterraHub.InventoryFull());
-        //    return false;
-        //}
+        if (!Inventory.main.container.HasRoomFor(totalSize))
+        {
+            QuickLogger.ModMessage(LanguageService.InventoryFull());
+            return;
+        }
 
-        //TODO Destination fix
-
-        //if (SelectedDestination == null)
-        //{
-        //    _mono.ShowMessage(LanguageService.NoDestinationFound());
-        //    return false;
-        //}
+        if (SelectedDestination == null)
+        {
+            _gui.ShowMessage(LanguageService.NoDestinationFound());
+            return;
+        }
 
         //if (!SelectedDestination.HasDepot())
         //{
-        //    VoiceNotificationSystem.main.Play("PDA_Drone_Instructions_key");
-        //    return false;
+        //    //VoiceNotificationSystem.main.Play("PDA_Drone_Instructions_key");
+        //    return;
         //}
 
         if (!AccountService.main.HasBeenRegistered())
         {
-            _mono.ShowMessage(LanguageService.AccountNotFoundFormat());
-            return false;
+            _gui.ShowMessage(LanguageService.AccountNotFoundFormat());
         }
 
         if (Inventory.main.container.GetCount(DebitCardSpawnable.PatchedTechType) <= 0)
         {
-            _mono.ShowMessage(LanguageService.CardNotDetected());
-            return false;
+            _gui.ShowMessage(LanguageService.CardNotDetected());
         }
 
         if (AccountService.main.HasEnough(_cartDropDownHandler.GetTotal()))
         {
-            QuickLogger.Debug("1");
+            _cartDropDownHandler.GetShipmentInfo().DestinationID = SelectedDestination.GetPreFabID();
 
-            //_cartDropDownHandler.GetShipmentInfo().DestinationID = SelectedDestination.GetPreFabID();
-
-            //_cartDropDownHandler.GetShipmentInfo().BaseName = SelectedDestination.GetBaseName();
+            _cartDropDownHandler.GetShipmentInfo().BaseName = SelectedDestination.GetBaseName();
 
 
             if (StoreManager.main.CompleteOrder(_cartDropDownHandler, _cartDropDownHandler.GetShipmentInfo()))
             {
-                QuickLogger.Debug("2");
                 _cartDropDownHandler.TransactionComplete();
                 HideDialog();
-                QuickLogger.Debug("3");
-                return true;
             }
         }
         else
         {
-            _mono.ShowMessage(LanguageService.NotEnoughMoneyOnAccount());
+            _gui.ShowMessage(LanguageService.NotEnoughMoneyOnAccount());
         }
-        return false;
     }
 
-    private void CreatePurchaseExitButton()
-    {
-        var purchaseBTN = GameObjectHelpers.FindGameObject(gameObject.transform.parent.gameObject, "PurchaseExitBTN").GetComponent<Button>();
-        purchaseBTN.onClick.AddListener(() =>
-        {
-            QuickLogger.Debug("Purchase Button Clicked", true);
-            if (MakePurchase())
-            {
-                //_mono.ExitStore();
-            }
-        });
-    }
+    //private void CreatePurchaseExitButton()
+    //{
+    //    //var purchaseBTN = GameObjectHelpers.FindGameObject(gameObject.transform.parent.gameObject, "PurchaseExitBTN").GetComponent<Button>();
+    //    //purchaseBTN.onClick.AddListener(() =>
+    //    //{
+    //    //    QuickLogger.Debug("Purchase Button Clicked", true);
+
+    //    //});
+    //}
 
     private void CreateDestinationPopup()
     {
         var destinationPopDiag = GameObjectHelpers.FindGameObject(gameObject.transform.parent.gameObject, "DestinationPopUp");
         _destinationDialogController = destinationPopDiag.GetComponent<DestinationDialogController>();
-        _destinationDialogController.Initialize(this);
+        _destinationDialogController.Initialize();
         _destinationDialogController.OnClose += () =>
         {
             //_destinationText.text = $"DestinationID: {SelectedDestination?.GetBaseName()}";
         };
     }
 
+    public void OnDestinationChanged(AlterraHubDepotItemController toggle)
+    {
+        if(toggle.IsChecked)
+        {
+            SelectedDestination = toggle.Destination;
+        }
+    }
+
     private void UpdateScreen()
     {
         QuickLogger.Debug("Updating Screen", true);
+
         if (!PlayerInteractionHelper.HasCard())
         {
             _accountBalance.text = LanguageService.AccountBalanceFormat(0);
@@ -188,20 +188,11 @@ internal class CheckOutPopupDialogWindow : MonoBehaviour
         }
     }
 
-    internal void ShowDialog(FCSAlterraHubGUI mono, CartDropDownHandler cart)
-    {
-        Initialize(mono);
-        ResetScreen();
-        _cartDropDownHandler = cart;
-        UpdateScreen();
-        gameObject.SetActive(true);
-    }
-
     internal void HideDialog()
     {
-        gameObject.SetActive(false);
         ResetScreen();
         onCheckOutPopupDialogClosed?.Invoke();
+        Exit();
     }
 
     internal void ResetScreen()

@@ -41,6 +41,16 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
     internal int ConnectedDevicesLimit => DetermineDeviceLimit();
     public Action<InventoryItem> OnItemTransferedToBase;
 
+    internal PortManager GetPortManager()
+    {
+        return _portManager;
+    }
+
+    internal void SetPortManager(PortManager portManager)
+    {
+        _portManager = portManager;
+    }
+
     internal int DetermineDeviceLimit()
     {
         int count = 0;
@@ -486,6 +496,7 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
 
     public Func<TechType,bool> IsAllowedToAddToBase;
     public Func<int,bool> HasSpace;
+    private PortManager _portManager;
 
     public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
     {
