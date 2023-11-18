@@ -68,10 +68,14 @@ internal class StoreManager : MonoBehaviour
             shipmentInfo.Sizes = sizes;
             var portManager = HabitatService.main.GetHabitat(shipmentInfo.DestinationID).GetPortManager();
 
+            QuickLogger.Debug($"Port Manager Found?: {portManager is not null}");
+            QuickLogger.Debug($"Client Type: {sender.ClientType}");
+
             switch (sender.ClientType)
             {
                 case StoreClientType.PDA:
                 case StoreClientType.Hub:
+                    QuickLogger.Debug("PDA/HUB 1");
                     if (portManager.HasContructor)
                     {
                         if (portManager.SendItemsToConstructor(GetCartItems(shipmentInfo)))

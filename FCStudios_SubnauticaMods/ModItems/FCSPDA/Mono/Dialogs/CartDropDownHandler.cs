@@ -155,6 +155,7 @@ internal class CartDropDownHandler : MonoBehaviour, IStoreClient
 
     public void OnOrderComplete(bool result)
     {
+        QuickLogger.Debug("On Order Complete");
     }
 
     public void OnCreatedCartItem()

@@ -2,6 +2,7 @@
 using FCS_AlterraHub.Core.Interfaces;
 using FCS_AlterraHub.ModItems.FCSPDA.Struct;
 using FCS_AlterraHub.ModItems.Spawnables.Drone;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -33,12 +34,14 @@ internal class PortManager : MonoBehaviour, IShippingDestination
 
     public bool SendItemsToConstructor(List<CartItemSaveData> pendingItem)
     {
+        //TODO Replace with contructor code
         if(pendingItem is not null && pendingItem.Count > 0)
         {
             foreach(CartItemSaveData item in pendingItem)
             {
                 PlayerInteractionHelper.GivePlayerItem(item.ReceiveTechType, item.ReturnAmount);
             }
+            return true;
         }
         return false;
     }
@@ -46,6 +49,11 @@ internal class PortManager : MonoBehaviour, IShippingDestination
     public void SetInboundDrone(DroneController droneController)
     {
         
+    }
+
+    internal string GetBaseID()
+    {
+        return Manager.GetBaseIDFormatted();
     }
 
     internal bool HasAccessPoint()

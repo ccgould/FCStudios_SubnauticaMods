@@ -46,6 +46,20 @@ internal class DestinationDialogController : Page
         //_list = _toggleGroup.gameObject.transform;
     }
 
+    public void OnDoneClick()
+    {
+        foreach (AlterraHubDepotItemController toggle in _toggles)
+        {
+            if (toggle.IsChecked)
+            {
+                _checkoutWindow.SelectedDestination = toggle.Destination;
+                break;
+            }
+        }
+        
+        Close();
+    }
+
     private void RefreshAlterraHubDepotList()
     {
         for (var i = _toggles.Count - 1; i >= 0; i--)
@@ -74,19 +88,19 @@ internal class DestinationDialogController : Page
         }
     }
     
-    private void Close(bool isCancel = false)
+    public void OnCancelBtnClicked()
     {
-        if (isCancel)
-        {
-            //_checkoutWindow.SelectedDestination = null;
-        }
+        _checkoutWindow.SelectedDestination = null;
+        Close();
+    }
+
+    private void Close()
+    {
         OnClose?.Invoke();
-        gameObject.SetActive(false);
     }
 
     internal void Open()
     {
         RefreshAlterraHubDepotList();
-        gameObject.SetActive(true);
     }
 }

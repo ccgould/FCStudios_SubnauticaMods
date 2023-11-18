@@ -261,6 +261,11 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
 
     internal int GetBaseID() => _baseID;
 
+    internal string GetBaseIDFormatted()
+    {
+        return $"BS{GetBaseID():D3}";
+    }
+
     internal void SetBaseID(int id)
     {
         if (_baseID != -1) return;
