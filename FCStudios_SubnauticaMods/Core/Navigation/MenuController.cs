@@ -75,7 +75,7 @@ public class MenuController : MonoBehaviour
         {
             Page currentPage = PageStack.Peek();
 
-            if (currentPage.ExitOnNewPagePush)
+            if (currentPage.ExitOnNewPagePush && !currentPage.IsOverlay)
             {
                 currentPage.Exit();
             }

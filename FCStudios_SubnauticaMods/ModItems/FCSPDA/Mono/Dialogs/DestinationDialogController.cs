@@ -101,6 +101,7 @@ internal class DestinationDialogController : Page
 
     internal void Open()
     {
+        Enter();
         RefreshAlterraHubDepotList();
     }
 }

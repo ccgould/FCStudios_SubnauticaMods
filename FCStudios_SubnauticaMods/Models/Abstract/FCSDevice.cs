@@ -193,6 +193,7 @@ public abstract class FCSDevice : MonoBehaviour, IFCSObject, IProtoEventListener
 
     public virtual void OnConstructedChanged(bool constructed)
     {
+
         IsConstructed = constructed;
 
         if (constructed)
@@ -212,6 +213,8 @@ public abstract class FCSDevice : MonoBehaviour, IFCSObject, IProtoEventListener
             }
         }
     }
+
+
 
     public virtual void OnProtoDeserialize(ProtobufSerializer serializer)
     {

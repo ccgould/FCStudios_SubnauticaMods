@@ -57,6 +57,7 @@ public class Page : MonoBehaviour
     private Coroutine animationCoroutine;
 
     public bool ExitOnNewPagePush = false;
+    public bool IsOverlay = false;
 
     public virtual void Awake()
     {
