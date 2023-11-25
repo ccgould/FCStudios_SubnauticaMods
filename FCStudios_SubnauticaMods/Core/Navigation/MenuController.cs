@@ -75,7 +75,7 @@ public class MenuController : MonoBehaviour
         {
             Page currentPage = PageStack.Peek();
 
-            if (currentPage.ExitOnNewPagePush && !currentPage.IsOverlay)
+            if (currentPage.ExitOnNewPagePush && !Page.IsOverlay)
             {
                 currentPage.Exit();
             }
@@ -95,10 +95,18 @@ public class MenuController : MonoBehaviour
     {
         if (PageStack.Count > 1)
         {
+            var isOverlay = PageStack.Peek().IsOverlay;
+
+            if (!isOverlay)
+            {
+
+            }
+
             Page page = PageStack.Pop();
             page.Exit();
 
             Page newCurrentPage = PageStack.Peek();
+
             if (newCurrentPage.ExitOnNewPagePush)
             {
                 QuickLogger.Debug("Pop Page : Exit On New Page Enter");

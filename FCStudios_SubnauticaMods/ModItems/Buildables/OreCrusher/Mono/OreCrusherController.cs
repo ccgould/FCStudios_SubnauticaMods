@@ -256,9 +256,15 @@ internal class OreCrusherController : FCSDevice, IFCSSave<SaveData>
 
         _interaction.onSettingsKeyPressed += onSettingsKeyPressed;
 
+        _interaction.IsAllowedToInteract += Interaction_IsAllowedToInteract;
+
         base.Initialize();
     }
-      
+
+    private bool Interaction_IsAllowedToInteract()
+    {
+        return AccountService.main.HasBeenRegistered();
+    }
 
     internal void onSettingsKeyPressed(TechType techType)
     {

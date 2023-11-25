@@ -7,6 +7,7 @@ using FCS_AlterraHub.Models.Structs;
 using FCSCommon.Utilities;
 using Nautilus.Assets;
 using Nautilus.Assets.Gadgets;
+using Nautilus.Handlers;
 using Nautilus.Utility;
 using System.Collections;
 using System.IO;
@@ -52,11 +53,15 @@ public abstract class FCSBuildableModBase : ModBase, IModBase
         // Set our prefab to a clone of the Seamoth electrical defense module
         prefab.SetGameObject(SetGameObjectAsync);
 
-        // Make the Vehicle upgrade console a requirement for our item's blueprint
-        ScanningGadget scanning = prefab.SetUnlock(TechType.None);
+        //// Make the Vehicle upgrade console a requirement for our item's blueprint
+        //ScanningGadget scanning = prefab.SetUnlock(TechType.None);
 
-        // Add our item to the Vehicle upgrades category
-        scanning.WithPdaGroupCategory(_settings.TechGroup, _settings.TechCategory);
+        // Add our item to the sets category
+        prefab.SetPdaGroupCategory(_settings.TechGroup, _settings.TechCategory);
+
+        KnownTechHandler.UnlockOnStart(prefab.Info.TechType);
+        
+        //scanning.WithPdaGroupCategory(_settings.TechGroup, _settings.TechCategory);
 
         prefab.SetRecipe(GetRecipe());
 

@@ -179,6 +179,8 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI
         {
             if(page == PDAPages.DevicePage)
             {
+                PurgeData();
+
                 var data = arg as Tuple<TechType, IFCSObject>;
 
                 QuickLogger.Debug($"{data.Item1} || {data.Item2}");

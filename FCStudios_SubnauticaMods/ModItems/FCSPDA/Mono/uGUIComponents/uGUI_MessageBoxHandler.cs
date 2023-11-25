@@ -86,6 +86,7 @@ internal class uGUI_MessageBoxHandler : MonoBehaviour
         }
 
         _messageBox.Exit();
+        FCSPDAController.Main.GetGUI().GoBackAPage();
     }
 
 

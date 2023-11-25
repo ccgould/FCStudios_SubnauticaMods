@@ -18,9 +18,13 @@ public class HoverInteraction : HandTarget, IHandTarget
     [SerializeField]
     private HandReticle.IconType icon = HandReticle.IconType.Hand;
     [SerializeField]
+    private HandReticle.IconType errorIcon = HandReticle.IconType.HandDeny;
+    [SerializeField]
     private GameInput.Button button = GameInput.Button.LeftHand;
     [SerializeField]
     private string mainText = "Open Settings";
+    [SerializeField]
+    private string errorText;
     [SerializeField]
     [Description("This component is for use on canvas where the HoverInteraction needs to be ignored to allow UI clicking")]
     private InterfaceInteraction interfaceInteraction;
@@ -28,13 +32,20 @@ public class HoverInteraction : HandTarget, IHandTarget
 
     public event Action<TechType> onSettingsKeyPressed;
     public event Action<FCSPDAController> onPDAClosed;
+    public event Func<bool> IsAllowedToInteract;
 
     private static readonly StringBuilder Sb = new();
 
     public void OnHandHover(GUIHand hand)
     {
-        if (!base.enabled)
+        if (!base.enabled || (IsAllowedToInteract is not null && !IsAllowedToInteract.Invoke()))
         {
+            var main = HandReticle.main;
+
+            main.SetText(HandReticle.TextType.Hand, errorText, false);
+            main.SetText(HandReticle.TextType.HandSubscript, Sb.ToString(), false, GameInput.Button.None);
+            main.SetIcon(errorIcon, 1f);
+
             return;
         }
         
@@ -64,7 +75,7 @@ public class HoverInteraction : HandTarget, IHandTarget
 
     public void OnHandClick(GUIHand hand)
     {
-        if (!base.enabled)
+        if (!base.enabled || (IsAllowedToInteract is not null && !IsAllowedToInteract.Invoke()))
         {
             return;
         }
