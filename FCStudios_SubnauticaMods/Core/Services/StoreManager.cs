@@ -25,6 +25,7 @@ internal class StoreManager : MonoBehaviour
     private static HashSet<StoreModCategory> _registerStoreMods = new();
 
     public DroneDeliveryService DeliveryService;
+    private bool _isTesting = true;
 
     public void Awake()
     {
@@ -66,17 +67,32 @@ internal class StoreManager : MonoBehaviour
             QuickLogger.Debug("Complete Order 2");
             var sizes = GetSizes(shipmentInfo);
             shipmentInfo.Sizes = sizes;
-            var portManager = HabitatService.main.GetHabitat(shipmentInfo.DestinationID).GetPortManager();
+            PortManager portManager = null; /* TODO Renable when tryign to ship.=> HabitatService.main.GetHabitat(shipmentInfo.DestinationID).GetPortManager();*/
 
             QuickLogger.Debug($"Port Manager Found?: {portManager is not null}");
             QuickLogger.Debug($"Client Type: {sender.ClientType}");
+
+           
 
             switch (sender.ClientType)
             {
                 case StoreClientType.PDA:
                 case StoreClientType.Hub:
                     QuickLogger.Debug("PDA/HUB 1");
-                    if (portManager.HasContructor)
+
+                    if(_isTesting)
+                    {
+                        var pendingItem = GetCartItems(shipmentInfo);
+                        if (pendingItem is not null && pendingItem.Count > 0)
+                        {
+                            foreach (CartItemSaveData item in pendingItem)
+                            {
+                                PlayerInteractionHelper.GivePlayerItem(item.ReceiveTechType, item.ReturnAmount);
+                            }
+                            wasOrderSuccessfull = true;
+                        }
+                    }
+                    else if (portManager.HasContructor)
                     {
                         if (portManager.SendItemsToConstructor(GetCartItems(shipmentInfo)))
                         {

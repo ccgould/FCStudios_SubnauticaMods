@@ -33,7 +33,7 @@ public interface IFCSModsAPIPublic
     Dictionary<TechType, FCSStoreEntry> GetRegisteredKits();
     void RegisterDevice(FCSDevice fCSDevice);
     void UnRegisterDevice(FCSDevice fCSDevice);
-    void CreateStoreEntry(TechType parentTechType, TechType receiveTechType,int returnAmount, decimal cost, StoreCategory energy);
+    void CreateStoreEntry(TechType parentTechType, TechType receiveTechType,int returnAmount, decimal cost, StoreCategory energy,bool forceUnlock = false);
     string GetModID(TechType techType);
     HashSet<FCSDevice> GetRegisteredDevices();
     HabitatManager GetHabitat(FCSDevice device);
@@ -140,9 +140,9 @@ public class FCSModsAPI : IFCSModsAPIPublic, IFCSModsAPIInternal
         HabitatService.main.UnRegisterDevice(fcsDevice);
     }
 
-    public void CreateStoreEntry(TechType parentTechType, TechType receiveTechType, int returnAmount, decimal cost, StoreCategory category)
+    public void CreateStoreEntry(TechType parentTechType, TechType receiveTechType, int returnAmount, decimal cost, StoreCategory category,bool forceUnlock = false)
     {
-        StoreInventoryService.CreateStoreEntry(parentTechType, receiveTechType, returnAmount, cost, category);
+        StoreInventoryService.CreateStoreEntry(parentTechType, receiveTechType, returnAmount, cost, category,forceUnlock);
     }
 
     public string GetModID(TechType techType)

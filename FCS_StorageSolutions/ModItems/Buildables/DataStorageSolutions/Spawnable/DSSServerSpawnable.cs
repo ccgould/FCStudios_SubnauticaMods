@@ -1,4 +1,6 @@
-﻿using FCS_AlterraHub.Models.Abstract;
+﻿using FCS_AlterraHub.API;
+using FCS_AlterraHub.Models.Abstract;
+using FCS_AlterraHub.Models.Enumerators;
 using FCSCommon.Helpers;
 using System.Collections;
 using UnityEngine;
@@ -13,9 +15,10 @@ internal class DSSServerSpawnable : FCSSpawnableModBase
 
     public DSSServerSpawnable() : base(PluginInfo.PLUGIN_NAME, "DSS_ServerDataDisc", FileSystemHelper.ModDirLocation, "DSSServer", "Data Disk")
     {
-        OnFinishRegister += () =>
+        OnStartRegister += () =>
         {
             PatchedTechType = TechType;
+            FCSModsAPI.PublicAPI.CreateStoreEntry(TechType, TechType, 1, _settings.ItemCost, StoreCategory.Storage,true);
         };
     }
 

@@ -145,8 +145,8 @@ internal class BaseManagerController : FCSDevice, IFCSSave<SaveData>
 
     private void UpdateData()
     {
-        var friendlyName = !string.IsNullOrEmpty(_baseManager.GetBaseName()) ? _baseManager.GetBaseName() : "Base";
-        baseName.text = $"{friendlyName} : BS{_baseManager.GetBaseID():D3}";
+        //var friendlyName = !string.IsNullOrEmpty(_baseManager.GetBaseName()) ? _baseManager.GetBaseName() : "Base";
+        baseName.text = _baseManager.GetBaseFriendlyName(); //$"{friendlyName} : BS{_baseManager.GetBaseID():D3}";
         infoItem1.text = DeterminePowerUsageString();
 
         var moreDevicesToConnect = _baseManager.GetFailedConnectionAttemptsCount() > 0 ? "*" : string.Empty;

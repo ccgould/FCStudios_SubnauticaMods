@@ -12,7 +12,6 @@ public partial class HabitatManager
     }
 
 
-
     internal struct DeviceWarning
     {
         public DeviceWarning(string devicId, string warningID, string description, WarningType warningType, FaultType faultType)

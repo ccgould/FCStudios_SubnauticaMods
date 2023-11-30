@@ -41,7 +41,7 @@ internal class CheckOutPopupDialogWindow : Page
         base.Enter(arg);
 
         Initialize();
-
+        UpdateScreen();
         //gameObject.SetActive(true);
     }
 
@@ -83,7 +83,7 @@ internal class CheckOutPopupDialogWindow : Page
     //    //});
     //}
 
-    public void MakePurchase()
+    public void MakePurchase(bool closePDA)
     {
         var totalSize = new List<Vector2int>();
         foreach (CartItemSaveData cartItem in _cartDropDownHandler.GetItems())
@@ -102,8 +102,8 @@ internal class CheckOutPopupDialogWindow : Page
 
         if (SelectedDestination == null)
         {
-            _gui.ShowMessage(LanguageService.NoDestinationFound());
-            return;
+            //_gui.ShowMessage(LanguageService.NoDestinationFound());
+            //return;
         }
 
         //if (!SelectedDestination.HasDepot())
@@ -124,15 +124,20 @@ internal class CheckOutPopupDialogWindow : Page
 
         if (AccountService.main.HasEnough(_cartDropDownHandler.GetTotal()))
         {
-            _cartDropDownHandler.GetShipmentInfo().DestinationID = SelectedDestination.GetPreFabID();
+           // _cartDropDownHandler.GetShipmentInfo().DestinationID = SelectedDestination.GetPreFabID();
 
-            _cartDropDownHandler.GetShipmentInfo().BaseName = SelectedDestination.GetBaseName();
+           // _cartDropDownHandler.GetShipmentInfo().BaseName = SelectedDestination.GetBaseName();
 
 
             if (StoreManager.main.CompleteOrder(_cartDropDownHandler, _cartDropDownHandler.GetShipmentInfo()))
             {
                 _cartDropDownHandler.TransactionComplete();
                 HideDialog();
+
+                if(closePDA)
+                {
+                    FCSPDAController.Main.Close();
+                }
             }
         }
         else

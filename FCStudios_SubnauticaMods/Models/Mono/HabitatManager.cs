@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection.Emit;
 using UnityEngine;
 using static HandReticle;
 
@@ -130,7 +131,29 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
     public string GetBaseFriendlyName()
     {
         var baseType = _habitat.isBase ? "Base" : "Cyclops";
-        return $"{baseType} {_baseID:D3}";
+        var baseNameID = $"{baseType} {_baseID:D3}";
+
+
+        return string.IsNullOrWhiteSpace(_baseName) ? baseNameID : _baseName;
+    }
+
+    /// <summary>
+    /// Gets the stored base Name from the
+    /// </summary>
+    /// <returns></returns>
+    public string GetBaseName()
+    {
+        return _baseName;
+    }
+
+    /// <summary>
+    /// Sets the base name field
+    /// </summary>
+    /// <param name="baseName"></param>
+    public void SetBaseName(string baseName)
+    {
+        _baseName = baseName;
+        //GlobalNotifyByID(String.Empty, "BaseUpdate");
     }
 
     internal bool HasDevice(string prefabID)
@@ -220,10 +243,17 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
         if (_dumpContainer == null)
         {
             _dumpContainer = gameObject.EnsureComponent<DumpContainerSimplified>();
-            _dumpContainer.Initialize(gameObject.transform, $"Add item to base: {GetBaseName()}", this, 6, 8, gameObject.name);
+            _dumpContainer.Initialize(gameObject.transform, $"Add item to base: {GetBaseFriendlyName()}", this, 6, 8, gameObject.name);
         }
 
-        _habitat = gameObject.GetComponent<SubRoot>();
+        
+        
+
+    }
+
+    internal void SetSubRoot(SubRoot instance)
+    {
+        _habitat = instance;
         _baseComponent = _habitat.GetComponent<Base>();
         _prefabID = _habitat.gameObject.gameObject?.GetComponentInChildren<PrefabIdentifier>()?.Id;
     }
@@ -238,24 +268,6 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
         HabitatService.main.onBaseDestroyed?.Invoke(this);
     }
 
-    /// <summary>
-    /// Sets the base name field
-    /// </summary>
-    /// <param name="baseName"></param>
-    public void SetBaseName(string baseName)
-    {
-        _baseName = baseName;
-        //GlobalNotifyByID(String.Empty, "BaseUpdate");
-    }
-
-    /// <summary>
-    /// Gets the stored base Name from the
-    /// </summary>
-    /// <returns></returns>
-    public string GetBaseName()
-    {
-        return _baseName;
-    }
 
     public string GetBasePrefabID() => _prefabID;
 
