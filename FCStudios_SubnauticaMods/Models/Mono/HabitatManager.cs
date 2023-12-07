@@ -41,6 +41,8 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
 
     internal int ConnectedDevicesLimit => DetermineDeviceLimit();
     public Action<InventoryItem> OnItemTransferedToBase;
+    public Action<TechType> OnModuleRemoved;
+    public Action<TechType> OnModuleAdded;
 
     internal PortManager GetPortManager()
     {
@@ -130,7 +132,13 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
 
     public string GetBaseFriendlyName()
     {
-        var baseType = _habitat.isBase ? "Base" : "Cyclops";
+        var baseType = string.Empty;
+
+        if (_habitat is not null)
+        {
+            baseType = _habitat.isBase ? "Base" : "Cyclops";
+        }
+
         var baseNameID = $"{baseType} {_baseID:D3}";
 
 
@@ -203,8 +211,17 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
         _registeredDevices.Remove(device);
         AdjustConnectedDevices(device);
         DisconnectDevice(device);
+         if(!HasBaseManager())
+        {
+            _connectedDevices.Clear();
+        }
     }
-    
+
+    private bool HasBaseManager()
+    {
+        return HasDevice(BaseManagerBuildable.PatchedTechType);
+    }
+
     private void DisconnectDevice(FCSDevice device)
     {
         if (device.GetBypassConnection()) return;
@@ -238,24 +255,21 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
         return _connectedDevices.ContainsKey(deviceID);
     }
 
-    private void Awake()
-    {
-        if (_dumpContainer == null)
-        {
-            _dumpContainer = gameObject.EnsureComponent<DumpContainerSimplified>();
-            _dumpContainer.Initialize(gameObject.transform, $"Add item to base: {GetBaseFriendlyName()}", this, 6, 8, gameObject.name);
-        }
-
-        
-        
-
-    }
 
     internal void SetSubRoot(SubRoot instance)
     {
         _habitat = instance;
         _baseComponent = _habitat.GetComponent<Base>();
         _prefabID = _habitat.gameObject.gameObject?.GetComponentInChildren<PrefabIdentifier>()?.Id;
+    }
+
+    internal void Initialize()
+    {
+        if (_dumpContainer == null)
+        {
+            _dumpContainer = gameObject.EnsureComponent<DumpContainerSimplified>();
+            _dumpContainer.Initialize(gameObject.transform, $"Add item to base: {GetBaseFriendlyName()}", this, 6, 8, gameObject.name);
+        }
     }
 
     private void Start()
@@ -381,7 +395,7 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
         return false;
     }
 
-    internal bool IsDssIntegration()
+    public bool IsDssIntegration()
     {
         foreach (var device in _registeredDevices)
         {

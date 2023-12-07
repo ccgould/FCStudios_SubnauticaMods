@@ -48,9 +48,9 @@ internal class OreCrusherBuildable : FCSBuildableModBase
         return new RecipeData
         {
             Ingredients =
-                {
-                    new Ingredient(_kitTechType, 1),
-                }
+            {
+                new Ingredient(TechType.Titanium, 1),
+            }
         };
     }
 }

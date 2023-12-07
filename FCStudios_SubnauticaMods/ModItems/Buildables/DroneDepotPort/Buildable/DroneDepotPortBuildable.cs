@@ -13,7 +13,6 @@ namespace FCS_AlterraHub.ModItems.Buildables.DroneDepotPort.Buildable;
 
 internal class DroneDepotPortBuildable : FCSBuildableModBase
 {
-    private TechType _kitTechType;
     public static TechType PatchedTechType { get; private set; }
     public DroneDepotPortBuildable() : base(PluginInfo.PLUGIN_NAME, "fcsDepotDronePort", FileSystemHelper.ModDirLocation, "DepotDronePort", "Drone Port")
     {
@@ -32,7 +31,6 @@ internal class DroneDepotPortBuildable : FCSBuildableModBase
     }
 
     
-
     protected override IEnumerator ModifyPrefab(GameObject prefab)
     {
         //prefab.AddComponent<ColorManager>();

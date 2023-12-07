@@ -14,8 +14,6 @@ using static CraftData;
 namespace FCS_StorageSolutions.ModItems.Buildables.RemoteStorage.Buildable;
 internal class DSSAntennaBuildable : FCSBuildableModBase
 {
-    private TechType _kitTechType;
-
     public DSSAntennaBuildable() : base(PluginInfo.PLUGIN_NAME, "DSS_Antenna", FileSystemHelper.ModDirLocation, "DSSAntenna", "Antenna")
     {
 
@@ -41,16 +39,5 @@ internal class DSSAntennaBuildable : FCSBuildableModBase
         MaterialHelpers.ChangeEmissionStrength(ModPrefabService.BasePrimaryCol, prefab, 5f);
         MaterialHelpers.ChangeEmissionStrength(ModPrefabService.BaseSecondaryCol, prefab, 5f);
         yield break;
-    }
-
-    public override RecipeData GetRecipe()
-    {
-        return new RecipeData
-        {
-            Ingredients =
-                {
-                    new Ingredient(_kitTechType, 1),
-                }
-        };
     }
 }

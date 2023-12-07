@@ -3,6 +3,7 @@ using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Enumerators;
 using FCS_AlterraHub.Models.Mono;
 using FCS_AlterraHub.Models.Structs;
+using FCS_AlterraHub.ModItems.Buildables.BaseManager.Buildable;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCSCommon.Utilities;
 using System;
@@ -41,6 +42,9 @@ public interface IFCSModsAPIPublic
     void AddStoreCategory(string pLUGIN_GUID, string iconName, string pageName, PDAPages pdaPage);
     bool IsRegisteredInBase(string prefabID, out HabitatManager manager);
     HabitatManager GetPlayerHabitat();
+
+    TechType GetDssInterationTechType();
+    void RegisterBaseManagerModule(string pluginName, string classID, string friendlyName, string description, decimal itemCost, StoreCategory storeCategory);
 }
 public interface IFCSModsAPIInternal
 {
@@ -182,5 +186,15 @@ public class FCSModsAPI : IFCSModsAPIPublic, IFCSModsAPIInternal
     public HabitatManager GetPlayerHabitat()
     {
         return HabitatService.main.GetPlayersCurrentBase();
+    }
+
+    public TechType GetDssInterationTechType()
+    {
+        return BaseManagerBuildable.DSSIntegrationModuleTechType;
+    }
+
+    public void RegisterBaseManagerModule(string pluginName, string classID, string friendlyName, string description, decimal itemCost, StoreCategory storeCategory)
+    {
+        BaseManagerBuildable.CreateNewBaseManagerModule(pluginName, classID, friendlyName, description, itemCost, storeCategory);
     }
 }

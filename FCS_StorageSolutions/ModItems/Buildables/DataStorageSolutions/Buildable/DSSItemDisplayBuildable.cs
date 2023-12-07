@@ -13,8 +13,6 @@ using static CraftData;
 namespace FCS_StorageSolutions.ModItems.Buildables.RemoteStorage.Buildable;
 internal class DSSItemDisplayBuildable : FCSBuildableModBase
 {
-    private TechType _kitTechType;
-
     public DSSItemDisplayBuildable() : base(PluginInfo.PLUGIN_NAME, "DSS_ItemDisplay", FileSystemHelper.ModDirLocation, "DSSItemDisplay", "Terminal S23")
     {
 

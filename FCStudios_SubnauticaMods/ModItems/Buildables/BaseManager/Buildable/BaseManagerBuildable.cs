@@ -11,11 +11,13 @@ using System.Collections;
 using UnityEngine;
 using Nautilus.Assets.Gadgets;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Mono;
+using Nautilus.Utility;
+using System.IO;
+using System.Reflection;
 
 namespace FCS_AlterraHub.ModItems.Buildables.BaseManager.Buildable;
 internal class BaseManagerBuildable : FCSBuildableModBase
 {
-    private TechType _kitTechType;
     public static TechType PatchedTechType { get; private set; }
     public static TechType RemoteModuleTechType { get; private set; }
     public static TechType TranceiverModuleTechType { get; private set; }
@@ -39,36 +41,53 @@ internal class BaseManagerBuildable : FCSBuildableModBase
 
     private void PatchModules()
     {
+        var assetPath = ModRegistrationService.GetModPackData(PluginInfo.PLUGIN_NAME).GetAssetPath();
+
         // Remote Module.
-        var remoteConnectionModuleInfo = PrefabInfo.WithTechType("RemoteConnectionModule", "Remote Connection", "Allows the FCS PDA to see all base deviced from the Base Manager remotely.").WithIcon(SpriteManager.Get(TechType.MapRoomUpgradeScanRange));
+        var remoteConnectionModuleInfo = PrefabInfo.WithTechType("RemoteConnectionModule", "Remote Connection Module", "Allows the FCS PDA to see all base devices from the Base Manager remotely.").WithIcon(ImageUtils.LoadSpriteFromFile(Path.Combine(assetPath, $"RemoteConnectionModule.png")));
         var remoteConnectionModulePrefab = new CustomPrefab(remoteConnectionModuleInfo);
         var cyclopsHullObj = new CloneTemplate(remoteConnectionModuleInfo, TechType.CyclopsHullModule1);
         remoteConnectionModulePrefab.SetGameObject(cyclopsHullObj);
         remoteConnectionModulePrefab.SetEquipment(BaseManagerModuleRackBuildable.BaseManagerEquipmentType);
         remoteConnectionModulePrefab.Register();
         RemoteModuleTechType = remoteConnectionModuleInfo.TechType;
-        FCSModsAPI.PublicAPI.CreateStoreEntry(RemoteModuleTechType, RemoteModuleTechType, 1, _settings.ItemCost, StoreCategory.AlterraHub);
+        FCSModsAPI.PublicAPI.CreateStoreEntry(RemoteModuleTechType, RemoteModuleTechType, 1, _settings.ItemCost, StoreCategory.AlterraHub,true);
 
         // Transceiver Module.
-        var transceiverModuleInfo = PrefabInfo.WithTechType("TransceiverModule", "Tranceiver", "N/A").WithIcon(SpriteManager.Get(TechType.MapRoomUpgradeScanRange));
+        var transceiverModuleInfo = PrefabInfo.WithTechType("TransceiverModule", "Tranceiver Module", "Supports 5 Automation Operations (See Encyclopedia) (Req Module Rack)").WithIcon(ImageUtils.LoadSpriteFromFile(Path.Combine(assetPath, $"TransceiverModule.png")));
         var transceiverModulePrefab = new CustomPrefab(transceiverModuleInfo);
         transceiverModulePrefab.SetGameObject(cyclopsHullObj);
         transceiverModulePrefab.SetEquipment(BaseManagerModuleRackBuildable.BaseManagerEquipmentType);
         transceiverModulePrefab.Register();
         TranceiverModuleTechType = transceiverModuleInfo.TechType;
-        FCSModsAPI.PublicAPI.CreateStoreEntry(TranceiverModuleTechType, TranceiverModuleTechType, 1, _settings.ItemCost, StoreCategory.AlterraHub);
+        FCSModsAPI.PublicAPI.CreateStoreEntry(TranceiverModuleTechType, TranceiverModuleTechType, 1, _settings.ItemCost, StoreCategory.AlterraHub,true);
 
+        //// DSS Integration Module.
+        //var assetPath = ModRegistrationService.GetModPackData(PluginInfo.PLUGIN_NAME).GetAssetPath();
+        //var dssIntegrationModuleInfo = PrefabInfo.WithTechType("DSSIntegrationModule", "DSS Integration", "N/A").WithIcon(ImageUtils.LoadSpriteFromFile(Path.Combine(assetPath, "DSSIntegrationModule.png")));
+        //var dssIntegerationModulePrefab = new CustomPrefab(dssIntegrationModuleInfo);
+        //dssIntegerationModulePrefab.SetGameObject(cyclopsHullObj);
+        //dssIntegerationModulePrefab.SetEquipment(BaseManagerModuleRackBuildable.BaseManagerEquipmentType);
+        //dssIntegerationModulePrefab.Register();
+        //DSSIntegrationModuleTechType = dssIntegrationModuleInfo.TechType;
+        //FCSModsAPI.PublicAPI.CreateStoreEntry(DSSIntegrationModuleTechType, DSSIntegrationModuleTechType, 1, _settings.ItemCost, StoreCategory.AlterraHub,true);
+
+
+
+    }
+
+    internal static void CreateNewBaseManagerModule(string pluginName,string classID,string friendlyName,string description,decimal itemCost,StoreCategory storeCategory)
+    {
         // DSS Integration Module.
-        var dssIntegrationModuleInfo = PrefabInfo.WithTechType("DSSIntegrationModule", "DSS Integration", "N/A").WithIcon(SpriteManager.Get(TechType.MapRoomUpgradeScanRange));
+        var assetPath = ModRegistrationService.GetModPackData(pluginName).GetAssetPath();
+        var dssIntegrationModuleInfo = PrefabInfo.WithTechType(classID, friendlyName, description).WithIcon(ImageUtils.LoadSpriteFromFile(Path.Combine(assetPath, $"{classID}.png")));
         var dssIntegerationModulePrefab = new CustomPrefab(dssIntegrationModuleInfo);
+        var cyclopsHullObj = new CloneTemplate(dssIntegrationModuleInfo, TechType.CyclopsHullModule1);
         dssIntegerationModulePrefab.SetGameObject(cyclopsHullObj);
         dssIntegerationModulePrefab.SetEquipment(BaseManagerModuleRackBuildable.BaseManagerEquipmentType);
         dssIntegerationModulePrefab.Register();
         DSSIntegrationModuleTechType = dssIntegrationModuleInfo.TechType;
-        FCSModsAPI.PublicAPI.CreateStoreEntry(DSSIntegrationModuleTechType, DSSIntegrationModuleTechType, 1, _settings.ItemCost, StoreCategory.AlterraHub);
-
-
-
+        FCSModsAPI.PublicAPI.CreateStoreEntry(DSSIntegrationModuleTechType, DSSIntegrationModuleTechType, 1, itemCost, storeCategory, true);
     }
 
     protected override IEnumerator ModifyPrefab(GameObject prefab)

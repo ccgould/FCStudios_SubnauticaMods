@@ -13,7 +13,6 @@ using UnityEngine;
 namespace FCS_AlterraHub.ModItems.Buildables.BaseManager.Buildable;
 internal class BaseManagerModuleRackBuildable : FCSBuildableModBase
 {
-    private TechType _kitTechType;
     public static TechType PatchedTechType { get; private set; }
     public static EnumBuilder<EquipmentType> BaseManagerEquipmentType { get; private set; }
 
@@ -28,7 +27,6 @@ internal class BaseManagerModuleRackBuildable : FCSBuildableModBase
             {
                 Equipment.slotMapping.Add(e, BaseManagerEquipmentType);
             }
-
 
             var kit = new FCSKit(ClassID, FriendlyName, PluginInfo.PLUGIN_NAME);
             kit.PatchSMLHelper();

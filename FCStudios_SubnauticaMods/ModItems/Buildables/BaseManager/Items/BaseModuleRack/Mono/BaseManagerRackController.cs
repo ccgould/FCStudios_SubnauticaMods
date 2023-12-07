@@ -64,6 +64,7 @@ internal class BaseManagerRackController : FCSDevice, IFCSSave<SaveData>
     {
         BaseManagerBuildable.RemoteModuleTechType,
         BaseManagerBuildable.TranceiverModuleTechType,
+        BaseManagerBuildable.DSSIntegrationModuleTechType
 
     };
     private int slotsFilled;
@@ -125,6 +126,8 @@ internal class BaseManagerRackController : FCSDevice, IFCSSave<SaveData>
         }
 
         slotsFilled -= 1;
+
+        CachedHabitatManager.OnModuleRemoved?.Invoke(item.item.GetTechType());
     }
 
     private void OnEquip(string slot, InventoryItem item)
@@ -158,6 +161,7 @@ internal class BaseManagerRackController : FCSDevice, IFCSSave<SaveData>
         }
 
         slotsFilled += 1;
+        CachedHabitatManager.OnModuleAdded?.Invoke(item.item.GetTechType());
     }
 
     private string GetSlotIndex(string slot)

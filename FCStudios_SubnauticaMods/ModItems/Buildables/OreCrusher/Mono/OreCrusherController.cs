@@ -327,7 +327,14 @@ internal class OreCrusherController : FCSDevice, IFCSSave<SaveData>
 
     public override bool IsOperational()
     {
-        if (IsInitialized && IsConstructed && CachedHabitatManager != null && _oreQueue != null && CachedHabitatManager.HasEnoughPower(GetPowerUsage()) && !_isBreakerTripped) return true;
+        if (IsInitialized && 
+            IsConstructed && 
+            CachedHabitatManager != null && 
+            _oreQueue != null && 
+            CachedHabitatManager.HasEnoughPower(GetPowerUsage()) && 
+            !_isBreakerTripped) return true;
+
+        //&& CachedHabitatManager.IsDeviceConnected(GetPrefabID())
         return false;
     }
 
@@ -428,5 +435,16 @@ internal class OreCrusherController : FCSDevice, IFCSSave<SaveData>
         yield break;
     }
 
+    public override string[] GetDeviceStats()
+    {
+        var totalTime = CalculateTargetTime();
+        var remainingTime = totalTime - _timeLeft;
+        var percentage = remainingTime / totalTime;
+
+        return new string[]
+        {
+            $"[EPM: {GetPowerUsage() * 60:F2}] [Status: {_status}] [Percentage: {percentage:P0}]",
+        };
+    }
 
 }

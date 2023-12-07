@@ -21,7 +21,7 @@ internal class SubRoot_Awake
             portManager.Manager = habitatManager;
             habitatManager.SetPortManager(portManager);
             habitatManager.SetSubRoot(__instance);
-
+            habitatManager.Initialize();
         }
     }
 }

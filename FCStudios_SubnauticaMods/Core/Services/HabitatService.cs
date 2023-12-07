@@ -160,7 +160,12 @@ public class HabitatService : MonoBehaviour
         {
             knownDevices.Remove(result);
             _globalFCSDevices.Remove(device);
-            var baseManager = knownBases.FirstOrDefault(x => x.HasDevice(result.PrefabID));
+
+            var baseManager = device.CachedHabitatManager; //knownBases.FirstOrDefault(x => x.HasDevice(result.PrefabID));
+            if(baseManager is null)
+            {
+                QuickLogger.Error($"Failed to remove {device.FriendlyName}: {device.GetPrefabID()} because baseManager returned null");
+            }
             baseManager?.UnRegisterDevice(device);
         }
     }

@@ -4,11 +4,13 @@ using FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Mono;
 using FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Mono.Base;
 using FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Mono.C40Terminal.Enumerator;
 using FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Spawnable;
+using FCS_StorageSolutions.ModItems.Buildables.RemoteStorage.Buildable;
 using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static HandReticle;
 
 namespace FCS_StorageSolutions.Models;
 internal class DSSManager : MonoBehaviour
@@ -126,7 +128,7 @@ internal class DSSManager : MonoBehaviour
         if (trackedResources.TryGetValue(techType, out var resource))
         {
             resource.UnTrackItem(deviceTechType, item);
-            if(resource.GetCount(DSSTerminalFilterOptions.ShowAll) <= 0)
+            if(resource.GetCount(DSSTerminalFilterOptions.ShowAll, habitatManager.IsDssIntegration()) <= 0)
             {
                 trackedResources.Remove(techType);
             }
@@ -206,7 +208,6 @@ internal class DSSManager : MonoBehaviour
         return sum;
     }
 
-
     internal bool AddItem(InventoryItem inventoryItem)
     { 
         foreach (var result in from storage in dssRacks.Values
@@ -256,7 +257,7 @@ internal class DSSManager : MonoBehaviour
 
             var pickupable = resource.UnTrackItemAndReturn(patchedTechType).item;
 
-            if (resource.GetCount(DSSTerminalFilterOptions.ShowAll) <= 0)
+            if (resource.GetCount(DSSTerminalFilterOptions.ShowAll, habitatManager.IsDssIntegration()) <= 0)
             {
                 trackedResources.Remove(techType);
             }
@@ -308,7 +309,9 @@ internal class DSSManager : MonoBehaviour
             case DSSTerminalFilterOptions.ShowAll:
                 foreach (var item in trackedResources)
                 {
-                    dict.Add(item.Key, item.Value.GetCount(filter));
+                    var count = item.Value.GetCount(filter, habitatManager.IsDssIntegration());
+                    if(count > 0)
+                        dict.Add(item.Key, count);
                 }
                 //GetServerItems(dict);
                 //GetStorageContainerItems(dict);
@@ -317,15 +320,35 @@ internal class DSSManager : MonoBehaviour
                 GetServerItems(dict);
                 break;
             case DSSTerminalFilterOptions.AlterraStorage:
+                if (habitatManager.IsDssIntegration())
+                {
+                    GetItemsCount(dict, RemoteStorageBuildable.PatchedTechType);
+                }
                 break;
             case DSSTerminalFilterOptions.StorageLocker:
-                //GetStorageContainerItems(dict);
+                if (habitatManager.IsDssIntegration())
+                {
+                    GetItemsCount(dict,TechType.Locker);
+                    GetItemsCount(dict,TechType.SmallLocker);
+                }        
                 break;
             case DSSTerminalFilterOptions.SeaBreeze:
+                if (habitatManager.IsDssIntegration())
+                {
+
+                }
                 break;
             case DSSTerminalFilterOptions.Harvesters:
+                if (habitatManager.IsDssIntegration())
+                {
+
+                }
                 break;
             case DSSTerminalFilterOptions.Replicator:
+                if (habitatManager.IsDssIntegration())
+                {
+
+                }
                 break;
         }
 
@@ -333,23 +356,16 @@ internal class DSSManager : MonoBehaviour
         return dict;
     }
 
-    private void GetStorageContainerItems(Dictionary<TechType, int> dict)
+    private void GetItemsCount(Dictionary<TechType, int> dict,TechType device)
     {
-        //foreach (var storageContainer in storageContainers)
-        //{
-        //    foreach (var item in storageContainer.container)
-        //    {
-        //        var techType = item.item.GetTechType();
-        //        if (dict.ContainsKey(techType))
-        //        {
-        //            dict[techType] += 1;
-        //        }
-        //        else
-        //        {
-        //            dict.Add(techType, 1);
-        //        }
-        //    }
-        //}
+
+        foreach (var trackedItem in trackedResources)
+        {
+            var count = trackedItem.Value.GetCount(device);
+            if (count > 0) {
+                dict.Add(trackedItem.Key, count);
+            }
+        }
     }
 
     private void GetServerItems(Dictionary<TechType, int> dict)
@@ -429,7 +445,7 @@ internal class DSSManager : MonoBehaviour
     {
         if(trackedResources.TryGetValue(currentItem, out var result))
         {
-            return result.GetCount(DSSTerminalFilterOptions.ShowAll);
+            return result.GetCount(DSSTerminalFilterOptions.ShowAll, habitatManager.IsDssIntegration());
         }
 
         return 0;

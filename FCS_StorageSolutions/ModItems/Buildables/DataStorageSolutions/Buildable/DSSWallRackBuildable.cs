@@ -14,8 +14,6 @@ using static CraftData;
 namespace FCS_StorageSolutions.ModItems.Buildables.RemoteStorage.Buildable;
 internal class DSSWallRackBuildable : FCSBuildableModBase
 {
-    private TechType _kitTechType;
-
 
     public DSSWallRackBuildable() : base(PluginInfo.PLUGIN_NAME, "DSS_WallServerRack", FileSystemHelper.ModDirLocation, "DSSWallServerRack", "Wall Server Rack")
     {

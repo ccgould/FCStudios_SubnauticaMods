@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+	<AssemblyName>FCS_EnergySolutions</AssemblyName>
+    <Version>1.0.0</Version>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>11</LangVersion>
+	<RootNamespace>FCS_EnergySolutions</RootNamespace>
+
+    <RestoreAdditionalProjectSources>
+      https://api.nuget.org/v3/index.json;
+      https://nuget.bepinex.dev/v3/index.json;
+    </RestoreAdditionalProjectSources>
+
+        <Configurations>Debug;Release;SN_Stable;BZ_Stable</Configurations> 
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SN_Stable|AnyCPU'"> 
+    <DefineConstants>$(DefineConstants);SUBNAUTICA;SUBNAUTICA_STABLE</DefineConstants> 
+  </PropertyGroup> 
+ 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BZ_Stable|AnyCPU'"> 
+    <DefineConstants>$(DefineConstants);BELOWZERO;BELOWZERO_STABLE</DefineConstants> 
+  </PropertyGroup> 
+
+  <ItemGroup>
+    <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
+    <PackageReference Include="BepInEx.Core" Version="5.4.21" />
+    <PackageReference Include="BepInEx.PluginInfoProps" Version="1.1.0" />
+    <PackageReference Include="UnityEngine.Modules" Version="2019.4.36" IncludeAssets="compile" />
+    <PackageReference Include="Subnautica.GameLibs" Version="71288.0.0-r.0" />
+    <PackageReference Include="PolySharp" Version="1.13.1" />
+    <PackageReference Include="Subnautica.Nautilus" Version="1.*-*" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FCStudios_SubnauticaMods\FCS_AlterraHub.csproj" />
+  </ItemGroup>
+
+  <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
+
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent"> 
+    <Exec Command="mkdir &quot;$(GameDir)\BepInEx\plugins\$(ProjectName)&quot;&#xD;&#xA;xcopy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;$(GameDir)\BepInEx\plugins\$(ProjectName)\&quot; /Y /I&#xD;&#xA;xcopy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;C:\FCSThunderkitProject\Assets\&quot; /Y /I&#xD;&#xA;xcopy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;C:\Program Files (x86)\Steam\steamapps\common\Subnautica\BepInEx\plugins\FCStudios\FCS_EnergySolutions\&quot; /Y /I" /> 
+  </Target> 
+</Project>

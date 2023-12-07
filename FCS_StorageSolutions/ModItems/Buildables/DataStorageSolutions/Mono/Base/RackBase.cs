@@ -25,7 +25,7 @@ internal class RackBase : FCSDevice, IFCSSave<SaveData>
     [SerializeField] private List<RackGaugeController> _uGUI_RackGauges;
     [SerializeField] private uGUI_DSSRackProgressBar _uGUI_DSSRackProgressBar;
     private Dictionary<int, RackSlotData> driveAssignments = new();
-    
+
     public override void Awake()
     {
         QuickLogger.Debug("Rack Awake", true);

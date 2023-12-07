@@ -1,4 +1,5 @@
 ﻿using FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Mono.C40Terminal.Enumerator;
+using FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Spawnable;
 using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
@@ -19,16 +20,44 @@ public class TrackedResource
         TrackItem(deviceTechType, item);
     }
 
-    internal int GetCount(DSSTerminalFilterOptions filter)
+    internal int GetCount(DSSTerminalFilterOptions filter,bool isDssIntergrated)
     {
         var amount = 0;
-
-        foreach (var item in trackedDevices.Values) 
+        if (!isDssIntergrated)
         {
-            amount += item.Count(); 
+            var dssserverItems = trackedDevices.Where(x=>x.Key == DSSServerSpawnable.PatchedTechType).ToList();
+
+            foreach (var item in dssserverItems)
+            {
+
+                amount += item.Value.Count();
+            }
+        }
+        else
+        {
+            foreach (var item in trackedDevices.Values)
+            {
+                amount += item.Count();
+            }
         }
 
+
+
         return amount;
+    }
+
+    internal int GetCount(TechType device)
+    {
+        if(trackedDevices.ContainsKey(device))
+        {
+            return trackedDevices[device].Count;
+        }
+        return 0;
+    }
+
+    internal Dictionary<TechType, List<InventoryItem>> GetTrackedDevices()
+    {
+        return trackedDevices;
     }
 
     internal bool HasDevice(TechType deviceTechType, out int amount)

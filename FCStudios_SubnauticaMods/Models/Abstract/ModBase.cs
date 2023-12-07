@@ -11,6 +11,7 @@ public abstract class ModBase
     public GameObject Prefab { get; set; }
     protected Action OnStartRegister;
     protected Action OnFinishRegister;
+    protected TechType _kitTechType;
 
     /// <summary>
     /// Information for registering the prefab.
@@ -49,7 +50,7 @@ public abstract class ModBase
             craftAmount = 1,
             Ingredients = new List<CraftData.Ingredient>
             {
-                new CraftData.Ingredient(TechType.Titanium)
+                new CraftData.Ingredient(_kitTechType == TechType.None ? TechType.Titanium : _kitTechType)
             }
         };
     }

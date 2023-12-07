@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{B036E9
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FCS_StorageSolutions", "FCS_StorageSolutions\FCS_StorageSolutions.csproj", "{7A3D9454-5DC7-4021-99D3-8F1B8BD34BD2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCS_EnergySolutions", "FCS_EnergySolutions\FCS_EnergySolutions.csproj", "{36180853-DDE9-4FAF-9939-C2C92E853CF4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		BZ_Stable|Any CPU = BZ_Stable|Any CPU
@@ -45,6 +47,14 @@ Global
 		{7A3D9454-5DC7-4021-99D3-8F1B8BD34BD2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7A3D9454-5DC7-4021-99D3-8F1B8BD34BD2}.SN_Stable|Any CPU.ActiveCfg = SN_Stable|Any CPU
 		{7A3D9454-5DC7-4021-99D3-8F1B8BD34BD2}.SN_Stable|Any CPU.Build.0 = SN_Stable|Any CPU
+		{36180853-DDE9-4FAF-9939-C2C92E853CF4}.BZ_Stable|Any CPU.ActiveCfg = Debug|Any CPU
+		{36180853-DDE9-4FAF-9939-C2C92E853CF4}.BZ_Stable|Any CPU.Build.0 = Debug|Any CPU
+		{36180853-DDE9-4FAF-9939-C2C92E853CF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36180853-DDE9-4FAF-9939-C2C92E853CF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36180853-DDE9-4FAF-9939-C2C92E853CF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36180853-DDE9-4FAF-9939-C2C92E853CF4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36180853-DDE9-4FAF-9939-C2C92E853CF4}.SN_Stable|Any CPU.ActiveCfg = Debug|Any CPU
+		{36180853-DDE9-4FAF-9939-C2C92E853CF4}.SN_Stable|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -56,6 +66,7 @@ Global
 		SolutionGuid = {79065CEC-4A2F-482C-8498-08CC377B3E61}
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		FCSCommon\FCSCommon.projitems*{36180853-dde9-4faf-9939-c2c92e853cf4}*SharedItemsImports = 5
 		FCSCommon\FCSCommon.projitems*{7a3d9454-5dc7-4021-99d3-8f1b8bd34bd2}*SharedItemsImports = 5
 		FCSCommon\FCSCommon.projitems*{7b707a4c-d832-408e-a5dc-2c7dda6fb63f}*SharedItemsImports = 13
 		FCSCommon\FCSCommon.projitems*{80bc769b-72ab-4938-9af1-e735928a3777}*SharedItemsImports = 5

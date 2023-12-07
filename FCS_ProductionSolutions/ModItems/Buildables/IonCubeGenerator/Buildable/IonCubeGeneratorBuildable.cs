@@ -15,8 +15,6 @@ namespace FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Buildable
 
 internal class IonCubeGeneratorBuildable : FCSBuildableModBase
 {
-    private TechType _kitTechType;
-
     /// <summary>
     /// A class that defines the IonCube Generator mod
     /// Created by: Primesonic and FCStudios.

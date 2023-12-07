@@ -182,9 +182,14 @@ public abstract class FCSDevice : MonoBehaviour, IFCSObject, IProtoEventListener
                 }
 
                 _colorManager?.ChangeBaseConnectionStatusLights(IsConnectedToBase);
+
+                return;
             }
         }
+
+        IsConnectedToBase = false;
     }
+
 
     public virtual bool IsDeconstructionObstacle()
     {

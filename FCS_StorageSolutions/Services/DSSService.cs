@@ -50,6 +50,7 @@ internal class DSSService : MonoBehaviour
 
     private void RegisterBase(HabitatManager root)
     {
+        QuickLogger.Debug($"Registering Base: {root.GetBaseName()}");
         var manager = root.gameObject.GetComponentInChildren<DSSManager>();
         var prefabID = root.GetBasePrefabID();
 

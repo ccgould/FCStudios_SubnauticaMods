@@ -5,14 +5,15 @@ using FCS_AlterraHub.Models;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Enumerators;
 using FCSCommon.Helpers;
+using Nautilus.Crafting;
 using Nautilus.Handlers;
 using System.Collections;
 using UnityEngine;
+using static CraftData;
 
 namespace FCS_AlterraHub.ModItems.Buildables.BaseManager.Items.BaseTransmitter.Buildable;
 internal class ConnectionGridExtensionBuildable : FCSBuildableModBase
 {
-    private TechType _kitTechType;
     public static TechType PatchedTechType { get; private set; }
     public static EnumBuilder<EquipmentType> BaseManagerEquipmentType { get; private set; }
 

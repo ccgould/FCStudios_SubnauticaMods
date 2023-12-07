@@ -21,6 +21,11 @@ internal class uGUI_Notification : MonoBehaviour
         animator = GetComponentInChildren<Animator>();
     }
 
+    public string GetMessage()
+    {
+        return messageText.text;
+    }
+
     public void SetMessage(string message)
     {
         gameObject.SetActive(true);

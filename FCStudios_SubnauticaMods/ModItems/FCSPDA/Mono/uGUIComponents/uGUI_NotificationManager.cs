@@ -12,6 +12,7 @@ internal class uGUI_NotificationManager : MonoBehaviour
     [SerializeField] private int notificationMessageMax = 3;
 
     private Queue<string> pendingMessages = new();
+    private List<string> currentMessages = new();
     private int _currentMessagesCount;
 
     private void Awake()
@@ -34,6 +35,8 @@ internal class uGUI_NotificationManager : MonoBehaviour
 
     public void AddNotification(string message)
     {
+        if (pendingMessages.Contains(message) || currentMessages.Contains(message)) return;
+
         if (_currentMessagesCount == notificationMessageMax)
         {
             pendingMessages.Enqueue(message);
@@ -50,11 +53,14 @@ internal class uGUI_NotificationManager : MonoBehaviour
         notification.SetMessage(message);
         notification.OnDeleted += Notification_OnDeleted;
         _currentMessagesCount++;
+        currentMessages.Add(message);
     }
 
     private void Notification_OnDeleted(object sender, uGUI_Notification.OnDeletedArg e)
     {
         _currentMessagesCount--;
+
+        currentMessages.Remove(e.notification.GetMessage());
 
         Destroy(e.notification.gameObject);
 

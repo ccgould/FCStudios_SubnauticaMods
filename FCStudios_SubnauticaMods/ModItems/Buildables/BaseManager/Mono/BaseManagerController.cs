@@ -5,6 +5,7 @@ using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Enumerators;
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.Models.Mono;
+using FCS_AlterraHub.ModItems.FCSPDA.Mono.uGUIComponents;
 using FCSCommon.Utilities;
 using TMPro;
 using UnityEngine;
@@ -196,19 +197,20 @@ internal class BaseManagerController : FCSDevice, IFCSSave<SaveData>
         string result;
 
 
-        if (_baseManager.HasDevice("DSS_Terminal".ToTechType()))
+        if (_baseManager.HasDevice("DSSTerminal".ToTechType()))
         {
             isStorageSolutionsInstalled = true;
         }
 
-        if(!isStorageSolutionsInstalled && !_baseManager.IsDssIntegration())
+        if (!_baseManager.IsDssIntegration())
         {
             result = "<color=red>Offline</color>";
         }
         else if (!isStorageSolutionsInstalled && _baseManager.IsDssIntegration())
         {
             result = "<color=yellow>Offline</color>";
-        }
+            uGUI_NotificationManager.Instance.AddNotification("No Terminal detected for DSS Integration");
+        }        
         else
         {
             result = "<color=green>Online</color>";

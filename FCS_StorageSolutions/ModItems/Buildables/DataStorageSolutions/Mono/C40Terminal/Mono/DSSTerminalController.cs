@@ -186,7 +186,7 @@ internal class DSSTerminalController : FCSDevice, IFCSSave<SaveData>
 
             if (_dssManager is not null)
             {
-                UpdateValuesOnScreen();
+                
 
                 Dictionary<TechType, int> grouped;
 
@@ -227,6 +227,8 @@ internal class DSSTerminalController : FCSDevice, IFCSSave<SaveData>
 
                 }
             }
+
+            UpdateValuesOnScreen();
         }
         catch (Exception e)
         {
@@ -268,8 +270,13 @@ internal class DSSTerminalController : FCSDevice, IFCSSave<SaveData>
 
             var serverCapacity = rackCount * 48;
 
+            QuickLogger.Debug("1");
             totalCountLabel.text = $"{serverTotal.ToString("D4")}/{serverCapacity.ToString("D4")}";
+            QuickLogger.Debug("2");
+
             serverCountLabel.text = $"Servers: {_dssManager.GetServerCount():D3}";
+            QuickLogger.Debug("3");
+
             rackCountLabel.text = $"Racks: {_dssManager.GetRackCount():D3}";
             QuickLogger.Debug($"Server Capacity: {serverCapacity}", true);
 
@@ -337,8 +344,18 @@ internal class DSSTerminalController : FCSDevice, IFCSSave<SaveData>
         if(RegisterEventListener())
         {
             _dssManager.GetHabitatManager().OnItemTransferedToBase += BaseDump_ItemTransferedToBase;
+            _dssManager.GetHabitatManager().OnModuleAdded += OnModuleChanged;
+            _dssManager.GetHabitatManager().OnModuleRemoved += OnModuleChanged;
             currentBaseLabel.text = $"{_dssManager.GetHabitatManager().GetBaseFriendlyName()} [Current Base]";
             RefreshGrid();
+        }
+    }
+
+    private void OnModuleChanged(TechType type)
+    {
+        if(type == FCSModsAPI.PublicAPI.GetDssInterationTechType())
+        {
+            RefreshDisplay();
         }
     }
 

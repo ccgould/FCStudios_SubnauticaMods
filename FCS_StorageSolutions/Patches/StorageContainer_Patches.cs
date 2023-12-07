@@ -116,21 +116,33 @@ internal class StorageContainer_Patches
         [HarmonyPostfix]
         internal static void Postfix(bool constructed, Constructable __instance)
         {
+            QuickLogger.Debug("[Constructable.OnConstructedChanged.PostFix] : 1");
             if (__instance == null || !constructed || StorageContainerAwakePatcher.InvalidComponent(__instance.gameObject))
             {
                 return;
             }
+            QuickLogger.Debug("2");
 
             var fcsdevice = __instance.gameObject.GetComponentInChildren<FCSDevice>();
+            QuickLogger.Debug("3");
+
             var fcsStorage = __instance.gameObject.GetComponentInChildren<FCSStorage>();
+            QuickLogger.Debug("4");
+
             var storageContainer = __instance.gameObject.GetComponentInChildren<StorageContainer>(true);
+            QuickLogger.Debug("5");
+
             var planter = __instance.gameObject.GetComponentInChildren<Planter>(true);
+            QuickLogger.Debug("6");
 
             var manager = HabitatService.main.GetBaseManager(__instance.gameObject);
+            QuickLogger.Debug("7");
 
             if (manager == null) return;
-       
-            if (fcsdevice != null && (fcsStorage is not null && !fcsStorage.IsVisibleInNetwork) || storageContainer is null) return;
+            QuickLogger.Debug("8");
+
+            if (fcsdevice is not null && (fcsStorage is not null && !fcsStorage.IsVisibleInNetwork) || storageContainer is null) return;
+            QuickLogger.Debug("9");
 
             //QuickLogger.Debug($"OnConstructedChanged: FCSDevice: {fcsdevice} || Is Bypassing: {fcsdevice?.BypassFCSDeviceCheck} || {fcsdevice?.StorageType}", true);
 
@@ -140,10 +152,19 @@ internal class StorageContainer_Patches
                 QuickLogger.DebugError($"[StorageContainerPatch_OnConstructedChanged] DSS Manager is null canceling operation");
                 return;
             }
+            QuickLogger.Debug("10");
 
             var dssManager = DSSService.main.GetDSSManager(manager);
+            QuickLogger.Debug("11");
 
             var techTag = __instance.gameObject.GetComponentInParent<TechTag>();
+            QuickLogger.Debug("12");
+
+            if (dssManager is null)
+            {
+                QuickLogger.Error($"StorageContainer_ConstructionChanged: DSSManagder was not found.");
+                return;
+            }
 
             if (techTag is not null)
             {
@@ -151,8 +172,10 @@ internal class StorageContainer_Patches
             }
             else
             {
-                QuickLogger.DebugError($"StorageContainer_Awake: TechTag was not found on {__instance.gameObject.name}");
+                QuickLogger.DebugError($"StorageContainer_ConstructionChanged: TechTag was not found on {__instance.gameObject.name}");
             }
+            QuickLogger.Debug("13");
+
         }
     }
 }
