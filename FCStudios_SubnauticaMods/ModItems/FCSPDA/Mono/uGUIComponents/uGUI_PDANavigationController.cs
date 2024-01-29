@@ -1,4 +1,5 @@
-﻿using FCS_AlterraHub.Core.Navigation;
+﻿using FCS_AlterraHub.Core.Components.uGUIComponents;
+using FCS_AlterraHub.Core.Navigation;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.ModItems.FCSPDA.Interfaces;
@@ -15,6 +16,9 @@ public class uGUI_PDANavigationController : MonoBehaviour
     [SerializeField] private GameObject settingButton;
     [SerializeField] private GameObject infoButton;
     [SerializeField] private GameObject storageButton;
+    [SerializeField] private GameObject errorButton;
+    [SerializeField] private uGUI_ErrorButton uGUIErrorButton;
+
     private IuGUIAdditionalPage _page;
     private Page _additionalPageAsPage;
     private FCSDevice _IFCSObjectAsFCSDevice;
@@ -60,6 +64,11 @@ public class uGUI_PDANavigationController : MonoBehaviour
         FCSPDAController.Main.GetGUI().GoBackAPage();
     }
 
+    public void OnErrorButtonCicked()
+    {
+        FCSPDAController.Main.GetGUI().OnErrorButtonClicked?.Invoke((FCSDevice)_page.GetController());
+    }
+
     public void OnSettingsButtonClicked()
     {
         onSettingsClicked?.Invoke(_page.GetController());
@@ -83,13 +92,24 @@ public class uGUI_PDANavigationController : MonoBehaviour
         this._IFCSObjectAsFCSDevice = page.GetController() as FCSDevice;
     }
 
-    public void SetNavigationButtons(Page currentPage)
+    internal void SetNavigationButtons(Page currentPage)
     {
+        this.errorButton.SetActive(currentPage.ShowErrorButton());
         this.backButton.SetActive(currentPage.ShowBackButton());
         this.storageButton.SetActive(currentPage.ShowStorageButton());
         this.settingButton.SetActive(currentPage.ShowSettingsButton());
         this.infoButton.SetActive(currentPage.ShowInfoButton());
         this.pageLabel.gameObject.SetActive(currentPage.ShowLabel());
+    }
+
+    public void SetErrorButtonDevice(FCSDevice device)
+    {
+        uGUIErrorButton.SetDevice(device);
+    }
+
+    internal void PurgeErrorButton()
+    {
+        uGUIErrorButton.Purge();
     }
 
     internal void SetLabel(string value)

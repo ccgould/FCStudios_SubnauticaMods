@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FCS_AlterraHub.Core.Helpers;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,25 +17,44 @@ public class uGUI_StorageItem : MonoBehaviour
 
     private void Awake()
     {
-
+        _tooltip.RequestPermission += OnRequestPermission;
     }
 
-    public void Set(TechType techType, int amount)
+    private bool OnRequestPermission()
     {
+        return WorldHelpers.CheckIfPlayerInRange(gameObject, 3f);
+    }
+
+    public void Set(TechType techType, int amount = 0)
+    {
+        gameObject.SetActive(true);
         this.techType = techType;
-        _amount.text = amount.ToString();
+
+        if(_amount is not null)
+        {
+            _amount.text = amount.ToString();
+        }
+
         _icon.sprite = SpriteManager.Get(techType);
         textLineOne = Language.main.Get(techType);
-        gameObject.SetActive(true);
+        _tooltip.SetTechType(techType);
     }
 
     public void Reset()
     {
-        techType = TechType.None;
-        textLineOne = string.Empty;
-        _amount.text = string.Empty;
-        _icon.sprite = SpriteManager.Get(TechType.None);
-        gameObject.SetActive(false);
+        if(gameObject.activeSelf)
+        {
+            techType = TechType.None;            
+            textLineOne = string.Empty;
+
+            if(_amount is not null)
+            {
+                _amount.text = string.Empty;
+            }
+
+            _icon.sprite = SpriteManager.Get(TechType.None);
+            gameObject.SetActive(false);
+        }
     }
 
     public void OnClick()

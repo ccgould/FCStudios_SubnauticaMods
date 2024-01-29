@@ -97,7 +97,10 @@ public static class Player_Patches
         defPDA = player.pda.gameObject;
 
        
-        var pda = GameObject.Instantiate(FCSAssetBundlesService.PublicAPI.GetLocalPrefab("fcsPDA"));
+        var pda = GameObject.Instantiate(FCSAssetBundlesService.PublicAPI.GetLocalPrefab("fcsPDA",true));
+
+
+
         var canvas = pda.GetComponentInChildren<Canvas>();
 
         if (canvas != null)

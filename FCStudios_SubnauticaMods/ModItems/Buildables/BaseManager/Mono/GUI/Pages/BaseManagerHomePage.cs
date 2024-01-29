@@ -104,7 +104,7 @@ internal class BaseManagerHomePage : Page
 
     public void OnRenameBaseButtonClicked()
     {
-        uGUI.main.userInput.RequestString(LanguageService.ChangeBaseName(), LanguageService.Submit(), _baseManager.GetBaseName(), 20, (s) =>
+        uGUI.main.userInput.RequestString(LanguageService.ChangeBaseName(), LanguageService.Submit(), _baseManager.GetBaseFriendlyName(), 20, (s) =>
         {
             _baseManager.SetBaseName(s);
             UpdateBaseName();
@@ -113,15 +113,15 @@ internal class BaseManagerHomePage : Page
 
     private void UpdateBaseName()
     {
-        if (string.IsNullOrEmpty(_baseManager.GetBaseName()))
+        if (string.IsNullOrEmpty(_baseManager.GetBaseFriendlyName()))
         {
-            baseName.text = _baseManager.GetBaseFriendlyName();
+            baseName.text = _baseManager.GetBaseFormatedID();
             clock.text = string.Empty;
         }
         else
         {
-            baseName.text = _baseManager.GetBaseName();
-            clock.text = _baseManager.GetBaseFriendlyName();
+            baseName.text = _baseManager.GetBaseFriendlyName();
+            clock.text = _baseManager.GetBaseFormatedID();
         }
     }
 
@@ -169,7 +169,7 @@ internal class BaseManagerHomePage : Page
 
         if (_baseManager.HasDevicesNotConnected())
         {
-            uGUI_NotificationManager.Instance.AddNotification($"* Could not connect to all devices: {_baseManager.DevicesThatCanConnectCount()} devices detected for {_baseManager.GetConnectedDevicesCount()}  connection ports devices are built only  are connected!");
+            //TODO reenable uGUI_NotificationManager.Instance.AddNotification($"* Could not connect to all devices: {_baseManager.DevicesThatCanConnectCount()} devices detected for {_baseManager.GetConnectedDevicesCount()}  connection ports devices are built only  are connected!");
         }
     }
 

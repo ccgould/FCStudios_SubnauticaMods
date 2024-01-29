@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine;
 
 namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.uGUIComponents;
+
 internal class uGUI_Notification : MonoBehaviour
 {
     private const string POPUP = "Popup";

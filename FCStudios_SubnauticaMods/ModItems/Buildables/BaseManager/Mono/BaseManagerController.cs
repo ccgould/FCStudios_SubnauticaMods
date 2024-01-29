@@ -146,8 +146,7 @@ internal class BaseManagerController : FCSDevice, IFCSSave<SaveData>
 
     private void UpdateData()
     {
-        //var friendlyName = !string.IsNullOrEmpty(_baseManager.GetBaseName()) ? _baseManager.GetBaseName() : "Base";
-        baseName.text = _baseManager.GetBaseFriendlyName(); //$"{friendlyName} : BS{_baseManager.GetBaseID():D3}";
+        baseName.text = $"[{_baseManager.GetBaseFormatedID()}] {_baseManager.GetBaseFriendlyName()}";
         infoItem1.text = DeterminePowerUsageString();
 
         var moreDevicesToConnect = _baseManager.GetFailedConnectionAttemptsCount() > 0 ? "*" : string.Empty;
@@ -209,7 +208,7 @@ internal class BaseManagerController : FCSDevice, IFCSSave<SaveData>
         else if (!isStorageSolutionsInstalled && _baseManager.IsDssIntegration())
         {
             result = "<color=yellow>Offline</color>";
-            uGUI_NotificationManager.Instance.AddNotification("No Terminal detected for DSS Integration");
+            //TODO reenable uGUI_NotificationManager.Instance.AddNotification("No Terminal detected for DSS Integration");
         }        
         else
         {

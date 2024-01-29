@@ -50,7 +50,7 @@ public class Plugin : BaseUnityPlugin
         // set project-scoped logger instance
         Logger = base.Logger;
 
-        LanguageService.AdditionalPatching();
+        LanguageHandler.RegisterLocalizationFolder();
 
 
         //Register Ccommands

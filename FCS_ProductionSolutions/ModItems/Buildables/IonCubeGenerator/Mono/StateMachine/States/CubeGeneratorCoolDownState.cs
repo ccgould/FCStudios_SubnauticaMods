@@ -48,4 +48,9 @@ internal class CubeGeneratorCoolDownState : CubeGeneratorBaseState
     {
         coolDownProcess = progess;
     }
+
+    public override float GetProgress()
+    {
+        return coolDownProcess;
+    }
 }

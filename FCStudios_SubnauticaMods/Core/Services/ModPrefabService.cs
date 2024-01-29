@@ -4,6 +4,7 @@ using FCS_AlterraHub.Core.Helpers;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using Nautilus.Utility;
+using Nautilus.Utility.MaterialModifiers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -83,7 +84,7 @@ public static class ModPrefabService
             if (applyShaders)
             {
                 //Lets apply the material shader
-                MaterialUtils.ApplySNShaders(prefab, 4, 1, 1);
+                MaterialUtils.ApplySNShaders(prefab, 4, 1, 1,new NoMaterial());
 
                 //ReplaceShadersV2(prefab);
             }
@@ -271,4 +272,19 @@ public static class ModPrefabService
         return ImageUtils.LoadSpriteFromFile(Path.Combine(ModRegistrationService.GetModPackData(modPackName).GetAssetPath(), $"{iconName}.png"));
     }
 #endif
+}
+
+internal class NoMaterial : MaterialModifier
+{
+    public override void EditMaterial(Material material, Renderer renderer, int materialIndex, MaterialUtils.MaterialType materialType)
+    {
+
+    }
+
+    public override bool BlockShaderConversion(Material material, Renderer renderer, MaterialUtils.MaterialType materialType)
+    {
+        var particle = renderer.gameObject.GetComponent<ParticleSystem>();
+
+        return particle is not null;
+    }
 }

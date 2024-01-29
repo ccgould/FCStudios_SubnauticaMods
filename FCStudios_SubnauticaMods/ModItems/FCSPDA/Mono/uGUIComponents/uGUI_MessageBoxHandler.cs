@@ -41,6 +41,7 @@ internal class uGUI_MessageBoxHandler : MonoBehaviour
 
     public void ShowMessage(string message, FCSMessageButton button, Action<FCSMessageResult> result = null)
     {
+        QuickLogger.Debug($"Attemping to show message: {message}", true);
         if (_messageBox == null)
         {
             QuickLogger.ModMessage(LanguageService.ErrorHasOccurred("0x0003"));

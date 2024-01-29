@@ -24,7 +24,7 @@ namespace FCS_AlterraHub.Models.Abstract;
 /// </summary>
 [RequireComponent(typeof(PrefabIdentifier))]
 [RequireComponent(typeof(TechTag))]
-[RequireComponent(typeof(HoverInteraction))]
+//[RequireComponent(typeof(HoverInteraction))]
 [RequireComponent(typeof(Constructable))]
 [DisallowMultipleComponent]
 //[RequireComponent(typeof(LargeWorldEntity))] Removed to fix error with large world enitity
@@ -42,6 +42,8 @@ public abstract class FCSDevice : MonoBehaviour, IFCSObject, IProtoEventListener
     private string _prefabID;
     protected PowerRelay powerRelay;
     [SerializeField] [Range(0f,1f)] protected float energyPerSecond = 0f;
+    protected FCSDeviceErrorHandler errorHandler;
+
 
     /// <summary>
     /// Boolean that represents if the device is constructed and ready to operate
@@ -78,6 +80,12 @@ public abstract class FCSDevice : MonoBehaviour, IFCSObject, IProtoEventListener
     /// </summary>
     public bool IsVisibleInPDA = true;
 
+    /// <summary>
+    /// Inter Process Communication used to communicate with devices
+    /// </summary>
+    public virtual Action<string> IPCMessage { get; set; }
+
+
     [SerializeField]
     [Description("Bypasses Base Connection")]
     private bool bypassConnection;
@@ -98,6 +106,7 @@ public abstract class FCSDevice : MonoBehaviour, IFCSObject, IProtoEventListener
     public virtual void Awake() 
     { 
         _colorManager = gameObject.GetComponent<ColorManager>();
+        errorHandler = gameObject.GetComponent<FCSDeviceErrorHandler>();
     }
 
     public virtual void OnEnable()
@@ -121,8 +130,8 @@ public abstract class FCSDevice : MonoBehaviour, IFCSObject, IProtoEventListener
     /// <returns></returns>
     public TechType GetTechType()
     {
-        return gameObject.GetComponent<TechTag>()?.type ??
-               gameObject.GetComponentInChildren<TechTag>()?.type ??
+        return gameObject?.GetComponent<TechTag>()?.type ??
+               gameObject?.GetComponentInChildren<TechTag>()?.type ??
                TechType.None;
     }
 
@@ -134,11 +143,11 @@ public abstract class FCSDevice : MonoBehaviour, IFCSObject, IProtoEventListener
     {
         if(string.IsNullOrEmpty(_prefabID))
         {
-            _prefabID = gameObject.GetComponent<PrefabIdentifier>()?.Id ??
-               gameObject.GetComponentInChildren<PrefabIdentifier>()?.Id;
+            
         }
 
-        return _prefabID;
+        return  gameObject.GetComponent<PrefabIdentifier>()?.Id ??
+               gameObject.GetComponentInChildren<PrefabIdentifier>()?.Id; ;
     }
 
     public virtual Vector3 GetPosition()
@@ -175,10 +184,12 @@ public abstract class FCSDevice : MonoBehaviour, IFCSObject, IProtoEventListener
                 if(result)
                 {
                     IsConnectedToBase = true;
+                    OnConnectedToManager();
                 }
                 else
                 {
                     IsConnectedToBase = CachedHabitatManager.AttemptToConnectDevice(this);
+                    OnConnectedToManager();
                 }
 
                 _colorManager?.ChangeBaseConnectionStatusLights(IsConnectedToBase);
@@ -190,6 +201,7 @@ public abstract class FCSDevice : MonoBehaviour, IFCSObject, IProtoEventListener
         IsConnectedToBase = false;
     }
 
+    public virtual void OnConnectedToManager() { }
 
     public virtual bool IsDeconstructionObstacle()
     {
@@ -254,9 +266,14 @@ public abstract class FCSDevice : MonoBehaviour, IFCSObject, IProtoEventListener
     {
         _colorManager?.Initialize(gameObject);
         FindBaseManager();
-        FCSModsAPI.PublicAPI.RegisterDevice(this);
+        FCSModsAPI.PublicAPI.RegisterDevice(this,OnDeviceRegistered);
         InvokeRepeating(nameof(CheckConnection), 1f, 1f);
         this.powerRelay = base.gameObject.GetComponentInParent<PowerRelay>();
+    }
+
+    public virtual void OnDeviceRegistered()
+    {
+        //DO something
     }
 
     public virtual void OnDestroy()
@@ -270,7 +287,7 @@ public abstract class FCSDevice : MonoBehaviour, IFCSObject, IProtoEventListener
     /// <returns></returns>
     public virtual string[] GetDeviceStats()
     {
-        if (!IsConnectedToBase)
+        if (!IsConnectedToBase && !bypassConnection)
         {
             return new string[]
             {
@@ -389,6 +406,11 @@ public abstract class FCSDevice : MonoBehaviour, IFCSObject, IProtoEventListener
     public Transform GetTransform()
     {
         return transform;
+    }
+
+    public FCSDeviceErrorHandler GetDeviceErrorHandler()
+    {
+        return errorHandler;
     }
 }
 

@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using RootMotion.FinalIK;
+using System;
+using System.Linq;
 using UnityEngine;
 
 namespace FCS_EnergySolutions.ModItems.Buildables.SolarCluster.Mono;
@@ -15,6 +17,11 @@ internal class SolarClusterPowerManager : MonoBehaviour
         _mono = GetComponent<SolarClusterController>();
     }
 
+    internal PowerSource GetPowerSource()
+    {
+        return _powerSource;
+    }
+
     private float GetDepthScalar()
     {
         float time = Mathf.Clamp01((MaxDepth - Ocean.GetDepthOf(gameObject)) / MaxDepth);
@@ -26,7 +33,7 @@ internal class SolarClusterPowerManager : MonoBehaviour
         return DayNightCycle.main.GetLocalLightScalar();
     }
 
-    private float GetRechargeScalar()
+    internal float GetRechargeScalar()
     {
         return GetDepthScalar() * GetSunScalar();
     }
@@ -86,5 +93,15 @@ internal class SolarClusterPowerManager : MonoBehaviour
         {
             habitat.powerRelay.AddInboundPower(_powerSource);
         }
+    }
+
+    internal float GetPower()
+    {
+        return _powerSource.GetPower();
+    }
+
+    internal float GetMaxPower()
+    {
+        return _powerSource.GetMaxPower();
     }
 }

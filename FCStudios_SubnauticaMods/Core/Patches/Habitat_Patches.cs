@@ -1,4 +1,5 @@
-﻿using FCS_AlterraHub.Models.Mono;
+﻿using FCS_AlterraHub.Core.Managers;
+using FCS_AlterraHub.Models.Mono;
 using FCSCommon.Utilities;
 using HarmonyLib;
 using UnityEngine;
@@ -16,12 +17,14 @@ internal class SubRoot_Awake
         QuickLogger.Debug($"Awake Called on {__instance.gameObject.activeSelf} | {__instance.gameObject.transform.position != Vector3.zero}");
         if (__instance.gameObject.activeSelf && __instance.gameObject.transform.position != Vector3.zero)
         {
+            var vehDocking = __instance.gameObject.EnsureComponent<VehicleDockingBayManager>();
             var habitatManager = __instance.gameObject.EnsureComponent<HabitatManager>();
             var portManager = __instance.gameObject.EnsureComponent<PortManager>();
             portManager.Manager = habitatManager;
             habitatManager.SetPortManager(portManager);
             habitatManager.SetSubRoot(__instance);
             habitatManager.Initialize();
+            vehDocking.Initialize(habitatManager);
         }
     }
 }

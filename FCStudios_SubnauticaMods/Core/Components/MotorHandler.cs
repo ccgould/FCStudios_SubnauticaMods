@@ -1,4 +1,7 @@
-﻿using System;
+﻿using FCS_AlterraHub.Core.Enumerators;
+using FCSCommon.Utilities;
+using Newtonsoft.Json;
+using System;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Core.Components;
@@ -8,6 +11,7 @@ public class MotorHandler : MonoBehaviour
     [SerializeField] private float _rpm;
     [SerializeField] private const float RpmPerDeg = 0.16667f;
     [SerializeField] private float _increaseRate = 2f;
+    [SerializeField] private Vector3 spinAxis = Vector3.up;
     private bool _increasing = true;
     public bool IsRunning => _increasing;
 
@@ -20,7 +24,7 @@ public class MotorHandler : MonoBehaviour
     {
         //increase or decrease the current speed depending on the value of increasing
         _currentRpm = Mathf.Clamp(_currentRpm + DayNightCycle.main.deltaTime * _increaseRate * (_increasing ? 1 : -1), 0, _rpm);
-        gameObject.transform.Rotate(Vector3.up, _currentRpm * DayNightCycle.main.deltaTime);
+        gameObject.transform.Rotate(spinAxis, _currentRpm * DayNightCycle.main.deltaTime);
     }
 
     public int GetSpeed()
@@ -83,4 +87,40 @@ public class MotorHandler : MonoBehaviour
     {
         _increaseRate = value;
     }
+
+    /// <summary>
+    /// Gives you the is increasing.
+    /// </summary>
+    /// <returns></returns>
+    public bool GetIsIncreasing()
+    {
+        return _increasing;
+    }
+
+    public MotorSaveData Save()
+    {
+        return new MotorSaveData()
+        {
+            IsIncreasing = _increasing,
+            CurrentSpeed = _currentRpm,
+            TargetRPM = _rpm,
+        };
+    }
+
+    public void Load(MotorSaveData savedData)
+    {
+        QuickLogger.Debug($"Increasing: {savedData.IsIncreasing} || Current RPM: {savedData.CurrentSpeed} || RPM {savedData.TargetRPM}", true);
+
+        _increasing = savedData.IsIncreasing;
+        _currentRpm = savedData.CurrentSpeed;
+        _rpm = savedData.TargetRPM;
+
+    }
+}
+
+public struct MotorSaveData
+{
+    public bool IsIncreasing { get; set; }
+    public float CurrentSpeed { get; set; }
+    public float TargetRPM { get; set; }
 }

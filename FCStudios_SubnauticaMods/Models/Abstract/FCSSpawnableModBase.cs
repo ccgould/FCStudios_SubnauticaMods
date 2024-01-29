@@ -73,33 +73,7 @@ public abstract class FCSSpawnableModBase : ModBase,IModBase
 
     public virtual IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
     {
-        //if (_cachedPrefab != null)
-        //{
-        //    gameObject.Set(_cachedPrefab);
-        //    yield break;
-        //}
-
         var prefab = GameObject.Instantiate(Prefab);
-
-        //var placeTool = prefab.GetComponent<PlaceTool>();
-        //if(placeTool != null )
-        //{
-        //    placeTool.allowedInBase = _settings.AllowedInBase;
-        //    placeTool.allowedOnBase = _settings.AllowedOnBase;
-        //    placeTool.allowedOnCeiling = _settings.AllowedOnCeiling;
-        //    placeTool.allowedOnConstructable = _settings.AllowedOnConstructables;
-        //    placeTool.allowedOnGround = _settings.AllowedOnGround;
-        //    placeTool.allowedOnRigidBody = _settings.AllowOnRigidBody;
-        //    placeTool.allowedOnWalls = _settings.AllowedOnWall;
-        //    placeTool.allowedOutside = _settings.AllowedOutside;
-        //    placeTool.rotationEnabled = _settings.RotationEnabled;
-        //    placeTool.hasAnimations = _settings.HasAnimations;
-        //    placeTool.hasBashAnimation = _settings.HasBashAnimation;
-        //    placeTool.hasFirstUseAnimation = _settings.HasFirstAnimation;
-        //    placeTool.drawTime = _settings.DrawTime;
-        //    placeTool.dropTime = _settings.DropTime;
-        //    placeTool.holsterTime = _settings.HolsterTime;
-        //}
 
         if (_settings.HasGlass)
         {
@@ -110,7 +84,7 @@ public abstract class FCSSpawnableModBase : ModBase,IModBase
         yield return ModifyPrefab(prefab);
 
         gameObject.Set(prefab);
-        //_cachedPrefab = prefab;
+
         yield break;
     }
 

@@ -1,4 +1,5 @@
 using FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Mono.StateMachine.Abstract;
+using FCSCommon.Utilities;
 using UnityEngine;
 
 namespace FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Mono.StateMachine.States;
@@ -48,8 +49,16 @@ internal class CubeGeneratorGeneratingState : CubeGeneratorBaseState
         return Mathf.Max(0f, generatingProcess / generatingStateGoal);
     }
 
+
+
     internal override void SetProgress(float progess)
     {
+        QuickLogger.Debug($"Setting {nameof(CubeGeneratorGeneratingState)} {generatingProcess} to {progess}");
         generatingProcess = progess;
+    }
+
+    public override float GetProgress()
+    {
+        return generatingProcess;
     }
 }

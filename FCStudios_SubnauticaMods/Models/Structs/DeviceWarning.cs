@@ -1,17 +1,10 @@
-﻿using FCS_AlterraHub.Models.Enumerators;
-using FCSCommon.Utilities;
+﻿using FCS_AlterraHub.Configuation;
+using FCS_AlterraHub.Models.Enumerators;
 using System;
 
 namespace FCS_AlterraHub.Models.Mono;
 public partial class HabitatManager
 {
-
-    public void OpenItemTransfer()
-    {
-        _dumpContainer.OpenStorage();
-    }
-
-
     internal struct DeviceWarning
     {
         public DeviceWarning(string devicId, string warningID, string description, WarningType warningType, FaultType faultType)

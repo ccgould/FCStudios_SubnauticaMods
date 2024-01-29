@@ -33,6 +33,8 @@ public class Plugin : BaseUnityPlugin
 
     private void Awake()
     {
+        LanguageHandler.RegisterLocalizationFolder();
+
         RegisterCommands();
 
         // set project-scoped logger instance

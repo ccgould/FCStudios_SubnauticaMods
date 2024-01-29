@@ -27,6 +27,8 @@ public class Page : MonoBehaviour
     private bool showInfoButton = false;
     [SerializeField]
     private bool showLabel = false;
+    [SerializeField]
+    private bool showErrorButton = false;
 
     [SerializeField]
     private PDAPages PageType;
@@ -193,8 +195,17 @@ public class Page : MonoBehaviour
     {
         return showLabel;
     }
+
+    internal bool ShowErrorButton()
+    {
+        return showErrorButton;
+    }
     internal PDAPages PDAGetPageType() => PageType;
 
+    public virtual void OnPushCompleted()
+    {
+        
+    }
 }
 
 

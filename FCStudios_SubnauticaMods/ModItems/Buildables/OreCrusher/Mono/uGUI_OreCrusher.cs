@@ -27,14 +27,17 @@ internal class uGUI_OreCrusher : Page, IuGUIAdditionalPage
     {
         QuickLogger.Debug($"OreCrusher Enter Called {arg is IFCSObject}", true);
         QuickLogger.Debug($"OreCrusher Enter Called {arg?.GetType()}", true);
-
-        
+               
 
         base.Enter(arg);
 
-        _sender = arg as OreCrusherController;
+        if(arg is not null)
+        {
+            _sender = arg as OreCrusherController;
 
-        if(_sender is not null )
+        }
+
+        if (_sender is not null )
         {
             _sender.OnProcessingCompleted += OnLoadDisplay;
             FCSPDAController.Main.ui.SetPDAAdditionalLabel(Language.main.Get(_sender.GetTechType()));

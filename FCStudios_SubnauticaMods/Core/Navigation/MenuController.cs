@@ -20,9 +20,9 @@ public class MenuController : MonoBehaviour
 
     private Stack<Page> PageStack = new Stack<Page>();
 
-    public event EventHandler<OnMenuControllerEventArg> OnMenuContollerPop;
-    public event EventHandler<OnMenuControllerEventArg> OnMenuContollerPush;
-    public class OnMenuControllerEventArg : EventArgs
+    internal event EventHandler<OnMenuControllerEventArg> OnMenuContollerPop;
+    internal event EventHandler<OnMenuControllerEventArg> OnMenuContollerPush;
+    internal class OnMenuControllerEventArg : EventArgs
     {
         public Page Page { get; set; }
     }
@@ -57,18 +57,24 @@ public class MenuController : MonoBehaviour
         }
     }
 
-    public bool IsPageInStack(Page Page)
+    internal bool IsPageInStack(Page Page)
     {
         return PageStack.Contains(Page);
     }
 
-    public bool IsPageOnTopOfStack(Page Page)
+    internal bool IsPageOnTopOfStack(Page Page)
     {
         return PageStack.Count > 0 && Page == PageStack.Peek();
     }
 
     public void PushPage(Page Page,object arg = null)
     {
+        if (Page == null)
+        {
+            uGUI_MessageBoxHandler.Instance.ShowMessage(Language.main.Get("AHB_FailedToLoadPage"),FCSMessageButton.OK);
+            return;
+        }
+
         Page.Enter(arg);
 
         if (PageStack.Count > 0)
@@ -79,11 +85,11 @@ public class MenuController : MonoBehaviour
             {
                 currentPage.Exit();
             }
-
             OnMenuContollerPush?.Invoke(this, new OnMenuControllerEventArg { Page = Page });
         }
 
         PageStack.Push(Page);
+        Page.OnPushCompleted();
     }
 
     public void PushPage(Page page)

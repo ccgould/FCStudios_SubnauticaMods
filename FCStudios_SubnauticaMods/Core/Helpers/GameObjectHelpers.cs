@@ -211,6 +211,25 @@ SearchOption searchOption = SearchOption.Full)
         applier.useGUILayout = true;
         applier.enabled = true;
     }
+
+
+}
+
+
+public static class ScriptableObjectEctension
+{
+    public static T Clone<T>(this T scriptableObject) where T : ScriptableObject
+    {
+        if(scriptableObject is null)
+        {
+            QuickLogger.Error($"ScriptableObject was null. Returning default {typeof(T)} object.");
+            return (T)ScriptableObject.CreateInstance(typeof(T));
+        }
+
+        T instance = UnityEngine.Object.Instantiate(scriptableObject);
+        instance.name = scriptableObject.name; // remove (Clone) from name
+        return instance;
+    }
 }
 
 /// <summary>

@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.uGUIComponents;
 
-public class FCSMessageBox : Page
+internal class FCSMessageBox : Page
 {
     [SerializeField]
     private Text _message;

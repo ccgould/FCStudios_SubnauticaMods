@@ -13,6 +13,7 @@ using FCS_AlterraHub.Models.Mono;
 using Nautilus.Json;
 using static FCS_AlterraHub.Configuation.SaveData;
 using FCS_AlterraHub.Models.Interfaces;
+using FCS_AlterraHub.Core.Components;
 
 namespace FCS_AlterraHub.ModItems.Spawnables.PaintTool.Mono;
 internal class PaintToolController : PlayerTool, IFCSObject
@@ -311,5 +312,10 @@ internal class PaintToolController : PlayerTool, IFCSObject
     public Transform GetTransform()
     {
         return transform;
+    }
+
+    public FCSDeviceErrorHandler GetDeviceErrorHandler()
+    {
+        return null;
     }
 }

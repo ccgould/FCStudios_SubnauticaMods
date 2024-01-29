@@ -32,7 +32,7 @@ public class InfoController : MonoBehaviour
         _accountBalance.text = $"{AccountService.main.GetAccountBalance():N0}";
 
         var currentBase = HabitatService.main.GetPlayersCurrentBase();
-        var friendly = currentBase?.GetBaseFriendlyName();
+        var friendly = currentBase?.GetBaseFormatedID();
         var baseId = currentBase?.GetBaseID() ?? 0;
 
         if (!string.IsNullOrWhiteSpace(friendly))

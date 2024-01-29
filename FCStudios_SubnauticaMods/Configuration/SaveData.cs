@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using UnityEngine;
 using FCS_AlterraHub.ModItems.Buildables.OreCrusher.Enums;
+using System.Security.Policy;
 
 namespace FCS_AlterraHub.Configuation;
 
@@ -74,6 +75,13 @@ internal class SaveData
                 new ColorTemplate{ TemplateName = "Template 5" },
             };
         public Dictionary<string, PaintToolDataEntry> paintTools = new();
+        public Dictionary<string, BaseInfoSaveData> bases = new();
+    }
+
+    public class BaseInfoSaveData
+    {
+        public string FriendlyName { get; set; }
+        public int BaseId { get; set; }
     }
 
     public class BaseRackSaveData

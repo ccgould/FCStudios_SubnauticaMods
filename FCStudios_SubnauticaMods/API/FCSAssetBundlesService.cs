@@ -128,7 +128,7 @@ public class FCSAssetBundlesService : IFcAssetBundlesPublicService, IFcAssetBund
             return preLoadedBundle;
         }
 
-        var onDemandBundle = AssetBundleHelper.Asset(bundleName);
+        var onDemandBundle = AssetBundleHelper.GetAssetBundle(bundleName);
 
         if (onDemandBundle != null)
         {

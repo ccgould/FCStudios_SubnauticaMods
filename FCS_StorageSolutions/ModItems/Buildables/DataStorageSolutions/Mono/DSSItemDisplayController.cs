@@ -31,8 +31,6 @@ internal class DSSItemDisplayController : FCSDevice, IFCSSave<SaveData>
 
     public override void OnEnable()
     {
-        base.OnEnable();
-
         if (_runStartUpOnEnable)
         {
             if (!IsInitialized)
@@ -50,11 +48,11 @@ internal class DSSItemDisplayController : FCSDevice, IFCSSave<SaveData>
                 if (_savedData is not null)
                 {
                     var savedData = _savedData as DSSItemDisplaySaveData;
-                    SetIcon(savedData.CurrentTechType);
-                    _colorManager?.LoadTemplate(((ISaveDataEntry)_savedData).ColorTemplate);
+                    currentItem = savedData.CurrentTechType;
+                    //_colorManager?.LoadTemplate(((ISaveDataEntry)_savedData).ColorTemplate);
                 }
 
-                SetIcon(currentItem);
+                SetItem(currentItem);
             }
 
             _runStartUpOnEnable = false;
@@ -90,7 +88,12 @@ internal class DSSItemDisplayController : FCSDevice, IFCSSave<SaveData>
 
     private void DumpContainer_OnDumpContainerItemSample(Pickupable obj)
     {
-        SetIcon(obj.GetTechType());
+        SetItem(obj.GetTechType());
+    }
+
+    private void SetItem(TechType obj)
+    {
+        SetIcon(obj);
         RefreshDisplay();
     }
 
@@ -247,6 +250,10 @@ internal class DSSItemDisplayController : FCSDevice, IFCSSave<SaveData>
         {
             PlayerInteractionHelper.GivePlayerItem(item);
         }
+
+        CachedHabitatManager.OnTransferActionCompleted?.Invoke();
+
+        RefreshDisplay();
     }
 
     public void OnResetButtonClicked()
@@ -255,5 +262,12 @@ internal class DSSItemDisplayController : FCSDevice, IFCSSave<SaveData>
         itemCountLBL.text = "0";
         itemIcon.sprite = SpriteManager.Get(TechType.None);
         resetButton.SetActive(false);
+    }
+
+    public override void OnDestroy()
+    {
+        _dssManager.GetHabitatManager().OnItemTransferedToBase -= BaseDump_ItemTransferedToBase;
+        _dssManager.OnServerAdded -= RefreshDisplay;
+        _dssManager.OnServerRemoved -= RefreshDisplay;
     }
 }

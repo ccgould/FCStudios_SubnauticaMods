@@ -21,7 +21,12 @@ public static class WorldHelpers
     public static Dictionary<TechType, PickReturnsData> PickReturns = new()
     {
         //Marine Flora
-        { TechType.AcidMushroomSpore, new PickReturnsData { ReturnType = TechType.AcidMushroom, IsLandPlant = false } },
+        { TechType.AcidMushroomSpore, 
+            new PickReturnsData 
+            { ReturnType = TechType.AcidMushroom, 
+                IsLandPlant = false 
+            } 
+        },
         {
             TechType.BloodOil,
             new PickReturnsData
@@ -347,6 +352,14 @@ public static class WorldHelpers
         return distance <= range;
     }
 
+    public static bool CheckIfPlayerInRange(GameObject device, float range)
+    {
+        if (device == null || !device.activeSelf) return false;
+        float distance = Vector3.Distance(Player.main.gameObject.transform.position,
+            device.gameObject.transform.position);
+        return distance <= range;
+    }
+
     //public static bool CheckIfInRange(FCSDevice currentDevice, BaseManager device, float range)
     //{
     //    Collider[] hitColliders = Physics.OverlapSphere(currentDevice.GetPosition(), range);
@@ -593,6 +606,7 @@ public static class WorldHelpers
 
         return "LOADING";
     }
+   
 }
 
 public struct PickReturnsData

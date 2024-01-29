@@ -13,7 +13,11 @@
       https://nuget.bepinex.dev/v3/index.json;
     </RestoreAdditionalProjectSources>
 
-        <Configurations>Debug;Release;SN_Stable;BZ_Stable</Configurations> 
+        <Configurations>Debug;Release;SN_Stable;BZ_Stable</Configurations>
+
+        <AssemblyVersion>1.0.63.0</AssemblyVersion>
+
+        <FileVersion>1.0.63.0</FileVersion> 
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" /> 
@@ -32,7 +36,7 @@
     <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
     <PackageReference Include="BepInEx.Core" Version="5.4.21" />
     <PackageReference Include="BepInEx.PluginInfoProps" Version="1.1.0" />
-    <PackageReference Include="Subnautica.Nautilus" Version="1.0.0-pre.21" />
+    <PackageReference Include="Subnautica.Nautilus" Version="1.0.0-pre.28" />
     <PackageReference Include="UnityEngine.Modules" Version="2019.4.36" IncludeAssets="compile" />
     <PackageReference Include="Subnautica.GameLibs" Version="71288.0.0-r.0" />
     <PackageReference Include="PolySharp" Version="1.13.1" />

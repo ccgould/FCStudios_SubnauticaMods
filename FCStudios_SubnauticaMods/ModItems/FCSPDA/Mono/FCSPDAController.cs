@@ -1,16 +1,19 @@
 ﻿using FCS_AlterraHub;
+using FCS_AlterraHub.Core.Components.uGUIComponents;
 using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono;
+using FCS_AlterraHub.ModItems.FCSPDA.Mono.uGUIComponents;
 using FCS_AlterraHub.ModItems.FCSPDA.Patches;
 using FCSCommon.Utilities;
 using FMOD.Studio;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 using UWE;
 
 public class FCSPDAController : MonoBehaviour
@@ -228,7 +231,12 @@ public class FCSPDAController : MonoBehaviour
     private void ResetToHome()
     {
         if (ui.CurrentPage() == PDAPages.DevicePage || ui.CurrentPage() == PDAPages.DeviceSettings)
+        {
             ui.PurgeData();
+        }
+
+        uGUI_NotificationManager.Instance.PurgeData();
+        GetGUI().GetNavigationController().PurgeErrorButton();
     }
 
     public void Activated()
@@ -345,6 +353,16 @@ public class FCSPDAController : MonoBehaviour
     {
         ui.EnsureComponent<T>();
         additionPages.Add(id, ui);
+
+        var buttons = ui.GetAllComponentsInChildren<Button>();
+
+        foreach (Button item in buttons)
+        {
+            item.onClick.AddListener(() =>
+            {
+                QuickLogger.Debug($"Clicked: {item.gameObject.name}");
+            });
+        }
     }
 
     private void PatchAdditionalPages()

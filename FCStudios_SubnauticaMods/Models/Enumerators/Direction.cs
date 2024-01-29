@@ -1,5 +1,5 @@
 ﻿namespace FCS_AlterraHub.Models.Enumerators;
-internal enum Direction
+public enum Direction
 {
     NONE,
     UP,

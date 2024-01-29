@@ -89,7 +89,7 @@ internal class CubeGeneratorStateManager : MonoBehaviour
 
     internal float GetCurrentProgress()
     {
-        return currentState.GetProgressNormalized();
+        return currentState.GetProgress();
     }
 
     internal bool IsIdle()

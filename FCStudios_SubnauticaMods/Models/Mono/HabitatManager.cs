@@ -1,5 +1,9 @@
-﻿using FCS_AlterraHub.Core.Components;
+﻿using FCS_AlterraHub.API;
+using FCS_AlterraHub.Configuation;
+using FCS_AlterraHub.Core.Components;
+using FCS_AlterraHub.Core.Extensions;
 using FCS_AlterraHub.Core.Helpers;
+using FCS_AlterraHub.Core.Managers;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Enumerators;
@@ -7,14 +11,11 @@ using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Buildable;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Items.BaseModuleRack.Mono;
 using FCSCommon.Utilities;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reflection.Emit;
 using UnityEngine;
-using static HandReticle;
 
 namespace FCS_AlterraHub.Models.Mono;
 public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
@@ -24,8 +25,7 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
     private readonly Dictionary<string,FCSDevice> _connectedDevices = new();
     private Dictionary<string, WorkUnit> _workUnits = new();
     private Dictionary<string,List<object>> _automatedOperations = new();
-
-    private string _baseFriendlyID => GetBaseFriendlyName();
+    private string _baseFriendlyID => GetBaseFormatedID();
 
     private DumpContainerSimplified _dumpContainer;
     private SubRoot _habitat;
@@ -41,8 +41,37 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
 
     internal int ConnectedDevicesLimit => DetermineDeviceLimit();
     public Action<InventoryItem> OnItemTransferedToBase;
+    public Action OnTransferActionCompleted;
     public Action<TechType> OnModuleRemoved;
     public Action<TechType> OnModuleAdded;
+    public bool PullFromDockedVehicles { get; set; } = true;
+    private readonly List<TechType> _dockingBlackList = new();
+
+    internal void LoadSaveData(SaveData.BaseInfoSaveData value)
+    {
+        _baseName = value.FriendlyName;
+        _baseID = value.BaseId;
+        QuickLogger.Debug($"Loaded Base ID: {_baseID} with friendlyName {_baseName} at PrefabID {GetBasePrefabID()}");
+
+    }
+
+    public void AddDockingBlackList(TechType techType)
+    {
+        _dockingBlackList.Add(techType);
+        HabitatService.main.GlobalNotifyByID("SST", "AddToBlackList");
+    }
+
+    public void RemoveDockingBlackList(TechType techType)
+    {
+        _dockingBlackList.Remove(techType);
+        HabitatService.main.GlobalNotifyByID("SST", "RemoveFromBlackList");
+
+    }
+
+    public  ReadOnlyCollection<TechType> GetDockingBlackList()
+    {
+        return _dockingBlackList.AsReadOnly();
+    }
 
     internal PortManager GetPortManager()
     {
@@ -66,6 +95,11 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
         }
 
         return count;
+    }
+
+    public bool IsCyclops()
+    {
+        return _habitat.isCyclops;
     }
 
     internal int DetermineModuleLimit()
@@ -117,6 +151,16 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
         return count * _transceiverMaxCount;
     }
 
+    private void Awake()
+    {
+        _vehicleDockingBayManager = gameObject.GetComponent<VehicleDockingBayManager>();
+    }
+
+    public VehicleDockingBayManager GetDockingManager()
+    {
+        return _vehicleDockingBayManager;
+    }
+
     private void Update()
     {
         //timeLeft -= Time.deltaTime;
@@ -130,7 +174,7 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
         //}
     }
 
-    public string GetBaseFriendlyName()
+    public string GetBaseFormatedID()
     {
         var baseType = string.Empty;
 
@@ -138,18 +182,14 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
         {
             baseType = _habitat.isBase ? "Base" : "Cyclops";
         }
-
-        var baseNameID = $"{baseType} {_baseID:D3}";
-
-
-        return string.IsNullOrWhiteSpace(_baseName) ? baseNameID : _baseName;
+        return $"{baseType} {_baseID:D3}";
     }
 
     /// <summary>
     /// Gets the stored base Name from the
     /// </summary>
     /// <returns></returns>
-    public string GetBaseName()
+    public string GetBaseFriendlyName()
     {
         return _baseName;
     }
@@ -161,7 +201,7 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
     public void SetBaseName(string baseName)
     {
         _baseName = baseName;
-        //GlobalNotifyByID(String.Empty, "BaseUpdate");
+        HabitatService.main.GlobalNotifyByID(string.Empty, "BaseUpdate");
     }
 
     internal bool HasDevice(string prefabID)
@@ -174,7 +214,7 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
         return _registeredDevices.Any(x => x.GetTechType().Equals(techType));
     }
 
-    internal void RegisterDevice(FCSDevice device)
+    public void RegisterDevice(FCSDevice device)
     {
         _registeredDevices.Add(device);
         AttemptToConnectDevice(device);
@@ -206,7 +246,7 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
         return _registeredDevices.Count(x=>x.GetBypassConnection() == false);
     }
 
-    internal void UnRegisterDevice(FCSDevice device)
+    public void UnRegisterDevice(FCSDevice device)
     {
         _registeredDevices.Remove(device);
         AdjustConnectedDevices(device);
@@ -268,9 +308,11 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
         if (_dumpContainer == null)
         {
             _dumpContainer = gameObject.EnsureComponent<DumpContainerSimplified>();
-            _dumpContainer.Initialize(gameObject.transform, $"Add item to base: {GetBaseFriendlyName()}", this, 6, 8, gameObject.name);
+            _dumpContainer.Initialize(gameObject.transform, $"Add item to base: {GetBaseFormatedID()}", this, 6, 8, gameObject.name);
+            _dumpContainer.OnDumpContainerClosed += OnTransferCompleted;
         }
     }
+
 
     private void Start()
     {
@@ -285,7 +327,7 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
 
     public string GetBasePrefabID() => _prefabID;
 
-    internal int GetBaseID() => _baseID;
+    public int GetBaseID() => _baseID;
 
     internal string GetBaseIDFormatted()
     {
@@ -402,7 +444,7 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
             if (device is BaseManagerRackController)
             {
                 var rack = (BaseManagerRackController)device;
-                if (rack.HasModule(BaseManagerBuildable.DSSIntegrationModuleTechType))
+                if (rack.HasModule(FCSModsAPI.PublicAPI.GetDssInterationTechType()/*BaseManagerBuildable.DSSIntegrationModuleTechType*/))
                 {
                     return true;
                 }
@@ -502,18 +544,19 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
 
     public bool AddItemToContainer(InventoryItem item)
     {
+       // QuickLogger.Debug($"Add Items to base: {item.item.GetTechName()}", true);
         OnItemTransferedToBase?.Invoke(item);
         return true;
     }
 
-    public bool IsAllowedToAdd(TechType techType, bool verbose)
-    {        
-        return IsAllowedToAddToBase?.Invoke(techType) ?? false;
+    internal void OnTransferCompleted()
+    {
+        OnTransferActionCompleted?.Invoke();
     }
 
-    public bool IsAllowedToAdd(TechType techType, int containerTotal)
+    public bool IsAllowedToAdd(Pickupable pickupable, int containerTotal = 0)
     {
-        return (IsAllowedToAddToBase?.Invoke(techType) ?? false) && (HasSpace?.Invoke(containerTotal) ?? false);
+        return (IsAllowedToAddToBase?.Invoke(pickupable.GetTechType(), containerTotal) ?? false);
     }
 
     internal PowerSystem.Status GetPowerState()
@@ -525,19 +568,48 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
         return _habitat?.powerRelay?.GetPowerStatus() ?? PowerSystem.Status.Offline;
     }
 
-    public Func<TechType,bool> IsAllowedToAddToBase;
+    public Func<TechType,int,bool> IsAllowedToAddToBase;
     public Func<int,bool> HasSpace;
     private PortManager _portManager;
 
-    public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
-    {
-        return IsAllowedToAddToBase?.Invoke(pickupable.GetTechType()) ?? false;
-    }
 
     public SubRoot GetSubRoot()
     {
         return _habitat;
     }
+
+    public bool IsDockingFilterAddedWithType(TechType techType)
+    {
+        return _dockingBlackList.Contains(techType);
+    }
+    public void OpenItemTransfer()
+    {
+        _dumpContainer.OpenStorage();
+    }
+
+    public void RegisterDockingBay(VehicleDockingBay instance)
+    {
+        _vehicleDockingBayManager.RegisterDockingBay(instance);
+    }
+
+    public void UnRegisterDockingBay(VehicleDockingBay instance)
+    {
+        _vehicleDockingBayManager.UnRegisterDockingBay(instance);
+    }
+
+    private VehicleDockingBayManager _vehicleDockingBayManager;
+
+    public float GetPower()
+    {
+        return GetSubRoot().powerRelay.GetPower();
+    }
+
+    public float GetBasePowerCapacity()
+    {
+        return GetSubRoot().powerRelay.GetMaxPower();
+    }
+
+
 }
 
 public struct WorkUnit

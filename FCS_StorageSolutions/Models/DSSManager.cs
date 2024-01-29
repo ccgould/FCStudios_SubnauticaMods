@@ -17,8 +17,6 @@ internal class DSSManager : MonoBehaviour
 {
     private Dictionary<RackBase,HashSet<FCSStorage>> dssRacks = new();
     private HashSet<DSSAntennaController> dssAntennas = new();
-    //private HashSet<StorageContainer> storageContainers = new();
-
     private    readonly Dictionary<TechType, TrackedResource> trackedResources = new();
 
     internal Action OnServerAdded;
@@ -95,16 +93,13 @@ internal class DSSManager : MonoBehaviour
 
     internal void RegisterStorage(TechType deviceTechType, ItemsContainer storage)
     {
-        //storageContainers.Add(storage);
-
-
         foreach (var item in storage)
         {
             TrackResource(deviceTechType, item);
         }
         storage.onAddItem += StorageContainer_ItemAdded;
         storage.onRemoveItem += StorageContainer_ItemRemoved;
-        OnServerAdded?.Invoke();
+        //OnServerAdded?.Invoke();
     }
 
     private void TrackResource(TechType deviceTechType, InventoryItem item)
@@ -137,32 +132,57 @@ internal class DSSManager : MonoBehaviour
 
     private void StorageContainer_ItemRemoved(InventoryItem item)
     {
-        var techTag = item.item.gameObject.GetComponentInParent<TechTag>(true);
-        QuickLogger.Debug($"StorageContainer_ItemRemoved: {item.item.GetTechName()}", true);
-        if (techTag is not null)
+        var techTag = GetParentTechType(item);
+        QuickLogger.Debug($"StorageContainer_ItemRemoved: {techTag}", true);
+        UnTrackResource(techTag, item);
+        if (techTag != DSSServerSpawnable.PatchedTechType)
         {
-            UnTrackResource(techTag.type, item);
-            OnServerAdded?.Invoke();
+            habitatManager.OnTransferActionCompleted?.Invoke();
         }
     }
 
     private void StorageContainer_ItemAdded(InventoryItem item)
     {
-        var techTag = item.item.gameObject.GetComponentInParent<TechTag>(true);
-        QuickLogger.Debug($"StorageContainer_ItemAdded: {item.item.GetTechName()} |  Item Parent Type:  {techTag?.type.AsString()}", true);
+        //var techTag = item.item.gameObject.GetComponentInParent<TechTag>(true);
 
-        if (techTag is not null)
+        var techTag = GetParentTechType(item);
+
+        QuickLogger.Debug($"StorageContainer_ItemAdded: {item.item.GetTechName()} |  Item Parent Type:  {techTag}", true);
+
+        TrackResource(techTag, item);
+
+        if(techTag != DSSServerSpawnable.PatchedTechType)
         {
-            TrackResource(techTag.type, item);
-            OnServerRemoved?.Invoke();
+            habitatManager.OnTransferActionCompleted?.Invoke();
         }
     }
 
+    private static TechType GetParentTechType(InventoryItem item)
+    {
+        var dssServerType = item.item.gameObject.GetComponentInParent<DSSServerController>(true);
+        var fcsDevice = item.item.gameObject.GetComponentInParent<FCSDevice>(true);
+        var storage = item.item.gameObject.GetComponentInParent<StorageContainer>(true);
+
+        if (dssServerType is not null)
+        {
+           return DSSServerSpawnable.PatchedTechType;
+        }
+
+        if(fcsDevice is not null)
+        {
+            return fcsDevice.GetTechType();
+        }
+
+        if (storage is not null)
+        {
+            return storage.gameObject.GetComponent<TechTag>()?.type ?? TechType.None;
+        }
+
+        return TechType.None;
+    }
 
     internal void UnRegisterStorage(TechType deviceTechType, ItemsContainer storage)
     {
-        //storageContainers.Remove(storage);
-
         foreach (var item in storage)
         {
             UnTrackResource(deviceTechType, item);
@@ -170,7 +190,7 @@ internal class DSSManager : MonoBehaviour
 
         storage.onAddItem -= StorageContainer_ItemAdded;
         storage.onRemoveItem -= StorageContainer_ItemRemoved;
-        OnServerRemoved?.Invoke();
+        //OnServerRemoved?.Invoke();
     }
 
     internal void OnRackDestroyed(RackBase parentRack)
@@ -186,6 +206,7 @@ internal class DSSManager : MonoBehaviour
 
     internal bool HasSpace(int amount)
     {
+        QuickLogger.Debug($"[HasSpace] {SpaceAvaliable() >= amount + 1} | SpaceAvaliable: {SpaceAvaliable()} | Amount Requested {amount}", true);
 
         if(dssRacks.Any())
         {
@@ -193,6 +214,11 @@ internal class DSSManager : MonoBehaviour
         }
 
         return false;
+    }
+
+    internal int TotalSpace()
+    {
+        return GetServerCount() * 48;
     }
 
     internal int SpaceAvaliable()
@@ -218,7 +244,7 @@ internal class DSSManager : MonoBehaviour
         {
 
             //TrackResource(DSSServerSpawnable.PatchedTechType, inventoryItem);
-            OnServerAdded?.Invoke();
+            //OnServerAdded?.Invoke();
             return result;
         }
 
@@ -236,12 +262,12 @@ internal class DSSManager : MonoBehaviour
                                    select result)
             {
                 UnTrackResource(DSSServerSpawnable.PatchedTechType, result.inventoryItem);
-                OnServerRemoved?.Invoke();
+                //OnServerRemoved?.Invoke();
                 return result;
             }
 
             var pickupable = UnTrackResourceAndReturn(TechType.None, techType);
-            OnServerRemoved?.Invoke();
+            //OnServerRemoved?.Invoke();
 
             return pickupable;
         }
@@ -391,9 +417,9 @@ internal class DSSManager : MonoBehaviour
         }
     }
 
-    internal bool IsAllowedToAdd(TechType item)
+    internal bool IsAllowedToAdd(TechType item,int amount)
     {
-        return HasSpace(1);
+        return HasSpace(amount);
     }
 
     internal int GetRackCount()
@@ -406,7 +432,7 @@ internal class DSSManager : MonoBehaviour
         return dssRacks.Sum( x => x.Value.Count);
     }
 
-    internal string GetBaseName()
+    internal string GetBaseFriendlyName()
     {
         return habitatManager.GetBaseFriendlyName();
     }
@@ -423,7 +449,7 @@ internal class DSSManager : MonoBehaviour
 
     internal bool IsConnectedToNetwork()
     {
-        return dssAntennas.Any(x => x.IsOperational());
+        return dssAntennas.Any(x => x.IsOperational()) || habitatManager.IsCyclops();
     }
 
     internal int GetDeviceItemTotal(TechType techType)
@@ -449,5 +475,10 @@ internal class DSSManager : MonoBehaviour
         }
 
         return 0;
+    }
+
+    internal string GetBaseFormattedID()
+    {
+        return habitatManager.GetBaseFormatedID();
     }
 }

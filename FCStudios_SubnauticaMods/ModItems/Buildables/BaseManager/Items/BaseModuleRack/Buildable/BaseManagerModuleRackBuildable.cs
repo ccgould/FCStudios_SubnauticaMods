@@ -8,6 +8,7 @@ using FCS_AlterraHub.ModItems.Buildables.BaseManager.Items.BaseModuleRack.Mono;
 using FCSCommon.Helpers;
 using Nautilus.Handlers;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace FCS_AlterraHub.ModItems.Buildables.BaseManager.Buildable;
@@ -15,6 +16,8 @@ internal class BaseManagerModuleRackBuildable : FCSBuildableModBase
 {
     public static TechType PatchedTechType { get; private set; }
     public static EnumBuilder<EquipmentType> BaseManagerEquipmentType { get; private set; }
+
+    public static List<TechType> allowedTech = new List<TechType>();
 
 
     public BaseManagerModuleRackBuildable() : base(PluginInfo.PLUGIN_NAME, "fcsBaseManagerRack", FileSystemHelper.ModDirLocation, "BaseManagerModuleRack", "Base Manager Module Rack")

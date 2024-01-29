@@ -1,6 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using FCS_AlterraHub.Models;
+using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Mono;
+using FCS_AlterraHub.ModItems.FCSPDA.ScriptableObjects;
+using FCSCommon.Utilities;
 using UnityEngine;
 
 namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.uGUIComponents;
@@ -12,7 +17,7 @@ internal class uGUI_NotificationManager : MonoBehaviour
     [SerializeField] private int notificationMessageMax = 3;
 
     private Queue<string> pendingMessages = new();
-    private List<string> currentMessages = new();
+    private List<GameObject> currentMessagesGO = new();
     private int _currentMessagesCount;
 
     private void Awake()
@@ -20,22 +25,9 @@ internal class uGUI_NotificationManager : MonoBehaviour
         Instance = this;
     }
 
-    private void Start()
+    public void AddNotification(string message = null)
     {
-        if (uGUI_BaseManager.Instance is not null)
-        {
-            uGUI_BaseManager.Instance.OnUGUIBaseManagerOpened += UguiBaseManager_OnUGUIBaseManagerOpened;
-        }
-    }
-
-    private void UguiBaseManager_OnUGUIBaseManagerOpened(object sender, System.EventArgs e)
-    {
-
-    }
-
-    public void AddNotification(string message)
-    {
-        if (pendingMessages.Contains(message) || currentMessages.Contains(message)) return;
+        if (pendingMessages.Any(x => x == message)) return;
 
         if (_currentMessagesCount == notificationMessageMax)
         {
@@ -53,14 +45,15 @@ internal class uGUI_NotificationManager : MonoBehaviour
         notification.SetMessage(message);
         notification.OnDeleted += Notification_OnDeleted;
         _currentMessagesCount++;
-        currentMessages.Add(message);
+        pendingMessages.Enqueue(message);
+        currentMessagesGO.Add(template.gameObject);
     }
 
     private void Notification_OnDeleted(object sender, uGUI_Notification.OnDeletedArg e)
     {
         _currentMessagesCount--;
 
-        currentMessages.Remove(e.notification.GetMessage());
+        currentMessagesGO.Remove(e.notification.gameObject);
 
         Destroy(e.notification.gameObject);
 
@@ -76,5 +69,17 @@ internal class uGUI_NotificationManager : MonoBehaviour
                 AddNotification(message);
             }
         }
+    }
+        
+    internal void PurgeData()
+    {
+        foreach (var go in currentMessagesGO)
+        {
+            Destroy(go);
+        }
+
+        currentMessagesGO.Clear();
+        pendingMessages.Clear();
+        _currentMessagesCount = 0;
     }
 }

@@ -61,15 +61,8 @@ public class HoverInteraction : HandTarget, IHandTarget
 
             if (Input.GetKeyDown(Plugin.Configuration.PDAInfoKeyCode))
             {
-                //TODO V2 FIx
-
                 EncyclopediaService.OpenEncyclopedia(_controller);
             }
-
-            //if (Input.GetKeyDown(Plugin.Configuration.PDASettingsKeyCode))
-            //{
-                
-            //}
         }
     }
 
@@ -106,7 +99,7 @@ public class HoverInteraction : HandTarget, IHandTarget
 
         var strings = controller.GetDeviceStats();
 
-        if (strings == null || main == null) return;
+        if (main == null) return;
        
         CreateText(controller, strings);
 
@@ -130,15 +123,20 @@ public class HoverInteraction : HandTarget, IHandTarget
         Sb.Append(LanguageService.DeviceNameStructure(controller));
 
         Sb.Append(Environment.NewLine);
-        for (var i = 0; i < strings.Length; i++)
+
+        if(strings is not null)
         {
-            string s = strings[i];
-            if (string.IsNullOrEmpty(s)) continue;
-            Sb.Append(s);
-            if (strings.Length == 1 || i == strings.Length - 1) continue;
+            for (var i = 0; i < strings.Length; i++)
+            {
+                string s = strings[i];
+                if (string.IsNullOrEmpty(s)) continue;
+                Sb.Append(s);
+                if (strings.Length == 1 || i == strings.Length - 1) continue;
+                Sb.Append(Environment.NewLine);
+            }
             Sb.Append(Environment.NewLine);
         }
-        Sb.Append(Environment.NewLine);
+
         if(!_controller.IsConnectedToBase && !_controller.GetBypassConnection())
         {
             Sb.Append(LanguageService.NotConnectedToBaseManager());

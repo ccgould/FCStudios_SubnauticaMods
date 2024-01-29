@@ -1,10 +1,13 @@
-﻿using FCS_AlterraHub.Core.Services;
+﻿using FCS_AlterraHub.Core.Extensions;
+using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Enumerators;
 using FCS_AlterraHub.Models.Mono;
 using FCS_AlterraHub.Models.Structs;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Buildable;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
+using FCS_AlterraHub.ModItems.FCSPDA.Mono.uGUIComponents;
+using FCS_AlterraHub.ModItems.FCSPDA.ScriptableObjects;
 using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
@@ -32,7 +35,7 @@ public interface IFCSModsAPIPublic
     bool IsInOreBuildMode();
     string GetModBundleName(string modName, string classID);
     Dictionary<TechType, FCSStoreEntry> GetRegisteredKits();
-    void RegisterDevice(FCSDevice fCSDevice);
+    void RegisterDevice(FCSDevice fCSDevice, Action callback = null);
     void UnRegisterDevice(FCSDevice fCSDevice);
     void CreateStoreEntry(TechType parentTechType, TechType receiveTechType,int returnAmount, decimal cost, StoreCategory energy,bool forceUnlock = false);
     string GetModID(TechType techType);
@@ -45,6 +48,8 @@ public interface IFCSModsAPIPublic
 
     TechType GetDssInterationTechType();
     void RegisterBaseManagerModule(string pluginName, string classID, string friendlyName, string description, decimal itemCost, StoreCategory storeCategory);
+    HashSet<FCSDevice> GetRegisteredDevicesOfId(string modID);
+    void ShowMessageInPDA(string message, FCSMessageButton button = FCSMessageButton.OK, Action<FCSMessageResult> result = null);
 }
 public interface IFCSModsAPIInternal
 {
@@ -134,9 +139,9 @@ public class FCSModsAPI : IFCSModsAPIPublic, IFCSModsAPIInternal
         return StoreInventoryService.GetRegisteredKits();
     }
 
-    public void RegisterDevice(FCSDevice fcsDevice)
+    public void RegisterDevice(FCSDevice fcsDevice, Action callback = null)
     {
-        HabitatService.main.RegisterDevice(fcsDevice);
+        HabitatService.main.RegisterDevice(fcsDevice,callback);
     }
 
     public void UnRegisterDevice(FCSDevice fcsDevice)
@@ -190,11 +195,21 @@ public class FCSModsAPI : IFCSModsAPIPublic, IFCSModsAPIInternal
 
     public TechType GetDssInterationTechType()
     {
-        return BaseManagerBuildable.DSSIntegrationModuleTechType;
+        return "DSSIntegrationModule".ToTechType();/*BaseManagerBuildable.DSSIntegrationModuleTechType;*/
     }
 
     public void RegisterBaseManagerModule(string pluginName, string classID, string friendlyName, string description, decimal itemCost, StoreCategory storeCategory)
     {
         BaseManagerBuildable.CreateNewBaseManagerModule(pluginName, classID, friendlyName, description, itemCost, storeCategory);
+    }
+
+    public HashSet<FCSDevice> GetRegisteredDevicesOfId(string modID)
+    {
+        return HabitatService.main.GetRegisteredDevicesOfId(modID);
+    }
+
+    public void ShowMessageInPDA(string message,FCSMessageButton button = FCSMessageButton.OK,Action<FCSMessageResult> result = null)
+    {
+        uGUI_MessageBoxHandler.Instance.ShowMessage(message, button, result);
     }
 }

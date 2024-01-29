@@ -73,7 +73,6 @@ public class Config : ConfigFile
     public float DDMaxOreCountUpgradePowerUsage = 0.2f;
     public float DDInternalBatteryCapacity = 1000f;
     public float DDDrillAlterraStorageRange = 30f;
-    public int DDStorageSize = 300;
     public float DDSolarCapacity = 125;
 
     [Toggle("[Auto Crafter]] Is Mod Enabled", Tooltip = "Enables/Disables Auto Crafter from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]

@@ -60,13 +60,7 @@ internal class BaseManagerRackController : FCSDevice, IFCSSave<SaveData>
             "BaseManagerModule6",
     };
 
-    private List<TechType> allowedTech = new List<TechType>()
-    {
-        BaseManagerBuildable.RemoteModuleTechType,
-        BaseManagerBuildable.TranceiverModuleTechType,
-        BaseManagerBuildable.DSSIntegrationModuleTechType
 
-    };
     private int slotsFilled;
 
     private bool GetCompatibleSlot(EquipmentType itemType, out string slot)
@@ -275,7 +269,7 @@ internal class BaseManagerRackController : FCSDevice, IFCSSave<SaveData>
         if (pickupable != null)
         {
             TechType techType = pickupable.GetTechType();
-            flag = allowedTech.Contains(techType);
+            flag = BaseManagerModuleRackBuildable.allowedTech.Contains(techType);
         }
         if (!flag && verbose)
         {

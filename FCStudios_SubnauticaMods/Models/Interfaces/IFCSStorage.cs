@@ -24,7 +24,5 @@ public interface IFCSStorage
 public interface IFCSDumpContainer
 {
     bool AddItemToContainer(InventoryItem item);
-    bool IsAllowedToAdd(TechType techType, bool verbose);
-    bool IsAllowedToAdd(Pickupable pickupable, bool verbose);
-    bool IsAllowedToAdd(TechType techType, int containerTotal);
+    bool IsAllowedToAdd(Pickupable techType, int containerTotal);
 }

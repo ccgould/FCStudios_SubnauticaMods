@@ -4,7 +4,7 @@ using UnityEngine;
 using FCS_AlterraHub.Models.Enumerators;
 
 namespace FCS_AlterraHub.Models;
-internal class AnimationHelper
+public class AnimationHelper
 {
     public static IEnumerator ZoomIn(RectTransform Transform, float Speed, UnityEvent OnEnd)
     {
@@ -37,6 +37,7 @@ internal class AnimationHelper
 
     public static IEnumerator FadeIn(CanvasGroup CanvasGroup, float Speed, UnityEvent OnEnd)
     {
+        if (CanvasGroup is null) yield break;
         CanvasGroup.blocksRaycasts = true;
         CanvasGroup.interactable = true;
 
@@ -50,6 +51,7 @@ internal class AnimationHelper
 
         CanvasGroup.alpha = 1;
         OnEnd?.Invoke();
+        yield break;
     }
 
     public static IEnumerator FadeOut(CanvasGroup CanvasGroup, float Speed, UnityEvent OnEnd)

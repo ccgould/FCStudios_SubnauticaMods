@@ -8,8 +8,6 @@ namespace FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Mono.C40
 {
     [SerializeField] private Text _label;
     [SerializeField] private DSSTerminalController controller;
-    [SerializeField] private string TextLineOne;
-    [SerializeField] private string TextLineTwo;
 
 
     private void Start()

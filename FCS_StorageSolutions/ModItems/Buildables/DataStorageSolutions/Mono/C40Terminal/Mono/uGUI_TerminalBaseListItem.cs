@@ -27,7 +27,7 @@ internal class uGUI_TerminalBaseListItem : MonoBehaviour
 
         this.terminalController = terminalController;
         this.dssManager = dssManager.Value;
-        nameLbl.text = dssManager.Value.GetBaseName();
+        nameLbl.text = string.IsNullOrEmpty(dssManager.Value.GetBaseFriendlyName()) ? dssManager.Value.GetBaseFormattedID() : dssManager.Value.GetBaseFriendlyName();
         SetIcon();
 
         gameObject.SetActive((this.dssManager.IsConnectedToNetwork() && terminalController.GetDSSManager().IsConnectedToNetwork()) || IsCurrentSub());

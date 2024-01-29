@@ -22,7 +22,7 @@ public abstract class FCSBuildableModBase : ModBase, IModBase
     protected readonly string _classID;
     protected readonly string _friendlyName;
     private readonly string _prefabName;
-    private readonly string AssetsFolder;
+    protected readonly string AssetsFolder;
 
     protected FCSBuildableModBase(string modName, string prefabName,string modDir, string classId, string friendlyName) : base(friendlyName)
     {
@@ -32,6 +32,7 @@ public abstract class FCSBuildableModBase : ModBase, IModBase
         _prefabName = prefabName;
         AssetsFolder = ModRegistrationService.GetModPackData(modName)?.GetAssetPath();
         Prefab = FCSAssetBundlesService.PublicAPI.GetPrefabByName(prefabName, ModRegistrationService.GetModPackData(modName)?.GetBundleName(), modDir) ?? FCSAssetBundlesService.InternalAPI.GetLocalPrefab("DummyObject");
+        
         QuickLogger.Debug($"FCSBuildable Prefab: {Prefab?.name}");
     }
 
@@ -77,31 +78,7 @@ public abstract class FCSBuildableModBase : ModBase, IModBase
     public IEnumerator SetGameObjectAsync(IOut<GameObject> gameObject)
     {
         QuickLogger.Debug($"SetGameObjectAsync Prefab: {Prefab?.name}");
-        var prefab = GameObject.Instantiate(Prefab);
-
-        //========== Allows the building animation and material colors ==========//
-        //GameObjectHelpers.SetDefaultSkyApplier(prefab);
-        //========== Allows the building animation and material colors ==========// 
-
-
-        var constructable = prefab.GetComponent<Constructable>();
-        var pid = prefab.GetComponent<PrefabIdentifier>();
-
-        QuickLogger.Info($"==================== PID {pid.Id} Name: {prefab.name} ===================================");
-
-        QuickLogger.Info($"In Base: {prefab.GetComponentInParent<SubRoot>() is null}");
-
-        QuickLogger.Info($"Constructed: {constructable._constructed}");
-        QuickLogger.Info($"IsNew: {constructable.isNew}");
-        QuickLogger.Info($"IsInside: {constructable.isInside}");
-        QuickLogger.Info($"Constructed Amount: {constructable.constructedAmount}");
-
-        QuickLogger.Info($"==================== PID {pid.Id} ===================================");
-
-
-        var lw = prefab.GetComponent<LargeWorldEntity>();
-        if(lw is not null)
-            lw.cellLevel = _settings.CellLevel;
+       var prefab = GameObject.Instantiate(Prefab);
         
         if (_settings.HasGlass)
         {
@@ -111,7 +88,7 @@ public abstract class FCSBuildableModBase : ModBase, IModBase
 
         yield return ModifyPrefab(prefab);
 
-        //MaterialUtils.ApplySNShaders(prefab);
+        prefab.SetActive(false);
 
         gameObject.Set(prefab);
         yield break;

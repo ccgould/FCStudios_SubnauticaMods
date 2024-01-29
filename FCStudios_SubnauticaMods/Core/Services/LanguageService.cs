@@ -1,7 +1,5 @@
 ﻿using FCS_AlterraHub.Models.Abstract;
 using FCSCommon.Utilities;
-using Nautilus.Handlers;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Core.Services;
@@ -9,103 +7,6 @@ namespace FCS_AlterraHub.Core.Services;
 public static class LanguageService
 {
     private const string ModKey = "AHB";
-
-    private static Dictionary<string, string> LanguageDictionary = new()
-    {
-        { $"{ModKey}_RequestNewCard","Request New Card."},
-        { $"{ModKey}_CreateNewAccount","Create New Account."},
-        { $"{ModKey}_CardNotInSystemSettingBalanceFormat", "This card number ({0}) wasn't found in the system. Setting balance to {1}." },
-        { $"{ModKey}_ErrorHasOccurred", "An error has occurred please let FCStudios in the Alterra Corp. know about this error. Thank you and sorry for the inconvenience. Error Code: {0}"},
-        { $"{ModKey}_NotEnoughMoneyOnAccount", "There is not enough money on card to perform this transaction." },
-        { $"{ModKey}_AccountNotFoundFormat", "Unable to locate your AlterraHub Account. Please consult your FCStudios PDA." },
-        { $"{ModKey}_CardReader", "Card Reader" },
-        { $"{ModKey}_AccountBalanceFormat", "Account Balance: {0}" },
-        { $"{ModKey}_DebtBalanceFormat", "Debt Balance: {0}" },
-        { $"{ModKey}_CheckOutTotalFormat", "Cart Total: {0}" },
-        { $"{ModKey}_AccountNewBalanceFormat", "New Balance: {0}" },
-        { $"{ModKey}_NoValidCardForPurchase", "Please select a valid card with enough finances to complete transaction." },
-        { $"{ModKey}_NoItemsInCart", "No items in the card to purchase!" },
-        { $"{ModKey}_CartMaxItems", "No more items can be added to the cart!. Please remove items to add more to the cart." },
-        { $"{ModKey}_OreConsumerReceptacle", "Add ores to cash in." },
-        { $"{ModKey}_AccountTotal", "Account Total" },
-        { $"{ModKey}_TransferMoney", "Transfer Money" },
-        { $"{ModKey}_RemoveAllCreditFromDevice", "Remove all credit to card before destroying." },
-        { $"{ModKey}_Account", "ACCOUNT" },
-        { $"{ModKey}_WelcomeBack", "WELCOME BACK!" },
-        { $"{ModKey}_CardRequirementsMessage", "You need x1 {0} and x1 {1} to get a new card."},
-        { $"{ModKey}_RegisterWelcomeMessage", "Create an account and get your free card!"},
-        { $"{ModKey}_FullName", "Full Name"},
-        { $"{ModKey}_UserName", "User Name"},
-        { $"{ModKey}_Password", "Password"},
-        { $"{ModKey}_PIN", "PIN (4 Digits)"},
-        { $"{ModKey}_FullNamePlaceHolder", "Enter Full Name..."},
-        { $"{ModKey}_UserNamePlaceHolder", "Enter username..."},
-        { $"{ModKey}_PasswordPlaceHolder", "Enter password..."},
-        { $"{ModKey}_PINPlaceHolder", "Enter pin number..."},
-        { $"{ModKey}_AccountCreated", "Thank you for registering for a temporary Alterra Account. Your current account balance is {0}"},
-        { $"{ModKey}_NoCardInventory", "Error: No debit card detected. There is no card in your inventory. Your account card is needed for validation.Please get you card or request a new on from the account page."},
-        { $"{ModKey}_AccountSetupError", "[Error] Please refill the following fields and press enter in the field to continue: {0}"},
-        { $"{ModKey}_OreConsumerTimeLeftFormat", "Time left till {0} ore processed {1} | Pending {2} (Container Limit: {3})."},
-        { $"{ModKey}_NoOresToProcess", "No ores to process."},
-        { $"{ModKey}_PleaseBuildOnPlatForm", "Please Build on a platform to operate."},
-        { $"{ModKey}_BaseOnOff","{0} is now {1}."},
-        { $"{ModKey}_Online","online"},
-        { $"{ModKey}_Offline","offline"},
-        { $"{ModKey}_ChangeBaseName","Change Base Name"},
-        { $"{ModKey}_ClickToSearchForItems","onClick to search for items..."},
-        { $"{ModKey}_BlackListItemFormat","{0} item is in the blacklist an will not be pulled from the vehicle."},
-        { $"{ModKey}_NoVehicles","No vehicles are docked at this base."},
-        { $"{ModKey}_NegativeNumbersNotAllowed","Negative numbers not allowed"},
-        { $"{ModKey}_PressToTurnDeviceOnOff","Press {0} to turn device on/off"},
-        { $"{ModKey}_DeviceOn","DevicePage ON"},
-        { $"{ModKey}_DeviceOff","DevicePage OFF"},
-        { $"{ModKey}_Bulk","Bulk"},
-        { $"{ModKey}_FoodItemsNotAllowed","Cooked food items are not allowed in Data Storage Solutions."},
-        { $"{ModKey}_PDAButtonPressFormat","Press ({0}) to open Alterra Hub PDA"},
-        { $"{ModKey}_OperationExists","Similar operation already exists for device {0}"},
-        { $"{ModKey}_DepotFull","Depot is full or doesn't have enough space for your purchase."},
-        { $"{ModKey}_DepotNotFound","Depot cannot be located."},
-        { $"{ModKey}_PurchaseSuccessful","Purchase was successful. Your items will be shipped to your selected base."},
-        { $"{ModKey}_ErrorLoadingAccountDetails","There was an error loading your account details. Please contact FCStudio about this issue. Please provide your game log located in the Subnautica root folder. \nFileName:\"qmodmanager_log-Subnautica.txt\""},
-        { $"{ModKey}_NoSpaceAccountCreation","To complete your account creation, you need at least one slot to receive your debit card. Please try again once one inventory slot is available in your inventory."},
-        { $"{ModKey}_NoDestinationFound","Please select a destination for your items to be transferred to. You must have an AlterraHub Depot at a base."},
-        { $"{ModKey}_IsDeviceOn","DevicePage On: {0}"},
-        { $"{ModKey}_PowerPerMinuteDistance", "Distance Related Power Loss: {0} epm" },
-        { $"{ModKey}_PowerPerMinute", "Power Per Minute: {0} epm" },
-        { $"{ModKey}_Waiting","WAITING"},
-        { $"{ModKey}_DoorInstructions","Put in the correct 4 digit pin to unlock the door"},
-        { $"{ModKey}_CannotRemovePowercell","Cannot remove powercell from generator."},
-        { $"{ModKey}_AntennaPinNeededMessage","Valid 4 digit pin required to activate antenna."},
-        { $"{ModKey}_ProcessingItem","Processing Item"},
-        { $"{ModKey}_OreValue","Ore Value"},
-        { $"{ModKey}_TimeLeft","Time Left"},
-        { $"{ModKey}_PleaseClearHands","Please clear hands (E) to use."},
-        { $"{ModKey}_DebitHasBeenPaid","Your balance has been paid off."},
-        { $"{ModKey}_MustBeBuiltOnBasePlatform","Must be built on Base Platform"},
-        { $"{ModKey}_HolsterPaintTool","To change color and pattern/image use the Paint Tool."},
-        { $"{ModKey}_Error404", "Connection to station failed! Please visit the AlterraHub Fabrication Facility for assistance." },
-        { $"{ModKey}_OrderBeingShipped", "Your order is now being shipped to base" },
-        { $"{ModKey}_OrderHasBeenShipped", "Your order has been shipped to base" },
-        { $"{ModKey}_NoPowerEmergencyMode", "NO POWER SYSTEM IN EMERGENCY MODE" },
-        { $"{ModKey}_BaseIDFormat", "Base ID: {0}" },
-        { $"{ModKey}_CreditMessage", "Added {0} to account new balance is {1}" },
-        { $"{ModKey}_PressToInteractWith", "Press {0} to interact." },
-        { $"{ModKey}_DeviceNameStructure", "{0} [{1}] {2}" },
-        { $"{ModKey}_NotConnectedToBaseManager", "Not Connected To Base Manager" },
-        { $"{ModKey}_StorageAmountFormat","{0}/{1} Items"},
-        { $"{ModKey}_ToFarFromDevice","You are to far from this device to open the storage container."},
-    };
-
-    /// <summary>
-    /// Patches all the string to be used in the LanguageHandler. Must be done first
-    /// </summary>
-    internal static void AdditionalPatching()
-    {
-        foreach (KeyValuePair<string, string> languageEntry in LanguageDictionary)
-        {
-            LanguageHandler.SetLanguageLine(languageEntry.Key, languageEntry.Value);
-        }
-    }
 
     /// <summary>
     /// Gets the requested string from the Language Handler
@@ -119,7 +20,7 @@ public static class LanguageService
         if (key.Equals(result))
         {
             var newKey = $"{ModKey}_{key}";
-            return LanguageDictionary.ContainsKey(newKey) ? Language.main.Get(newKey) : string.Empty;
+            return Language.main.Get(newKey);
         }
 
         return result; 

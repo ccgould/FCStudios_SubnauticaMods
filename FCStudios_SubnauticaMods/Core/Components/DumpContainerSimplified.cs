@@ -46,7 +46,7 @@ public class DumpContainerSimplified : MonoBehaviour
     private bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
     {
         QuickLogger.Debug($"[DumpContainerSimplified] Container Count: {_dumpContainer.count}",true);
-        return _storage.IsAllowedToAdd(pickupable.GetTechType(), _dumpContainer.count);
+        return _storage.IsAllowedToAdd(pickupable, _dumpContainer.count);
     }
 
     public void OpenStorage()

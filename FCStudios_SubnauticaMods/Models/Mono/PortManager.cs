@@ -24,7 +24,7 @@ internal class PortManager : MonoBehaviour, IShippingDestination
 
     public string GetBaseName()
     {
-        return Manager.GetBaseFriendlyName();
+        return Manager.GetBaseFormatedID();
     }
 
     public string GetPreFabID()

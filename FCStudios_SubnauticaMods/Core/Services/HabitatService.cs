@@ -1,15 +1,19 @@
-﻿using FCS_AlterraHub.Models;
+﻿using FCS_AlterraHub.API;
+using FCS_AlterraHub.Configuation;
+using FCS_AlterraHub.Models;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Mono;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Buildable;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Mono;
 using FCSCommon.Utilities;
+using Nautilus.Json;
 using Nautilus.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using static FCS_AlterraHub.Configuation.SaveData;
 
 namespace FCS_AlterraHub.Core.Services;
 
@@ -20,8 +24,8 @@ public class HabitatService : MonoBehaviour
 {
     public static HabitatService main { get; private set; }
     private HashSet<KnownDevice> knownDevices  = new();
-    private HashSet<HabitatManager> knownBases  = new();
-    
+    private HashSet<HabitatManager> knownBases = new();
+
     public Action<HabitatManager> onBaseDestroyed;
 
     public Action<HabitatManager> onBaseCreated;
@@ -41,6 +45,8 @@ public class HabitatService : MonoBehaviour
             }
         });
 
+        Plugin.AlterraHubSaveData.OnStartedSaving += OnBeforeSave;
+        //Plugin.AlterraHubSaveData.OnFinishedLoading += OnFinishedLoading;
 
         if (main != null && main != this)
         {
@@ -56,25 +62,63 @@ public class HabitatService : MonoBehaviour
         onBaseDestroyed += UnRegisterBase;
     }
 
+    //private void OnFinishedLoading(object sender, JsonFileEventArgs e)
+    //{
+    //    QuickLogger.Debug("[Habitat Service] OnFinishedLoading");
+    //    AlterraHubSaveData data = e.Instance as AlterraHubSaveData;
+
+    //    if (data != null)
+    //    {
+    //        QuickLogger.Debug("[Habitat Service] Data Found");
+
+            
+    //    }
+    //}
+
+    private void OnBeforeSave(object sender, JsonFileEventArgs e)
+    {
+        foreach (var baseManager in knownBases)
+        {
+            if (baseManager != null)
+            {
+                QuickLogger.Debug($"Saving Base: {baseManager.GetBaseFormatedID()} | {baseManager.GetBasePrefabID()}", true);
+                if(Plugin.AlterraHubSaveData.bases.TryGetValue(baseManager.GetBasePrefabID(),out BaseInfoSaveData baseSaveData))
+                {
+                    baseSaveData.BaseId = baseManager.GetBaseID();
+                    baseSaveData.FriendlyName = baseManager.GetBaseFriendlyName();
+                }
+                else
+                {
+                    Plugin.AlterraHubSaveData.bases.Add(baseManager.GetBasePrefabID(), new BaseInfoSaveData
+                    {
+                        BaseId = baseManager.GetBaseID(),
+                        FriendlyName = baseManager.GetBaseFriendlyName()
+                    });
+                }
+            }
+        }
+    }
+
     private void OnDestroy()
     {
         onBaseCreated -= RegisterBase;
         onBaseDestroyed -= UnRegisterBase;
+        Plugin.AlterraHubSaveData.OnStartedSaving -= OnBeforeSave;
     }
 
     private void RegisterBase(HabitatManager baseManager)
     {
-        if(!knownBases.Contains(baseManager))
-        {
-            var savedID = -1;
+        QuickLogger.Debug("[Habitat Service] RegisterBase");
 
-            if(savedID < 0)
+        if (!knownBases.Contains(baseManager))
+        {
+            if (Plugin.AlterraHubSaveData.bases.TryGetValue(baseManager.GetBasePrefabID(), out BaseInfoSaveData value))
             {
-                baseManager.SetBaseID(GenerateNewBaseID());
+                baseManager.LoadSaveData(value);
             }
             else
             {
-                baseManager.SetBaseID(savedID);
+                baseManager.SetBaseID(GenerateNewBaseID());
             }
             knownBases.Add(baseManager);
         }
@@ -113,7 +157,7 @@ public class HabitatService : MonoBehaviour
         knownBases.Remove(baseManager);
     }
 
-    internal void RegisterDevice(FCSDevice device)
+    internal void RegisterDevice(FCSDevice device,Action callBack = null )
     {
         var prefabID = device.GetPrefabID();
 
@@ -146,10 +190,7 @@ public class HabitatService : MonoBehaviour
 
         QuickLogger.Debug($"Registering Device: {device.UnitID}");
 
-        foreach (var item in device.GetAllComponentsInChildren<Button>())
-        {
-
-        }
+        callBack?.Invoke();
     }
 
     internal void UnRegisterDevice(FCSDevice device)
@@ -178,8 +219,8 @@ public class HabitatService : MonoBehaviour
     internal Dictionary<string, List<FCSDevice>> GetDevicesInCurrentBase()
     {
         var currentBase = GetPlayersCurrentBase();
-
-        return currentBase.GetDevicesList();
+        
+        return currentBase?.GetDevicesList();
     }
 
     internal  HashSet<FCSDevice> GetRegisteredDevices()
@@ -242,8 +283,52 @@ public class HabitatService : MonoBehaviour
         return GetPlayersCurrentBase()?.IsRemoteLinkConnected() ?? false;
     }
 
-    internal HabitatManager GetHabitat(string destinationID)
+    public HabitatManager GetHabitatByPrefabID(string prefabID)
     {
-        return knownBases.FirstOrDefault(x => x.GetBasePrefabID() == destinationID);
+        return knownBases.FirstOrDefault(x => x.GetBasePrefabID() == prefabID);
+    }
+
+    public HabitatManager GetHabitatByID(int baseID)
+    {
+        return knownBases.FirstOrDefault(x => x.GetBaseID() == baseID);
+    }
+
+    public void GlobalNotifyByID(string modID, string commandMessage)
+        {
+        if (!string.IsNullOrEmpty(modID))
+        {
+            foreach (FCSDevice device in FCSModsAPI.PublicAPI.GetRegisteredDevicesOfId(modID))
+            {
+                device.IPCMessage?.Invoke(commandMessage);
+            }
+        }
+        else
+        {
+            foreach (FCSDevice device in FCSModsAPI.PublicAPI.GetRegisteredDevices())
+            {
+                device.IPCMessage?.Invoke(commandMessage);
+            }
+        }
+        }
+
+    internal HashSet<FCSDevice> GetRegisteredDevicesOfId(string modID)
+    {
+        var f = new HashSet<FCSDevice>();
+        foreach (var item in knownDevices)
+        {
+            if(item.DeviceTabId.Equals(modID,StringComparison.OrdinalIgnoreCase))
+            {
+                var fcsDevice = _globalFCSDevices.FirstOrDefault(x => x.GetPrefabID() == item.PrefabID);
+                if(fcsDevice is not null)
+                f.Add(fcsDevice);
+            }
+        }
+
+        return f;
+    }
+
+    public  HabitatManager GetHabitatManager(SubRoot currentSub)
+    {
+        return knownBases.FirstOrDefault(x => x.GetSubRoot() == currentSub);
     }
 }

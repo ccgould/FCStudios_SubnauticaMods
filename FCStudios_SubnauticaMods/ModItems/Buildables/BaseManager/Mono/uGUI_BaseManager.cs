@@ -5,6 +5,7 @@ using FCS_AlterraHub.ModItems.FCSPDA.Interfaces;
 using FCSCommon.Utilities;
 using System;
 using UnityEngine;
+using Valve.VR;
 
 namespace FCS_AlterraHub.ModItems.Buildables.BaseManager.Mono;
 
@@ -43,7 +44,11 @@ internal class uGUI_BaseManager : Page, IuGUIAdditionalPage
         QuickLogger.Debug($"BaseManager Enter Called {arg?.GetType()}", true);
         base.Enter(arg);
 
-        _fcsObject = arg as IFCSObject;
+        if(arg is not null )
+        {
+            _fcsObject = arg as IFCSObject;
+        }
+
         initialPage?.Enter(this);
         FCSPDAController.Main.ui.SetPDAAdditionalLabel(Language.main.Get(_fcsObject.GetTechType()));
         OnUGUIBaseManagerOpened?.Invoke(this, EventArgs.Empty);

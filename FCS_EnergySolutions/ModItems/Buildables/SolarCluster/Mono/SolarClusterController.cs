@@ -124,6 +124,16 @@ internal class SolarClusterController : FCSDevice, IFCSSave<SaveData>
     {
         return IsConstructed;
     }
+
+    public override string[] GetDeviceStats()
+    {
+        return new string[]
+        {
+             AuxPatchers.SolarClusterHover(Mathf.RoundToInt(_powerManager.GetRechargeScalar() * 100f),
+                        Mathf.RoundToInt(_powerManager.GetPower()), Mathf.RoundToInt(_powerManager.GetMaxPower()),
+                        Mathf.RoundToInt((_powerManager.GetRechargeScalar() * 0.20f/*0.25f old value */ * 5f) * 13f))
+        };
+    }
     #endregion
 
     #region IConstructable
@@ -184,7 +194,7 @@ internal class SolarClusterController : FCSDevice, IFCSSave<SaveData>
         save.Id = GetPrefabID();
 
         QuickLogger.Debug($"Saving ID {save.Id}", true);
-        save.ColorTemplate = _colorManager.SaveTemplate();
+        save.ColorTemplate = _colorManager?.SaveTemplate() ?? new ColorTemplateSave();
         save.StoredPower = _powerManager.GetStoredPower();
         newSaveData.Data.Add(save);
     }

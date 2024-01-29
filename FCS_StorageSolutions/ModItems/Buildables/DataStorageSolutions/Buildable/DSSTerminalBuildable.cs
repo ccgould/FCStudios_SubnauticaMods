@@ -32,9 +32,6 @@ internal class DSSTerminalBuildable : FCSBuildableModBase
             FCSModsAPI.PublicAPI.CreateStoreEntry(TechType, _kitTechType, 1, _settings.ItemCost, StoreCategory.Storage);
 
             FCSModsAPI.PublicAPI.RegisterBaseManagerModule(PluginInfo.PLUGIN_NAME, "DSSIntegrationModule", "DSS Integration Module", "Links Data Storage to the Base Manager, allowing DSS access to device storage and Transceiver automation from DSS. (Req Module Rack)", 9000,StoreCategory.Storage);
-
-
-
         };
     }
 
@@ -43,10 +40,10 @@ internal class DSSTerminalBuildable : FCSBuildableModBase
 
     protected override IEnumerator ModifyPrefab(GameObject prefab)
     {
-        MaterialHelpers.ChangeEmissionColor(ModPrefabService.BasePrimaryCol, prefab, Color.cyan);
-        MaterialHelpers.ChangeEmissionColor(ModPrefabService.BaseSecondaryCol, prefab, Color.green);
-        MaterialHelpers.ChangeEmissionStrength(ModPrefabService.BasePrimaryCol, prefab, 5f);
-        MaterialHelpers.ChangeEmissionStrength(ModPrefabService.BaseSecondaryCol, prefab, 5f);
+        //MaterialHelpers.ChangeEmissionColor(ModPrefabService.BasePrimaryCol, prefab, Color.cyan);
+        //MaterialHelpers.ChangeEmissionColor(ModPrefabService.BaseSecondaryCol, prefab, Color.green);
+        //MaterialHelpers.ChangeEmissionStrength(ModPrefabService.BasePrimaryCol, prefab, 5f);
+        //MaterialHelpers.ChangeEmissionStrength(ModPrefabService.BaseSecondaryCol, prefab, 5f);
         yield break;
     }
 

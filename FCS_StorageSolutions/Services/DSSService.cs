@@ -1,7 +1,6 @@
 ﻿using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Mono;
 using FCS_StorageSolutions.Models;
-using FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Mono.Base;
 using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
@@ -50,7 +49,7 @@ internal class DSSService : MonoBehaviour
 
     private void RegisterBase(HabitatManager root)
     {
-        QuickLogger.Debug($"Registering Base: {root.GetBaseName()}");
+        QuickLogger.Debug($"Registering Base: {root.GetBaseFriendlyName()}");
         var manager = root.gameObject.GetComponentInChildren<DSSManager>();
         var prefabID = root.GetBasePrefabID();
 
@@ -60,9 +59,9 @@ internal class DSSService : MonoBehaviour
             {
                 _managers.Add(prefabID, manager);
 
-                root.IsAllowedToAddToBase += (item) =>
+                root.IsAllowedToAddToBase += (item,amount) =>
                 {
-                    return manager.IsAllowedToAdd(item);
+                    return manager.IsAllowedToAdd(item,amount);
                 };
 
                 root.HasSpace += (amount) =>
@@ -77,7 +76,7 @@ internal class DSSService : MonoBehaviour
 
                 manager.OnNetworkConnectionChanged += OnNetworkConnectionChanged;
 
-                QuickLogger.Debug($"Base: {root.GetBaseFriendlyName()} registered in DSSManager",true);
+                QuickLogger.Debug($"Base: {root.GetBaseFormatedID()} registered in DSSManager",true);
             }
         }
         else

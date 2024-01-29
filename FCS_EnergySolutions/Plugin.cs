@@ -5,7 +5,8 @@ using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_EnergySolutions.Configuration;
-using FCS_EnergySolutions.Items.Equipment;
+using FCS_EnergySolutions.ModItems.Buildables.JetStream.Buildables;
+using FCS_EnergySolutions.ModItems.Buildables.PowerStorage.Buildable;
 using FCS_EnergySolutions.ModItems.Buildables.SolarCluster.Buildable;
 using FCSCommon.Utilities;
 using HarmonyLib;
@@ -37,7 +38,7 @@ public class Plugin : BaseUnityPlugin
 
         //Register mod pack
         FCSModsAPI.PublicAPI.RegisterModPack(PluginInfo.PLUGIN_NAME, Assembly.GetExecutingAssembly(), ModSettings.AssetBundleName, ModSaveManager.Save, ModSaveManager.LoadData);
-        FCSModsAPI.PublicAPI.AddStoreCategory(PluginInfo.PLUGIN_GUID, "ProductionSolutionsIcon_W", "Production Solutions", PDAPages.ProductionSolutions);
+        FCSModsAPI.PublicAPI.AddStoreCategory(PluginInfo.PLUGIN_GUID, "EnergySolutionsIcon_W", "Energy Solutions", PDAPages.EnergySolutions);
         StartCoroutine(MaterialHelpers.GetGameBaseMaterial(() =>
         {
             QuickLogger.Info($"Started patching [{PluginInfo.PLUGIN_NAME}]. Version: {QuickLogger.GetAssemblyVersion(Assembly)}");
@@ -47,6 +48,7 @@ public class Plugin : BaseUnityPlugin
 
         // register harmony patches, if there are any
         Harmony.CreateAndPatchAll(Assembly, $"{PluginInfo.PLUGIN_GUID}");
+        LanguageHandler.RegisterLocalizationFolder();
         Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
     }
 
@@ -54,6 +56,8 @@ public class Plugin : BaseUnityPlugin
     {
         //YeetKnifePrefab.Register();
         FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "SC", new SolarClusterBuildable());
+        FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "PS", new PowerStorageBuildable());
+        FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "JS", new JetStreamT242Buildable());
 
     }
 }

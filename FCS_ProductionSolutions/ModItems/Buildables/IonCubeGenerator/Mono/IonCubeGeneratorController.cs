@@ -41,7 +41,7 @@ internal class IonCubeGeneratorController : FCSDevice, IFCSSave<SaveData>, IWork
         _interaction = gameObject.GetComponent<HoverInteraction>();
     }
 
-    public override void Start()
+    public override void OnEnable()
     {
         QuickLogger.Debug($"Start: {GetPrefabID()}");
         base.Start();
@@ -55,7 +55,6 @@ internal class IonCubeGeneratorController : FCSDevice, IFCSSave<SaveData>, IWork
 
             if (IsFromSave)
             {
-                QuickLogger.Debug($"Is From Save: {GetPrefabID()}");
                 if (_savedData == null)
                 {
                     ReadySaveData();
@@ -72,6 +71,7 @@ internal class IonCubeGeneratorController : FCSDevice, IFCSSave<SaveData>, IWork
                     _colorManager?.LoadTemplate(((ISaveDataEntry)_savedData).ColorTemplate);
 
                     //NumberOfCubes = NumberOfCubes();
+
                     cubeGeneratorStateManager.SwitchState(savedData.State, savedData.Progress);
                     SetCurrentSpeedMode(savedData.CurrentSpeedMode);
                 }
@@ -79,6 +79,11 @@ internal class IonCubeGeneratorController : FCSDevice, IFCSSave<SaveData>, IWork
             _runStartUpOnEnable = false;
         }
         CoroutineHost.StartCoroutine(this.GetCubePrefab());
+    }
+
+    public override void Start()
+    {
+
     }
 
     private void Update()
@@ -249,6 +254,7 @@ internal class IonCubeGeneratorController : FCSDevice, IFCSSave<SaveData>, IWork
 
     internal void SetCurrentSpeedMode(IonCubeGenSpeedModes speed)
     {
+        QuickLogger.Debug($"Changing current soeedmode from {_currentSpeedMode} to {speed}");
         _currentSpeedMode = speed;
 
         if (_currentSpeedMode != IonCubeGenSpeedModes.Off)

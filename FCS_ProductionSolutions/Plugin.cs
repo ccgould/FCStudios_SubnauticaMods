@@ -5,11 +5,19 @@ using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_ProductionSolutions.Configuration;
+using FCS_ProductionSolutions.ModItems.Buildables.DeepDrillers.Buildables;
+using FCS_ProductionSolutions.ModItems.Buildables.HydroponicHarvester.Buildable;
+using FCS_ProductionSolutions.ModItems.Buildables.HydroponicHarvester.Mono.FMod;
 using FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Buildable;
+using FCS_ProductionSolutions.ModItems.Spawnables;
+using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using FMOD;
 using HarmonyLib;
 using Nautilus.Handlers;
+using Nautilus.Utility;
 using System.Reflection;
+using UnityEngine;
 
 namespace FCS_ProductionSolutions;
 
@@ -35,6 +43,8 @@ public class Plugin : BaseUnityPlugin
         Logger = base.Logger;
         MaterialHelpers.GetIngameObjects();
 
+        LanguageHandler.RegisterLocalizationFolder();
+
         //Register mod pack
         FCSModsAPI.PublicAPI.RegisterModPack(PluginInfo.PLUGIN_NAME, Assembly.GetExecutingAssembly(), ModSettings.AssetBundleName, ModSaveManager.Save, ModSaveManager.LoadData);
         FCSModsAPI.PublicAPI.AddStoreCategory(PluginInfo.PLUGIN_GUID, "ProductionSolutionsIcon_W", "Production Solutions", PDAPages.ProductionSolutions);
@@ -54,5 +64,12 @@ public class Plugin : BaseUnityPlugin
     {
         //Add mod and patch.
         FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "IC", new IonCubeGeneratorBuildable());
+        FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "LDD", new DeepDrillerLightDutyBuildable());
+        FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "HH", new HydroponicHarvesterBuildable());
+
+
+        //Add mod and patch.
+        FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "SB", new SandBagSpawnable());
+        FCSGlass.Register();
     }
 }

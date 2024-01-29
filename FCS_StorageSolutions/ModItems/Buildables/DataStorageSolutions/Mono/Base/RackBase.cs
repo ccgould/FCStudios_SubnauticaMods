@@ -14,6 +14,7 @@ using FCS_AlterraHub.Core.Components;
 using System.Collections.Generic;
 using FCS_AlterraHub.Core.Services;
 using UnityEngine.UI;
+using System;
 
 namespace FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Mono.Base;
 internal class RackBase : FCSDevice, IFCSSave<SaveData>
@@ -56,8 +57,8 @@ internal class RackBase : FCSDevice, IFCSSave<SaveData>
 
         _habitatManager = FCSModsAPI.PublicAPI.GetHabitat(this);
         _dssManager = DSSService.main.GetDSSManager(_habitatManager?.GetBasePrefabID());
-        _fcsStorage.container.onAddItem += RackContainer_onAddItem;
-        _fcsStorage.container.onRemoveItem += RackContainer_onRemoveItem;
+        _fcsStorage.container.onAddItem += DockServer;
+        _fcsStorage.container.onRemoveItem += UnDockServer;
         _fcsStorage.AddAllowedTech(DSSServerSpawnable.PatchedTechType);
 
         for (int i = 0; i < _uGUI_RackGauges.Count; i++)
@@ -93,6 +94,17 @@ internal class RackBase : FCSDevice, IFCSSave<SaveData>
         base.OnEnable();
     }
 
+    public override void OnDestroy()
+    {
+        base.OnDestroy();
+
+        if(_fcsStorage?.container is not null)
+        {
+            _fcsStorage.container.onAddItem -= DockServer;
+            _fcsStorage.container.onRemoveItem -= UnDockServer;
+        }
+    }
+
     private void CheckTeleportationComplete()
     {
         if (LargeWorldStreamer.main.IsWorldSettled() && gameObject.activeSelf)
@@ -124,7 +136,7 @@ internal class RackBase : FCSDevice, IFCSSave<SaveData>
 
         foreach (InventoryItem inventoryItem in _fcsStorage.container)
         {
-            RackContainer_onAddItem(inventoryItem);
+            DockServer(inventoryItem);
         }
     }
 
@@ -146,15 +158,16 @@ internal class RackBase : FCSDevice, IFCSSave<SaveData>
 
     }
 
-    private void RackContainer_onRemoveItem(InventoryItem item)
+    private void UnDockServer(InventoryItem item)
     {
         var serverStorage = item.item.gameObject.GetComponent<FCSStorage>();
-        serverStorage.ItemsContainer.onAddItem -= _uGUI_DSSRackProgressBar.Refresh;
-        serverStorage.ItemsContainer.onRemoveItem -= _uGUI_DSSRackProgressBar.Refresh;
+        serverStorage.ItemsContainer.onAddItem -= Refresh;
+        serverStorage.ItemsContainer.onRemoveItem -= Refresh;
         _dssManager.UnRegisterServer(this,serverStorage);
+        item.item.gameObject.SetActive(false);
     }
 
-    private void RackContainer_onAddItem(InventoryItem item)
+    private void DockServer(InventoryItem item)
     {
         QuickLogger.Debug("Registering Server", true);
 
@@ -173,8 +186,8 @@ internal class RackBase : FCSDevice, IFCSSave<SaveData>
             return;
         }
 
-        serverStorage.ItemsContainer.onAddItem += _uGUI_DSSRackProgressBar.Refresh;
-        serverStorage.ItemsContainer.onRemoveItem += _uGUI_DSSRackProgressBar.Refresh;
+        serverStorage.ItemsContainer.onAddItem += Refresh;
+        serverStorage.ItemsContainer.onRemoveItem += Refresh;
 
         if(_dssManager is null)
         {
@@ -200,6 +213,13 @@ internal class RackBase : FCSDevice, IFCSSave<SaveData>
                 break;
             }
         }
+
+        item.item.gameObject.SetActive(true); // changed to true because easycraft isnt able to read the disk
+    }
+
+    private void Refresh(InventoryItem item)
+    {
+        _uGUI_DSSRackProgressBar.Refresh(item);
     }
 
     internal void onSettingsKeyPressed(TechType techType)

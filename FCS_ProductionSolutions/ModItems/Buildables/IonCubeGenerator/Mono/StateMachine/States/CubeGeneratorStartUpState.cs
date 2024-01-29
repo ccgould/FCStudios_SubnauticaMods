@@ -45,4 +45,9 @@ internal class CubeGeneratorStartUpState : CubeGeneratorBaseState
     {
         startUpProcess = progess;
     }
+
+    public override float GetProgress()
+    {
+        return startUpProcess;
+    }
 }

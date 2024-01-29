@@ -9,5 +9,9 @@ internal abstract class CubeGeneratorBaseState
         return -1;
     }
 
+    public virtual float GetProgress()
+    {
+        return -1;
+    }
     internal virtual void SetProgress(float progess) { }
 }

@@ -13,7 +13,11 @@
       https://nuget.bepinex.dev/v3/index.json;
     </RestoreAdditionalProjectSources>
 
-        <Configurations>Debug;Release;SN_Stable;BZ_Stable</Configurations> 
+        <Configurations>Debug;Release;SN_Stable;BZ_Stable</Configurations>
+
+        <AssemblyVersion>1.0.54.0</AssemblyVersion>
+
+        <FileVersion>1.0.54.0</FileVersion> 
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SN_Stable|AnyCPU'"> 
@@ -40,6 +44,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FCStudios_SubnauticaMods\FCS_AlterraHub.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ModItems\Buildables\AlterraGen\Mono\" />
   </ItemGroup>
 
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />

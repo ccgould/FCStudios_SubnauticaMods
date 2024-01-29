@@ -36,7 +36,7 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI
 
     public Action<TechType> OnInfoButtonClicked;
     public Action OnStorageButtonClicked;
-
+    public Action<FCSDevice> OnErrorButtonClicked;
     [SerializeField]
     private EncyclopediaTabController _encyclopediaTabController;
 
@@ -77,6 +77,7 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI
 
     public bool IsOpen { get; set; }
     public FCSAlterraHubGUISender SenderType { get; set; }
+
 
     public override void Awake()
     {
@@ -122,6 +123,11 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI
         }
     }
 
+    public uGUI_PDANavigationController GetNavigationController()
+    {
+        return _uGUI_PDANavigationController;
+    }
+
     internal void SetInstance(FCSAlterraHubGUISender sender)
     {
         if (_isInitialized) return;
@@ -136,12 +142,18 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI
         CreateStorePage();
 
         OnInfoButtonClicked += onInfoButtonClicked;
+        OnErrorButtonClicked += onErrorButtonClicked;
         _isInitialized = true;
     }
 
     private void onInfoButtonClicked(TechType techType)
     {
-        FCSPDAController.Main.GetGUI().OpenEncyclopedia(techType);
+        OpenEncyclopedia(techType);
+    }
+
+    private void onErrorButtonClicked(FCSDevice device)
+    {
+        GoToPage(PDAPages.ErrorPage, device);
     }
 
     private void AddPages()
@@ -181,7 +193,11 @@ public class FCSAlterraHubGUI : uGUI_InputGroup, IFCSAlterraHubGUI
             {
                 PurgeData();
 
+                QuickLogger.Debug("Data Purged");
+
                 var data = arg as Tuple<TechType, IFCSObject>;
+                
+                QuickLogger.Debug("Data Recieved");
 
                 QuickLogger.Debug($"{data.Item1} || {data.Item2}");
 

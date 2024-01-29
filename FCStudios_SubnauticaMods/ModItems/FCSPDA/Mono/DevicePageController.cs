@@ -56,13 +56,16 @@ internal class DevicePageController : Page
         //Generate a list of devices
         var devices = HabitatService.main.GetDevicesInCurrentBase();
 
-        foreach (var device in devices)
+        if(devices is not null)
         {
-            var category = Instantiate(_categoryPrefab);
-            var deviceCat = category.GetComponent<DeviceCatergory>();
-            deviceCat.Initialize(this,device);
-            deviceCat.gameObject.transform.SetParent(_content, false);
-            _groups.Add(device.Key, deviceCat);
+            foreach (var device in devices)
+            {
+                var category = Instantiate(_categoryPrefab);
+                var deviceCat = category.GetComponent<DeviceCatergory>();
+                deviceCat.Initialize(this, device);
+                deviceCat.gameObject.transform.SetParent(_content, false);
+                _groups.Add(device.Key, deviceCat);
+            }
         }
     }
 }

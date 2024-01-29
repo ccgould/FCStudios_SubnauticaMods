@@ -6,15 +6,17 @@ using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Interfaces;
-using FCS_AlterraHub.Models.Mono;
 using FCS_StorageSolutions.Configuation;
 using FCS_StorageSolutions.Models;
 using FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Enumerators;
 using FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Mono.Base;
 using FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Mono.C40Terminal.Enumerator;
 using FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Spawnable;
+using FCS_StorageSolutions.ModItems.Buildables.RemoteStorage.Buildable;
+using FCS_StorageSolutions.ModItems.Buildables.RemoteStorage.Mono;
 using FCS_StorageSolutions.Services;
 using FCSCommon.Utilities;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -22,6 +24,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using FCSToolTip = FCS_AlterraHub.Core.Components.uGUIComponents.FCSToolTip;
 
 namespace FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Mono.C40Terminal.Mono;
 internal class DSSTerminalController : FCSDevice, IFCSSave<SaveData>
@@ -30,20 +33,35 @@ internal class DSSTerminalController : FCSDevice, IFCSSave<SaveData>
     [SerializeField] private List<uGUI_StorageItem> _inventoryButtons = new();
     [SerializeField] private PaginatorController _paginatorController;
     [SerializeField] private Text currentBaseLabel;
+    [SerializeField] private Text baseLabel;
     [SerializeField] private Text serverCountLabel;
     [SerializeField] private Text rackCountLabel;
     [SerializeField] private Text totalCountLabel;
     [SerializeField] private TMP_InputField inputField;
+
     public BulkMultipliers BulkMultiplier;
     private DSSManager _dssManager;
     private string _currentSearch;
     private DSSTerminalFilterOptions filter;
+
+
+
 
     public override void Awake()
     {
         base.Awake();
         inputField.onValueChanged.AddListener(OnSearchBoxValueChanged);
         _paginatorController.OnPageChanged += _paginatorController_OnPageChanged;
+        IPCMessage += OnIPCRecieved;
+    }
+
+    private void OnIPCRecieved(string message)
+    {
+        if (message.Equals("BaseUpdate"))
+        {
+            RefreshBaseName();
+        }
+
     }
 
     private void _paginatorController_OnPageChanged(object sender, PaginatorController.OnPageChangedArgs e)
@@ -63,8 +81,6 @@ internal class DSSTerminalController : FCSDevice, IFCSSave<SaveData>
         
         base.Start();
 
-
-        
         QuickLogger.Debug($"Terminal Start End {GetPrefabID()}");
 
     }
@@ -106,16 +122,9 @@ internal class DSSTerminalController : FCSDevice, IFCSSave<SaveData>
         QuickLogger.Debug($"On Enable End {GetPrefabID()} : {_runStartUpOnEnable}");
     }
 
-    public void ChangeMultiplier()
-    {
-        
-    }
-
     public override void Initialize()
     {
         if (IsInitialized) return;
-
-        QuickLogger.Debug($"Inventory Grid: {_inventoryGrid is not null}");
 
         _inventoryGrid.OnLoadDisplay += GridHelper_OnLoadDisplay;
 
@@ -125,7 +134,6 @@ internal class DSSTerminalController : FCSDevice, IFCSSave<SaveData>
         }
 
         RefreshGrid();
-
         base.Initialize();
     }
 
@@ -137,11 +145,6 @@ internal class DSSTerminalController : FCSDevice, IFCSSave<SaveData>
     public void OnDumpButtonCliicked()
     {
         _dssManager.GetHabitatManager().OpenItemTransfer();
-    }
-
-    private void BaseDump_ItemTransferedToBase(InventoryItem item)
-    {
-        
     }
 
     public void OnPowerButtonCliicked()
@@ -181,7 +184,6 @@ internal class DSSTerminalController : FCSDevice, IFCSSave<SaveData>
     {
         try
         {
-
             GetManager();
 
             if (_dssManager is not null)
@@ -228,7 +230,7 @@ internal class DSSTerminalController : FCSDevice, IFCSSave<SaveData>
                 }
             }
 
-            UpdateValuesOnScreen();
+            //UpdateValuesOnScreen();
         }
         catch (Exception e)
         {
@@ -240,11 +242,82 @@ internal class DSSTerminalController : FCSDevice, IFCSSave<SaveData>
 
     private void UpdateValuesOnScreen()
     {
-        
+        if (totalCountLabel is null || 
+           serverCountLabel is null || 
+           rackCountLabel is null ||
+           GetDSSManager() is null ||
+           CachedHabitatManager is null ||
+           _dssManager is null) return;
+
+        if (!totalCountLabel.isActiveAndEnabled ||
+           !serverCountLabel.isActiveAndEnabled ||
+           !rackCountLabel.isActiveAndEnabled) return;
+
+
+        //Check Filter
+
+        if (filter == DSSTerminalFilterOptions.ShowAll || filter == DSSTerminalFilterOptions.Servers)
+        {
+            var serverTotal = GetDSSManager().GetDeviceItemTotal(DSSServerSpawnable.PatchedTechType);
+
+            var devices = GetDSSManager().GetHabitatManager().GetCount<RackBase>();
+
+
+            if (devices is not null)
+            {
+                int rackCount = 0;
+
+
+                foreach (var device in devices)
+                {
+                    var rack = device as RackBase;
+                    rackCount += rack.GetServerInSlotCount();
+                }
+
+                var serverCapacity = rackCount * 48;
+
+                totalCountLabel.text = $"{serverTotal.ToString("D4")}/{serverCapacity.ToString("D4")}";
+
+            }
+        }
+        else if (filter == DSSTerminalFilterOptions.StorageLocker)
+        {
+            var lockerTotal = GetDSSManager().GetDeviceItemTotal(TechType.Locker) + GetDSSManager().GetDeviceItemTotal(TechType.SmallLocker);
+            totalCountLabel.text = $"{lockerTotal.ToString("D4")}";
+
+        }
+        else if (filter == DSSTerminalFilterOptions.AlterraStorage)
+        {
+            var devices = GetDSSManager().GetHabitatManager().GetCount<RemoteStorageController>();
+
+            var remoteStorageTotal = GetDSSManager().GetDeviceItemTotal(RemoteStorageBuildable.PatchedTechType);
+            var value = (devices.Count() * 200);
+            totalCountLabel.text = $"{remoteStorageTotal.ToString("D4")}/{value.ToString("D4")}";
+        }
+        else
+        {
+            totalCountLabel.text = $"{0.ToString("D4")}/{0.ToString("D4")}";
+
+        }
+
+
+
+
+
+
+
+
+
         //terminalController.GetDSSManager().GetDeviceTotal()
-        var serverTotal = GetDSSManager().GetDeviceItemTotal(DSSServerSpawnable.PatchedTechType);
-        var lockerTotal = GetDSSManager().GetDeviceItemTotal(TechType.Locker);
-        var smallLockerTotal = GetDSSManager().GetDeviceItemTotal(TechType.SmallLocker);
+
+
+
+
+
+
+
+
+
         //var seaBreezeTotal = _currentBase.GetTotal(StorageType.SeaBreeze);
         //var harvesterTotal = _currentBase.GetTotal(StorageType.Harvester);
         //var replicatorTotal = _currentBase.GetTotal(StorageType.Replicator);
@@ -256,35 +329,9 @@ internal class DSSTerminalController : FCSDevice, IFCSSave<SaveData>
         //var harvesterCapacity = _currentBase.GetDevicesCount("HH") * 150;
         //var replicatorCapacity = _currentBase.GetDevicesCount("RM") * 25;
 
-        var devices = CachedHabitatManager.GetCount<RackBase>();
+        serverCountLabel.text = $"Servers: {GetDSSManager().GetServerCount():D3}";
 
-        if (devices is not null)
-        {
-            int rackCount = 0;
-
-            foreach (var device in devices)
-            {
-                var rack = device as RackBase;
-                rackCount += rack.GetServerInSlotCount();
-            }
-
-            var serverCapacity = rackCount * 48;
-
-            QuickLogger.Debug("1");
-            totalCountLabel.text = $"{serverTotal.ToString("D4")}/{serverCapacity.ToString("D4")}";
-            QuickLogger.Debug("2");
-
-            serverCountLabel.text = $"Servers: {_dssManager.GetServerCount():D3}";
-            QuickLogger.Debug("3");
-
-            rackCountLabel.text = $"Racks: {_dssManager.GetRackCount():D3}";
-            QuickLogger.Debug($"Server Capacity: {serverCapacity}", true);
-
-        }
-
-        QuickLogger.Debug($"Server Total: {serverTotal}", true);
-        QuickLogger.Debug($"Locker Total: {lockerTotal}", true);
-        QuickLogger.Debug($"Small Locker Total: {smallLockerTotal}", true);
+        rackCountLabel.text = $"Racks: {GetDSSManager().GetRackCount():D3}";
     }
 
     private void GetManager()
@@ -300,6 +347,10 @@ internal class DSSTerminalController : FCSDevice, IFCSSave<SaveData>
 
     private bool RegisterEventListener()
     {
+        
+        CachedHabitatManager.OnTransferActionCompleted += RefreshDisplay;
+
+
         if (_dssManager is null)
         {
             _dssManager = DSSService.main.GetDSSManager(CachedHabitatManager?.GetBasePrefabID());
@@ -318,16 +369,20 @@ internal class DSSTerminalController : FCSDevice, IFCSSave<SaveData>
 
     private void UnRegisterEventListener()
     {
+        CachedHabitatManager.OnTransferActionCompleted -= RefreshDisplay;
+
         if (_dssManager is not null)
         {
-            _dssManager.OnServerAdded -= RefreshDisplay;
-            _dssManager.OnServerRemoved -= RefreshDisplay;
+            //_dssManager.OnServerAdded -= RefreshDisplay;
+            //_dssManager.OnServerRemoved -= RefreshDisplay;
             _dssManager.OnRackRemoved -= RefreshDisplay;
         }
     }
 
     private void RefreshDisplay()
     {
+
+        QuickLogger.Debug("Refresh Display", true);
         RefreshGrid();
         UpdateValuesOnScreen();
     }
@@ -341,14 +396,36 @@ internal class DSSTerminalController : FCSDevice, IFCSSave<SaveData>
             yield return null;
         }
 
-        if(RegisterEventListener())
+        if (RegisterEventListener())
         {
-            _dssManager.GetHabitatManager().OnItemTransferedToBase += BaseDump_ItemTransferedToBase;
             _dssManager.GetHabitatManager().OnModuleAdded += OnModuleChanged;
             _dssManager.GetHabitatManager().OnModuleRemoved += OnModuleChanged;
-            currentBaseLabel.text = $"{_dssManager.GetHabitatManager().GetBaseFriendlyName()} [Current Base]";
+
+            var selectBase = IsCurrentBase() ? Language.main.Get("AHB_CurrentBase") : Language.main.Get("AHB_CurrentBase");
+            currentBaseLabel.text = $"[{selectBase}]";
+            RefreshBaseName();
             RefreshGrid();
         }
+    }
+
+    private void RefreshBaseName()
+    {
+        baseLabel.text = GenerateBaseName();
+    }
+
+    private bool IsCurrentBase()
+    {
+        if (_dssManager is null) return true;
+
+        return _dssManager.GetHabitatManager() == CachedHabitatManager;
+    }
+
+    private string GenerateBaseName()
+    {
+        var baseName = string.IsNullOrEmpty(_dssManager.GetBaseFriendlyName()) ? _dssManager.GetBaseFormattedID() : _dssManager.GetBaseFriendlyName();
+
+        return $"{baseName} - BS{CachedHabitatManager.GetBaseID():D3}";
+
     }
 
     private void OnModuleChanged(TechType type)
@@ -381,7 +458,7 @@ internal class DSSTerminalController : FCSDevice, IFCSSave<SaveData>
 
         save.Id = GetPrefabID();
         save.BaseId = FCSModsAPI.PublicAPI.GetHabitat(this)?.GetBasePrefabID();
-        save.ColorTemplate = _colorManager.SaveTemplate();
+        save.ColorTemplate = _colorManager?.SaveTemplate() ?? new();
 
         newSaveData.Data.Add(save);
         QuickLogger.Debug($"Saves DSS Antenna {newSaveData.Data.Count}", true);
@@ -401,8 +478,11 @@ internal class DSSTerminalController : FCSDevice, IFCSSave<SaveData>
 
         if (_dssManager is not null)
         {
+            QuickLogger.Info("DSS Unsubscribing", true);
             _dssManager.OnServerAdded -= RefreshGrid;
             _dssManager.OnServerRemoved -= RefreshGrid;
+
+            UnRegisterEventListener();
         }
     }
 

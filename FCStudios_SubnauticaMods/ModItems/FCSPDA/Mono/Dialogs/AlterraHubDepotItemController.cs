@@ -23,7 +23,7 @@ internal class AlterraHubDepotItemController : MonoBehaviour
 
             Destination = depot;
 
-            text.text = $"Name: {depot.Manager.GetBaseFriendlyName()}\nStatus: N/A";
+            text.text = $"Name: {depot.Manager.GetBaseFormatedID()}\nStatus: N/A";
             
             //_toggleGroup = toggleGroup;
             //_toggle = gameObject.GetComponentInChildren<Toggle>();
@@ -57,7 +57,7 @@ internal class AlterraHubDepotItemController : MonoBehaviour
 
     internal void Refresh()
     {
-        text.text = $"Name: {Destination.Manager.GetBaseFriendlyName()}\nStatus: N/A";
+        text.text = $"Name: {Destination.Manager.GetBaseFormatedID()}\nStatus: N/A";
 
     }
 }
