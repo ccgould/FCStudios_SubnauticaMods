@@ -75,9 +75,9 @@ public class Plugin : BaseUnityPlugin
         // register harmony patches, if there are any
         Harmony.CreateAndPatchAll(Assembly, $"{PluginInfo.PLUGIN_GUID}");
 
-        LanguageHandler.SetLanguageLine("Subtitles_Mentus", "It Works");
+        //LanguageHandler.SetLanguageLine("Subtitles_Mentus", "It Works");
 
-        PDAHandler.AddLogEntry("Mentus", "Subtitles_Mentus", AssetBundleHelper.LoadAsset<AudioClip>(FCSAssetBundlesService.PublicAPI.GetAssetBundleByName(FCSAssetBundlesService.PublicAPI.GlobalBundleName), "PDAMetious"));
+        //PDAHandler.AddLogEntry("Mentus", "Subtitles_Mentus", AssetBundleHelper.LoadAsset<AudioClip>(FCSAssetBundlesService.PublicAPI.GetAssetBundleByName(FCSAssetBundlesService.PublicAPI.GlobalBundleName), "PDAMetious"));
         //Utils.PlayFMODAsset("")
         Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
     }

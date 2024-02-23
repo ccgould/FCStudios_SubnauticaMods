@@ -1,47 +1,42 @@
-﻿using FCS_AlterraHub.Core.Components;
-using FCS_AlterraHub.Core.Helpers;
+﻿using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Core.Navigation;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_AlterraHub.ModItems.FCSPDA.Interfaces;
-using FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Mono;
 using FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Mono.Base;
 using FCSCommon.Utilities;
-using rail;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UWE;
 
-namespace FCS_StorageSolutions.ModItems.Buildables.RemoteStorage.Mono;
+namespace FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Mono;
 
 internal class uGUI_ServerRack : Page, IuGUIAdditionalPage
 {
-    //[SerializeField] private List<uGUI_RemoteStorageItem> _inventoryButtons = new();
     [SerializeField] private Text _inventoryCountLbl;
     [SerializeField] private Text _deviceNameLbl;
     [SerializeField] private Transform grid;
     [SerializeField] private Transform slotTemplate;
     [SerializeField] private Image _inventoryCountPercentage;
-    //[SerializeField] private GridHelper _inventoryGrid;
-    //[SerializeField] private PaginatorController _paginatorController;
-
-
+    //Trying to set the slots by getting the slot from the controller
     private RackBase _controller;
-    private int _rackSlots;
+    private List<RackSlotData> _rackSlots;
     private MenuController _menuController;
 
     public event Action<PDAPages> onBackClicked;
     public event Action<FCSDevice> onSettingsClicked;
-    public List<RackGaugeController> rackGauges = new();
+    [SerializeField] private List<uGUI_RackGaugeController> rackLargeGauges;
+    [SerializeField] private List<uGUI_RackGaugeController> rackGaugesSmallConfig;
 
 
-    
+    // the problem i am facing is that I need to tell this what slots to use and match the ui with those slot id
+
+
 
     public override void Awake()
     {
@@ -52,7 +47,7 @@ internal class uGUI_ServerRack : Page, IuGUIAdditionalPage
     private void Start()
     {
         _menuController = FCSPDAController.Main.GetGUI().GetMenuController();
-    }    
+    }
 
 
     private void RefreshDevice()
@@ -137,42 +132,28 @@ internal class uGUI_ServerRack : Page, IuGUIAdditionalPage
     {
         base.Enter(arg);
         QuickLogger.Debug("Server Rack Enter", true);
-        
+
         if (arg is not null)
         {
             _controller = (RackBase)arg;
 
-            _rackSlots = _controller.GetMaxStorage();
+            _rackSlots = _controller.GetSlots();
 
             _deviceNameLbl.text = _controller.UnitID;
 
             GenerateSlots();
 
-            InjectServers();
+            var storage = _controller.GetStorage().container;
+            storage.onRemoveItem += Storage_onRemoveItem;
+
 
             //Set data before screen is shown.
             RefreshDevice();
         }
-              
+
         Show();
 
         FCSPDAController.Main.GetGUI().OnStorageButtonClicked += AlterraHubGUIOnStorageButtonClicked;
-    }
-
-    private void InjectServers()
-    {
-        if(_controller is not null)
-        {
-            var storage = _controller.GetStorage().container;
-
-            storage.onRemoveItem += Storage_onRemoveItem;
-
-            for (int i = 0; i < storage.count; i++)
-            {
-                var server = storage.ElementAt(i);
-                rackGauges[i].SetServer(server);
-            }
-        }
     }
 
     private void Storage_onRemoveItem(InventoryItem item)
@@ -184,15 +165,33 @@ internal class uGUI_ServerRack : Page, IuGUIAdditionalPage
     {
         QuickLogger.Debug($"Generate Slots: Count:{_rackSlots}");
 
-        for (int i = 0; i < _rackSlots; i++)
+        if (_rackSlots.Count > 6)
         {
-            QuickLogger.Debug($"Generating slot {i}");
-            var instance = Instantiate(slotTemplate, grid, false);
-            var controller = instance.GetComponent<RackGaugeController>();
-            controller.Initalize(i,_controller);
-            rackGauges.Add(controller);
-            instance.gameObject.SetActive(true);
-            QuickLogger.Debug($"Done Generating slot {i}");
+            for (int i = 0; i < _rackSlots.Count; i++)
+            {
+                var gauge = rackLargeGauges[i];
+                gauge.gameObject.SetActive(true);
+                gauge.SetSlot(_rackSlots[i], _controller, i);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < _rackSlots.Count; i++)
+            {
+                var gauge = rackGaugesSmallConfig[i];
+                gauge.gameObject.SetActive(true);
+                gauge.SetSlot(_rackSlots[i], _controller, i);
+            }
+
+        }
+    }
+
+    private void ClearSlots()
+    {
+        foreach (var gauge in rackLargeGauges)
+        {
+            gauge.Eject();
+            gauge.gameObject.SetActive(false);
         }
     }
 
@@ -205,17 +204,8 @@ internal class uGUI_ServerRack : Page, IuGUIAdditionalPage
         storage.onRemoveItem -= Storage_onRemoveItem;
 
         FCSPDAController.Main.GetGUI().OnStorageButtonClicked -= AlterraHubGUIOnStorageButtonClicked;
+
         ClearSlots();
-    }
-
-    private void ClearSlots()
-    {
-        foreach (var slot in rackGauges)
-        {
-            Destroy(slot.gameObject);
-        }
-
-        rackGauges.Clear();
     }
 
     public void Show()

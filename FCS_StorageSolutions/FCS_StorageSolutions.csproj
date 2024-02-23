@@ -15,9 +15,9 @@
 
         <Configurations>Debug;Release;SN_Stable;BZ_Stable</Configurations>
 
-        <AssemblyVersion>1.0.63.0</AssemblyVersion>
+        <AssemblyVersion>1.0.240.0</AssemblyVersion>
 
-        <FileVersion>1.0.63.0</FileVersion> 
+        <FileVersion>1.0.240.0</FileVersion> 
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" /> 
@@ -48,6 +48,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FCStudios_SubnauticaMods\FCS_AlterraHub.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ModItems\Buildables\DataStorageSolutions\Mono\ServerRacks\Base\" />
+    <Folder Include="ModItems\Buildables\DataStorageSolutions\Mono\ServerRacks\GUIs\" />
   </ItemGroup>
 
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />

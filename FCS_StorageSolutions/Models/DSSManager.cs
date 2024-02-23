@@ -1,4 +1,6 @@
-﻿using FCS_AlterraHub.Models.Abstract;
+﻿using BepInEx.Bootstrap;
+using FCS_AlterraHub.Core.Extensions;
+using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Mono;
 using FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Mono;
 using FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Mono.Base;
@@ -6,18 +8,20 @@ using FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Mono.C40Term
 using FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Spawnable;
 using FCS_StorageSolutions.ModItems.Buildables.RemoteStorage.Buildable;
 using FCSCommon.Utilities;
+using Nautilus.Handlers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static HandReticle;
 
 namespace FCS_StorageSolutions.Models;
+
 internal class DSSManager : MonoBehaviour
 {
     private Dictionary<RackBase,HashSet<FCSStorage>> dssRacks = new();
     private HashSet<DSSAntennaController> dssAntennas = new();
-    private    readonly Dictionary<TechType, TrackedResource> trackedResources = new();
+    private readonly Dictionary<TechType, TrackedResource> trackedResources = new();
+    private readonly Dictionary<string, StorageContainer> trackedStorages = new();
 
     internal Action OnServerAdded;
     internal Action OnServerRemoved;
@@ -28,6 +32,14 @@ internal class DSSManager : MonoBehaviour
     internal void Initialize(HabitatManager habitatManager)
     {
         this.habitatManager = habitatManager;
+
+        var storageContainers = habitatManager.GetComponentsInChildren<StorageContainer>();
+
+        foreach (StorageContainer container in storageContainers)
+        {
+            var techTag = container.gameObject.GetComponent<TechTag>();
+            RegisterStorage(techTag.type,container);
+        }
 
         QuickLogger.Info($"DSS Manager Initialized! Is habitat found:{habitatManager is not null}");
     }
@@ -75,7 +87,7 @@ internal class DSSManager : MonoBehaviour
             dssRacks.Add(parentRack, new HashSet<FCSStorage>() { storage });
         }
 
-        RegisterStorage(DSSServerSpawnable.PatchedTechType, storage.ItemsContainer);
+        RegisterStorage(DSSServerSpawnable.PatchedTechType, storage);
 
 
         OnServerAdded?.Invoke();
@@ -86,20 +98,60 @@ internal class DSSManager : MonoBehaviour
         if(dssRacks.ContainsKey(parentRack))
         {
             dssRacks[parentRack].Remove(storage);
-            UnRegisterStorage(DSSServerSpawnable.PatchedTechType, storage.ItemsContainer);
+            UnRegisterStorage(DSSServerSpawnable.PatchedTechType, storage);
             OnServerRemoved?.Invoke();
         }
     }
 
-    internal void RegisterStorage(TechType deviceTechType, ItemsContainer storage)
+    internal void RegisterStorage(TechType deviceTechType, StorageContainer storage)
     {
-        foreach (var item in storage)
+        if(InvalidStorage(storage.gameObject))
         {
-            TrackResource(deviceTechType, item);
+            QuickLogger.DebugError($"Tried to register invalid storage in dssmanager: {storage.gameObject.name}");
+            return;
         }
-        storage.onAddItem += StorageContainer_ItemAdded;
-        storage.onRemoveItem += StorageContainer_ItemRemoved;
+
+        var storageID = storage.gameObject.GetComponent<PrefabIdentifier>()?.id;
+
+        if (!trackedStorages.ContainsKey(storageID))
+        {
+            trackedStorages.Add(storageID, storage);
+
+
+            var itemsContainer = storage.container;
+
+            foreach (var item in itemsContainer)
+            {
+                TrackResource(deviceTechType, item);
+            }
+
+            itemsContainer.onAddItem += StorageContainer_ItemAdded;
+            itemsContainer.onRemoveItem += StorageContainer_ItemRemoved;
+        }  
+             
         //OnServerAdded?.Invoke();
+    }
+
+    internal void UnRegisterStorage(TechType deviceTechType, StorageContainer storage)
+    {
+        var itemsContainer = storage.container;
+
+        foreach (var item in itemsContainer)
+        {
+            UnTrackResource(deviceTechType, item);
+        }
+
+        itemsContainer.onAddItem -= StorageContainer_ItemAdded;
+        itemsContainer.onRemoveItem -= StorageContainer_ItemRemoved;
+
+        var storagePrefabId = storage.gameObject.GetComponent<PrefabIdentifier>()?.id;
+
+        if (trackedStorages.ContainsKey(storagePrefabId))
+        {
+            trackedStorages.Remove(storagePrefabId);
+        }
+
+        //OnServerRemoved?.Invoke();
     }
 
     private void TrackResource(TechType deviceTechType, InventoryItem item)
@@ -128,6 +180,36 @@ internal class DSSManager : MonoBehaviour
                 trackedResources.Remove(techType);
             }
         }
+    }
+
+    internal static bool InvalidStorage(GameObject __instance)
+    {
+        var fcsstorage = __instance.GetComponent<FCSStorage>();
+        if(fcsstorage != null && !fcsstorage.IsVisibleInNetwork)
+        {
+            return true;
+        }
+
+
+        if (__instance.GetComponent<Planter>() ||
+            __instance.GetComponent<Aquarium>() ||
+                __instance.GetComponent<RackBase>())
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public bool IsStorageRegistered(StorageContainer storageContainer)
+    {
+        var prefabIden = storageContainer.gameObject.GetComponent<PrefabIdentifier>();
+
+        if (prefabIden != null)
+        {
+            return trackedStorages.ContainsKey(prefabIden.id);
+        }
+
+        return false;
     }
 
     private void StorageContainer_ItemRemoved(InventoryItem item)
@@ -179,18 +261,6 @@ internal class DSSManager : MonoBehaviour
         }
 
         return TechType.None;
-    }
-
-    internal void UnRegisterStorage(TechType deviceTechType, ItemsContainer storage)
-    {
-        foreach (var item in storage)
-        {
-            UnTrackResource(deviceTechType, item);
-        }
-
-        storage.onAddItem -= StorageContainer_ItemAdded;
-        storage.onRemoveItem -= StorageContainer_ItemRemoved;
-        //OnServerRemoved?.Invoke();
     }
 
     internal void OnRackDestroyed(RackBase parentRack)
@@ -323,7 +393,6 @@ internal class DSSManager : MonoBehaviour
         }        
     }
 
-
     internal Dictionary<TechType,int> GetBaseItems(DSSTerminalFilterOptions filter)
     {
         var dict = new Dictionary<TechType, int>();
@@ -356,6 +425,11 @@ internal class DSSManager : MonoBehaviour
                 {
                     GetItemsCount(dict,TechType.Locker);
                     GetItemsCount(dict,TechType.SmallLocker);
+                    if(Chainloader.PluginInfos.ContainsKey("com.chadlymasterson.autosortlockers"))
+                    {                           
+                        GetItemsCount(dict, "AutosortTarget".ToTechType());
+                        GetItemsCount(dict, "AutosortTargetStanding".ToTechType());
+                    }
                 }        
                 break;
             case DSSTerminalFilterOptions.SeaBreeze:
@@ -389,7 +463,15 @@ internal class DSSManager : MonoBehaviour
         {
             var count = trackedItem.Value.GetCount(device);
             if (count > 0) {
-                dict.Add(trackedItem.Key, count);
+                if(dict.ContainsKey(trackedItem.Key))
+                {
+                    dict[trackedItem.Key] +=  count;
+                }
+                else
+                {
+                    dict.Add(trackedItem.Key, count);
+                }
+
             }
         }
     }

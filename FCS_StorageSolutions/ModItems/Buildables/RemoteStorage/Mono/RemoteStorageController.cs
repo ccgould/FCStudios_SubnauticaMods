@@ -6,7 +6,7 @@ using FCS_AlterraHub.Models;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.Models.Mono;
-using FCS_StorageSolutions.Configuation;
+using FCS_StorageSolutions.Configuration;
 using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;

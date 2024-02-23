@@ -24,6 +24,8 @@ internal class JetStreamController : FCSDevice, IFCSSave<SaveData>
     [SerializeField]private RotorHandler _rotor;
     [SerializeField]private HoverInteraction _interaction;
 
+    private int _isOperational;
+
     #region Unity Methods       
 
     public override void OnEnable()
@@ -94,6 +96,7 @@ internal class JetStreamController : FCSDevice, IFCSSave<SaveData>
     {
         base.Awake();
 
+        _isOperational = Animator.StringToHash("IsOperational");
         _interaction.onSettingsKeyPressed += onSettingsKeyPressed;
     }
 
@@ -181,7 +184,6 @@ internal class JetStreamController : FCSDevice, IFCSSave<SaveData>
 
         _powerManager?.ChangePowerState(FCSPowerStates.Powered);
     }
-
 
     public override void TurnOffDevice()
     {

@@ -25,7 +25,7 @@ internal class uGUI_DSSRackProgressBar : MonoBehaviour
         rackBase.GetStorage().ItemsContainer.onRemoveItem -= RackBase_ContainerChanged;
     }
 
-    
+
     internal void Refresh(InventoryItem item = null)
     {
         RackBase_ContainerChanged(item);

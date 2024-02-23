@@ -14,7 +14,7 @@ using System.Collections;
 using UnityEngine;
 using static CraftData;
 
-namespace FCS_StorageSolutions.ModItems.Buildables.RemoteStorage.Buildable;
+namespace FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Buildable;
 internal class DSSTerminalBuildable : FCSBuildableModBase
 {
     public DSSTerminalBuildable() : base(PluginInfo.PLUGIN_NAME, "DSS_TerminalMonitor", FileSystemHelper.ModDirLocation, "DSSTerminal", "Terminal C48")
@@ -31,7 +31,7 @@ internal class DSSTerminalBuildable : FCSBuildableModBase
             PatchedTechType = TechType;
             FCSModsAPI.PublicAPI.CreateStoreEntry(TechType, _kitTechType, 1, _settings.ItemCost, StoreCategory.Storage);
 
-            FCSModsAPI.PublicAPI.RegisterBaseManagerModule(PluginInfo.PLUGIN_NAME, "DSSIntegrationModule", "DSS Integration Module", "Links Data Storage to the Base Manager, allowing DSS access to device storage and Transceiver automation from DSS. (Req Module Rack)", 9000,StoreCategory.Storage);
+            FCSModsAPI.PublicAPI.RegisterBaseManagerModule(PluginInfo.PLUGIN_NAME, "DSSIntegrationModule", "DSS Integration Module", "Links Data Storage to the Base Manager, allowing DSS access to device storage and Transceiver automation from DSS. (Req Module Rack)", 9000, StoreCategory.Storage);
         };
     }
 

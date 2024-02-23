@@ -78,19 +78,21 @@ public abstract class FCSBuildableModBase : ModBase, IModBase
     public IEnumerator SetGameObjectAsync(IOut<GameObject> gameObject)
     {
         QuickLogger.Debug($"SetGameObjectAsync Prefab: {Prefab?.name}");
-       var prefab = GameObject.Instantiate(Prefab);
+      // var prefab = GameObject.Instantiate(Prefab);
         
         if (_settings.HasGlass)
         {
             //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
-            MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Plugin.ModSettings.ModPackID);
+            MaterialHelpers.ApplyGlassShaderTemplate(Prefab, "_glass", Plugin.ModSettings.ModPackID);
         }
 
-        yield return ModifyPrefab(prefab);
+        yield return ModifyPrefab(Prefab);
 
-        prefab.SetActive(false);
+        QuickLogger.Debug("Modified and returning prefab");
 
-        gameObject.Set(prefab);
+        Prefab.SetActive(false);
+
+        gameObject.Set(Prefab);
         yield break;
     }
 

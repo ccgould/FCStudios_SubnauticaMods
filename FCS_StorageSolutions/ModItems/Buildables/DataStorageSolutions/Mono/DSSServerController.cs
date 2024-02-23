@@ -1,4 +1,6 @@
 ﻿using FCS_AlterraHub.Models.Mono;
+using FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Mono.Base;
+using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,6 +11,7 @@ internal class DSSServerController : MonoBehaviour
     private FCSStorage _fcsStorage;
 
     private List<IRackGaugeListener> listners = new();
+    private RackSlotData currentSlot;
 
     private void Awake()
     {
@@ -71,5 +74,21 @@ internal class DSSServerController : MonoBehaviour
     internal void UnSubscribe(IRackGaugeListener callback)
     {
         listners.Remove(callback);
+    }
+
+    internal void SetSlot(RackSlotData slot)
+    {
+        this.currentSlot = slot;
+        QuickLogger.Debug($"Setting Server Slot ID: {slot?.GetSlotID() ?? -1}");
+    }
+
+    internal RackSlotData GetCurrentSlot()
+    {
+        return currentSlot;
+    }
+
+    internal Tuple<string,int> Save()
+    {
+        return new Tuple<string, int>(GetComponent<PrefabIdentifier>()?.id, currentSlot.GetSlotID());
     }
 }

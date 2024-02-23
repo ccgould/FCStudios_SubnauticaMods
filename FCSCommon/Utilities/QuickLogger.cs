@@ -5,6 +5,7 @@ using BepInEx.Logging;
 using System;
 using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.Remoting.Messaging;
 
 //Created by PrimeSonic GitHub repo: https://github.com/PrimeSonic/PrimeSonicSubnauticaMods
 
@@ -137,6 +138,7 @@ internal static class QuickLogger
         Initialize();
         string name = Assembly.GetCallingAssembly().GetName().Name;
         _logger.LogMessage($"[{name}] {msg}");
+        AddMessage($"[{name}] {msg}");
     }
 
 

@@ -1,11 +1,7 @@
-﻿using FCS_AlterraHub.API;
-using FCS_AlterraHub.Configuation;
-using FCS_AlterraHub.Models.Abstract;
-using FCS_AlterraHub.Models.Interfaces;
-using FCS_StorageSolutions.Configuation;
+﻿using FCS_AlterraHub.Models.Interfaces;
+using FCS_StorageSolutions.Configuration;
 using FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Mono.Base;
 using FCSCommon.Utilities;
-using UnityEngine;
 
 namespace FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Mono;
 internal class DSSFloorRackController : RackBase
@@ -35,7 +31,7 @@ internal class DSSFloorRackController : RackBase
                 {
                     QuickLogger.Debug($"Setting Data");
 
-                    var savedData = _savedData as BaseSaveData;
+                    var savedData = _savedData as DSSRackSaveData;
 
                     _colorManager?.LoadTemplate(((ISaveDataEntry)_savedData).ColorTemplate);
                 }

@@ -57,7 +57,7 @@ internal class BaseManagerRackController : FCSDevice, IFCSSave<SaveData>
             "BaseManagerModule3",
             "BaseManagerModule4",
             "BaseManagerModule5",
-            "BaseManagerModule6",
+            "BaseManagerModule6"
     };
 
 
@@ -194,24 +194,33 @@ internal class BaseManagerRackController : FCSDevice, IFCSSave<SaveData>
 
         if (Plugin.AlterraHubSaveData.savedRacks.TryGetValue(GetPrefabID(), out BaseRackSaveData data))
         {
-            data.EquippedTechTypesInSlots = new Dictionary<string, int>();
-
-            foreach (var pair in _equipment.equipment)
+            if(data is not null)
             {
-                if (pair.Value == null || pair.Value.item == null)
-                    data.EquippedTechTypesInSlots.Add(pair.Key, 0);
-                else
-                    data.EquippedTechTypesInSlots.Add(pair.Key, (int)pair.Value.item.GetTechType());
+                data.EquippedTechTypesInSlots = new Dictionary<string, int>();
+
+                if (_equipment?.equipment is null) return;
+
+                foreach (var pair in _equipment.equipment)
+                {
+                    if (pair.Value == null || pair.Value?.item == null)
+                        data.EquippedTechTypesInSlots.Add(pair.Key, 0);
+                    else
+                        data.EquippedTechTypesInSlots.Add(pair.Key, (int)pair.Value.item.GetTechType());
+                }
             }
+            
         }
         else
         {
             BaseRackSaveData saveData = new BaseRackSaveData();
 
             saveData.EquippedTechTypesInSlots = new Dictionary<string, int>();
+
+            if (_equipment?.equipment is null) return;
+
             foreach (var pair in equipment.equipment)
             {
-                if (pair.Value == null || pair.Value.item == null)
+                if (pair.Value == null || pair.Value?.item == null)
                 {
                     saveData.EquippedTechTypesInSlots.Add(pair.Key, 0);
                 }
@@ -220,6 +229,7 @@ internal class BaseManagerRackController : FCSDevice, IFCSSave<SaveData>
                     saveData.EquippedTechTypesInSlots.Add(pair.Key, (int)pair.Value.item.GetTechType());
                 }
             }
+
             Plugin.AlterraHubSaveData.savedRacks.Add(GetPrefabID(), saveData);
         }
     }

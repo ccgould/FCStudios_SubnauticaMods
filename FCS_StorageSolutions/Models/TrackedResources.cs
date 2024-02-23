@@ -23,6 +23,7 @@ public class TrackedResource
     internal int GetCount(DSSTerminalFilterOptions filter,bool isDssIntergrated)
     {
         var amount = 0;
+
         if (!isDssIntergrated)
         {
             var dssserverItems = trackedDevices.Where(x=>x.Key == DSSServerSpawnable.PatchedTechType).ToList();

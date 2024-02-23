@@ -10,6 +10,8 @@ using FCS_AlterraHub.ModItems.Buildables.OreCrusher.Enums;
 using FCS_AlterraHub.ModItems.Buildables.OreCrusher.Managers;
 using FCSCommon.Utilities;
 using HarmonyLib;
+using Nautilus.Handlers;
+using Nautilus.Utility;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -38,8 +40,7 @@ internal class OreCrusherController : FCSDevice, IFCSSave<SaveData>
     [SerializeField] private HoverInteraction _interaction;
     [SerializeField] private DumpContainer _dumpContainer;
     [SerializeField] private FCSStorage _storage;
-    [SerializeField] private AudioSource _drillSound;
-    [SerializeField] private AudioLowPassFilter _lowPassFilter;
+    private FMOD_CustomEmitter _rockCrushingSound;
 
 
     private OreCrusherEffectsManager effectsManager;
@@ -49,6 +50,8 @@ internal class OreCrusherController : FCSDevice, IFCSSave<SaveData>
 
     public override void Awake()
     {
+        _rockCrushingSound = GetComponent<FMOD_CustomLoopingEmitter>();
+
         base.Awake();           
     }
 
@@ -118,30 +121,6 @@ internal class OreCrusherController : FCSDevice, IFCSSave<SaveData>
     private void Update()
     {
         if (!IsConstructed || !IsInitialized || CachedHabitatManager == null) return;
-
-        if (_lowPassFilter != null)
-        {
-            _lowPassFilter.cutoffFrequency = Player.main.IsUnderwater() ||
-                                             Player.main.IsInBase() ||
-                                             Player.main.IsInSub() ||
-                                             Player.main.inSeamoth ||
-                                             Player.main.inExosuit ? 1566f : 22000f;
-        }
-
-        if (_drillSound != null && _drillSound.isPlaying)
-        {
-            if (WorldHelpers.CheckIfPaused())
-            {
-                _drillSound.Pause();
-                _wasDrillSoundPlaying = true;
-            }
-
-            if (_wasDrillSoundPlaying && !WorldHelpers.CheckIfPaused())
-            {
-                _drillSound.Play();
-                _wasDrillSoundPlaying = false;
-            }
-        }
 
         if (IsOperational() && _oreQueue.Count > 0)
         {
@@ -351,16 +330,18 @@ internal class OreCrusherController : FCSDevice, IFCSSave<SaveData>
             {
                 piston.SetState(true);
             }
-            if (_drillSound != null && !_drillSound.isPlaying)
+            if (_rockCrushingSound != null && !_rockCrushingSound.playing)
             {
-                _drillSound.Play();
+                _rockCrushingSound.Play();
+                CustomSoundHandler.TryGetCustomSoundChannel(_rockCrushingSound.GetInstanceID(), out var channel);
+                channel.setVolume(0.3f);
             }
         }
         else
         {
-            if (_drillSound != null && _drillSound.isPlaying)
+            if (_rockCrushingSound != null && _rockCrushingSound.playing)
             {
-                _drillSound.Stop();
+                _rockCrushingSound.Stop();
             }
             crusherMotorHandler.StopMotor();
             foreach (PistonBobbing piston in _pistons)

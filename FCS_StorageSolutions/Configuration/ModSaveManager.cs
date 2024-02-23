@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 using System.Collections;
 using UnityEngine;
 
-namespace FCS_StorageSolutions.Configuation;
+namespace FCS_StorageSolutions.Configuration;
 
 internal static class ModSaveManager
 {

@@ -279,7 +279,7 @@ internal class PowerStorageController : FCSDevice, IFCSSave<SaveData>
             {
                 _amountRemain -= amountConsumed;
                 powerSource.power = Mathf.Clamp(powerSource.power + amountConsumed, 0f, powerSource.maxPower);
-                QuickLogger.Debug($"Added {amountConsumed} to Power Storage");
+                //QuickLogger.Debug($"Added {amountConsumed} to Power Storage");
             }
         }
     }

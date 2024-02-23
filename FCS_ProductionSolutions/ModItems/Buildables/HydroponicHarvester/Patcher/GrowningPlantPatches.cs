@@ -1,5 +1,6 @@
 ﻿using FCS_AlterraHub.Core.Managers;
 using FCS_AlterraHub.Models.Mono;
+using FCS_ProductionSolutions.ModItems.Buildables.HydroponicHarvester.Mono;
 using FCSCommon.Utilities;
 using HarmonyLib;
 using System;
@@ -17,6 +18,8 @@ internal class GrowningPlantPatches
     [HarmonyPostfix]
     public static void Postfix(ref GrowingPlant __instance)
     {
+        if (__instance.GetComponentInParent<HydroponicHarvesterController>() is null) return;
+        
         var growthWidth = __instance.growthWidth;
 
         var growthHeight = __instance.growthHeight;

@@ -76,7 +76,7 @@ public class DumpContainer : MonoBehaviour
     {
         if (returnToPlayerOnDrop) return true;
 
-        var result = _storage.IsAllowedToAdd(pickupable, verbose);
+        var result = _storage.IsAllowedToAdd(_dumpContainer.count, pickupable, verbose);
         return result;
     }
 
@@ -112,5 +112,10 @@ public class DumpContainer : MonoBehaviour
         }
 
         OnDumpContainerClosed?.Invoke();
+    }
+
+    public FCSStorage GetFCSStorage()
+    {
+        return _storage;
     }
 }

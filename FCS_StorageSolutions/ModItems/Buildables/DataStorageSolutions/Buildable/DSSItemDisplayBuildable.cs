@@ -10,7 +10,7 @@ using System.Collections;
 using UnityEngine;
 using static CraftData;
 
-namespace FCS_StorageSolutions.ModItems.Buildables.RemoteStorage.Buildable;
+namespace FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Buildable;
 internal class DSSItemDisplayBuildable : FCSBuildableModBase
 {
     public DSSItemDisplayBuildable() : base(PluginInfo.PLUGIN_NAME, "DSS_ItemDisplay", FileSystemHelper.ModDirLocation, "DSSItemDisplay", "Terminal S23")

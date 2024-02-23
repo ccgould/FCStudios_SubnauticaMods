@@ -7,7 +7,10 @@ using FCS_AlterraHub.Models.Enumerators;
 using FCS_AlterraHub.ModItems.Buildables.BaseManager.Mono;
 using FCS_AlterraHub.ModItems.Buildables.OreCrusher.Mono;
 using FCSCommon.Helpers;
+using FMOD;
 using Nautilus.Crafting;
+using Nautilus.Handlers;
+using Nautilus.Utility;
 using System.Collections;
 using UnityEngine;
 using static CraftData;
@@ -31,6 +34,14 @@ internal class OreCrusherBuildable : FCSBuildableModBase
             PatchedTechType = TechType;
             FCSPDAController.AddAdditionalPage<uGUI_OreCrusher>(TechType, FCSAssetBundlesService.PublicAPI.GetPrefabByName("uGUI_OreCrusher", bundleName, FileSystemHelper.ModDirLocation, false));
             FCSModsAPI.PublicAPI.CreateStoreEntry(TechType, _kitTechType, 1, _settings.ItemCost, StoreCategory.AlterraHub);
+
+            MODE mode = MODE.DEFAULT | MODE.ACCURATETIME | MODE.LOOP_NORMAL | MODE._3D | MODE._3D_LINEARROLLOFF;
+            var drillSound = FCSAssetBundlesService.PublicAPI.GetAssetBundleByName(bundleName, FileSystemHelper.ModDirLocation).LoadAsset<AudioClip>("RockCrushing_SFX");
+            
+            var sound = AudioUtils.CreateSound(drillSound, mode);
+            CustomSoundHandler.RegisterCustomSound("OreCrusher_SFX", sound, "bus:/master/SFX_for_pause/PDA_pause/all/SFX/reverbsend");
+
+            sound.set3DMinMaxDistance(1, 20);
         };
     }
 

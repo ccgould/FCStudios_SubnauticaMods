@@ -31,12 +31,12 @@ internal class FCSDeepDrillerAnimationHandler : MonoBehaviour
 
         if (this.Animator == null)
         {
-            QuickLogger.Error("Animator component not found on the GameObject.");
+            QuickLogger.Error("animator component not found on the GameObject.");
         }
 
         if (this.Animator != null && this.Animator.enabled == false)
         {
-            QuickLogger.Debug("Animator was disabled and now has been enabled");
+            QuickLogger.Debug("animator was disabled and now has been enabled");
             this.Animator.enabled = true;
         }
     }

@@ -6,6 +6,7 @@ using System;
 using System.ComponentModel;
 using System.Text;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace FCS_AlterraHub.Models.Mono;
 
@@ -31,6 +32,7 @@ public class HoverInteraction : HandTarget, IHandTarget
 
 
     public event Action<TechType> onSettingsKeyPressed;
+    public event Action<TechType, HandTargetEventData> onSettingsWDataKeyPressed;
     public event Action<FCSPDAController> onPDAClosed;
     public event Func<bool> IsAllowedToInteract;
 
@@ -63,8 +65,16 @@ public class HoverInteraction : HandTarget, IHandTarget
             {
                 EncyclopediaService.OpenEncyclopedia(_controller);
             }
+
+            if(Input.anyKeyDown)
+            {
+                OnKeyDown?.Invoke();
+            }
         }
     }
+
+
+    public Action OnKeyDown;
 
     public void OnHandClick(GUIHand hand)
     {
@@ -82,7 +92,13 @@ public class HoverInteraction : HandTarget, IHandTarget
 
         if (!_constructable || _constructable.constructed)
         {
+            HandTargetEventData handTargetEventData = new HandTargetEventData(EventSystem.current);
+            handTargetEventData.guiHand = hand;
+            handTargetEventData.transform = base.transform;
+
+
             onSettingsKeyPressed?.Invoke(_controller.GetTechType());
+            onSettingsWDataKeyPressed?.Invoke(_controller.GetTechType(), handTargetEventData);
         }
     }
 

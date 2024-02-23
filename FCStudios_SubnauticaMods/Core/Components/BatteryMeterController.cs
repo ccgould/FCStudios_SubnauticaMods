@@ -31,6 +31,33 @@ public class BatteryMeterController : MonoBehaviour
         #endregion
     }
 
+    public void UpdateBatteryStatus(PowerSource data)
+    {
+        if (data == null) return;
+
+        var percent = data.power / data.maxPower;
+
+        if (_batteryFill != null)
+        {
+            if (data.power >= 0f)
+            {
+                var value = (percent >= 0.5f) ? Color.Lerp(this._colorHalf, this._colorFull, 2f * percent - 1f) : Color.Lerp(this._colorEmpty, this._colorHalf, 2f * percent);
+                _batteryFill.color = value;
+                _batteryFill.fillAmount = percent;
+            }
+            else
+            {
+                _batteryFill.color = _colorEmpty;
+                _batteryFill.fillAmount = 0f;
+            }
+        }
+
+        if(_batteryPercentage is not null)
+        {
+            _batteryPercentage.text = ((data.power < 0f) ? Language.main.Get("ChargerSlotEmpty") : $"{Mathf.CeilToInt(percent * 100)}%");
+        }
+    }
+
     public void UpdateBatteryStatus(PowercellData data)
     {
         var charge = data.GetCharge() < 1 ? 0f : data.GetCharge();
@@ -73,6 +100,9 @@ public class BatteryMeterController : MonoBehaviour
             _batteryFill.fillAmount = percent;
         }
 
-        _batteryPercentage.text = $"{percent:P0}";
+        if(_batteryPercentage is not null)
+        {
+            _batteryPercentage.text = $"{percent:P0}";
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using FCS_AlterraHub.Configuation;
 using FCS_AlterraHub.Models.Interfaces;
+using FCS_StorageSolutions.Configuration;
 using FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Mono.Base;
 using FCSCommon.Utilities;
 
@@ -32,7 +33,7 @@ internal class DSSWallRackController : RackBase
                 {
                     QuickLogger.Debug($"Setting Data");
 
-                    var savedData = _savedData as BaseSaveData;
+                    var savedData = _savedData as DSSRackSaveData;
 
                     _colorManager?.LoadTemplate(((ISaveDataEntry)_savedData).ColorTemplate);
                 }

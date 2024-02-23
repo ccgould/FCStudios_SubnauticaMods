@@ -5,7 +5,7 @@ using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Interfaces;
-using FCS_StorageSolutions.Configuation;
+using FCS_StorageSolutions.Configuration;
 using FCS_StorageSolutions.Models;
 using FCS_StorageSolutions.Services;
 using FCSCommon.Utilities;
@@ -57,8 +57,6 @@ internal class DSSItemDisplayController : FCSDevice, IFCSSave<SaveData>
 
             _runStartUpOnEnable = false;
         }
-
-
     }
 
     public override void Initialize()
@@ -157,7 +155,6 @@ internal class DSSItemDisplayController : FCSDevice, IFCSSave<SaveData>
     //    }
     //}
 
-
     private void BaseDump_ItemTransferedToBase(InventoryItem item)
     {
         RefreshDisplay();
@@ -186,7 +183,6 @@ internal class DSSItemDisplayController : FCSDevice, IFCSSave<SaveData>
 
         return false;
     }
-
 
     public override void ReadySaveData()
     {
@@ -226,34 +222,40 @@ internal class DSSItemDisplayController : FCSDevice, IFCSSave<SaveData>
 
     public void OnStorageButtonClicked()
     {
-        dumpContainer.OpenStorage();
+        _dssManager.GetHabitatManager().OpenItemTransfer();
     }
 
     public void OnItemButtonClicked()
     {
-        QuickLogger.Debug($"Give Player Item {currentItem.AsString()}");
-
-        if(!WorldHelpers.CheckIfPlayerInRange(this, 3f))
+        if(currentItem == TechType.None)
         {
-            QuickLogger.DebugError($"Player not in range of item display");
-            return;
+            dumpContainer.OpenStorage();
         }
-
-        if (!PlayerInteractionHelper.CanPlayerHold(currentItem))
+        else
         {
-            QuickLogger.Message(LanguageService.InventoryFull());
+            QuickLogger.Debug($"Give Player Item {currentItem.AsString()}");
+
+            if (!WorldHelpers.CheckIfPlayerInRange(this, 3f))
+            {
+                QuickLogger.DebugError($"Player not in range of item display");
+                return;
+            }
+
+            if (!PlayerInteractionHelper.CanPlayerHold(currentItem))
+            {
+                QuickLogger.Message(LanguageService.InventoryFull());
+            }
+
+            var item = _dssManager.RemoveItem(currentItem);
+
+            if (item is not null)
+            {
+                PlayerInteractionHelper.GivePlayerItem(item);
+            }
+
+            CachedHabitatManager.OnTransferActionCompleted?.Invoke();        
+            RefreshDisplay();
         }
-
-        var item = _dssManager.RemoveItem(currentItem);
-
-        if (item is not null)
-        {
-            PlayerInteractionHelper.GivePlayerItem(item);
-        }
-
-        CachedHabitatManager.OnTransferActionCompleted?.Invoke();
-
-        RefreshDisplay();
     }
 
     public void OnResetButtonClicked()

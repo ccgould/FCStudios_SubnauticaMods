@@ -135,7 +135,7 @@ public class FCSStorage : StorageContainer, IFCSStorage
 
     public virtual bool CanBeStored(int amount, TechType techType)
     {
-        QuickLogger.Debug($"GetCount: {GetCount()} | Amount {amount} | Slots: {SlotsAssigned}", true);
+        QuickLogger.Debug($"GetCount: {GetCount()} | Amount {amount} | Slots: {SlotsAssigned} | Has Enough Space {GetCount() + amount <= SlotsAssigned}", true);
 
         if (InvalidTechTypes.Contains(techType) || IsFull || (container.allowedTech != null && container.allowedTech.Any() && !container.allowedTech.Contains(techType))) return false;
 
@@ -145,6 +145,11 @@ public class FCSStorage : StorageContainer, IFCSStorage
     public virtual bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
     {
         return !NotAllowedToAddItems && CanBeStored(1, pickupable.GetTechType()) && (isAllowedToAdd is  null ||  isAllowedToAdd.Invoke(pickupable,verbose));
+    }
+
+    public virtual bool IsAllowedToAdd(int amount,Pickupable pickupable, bool verbose)
+    {
+        return !NotAllowedToAddItems && CanBeStored(1 + amount, pickupable.GetTechType()) && (isAllowedToAdd is null || isAllowedToAdd.Invoke(pickupable, verbose));
     }
 
     public bool NotAllowedToAddItems { get; set; }

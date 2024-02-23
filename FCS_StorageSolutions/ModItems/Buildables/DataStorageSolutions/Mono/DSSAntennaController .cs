@@ -3,7 +3,7 @@ using FCS_AlterraHub.Configuation;
 using FCS_AlterraHub.Core.Components;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Interfaces;
-using FCS_StorageSolutions.Configuation;
+using FCS_StorageSolutions.Configuration;
 using FCS_StorageSolutions.Models;
 using FCS_StorageSolutions.Services;
 using FCSCommon.Utilities;

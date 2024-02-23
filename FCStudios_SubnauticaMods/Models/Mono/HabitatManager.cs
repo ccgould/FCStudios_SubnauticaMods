@@ -163,17 +163,22 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
 
     private void Update()
     {
-        //timeLeft -= Time.deltaTime;
-        //if (timeLeft < 0)
-        //{
-        //    foreach (var device in _registeredDevices)
-        //    {
-        //        AttemptToConnectDevice(device);
-        //    }
-        //    timeLeft = 1;
-        //}
+        timeLeft -= DayNightCycle.main.deltaTime;
+
+        if (timeLeft <= 0)
+        {
+            PowerConsumption();
+            //PerformOperations();
+            timeLeft = 1f;
+        }
+
+        //PowerStateCheck();
     }
 
+    /// <summary>
+    /// Returns the base ID formated in the format of (Base 000) or (Cyclops 000)
+    /// </summary>
+    /// <returns></returns>
     public string GetBaseFormatedID()
     {
         var baseType = string.Empty;
@@ -181,6 +186,21 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
         if (_habitat is not null)
         {
             baseType = _habitat.isBase ? "Base" : "Cyclops";
+        }
+        return $"{baseType} {_baseID:D3}";
+    }
+
+    /// <summary>
+    /// Returns the base ID formated in the format of (BS 000) or (SUB 000)
+    /// </summary>
+    /// <returns></returns>
+    public string GetBaseShortHandFormatedID()
+    {
+        var baseType = string.Empty;
+
+        if (_habitat is not null)
+        {
+            baseType = _habitat.isBase ? "BS" : "SUB";
         }
         return $"{baseType} {_baseID:D3}";
     }
@@ -609,7 +629,20 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
         return GetSubRoot().powerRelay.GetMaxPower();
     }
 
+    private void PowerConsumption()
+    {
+        if (_registeredDevices == null) return;
+        //Take power from the base
+        for (int i = _registeredDevices.Count - 1; i >= 0; i--)
+        {
+            var device = _registeredDevices.ElementAt(i);
 
+            if (device.IsOperational() && _habitat.powerRelay != null)
+            {
+                _habitat.powerRelay.ConsumeEnergy(device.GetPowerUsage(), out float amountConsumed);
+            }
+        }
+    }
 }
 
 public struct WorkUnit

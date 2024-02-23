@@ -43,8 +43,6 @@ internal abstract class DrillSystem : FCSDevice
     private FCSDeepDrillerContainer _deepDrillerContainer;
     private FCSDeepDrillerOreGenerator _oreGenerator;
     private DumpContainer _oilDumpContainer;
-    //private AudioSource _audio;
-    //private AudioLowPassFilter _lowPassFilter;
     private FCSDeepDrillerOilHandler _oilHandler;
     private bool _noBiomeMessageSent;
     private bool _biomeFoundMessageSent;
@@ -304,7 +302,12 @@ internal abstract class DrillSystem : FCSDevice
     internal void PlaySFX()
     {
         if (!_customLoopingEmitter.playing)
+        {
             _customLoopingEmitter.Play();
+            CustomSoundHandler.TryGetCustomSoundChannel(_customLoopingEmitter.GetInstanceID(), out var channel);
+            channel.setVolume(0.2f);
+        }
+            
     }
 
     internal void SetPingName(string beaconName)

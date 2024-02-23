@@ -8,10 +8,12 @@ using FCS_EnergySolutions.Configuration;
 using FCS_EnergySolutions.ModItems.Buildables.JetStream.Buildables;
 using FCS_EnergySolutions.ModItems.Buildables.PowerStorage.Buildable;
 using FCS_EnergySolutions.ModItems.Buildables.SolarCluster.Buildable;
+using FCS_EnergySolutions.ModItems.Buildables.TelepowerPylon.Buildable;
 using FCSCommon.Utilities;
 using HarmonyLib;
 using Nautilus.Handlers;
 using System.Reflection;
+using static FCS_EnergySolutions.Configuration.SaveData;
 
 namespace FCS_EnergySolutions;
 [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
@@ -29,6 +31,8 @@ public class Plugin : BaseUnityPlugin
     internal static Config Configuration { get; } = OptionsPanelHandler.RegisterModOptions<Config>();
 
     public static IModSettingsBase ModSettings => new ModSettings();
+
+    internal static EnergrySolutionsSaveData TelepowerPylonSaveData { get; private set; }
 
     private void Awake()
     {
@@ -49,7 +53,16 @@ public class Plugin : BaseUnityPlugin
         // register harmony patches, if there are any
         Harmony.CreateAndPatchAll(Assembly, $"{PluginInfo.PLUGIN_GUID}");
         LanguageHandler.RegisterLocalizationFolder();
+
+       TelepowerPylonSaveData = SaveDataHandler.RegisterSaveDataCache<EnergrySolutionsSaveData>();
+
+       // AlterraHubSaveData.OnFinishedLoading += OnFinishedLoading;
+
+
+
         Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
+
+
     }
 
     private void InitializePrefabs()
@@ -58,6 +71,9 @@ public class Plugin : BaseUnityPlugin
         FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "SC", new SolarClusterBuildable());
         FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "PS", new PowerStorageBuildable());
         FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "JS", new JetStreamT242Buildable());
+        FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "AG", new AlterraGenBuildable());
+        FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "TP", new TelepowerPylonBuildable());
+        FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "UC", new UniversalChargerBuildable());
 
     }
 }

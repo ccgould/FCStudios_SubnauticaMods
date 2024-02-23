@@ -81,14 +81,18 @@ public class MenuController : MonoBehaviour
         {
             Page currentPage = PageStack.Peek();
 
+            QuickLogger.Debug($"[PushPage_Peek] {currentPage.name} || ExitOnPagePush = {currentPage.ExitOnNewPagePush} || IsOverlay = {currentPage.IsOverlay}",true);
+
             if (currentPage.ExitOnNewPagePush && !Page.IsOverlay)
             {
+                QuickLogger.Debug($"Exiting Page on Push",true);
                 currentPage.Exit();
             }
             OnMenuContollerPush?.Invoke(this, new OnMenuControllerEventArg { Page = Page });
         }
 
         PageStack.Push(Page);
+
         Page.OnPushCompleted();
     }
 

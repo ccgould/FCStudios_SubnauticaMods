@@ -4,14 +4,13 @@ using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Enumerators;
-using FCS_StorageSolutions.ModItems.Buildables.RemoteStorage.Mono;
 using FCSCommon.Helpers;
 using Nautilus.Crafting;
 using System.Collections;
 using UnityEngine;
 using static CraftData;
 
-namespace FCS_StorageSolutions.ModItems.Buildables.RemoteStorage.Buildable;
+namespace FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Buildable;
 internal class DSSAntennaBuildable : FCSBuildableModBase
 {
     public DSSAntennaBuildable() : base(PluginInfo.PLUGIN_NAME, "DSS_Antenna", FileSystemHelper.ModDirLocation, "DSSAntenna", "Antenna")

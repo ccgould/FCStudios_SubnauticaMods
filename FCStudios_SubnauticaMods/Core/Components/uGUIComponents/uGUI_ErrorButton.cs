@@ -11,6 +11,7 @@ namespace FCS_AlterraHub.Core.Components.uGUIComponents;
 internal class uGUI_ErrorButton : MonoBehaviour
 {
     [SerializeField] private Text _countLBL;
+    [SerializeField] private CanvasGroup canvasGroup;
     private FCSDeviceErrorHandler _errorHandler;
 
     public void SetDevice(FCSDevice device)
@@ -26,7 +27,17 @@ internal class uGUI_ErrorButton : MonoBehaviour
 
     private void OnErrorListChanged()
     {
-        _countLBL.text = _errorHandler.GetErrorsCount().ToString();
+        var count = _errorHandler.GetErrorsCount();
+        _countLBL.text = count.ToString();
+
+        if(count > 0)
+        {
+            canvasGroup.alpha = 1;
+        }
+        else
+        {
+            canvasGroup.alpha = 0;
+        }
     }
 
     public void Purge()

@@ -1,7 +1,7 @@
 ﻿using FCS_AlterraHub.Models;
 using FCS_AlterraHub.Models.Enumerators;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
-using System;
+using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.Events;
 using static FCS_AlterraHub.ModItems.FCSPDA.Mono.uGUIComponents.uGUI_PDANavigationController;
@@ -34,6 +34,8 @@ public class Page : MonoBehaviour
     private PDAPages PageType;
 
     public NavigationLabelState NavigationLabelState;
+    internal PDAPages PDAGetPageType() => PageType;
+
 
     [SerializeField]
     private float animationSpeed  = 4f;
@@ -106,6 +108,8 @@ public class Page : MonoBehaviour
                 FadeOut();
                 break;
         }
+
+        QuickLogger.Debug($"Exit Page: {name}");
     }
 
     private void SlideIn()
@@ -200,13 +204,9 @@ public class Page : MonoBehaviour
     {
         return showErrorButton;
     }
-    internal PDAPages PDAGetPageType() => PageType;
 
     public virtual void OnPushCompleted()
     {
         
     }
 }
-
-
-

@@ -6,7 +6,7 @@ using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Interfaces;
-using FCS_StorageSolutions.Configuation;
+using FCS_StorageSolutions.Configuration;
 using FCS_StorageSolutions.Models;
 using FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Enumerators;
 using FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Mono.Base;
@@ -60,6 +60,11 @@ internal class DSSTerminalController : FCSDevice, IFCSSave<SaveData>
         if (message.Equals("BaseUpdate"))
         {
             RefreshBaseName();
+        }
+
+        if (message.Equals("RefreshTerminal"))
+        {
+            RefreshGrid();
         }
 
     }
