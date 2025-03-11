@@ -3,7 +3,6 @@ using FCS_AlterraHub.Models;
 using FCS_AlterraHub.Models.Enumerators;
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_EnergySolutions.ModItems.Buildables.TelepowerPylon.Enumerators;
-using FCS_EnergySolutions.ModItems.Buildables.UniversalCharger.Enumerators;
 using Nautilus.Json;
 using Nautilus.Json.Attributes;
 using Newtonsoft.Json;
@@ -82,18 +81,7 @@ internal class SaveData
         [JsonProperty] internal int GlobalBaseCount { get; set; }
         [JsonProperty] internal int BasePylonCount { get; set; }
     }
-
-    internal class UniversalChargerDataEntry : ISaveDataEntry
-    {
-        public string Id { get; set; }
-        public string BaseId { get; set; }
-        public ColorTemplateSave ColorTemplate { get; set; }
-        [JsonProperty] internal Dictionary<string, string> BatteryData { get; set; }
-        [JsonProperty] internal Dictionary<string, string> ChargerData { get; set; }
-        [JsonProperty] internal PowerChargerMode Mode { get; set; }
-    }
-
-    
+   
 
     [FileName("EnergySolutions")]
     internal class EnergrySolutionsSaveData : SaveDataCache

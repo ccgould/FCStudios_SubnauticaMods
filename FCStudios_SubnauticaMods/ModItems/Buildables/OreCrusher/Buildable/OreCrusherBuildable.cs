@@ -60,7 +60,11 @@ internal class OreCrusherBuildable : FCSBuildableModBase
         {
             Ingredients =
             {
-                new Ingredient(TechType.Titanium, 1),
+                    new Ingredient(TechType.Glass, 2),
+                    new Ingredient(TechType.PlasteelIngot, 2),
+                    new Ingredient(TechType.AdvancedWiringKit, 1),
+                    new Ingredient(TechType.Silicone, 2),
+                    new Ingredient(TechType.Lubricant, 1)
             }
         };
     }

@@ -56,6 +56,7 @@ internal class MaxOreCountUpgrade : UpgradeFunction
     internal static bool IsValid(string[] paraResults, out Tuple<TechType, int> data)
     {
         data = null;
+
         try
         {
             if (paraResults.Length != 2)

@@ -265,7 +265,7 @@ internal class DSSTerminalController : FCSDevice, IFCSSave<SaveData>
         {
             var serverTotal = GetDSSManager().GetDeviceItemTotal(DSSServerSpawnable.PatchedTechType);
 
-            var devices = GetDSSManager().GetHabitatManager().GetCount<RackBase>();
+            var devices = GetDSSManager().GetHabitatManager().GetDevicesOfType<RackBase>();
 
 
             if (devices is not null)
@@ -293,7 +293,7 @@ internal class DSSTerminalController : FCSDevice, IFCSSave<SaveData>
         }
         else if (filter == DSSTerminalFilterOptions.AlterraStorage)
         {
-            var devices = GetDSSManager().GetHabitatManager().GetCount<RemoteStorageController>();
+            var devices = GetDSSManager().GetHabitatManager().GetDevicesOfType<RemoteStorageController>();
 
             var remoteStorageTotal = GetDSSManager().GetDeviceItemTotal(RemoteStorageBuildable.PatchedTechType);
             var value = (devices.Count() * 200);

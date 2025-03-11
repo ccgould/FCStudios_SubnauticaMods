@@ -75,6 +75,8 @@ public class MenuController : MonoBehaviour
             return;
         }
 
+        QuickLogger.Debug($"[PushPage: Arg is null = {arg is null}]");
+
         Page.Enter(arg);
 
         if (PageStack.Count > 0)

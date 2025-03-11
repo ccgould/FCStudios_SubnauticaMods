@@ -1,15 +1,14 @@
 ﻿using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.Models.Mono;
-using FCS_EnergySolutions.Configuration;
-using FCS_EnergySolutions.ModItems.Buildables.UniversalCharger.Enumerators;
+using FCS_HomeSolutions.Configuration;
+using FCS_HomeSolutions.ModItems.Buildables.UniversalCharger.Enumerators;
 using FCSCommon.Utilities;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
-using static FCS_EnergySolutions.Configuration.SaveData;
 
-namespace FCS_EnergySolutions.ModItems.Buildables.UniversalCharger.Mono;
+namespace FCS_HomeSolutions.ModItems.Buildables.UniversalCharger.Mono;
 internal class UniversalChargerController : FCSDevice, IFCSSave<SaveData>
 {
     [SerializeField] private HoverInteraction hoverInteraction;
@@ -31,7 +30,7 @@ internal class UniversalChargerController : FCSDevice, IFCSSave<SaveData>
 
     private void HoverInteraction_onKeyPressed()
     {
-        if(Input.GetKeyDown(Plugin.Configuration.UniversalChargeModeKey))
+        if (Input.GetKeyDown(Plugin.Configuration.UniversalChargeModeKey))
         {
             if (charger.HasChargables())
             {
@@ -73,7 +72,7 @@ internal class UniversalChargerController : FCSDevice, IFCSSave<SaveData>
 
                 //_colorManager.LoadTemplate(_savedData.ColorTemplate);
                 LoadChargerFromSave();
-                
+
                 _runStartUpOnEnable = false;
             }
         }
@@ -147,7 +146,7 @@ internal class UniversalChargerController : FCSDevice, IFCSSave<SaveData>
         {
             $"{Language.main.GetFormat("AES_UCPressToChangeMode",Plugin.Configuration.UniversalChargeModeKey)}",
             $"Current Mode: {charger.GetMode()}",
-            $"EPM: {charger.chargeSpeed}"
+            $"EPM: {charger.GetConsumedPower() * 60:n2}"
         };
         return stats;
     }

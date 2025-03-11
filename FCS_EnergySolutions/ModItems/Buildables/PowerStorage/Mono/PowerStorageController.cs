@@ -15,6 +15,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.XR;
 using static FCS_EnergySolutions.Configuration.SaveData;
 
 namespace FCS_EnergySolutions.ModItems.Buildables.PowerStorage.Mono;
@@ -34,14 +35,30 @@ internal class PowerStorageController : FCSDevice, IFCSSave<SaveData>
     private float _amountRemain;
 
     [SerializeField] private PowerSource powerSource;
+    [SerializeField] private HoverInteraction hoverInteraction;
+
+
+    public override string[] GetDeviceStats()
+    {
+        var data = new string[]
+        {
+            Language.main.GetFormat("AHB_EPS",(IsCharging() ? Plugin.Configuration.PowerStoragePowerDrainPerSecond : 0f) * 60f),
+            Language.main.GetFormat("AES_IsCharging",IsCharging()),
+            Language.main.GetFormat("HUDPowerStatus",Mathf.FloorToInt(powerSource.power),Mathf.FloorToInt(powerSource.maxPower)),
+            Language.main.GetFormat("AES_PowerPercentage",(powerSource.power / powerSource.maxPower).ToString("P0")),
+        };
+        return base.GetDeviceStats(); 
+    }
 
     public override void OnConnectedToManager()
     {
-        if(CachedHabitatManager is not null)
-        {
-            _basePowerStorage = CachedHabitatManager.gameObject.GetComponent<BasePowerStorage>();
-            _basePowerStorage.Register(this);
-        }
+        //Disabled until later
+
+        //if(CachedHabitatManager is not null)
+        //{
+        //    _basePowerStorage = CachedHabitatManager.gameObject.GetComponent<BasePowerStorage>();
+        //    _basePowerStorage.Register(this);
+        //}
     }
 
     public override Vector3 GetPosition()
@@ -91,6 +108,8 @@ internal class PowerStorageController : FCSDevice, IFCSSave<SaveData>
     public override void Start()
     {
         base.Start();
+
+
     }
 
     public override void OnEnable()
@@ -148,7 +167,20 @@ internal class PowerStorageController : FCSDevice, IFCSSave<SaveData>
         InvokeRepeating(nameof(UpdateVisuals), 1f, 1f);
         InvokeRepeating(nameof(TakePower), 1f, 1f);
 
+        InvokeRepeating(nameof(CheckForBaseManager),1f,1f);
+
         IsInitialized = true;
+    }
+
+    private void CheckForBaseManager()
+    {
+        if(CachedHabitatManager is not null)
+        {
+            CancelInvoke(nameof(CheckForBaseManager));
+
+            _basePowerStorage = CachedHabitatManager.gameObject.GetComponent<BasePowerStorage>();
+            _basePowerStorage.Register(this);
+        }
     }
 
     public void Charge()

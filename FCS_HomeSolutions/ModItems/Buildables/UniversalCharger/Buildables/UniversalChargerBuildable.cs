@@ -7,7 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace FCS_EnergySolutions.ModItems.Buildables.JetStream.Buildables;
+namespace FCS_HomeSolutions.ModItems.Buildables.UniversalCharger.Buildables;
 internal class UniversalChargerBuildable : FCSBuildableModBase
 {
     internal static List<string> ucPowercellSlots = new()
@@ -66,7 +66,7 @@ internal class UniversalChargerBuildable : FCSBuildableModBase
             PatchedTechType = TechType;
             PatchedClassID = ClassID;
             //FCSPDAController.AddAdditionalPage<uGUI_SolarCluster>(TechType, FCSAssetBundlesService.PublicAPI.GetPrefabByName("uGUI_SolarCluster", bundleName, FileSystemHelper.ModDirLocation, false));
-            FCSModsAPI.PublicAPI.CreateStoreEntry(TechType, _kitTechType, 1, _settings.ItemCost, StoreCategory.Energy);
+            FCSModsAPI.PublicAPI.CreateStoreEntry(TechType, _kitTechType, 1, _settings.ItemCost, StoreCategory.Home);
         };
     }
 

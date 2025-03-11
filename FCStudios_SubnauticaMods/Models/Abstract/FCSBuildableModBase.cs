@@ -90,7 +90,7 @@ public abstract class FCSBuildableModBase : ModBase, IModBase
 
         QuickLogger.Debug("Modified and returning prefab");
 
-        Prefab.SetActive(false);
+        //Prefab.SetActive(false);
 
         gameObject.Set(Prefab);
         yield break;

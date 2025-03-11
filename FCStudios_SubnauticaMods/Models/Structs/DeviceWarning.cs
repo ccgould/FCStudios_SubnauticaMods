@@ -8,7 +8,7 @@ public partial class HabitatManager
 {
     public List<string> GetConnectedDevices(object patchedTechType)
     {
-        throw new NotImplementedException();
+        return null;
     }
 
     internal struct DeviceWarning

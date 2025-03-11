@@ -92,7 +92,15 @@ internal class uGUI_TelepowerPylonMainPage : Page
             if(result == FCS_AlterraHub.ModItems.FCSPDA.Mono.uGUIComponents.FCSMessageResult.OKYES)
             {
                 masterPage.PopPage();
-                _sender.SetMode(Enumerators.TelepowerPylonMode.NONE);
+
+                foreach (var toggles in _trackedToggles)
+                {
+                    toggles.OnToggleStatechanged(false);
+                }
+
+                _sender.SetMode(TelepowerPylonMode.NONE);
+
+                FCSPDAController.ForceClose();
             }
         });
     }

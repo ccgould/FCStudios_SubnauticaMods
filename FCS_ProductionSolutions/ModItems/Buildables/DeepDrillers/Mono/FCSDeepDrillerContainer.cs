@@ -10,7 +10,7 @@ using UnityEngine;
 using UWE;
 
 namespace FCS_ProductionSolutions.ModItems.Buildables.DeepDrillers.Mono;
-internal class FCSDeepDrillerContainer : MonoBehaviour, IFCSStorage
+public class FCSDeepDrillerContainer : MonoBehaviour, IFCSStorage
 {
     public int GetContainerFreeSpace => CalculateFreeSpace();
 
@@ -288,6 +288,6 @@ internal class FCSDeepDrillerContainer : MonoBehaviour, IFCSStorage
 
     public int GetCount()
     {
-        throw new NotImplementedException();
+        return GetContainerTotal();
     }
 }

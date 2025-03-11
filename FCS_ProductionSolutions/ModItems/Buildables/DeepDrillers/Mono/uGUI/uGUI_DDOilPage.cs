@@ -39,8 +39,12 @@ internal class uGUI_DDOilPage : Page, IuGUIAdditionalPage
     public override void Enter(object arg = null)
     {
         base.Enter(arg);
-        _sender = arg as DrillSystem;
-        lubeMeter.UpdateStateByPercentage(_sender.GetOilPercentage());
+
+        if(arg is not null)
+        {
+            _sender = arg as DrillSystem;
+            lubeMeter.UpdateStateByPercentage(_sender.GetOilPercentage());
+        }
     }
 
     public IFCSObject GetController()

@@ -1,8 +1,10 @@
-﻿using FCS_AlterraHub.Core.Helpers;
+﻿using FCS_AlterraHub.Core.Components;
+using FCS_AlterraHub.Core.Helpers;
 using FCS_ProductionSolutions.ModItems.Buildables.DeepDrillers.Enumerators;
 using FCS_ProductionSolutions.ModItems.Buildables.DeepDrillers.Models;
 using FCS_ProductionSolutions.ModItems.Buildables.DeepDrillers.Models.Upgrades;
 using FCS_ProductionSolutions.ModItems.Buildables.DeepDrillers.Mono.Base;
+using FCS_ProductionSolutions.ModItems.Buildables.DeepDrillers.Mono.Base.Interface;
 using FCSCommon.Utilities;
 using System;
 using System.CodeDom.Compiler;
@@ -12,6 +14,7 @@ using System.ComponentModel;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
+using static HandReticle;
 
 namespace FCS_ProductionSolutions.ModItems.Buildables.DeepDrillers.Mono;
 internal class FCSDeepDrillerOreGenerator : MonoBehaviour
@@ -22,6 +25,8 @@ internal class FCSDeepDrillerOreGenerator : MonoBehaviour
     private float _passedTime;
     private HashSet<TechType> _focusOres = new HashSet<TechType>();
     [SerializeField] private FCSDeepDrillerContainer _container;
+    [SerializeField] private BiomeDetection _biomeDetector;
+    [SerializeField] private StorageContainer _storageContainer;
     private bool IsFocused
     {
         get => _isFocused;
@@ -56,7 +61,7 @@ internal class FCSDeepDrillerOreGenerator : MonoBehaviour
     private float _secondPerItem;
     private const float DayNight = 1200f;
     private int _oresPerDay = 12;
-    [SerializeField] private DrillSystem drillsystem;
+    private IDrillSystem drillsystem;
     private bool _isFocused;
     private bool _blacklistMode;
 
@@ -80,6 +85,11 @@ internal class FCSDeepDrillerOreGenerator : MonoBehaviour
 
     #endregion
 
+    internal void Initialize(IDrillSystem system)
+    {
+        drillsystem = system;
+    }
+
     private void Awake()
     {
         _random2 = new System.Random();
@@ -102,7 +112,7 @@ internal class FCSDeepDrillerOreGenerator : MonoBehaviour
                     _noBiomeMessageSent = true;
                 }
 
-                CurrentBiome = drillsystem.GetBiomeDetector().GetCurrentBiome();
+                CurrentBiome = _biomeDetector.GetCurrentBiome();
 
             }
             else
@@ -160,10 +170,10 @@ internal class FCSDeepDrillerOreGenerator : MonoBehaviour
 
             var index = _random2.Next(AllowedOres.Count);
             var item = AllowedOres[index];
+            drillsystem.AddItemToContainer(item);
             QuickLogger.Debug($"Spawning item {item}", true);
             if (CheckUpgrades(item)) yield return null;
-            _container.AddItemToContainer(item);
-
+            _container.AddItemToContainer(item);            
         }
         else
         {
@@ -174,6 +184,7 @@ internal class FCSDeepDrillerOreGenerator : MonoBehaviour
                 var item = blacklist.ElementAt(index);
                 if (CheckUpgrades(item)) yield return null;
                 _container.AddItemToContainer(item);
+                drillsystem.AddItemToContainer(item);
                 QuickLogger.Debug($"Spawning item {item}", true);
             }
             else
@@ -182,6 +193,7 @@ internal class FCSDeepDrillerOreGenerator : MonoBehaviour
                 var item = _focusOres.ElementAt(index);
                 if (CheckUpgrades(item)) yield return null;
                 _container.AddItemToContainer(item);
+                drillsystem.AddItemToContainer(item);
                 QuickLogger.Debug($"Spawning item {item}", true);
             }
         }
@@ -211,7 +223,7 @@ internal class FCSDeepDrillerOreGenerator : MonoBehaviour
             {
                 var functionComp = (MaxOreCountUpgrade)function;
                 if (functionComp.TechType != techType) continue;
-                var itemCount = drillsystem.GetDDContainer().GetItemCount(functionComp.TechType);
+                var itemCount = _storageContainer.container._items.Count(x=>x.Key == functionComp.TechType);
                 if (itemCount >= functionComp.Amount)
                 {
                     QuickLogger.Debug($"Max ore count of {functionComp.Amount} has been reached skipping ore {techType}. Current amount: {itemCount}", true);
@@ -327,5 +339,10 @@ internal class FCSDeepDrillerOreGenerator : MonoBehaviour
             callBack?.Invoke(AllowedOres);
         });
         
+    }
+
+    internal FCSDeepDrillerContainer GetStorage()
+    {
+        return _container;
     }
 }

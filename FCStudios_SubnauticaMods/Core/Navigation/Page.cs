@@ -195,6 +195,7 @@ public class Page : MonoBehaviour
     {
         return showInfoButton;
     }
+
     internal bool ShowLabel()
     {
         return showLabel;

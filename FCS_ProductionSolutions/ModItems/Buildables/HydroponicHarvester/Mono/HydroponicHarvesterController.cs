@@ -24,6 +24,7 @@ internal class HydroponicHarvesterController : FCSDevice, IFCSSave<SaveData>, IP
     [SerializeField] private DumpContainerSimplified _harvesterStorageContainer;
     [SerializeField] private StorageContainer _storage;
     [SerializeField] private Transform grownPlantsRoot;
+    [SerializeField] private SlerpHelper keyboard;
 
     private HarvesterSpeedModes _currentSpeedMode;
     private bool _isLightsOn;
@@ -34,6 +35,7 @@ internal class HydroponicHarvesterController : FCSDevice, IFCSSave<SaveData>, IP
         base.Awake();
         _hoverInteraction.onSettingsKeyPressed += _hoverInteraction_onSettingsKeyPressed;
         _harvesterStorageContainer.Initialize(transform, "Harvester Dump Container", this, 2, 2);
+        
     }
 
     public override void OnEnable()
@@ -60,6 +62,38 @@ internal class HydroponicHarvesterController : FCSDevice, IFCSSave<SaveData>, IP
         }
 
         LoadSave();
+
+        InvokeRepeating(nameof(DestroyLights), 1f, 1f);
+
+        keyboard = gameObject.GetComponentInChildren<SlerpHelper>();
+
+        IPCMessage += (s) =>
+        {
+            if(s.Equals("HHSFXOn"))
+            {
+                keyboard.playSFX = true;
+            }
+
+            if(s.Equals("HHSFXOff"))
+            {
+                keyboard.playSFX = false;
+            }
+        };
+
+        if(keyboard != null)
+        {
+            keyboard.playSFX = Plugin.Configuration.HHKeyboardSFX;
+        }
+    }
+
+    private void DestroyLights()
+    {
+       var lights =  grownPlantsRoot.GetAllComponentsInChildren<Light>();
+
+        foreach (var light in lights)
+        {
+            Destroy(light.gameObject);
+        }
     }
 
     internal void LoadSave()
@@ -237,9 +271,15 @@ internal class HydroponicHarvesterController : FCSDevice, IFCSSave<SaveData>, IP
     internal bool HasPowerToConsume()
     {
         GameModeUtils.GetGameMode(out GameModeOption mode, out GameModeOption cheats);
+
         if (mode == GameModeOption.Creative)
         {
             return true;
+        }
+
+        if(CachedHabitatManager is not null)
+        {
+            return CachedHabitatManager.ConsumePower(this);
         }
 
        return false;

@@ -23,6 +23,8 @@ using Nautilus.Assets.Gadgets;
 using Nautilus.Handlers;
 using Nautilus.Json;
 using Nautilus.Utility;
+using System.Drawing.Drawing2D;
+using System.IO;
 using System.Reflection;
 using Unity.Audio;
 using UnityEngine;
@@ -66,7 +68,9 @@ public class Plugin : BaseUnityPlugin
             QuickLogger.Info($"Finished patching. Version: {QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly())}");
         }));
 
-        FCSModsAPI.PublicAPI.AddStoreCategory(PluginInfo.PLUGIN_GUID, "HomeSolutionsIcon_W", "Alterra Hub", PDAPages.AlterraHub);
+
+        //Assembly.Load(Path.Combine(Path.GetDirectoryName(Assembly.Location), "sqlite3.dll"));
+        FCSModsAPI.PublicAPI.AddStoreCategory(PluginInfo.PLUGIN_NAME, "AlterraHubIcon_W", "Alterra Hub", PDAPages.AlterraHub);
 
         AlterraHubSaveData = SaveDataHandler.RegisterSaveDataCache<AlterraHubSaveData>();
 

@@ -1,14 +1,9 @@
-﻿using FCS_AlterraHub.Core.Extensions;
-using FCS_AlterraHub.Core.Services;
+﻿using FCS_AlterraHub.Core.Services;
 using FCSCommon.Utilities;
 using Nautilus.Json;
 using Nautilus.Options;
 using Nautilus.Options.Attributes;
-using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
 
 
 namespace FCS_EnergySolutions.Configuration;
@@ -25,20 +20,19 @@ public class Config : ConfigFile
     Order = 1, Tooltip = "Allows you to adjust the power drain of powerstorage. (The higher the faster Power Storage will charge.")]
     public float PowerStoragePowerDrainPerSecond = 1f;
 
-    [Slider("[Telepower Pylon] Pylon Effects Brightness", 0, 1, Step = 0.1f, Format = "{0:F2}", DefaultValue = 1,
-    Order = 2, Tooltip = "Allows you to adjust the brightness of the trail effect in the telepower Pylon effects."),
-    OnChange(nameof(BrightnessChangeEvent))]
 
-    [Toggle("[Telepower Pylon] Is Mod Enabled", Order = 3, Tooltip = "Enables/Disables Telepower Pylon from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+    [Toggle("[Telepower Pylon] Is Mod Enabled", Order = 2, Tooltip = "Enables/Disables Telepower Pylon from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
     public bool IsTelepowerPylonEnabled = true;
+
+
+    [Slider("[Telepower Pylon] Pylon Effects Brightness", 0, 1, Step = 0.1f, Format = "{0:F2}", DefaultValue = 1,
+    Order = 3, Tooltip = "Allows you to adjust the brightness of the trail effect in the telepower Pylon effects."),
+    OnChange(nameof(BrightnessChangeEvent))]
+    public float TelepowerPylonTrailBrightness { get; set; } = 1;
+
 
     [Slider("[Telepower Pylon] Pylon Power Usage Per Meter", 0, 0.00085f, Step = 0.00001f, Format = "{0:F6}", DefaultValue = 0.00085f,
     Order = 4, Tooltip = "Allows you to adjust the power usage of the Telepower Pylon.")]
-
-    [Keybind("[Universal Charger] Mode Change  Key", Order = 5, Tooltip = "Switches the mode of the Universal Charger from Powercell to Battery or vice versa.")]
-    public KeyCode UniversalChargeModeKey = KeyCode.M;
-
-
 
     public float TelepowerPylonPowerUsagePerMeter { get; set; } = 0.00085f;
 
@@ -74,7 +68,6 @@ public class Config : ConfigFile
             {"floating",300f },
             {"None",0f }
         };
-    public float TelepowerPylonTrailBrightness { get; set; } = 1;
 
     private void EnableDebugsToggleEvent(ToggleChangedEventArgs e)
     {
@@ -92,6 +85,9 @@ public class Config : ConfigFile
 
     private static void BrightnessChangeEvent(SliderChangedEventArgs e)
     {
-        HabitatService.main.GlobalNotifyByID("PS", "UpdateEffects");
+        if(HabitatService.main is not null)
+        {
+            HabitatService.main.GlobalNotifyByID("PS", "UpdateEffects");
+        }
     }
 }

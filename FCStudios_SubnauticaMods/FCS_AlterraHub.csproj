@@ -15,9 +15,10 @@
 
     <Configurations>Debug;Release;SN_Stable;BZ_Stable</Configurations>
 
-    <AssemblyVersion>4.0.131.0</AssemblyVersion>
+    <AssemblyVersion>4.0.240.0</AssemblyVersion>
 
-    <FileVersion>4.0.131.0</FileVersion>
+    <FileVersion>4.0.240.0</FileVersion>
+	  <BepInExPluginGuid>com.fcstudios.AlterraHub</BepInExPluginGuid>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" />
@@ -44,12 +45,15 @@
     <PackageReference Include="BepInEx.PluginInfoProps" Version="1.1.0" />
     <PackageReference Include="UnityEngine.Modules" Version="2019.4.36" IncludeAssets="compile" />
     <PackageReference Include="Subnautica.GameLibs" Version="71288.0.0-r.0" />
-    <PackageReference Include="PolySharp" Version="1.13.1" />
+    <PackageReference Include="PolySharp" Version="1.14.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Subnautica.Nautilus" Version="1.*-*" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>

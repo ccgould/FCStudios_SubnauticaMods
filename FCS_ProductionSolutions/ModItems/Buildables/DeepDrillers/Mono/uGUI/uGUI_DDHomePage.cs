@@ -33,6 +33,7 @@ internal class uGUI_DDHomePage : Page, IuGUIAdditionalPage
             _oresPerDayAmount.text = _sender.GetOresPerDayCount();
             _powerConsumptionAmount.text = _sender.GetPowerUsageAmount();
             _biomeLbl.text = AuxPatchers.BiomeFormat(_sender.GetBiomeDetector().GetCurrentBiome());
+            _batteryMeterController.UpdateBatteryStatus(_sender.GetBatteryPowerData());
         }
 
     }

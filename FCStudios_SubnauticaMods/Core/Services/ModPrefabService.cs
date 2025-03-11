@@ -84,7 +84,7 @@ public static class ModPrefabService
             if (applyShaders)
             {
                 //Lets apply the material shader
-                MaterialUtils.ApplySNShaders(prefab, 4, 1, 1,new NoMaterial());
+                MaterialUtils.ApplySNShaders(prefab, 8, 1, 1,new NoMaterial());
 
                 //ReplaceShadersV2(prefab);
             }
@@ -209,10 +209,13 @@ public static class ModPrefabService
 
     public static Sprite GetIconByName(string iconName, string modPackName)
     {
+        QuickLogger.Debug($"[ModPrefabService] IconName: {iconName} ModPackName: {modPackName}");
+
         if (loadedIcons.TryGetValue(iconName, out Sprite preLoadedBundle))
         {
             return preLoadedBundle;
         }
+
         var bundleName = ModRegistrationService.GetModPackData(modPackName).GetBundleName();
         var g = FCSAssetBundlesService.PublicAPI.GetAssetBundleByName(bundleName);
         var result =  g.LoadAsset<Sprite>(iconName);

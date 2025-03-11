@@ -6,6 +6,7 @@ using FCS_AlterraHub.Models.Structs;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;
 using FCS_AlterraHub.ModItems.FCSPDA.Mono.ScreenItems;
+using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -50,6 +51,7 @@ internal class StorePageController : Page
 
             foreach (StoreModCategory mod in StoreManager.main.GetRegisteredMods())
             {
+                QuickLogger.Debug($"Adding Store Entry: {mod.ModPackGUID} | Store Icon: {mod.IconName} | Page Name: {mod.PageName}");
                 _radialMenu.AddEntry(_gui, FCSAssetBundlesService.PublicAPI.GetIconByName(mod.IconName, mod.ModPackGUID), _pageTextLabel, mod.PageName, mod.PDAPage);
             }
 

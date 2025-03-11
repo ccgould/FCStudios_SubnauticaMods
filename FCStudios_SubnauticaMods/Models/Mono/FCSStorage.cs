@@ -135,7 +135,7 @@ public class FCSStorage : StorageContainer, IFCSStorage
 
     public virtual bool CanBeStored(int amount, TechType techType)
     {
-        QuickLogger.Debug($"GetCount: {GetCount()} | Amount {amount} | Slots: {SlotsAssigned} | Has Enough Space {GetCount() + amount <= SlotsAssigned}", true);
+        QuickLogger.Debug($"GetDevicesOfType: {GetCount()} | Amount {amount} | Slots: {SlotsAssigned} | Has Enough Space {GetCount() + amount <= SlotsAssigned}", true);
 
         if (InvalidTechTypes.Contains(techType) || IsFull || (container.allowedTech != null && container.allowedTech.Any() && !container.allowedTech.Contains(techType))) return false;
 

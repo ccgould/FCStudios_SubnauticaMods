@@ -127,8 +127,6 @@ internal class AlterraGenController : FCSDevice, IFCSSave<SaveData>
 
     #region Public Methods
 
-
-
     public override void Initialize()
     {
         //MaterialHelpers.ChangeEmissionColor(string.Empty, gameObject, Color.cyan);
@@ -180,7 +178,6 @@ internal class AlterraGenController : FCSDevice, IFCSSave<SaveData>
     #endregion
 
     #region IProtoEventListener
-
 
     public override void ReadySaveData()
     {

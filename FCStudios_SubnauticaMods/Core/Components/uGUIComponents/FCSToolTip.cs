@@ -13,6 +13,7 @@ public class FCSToolTip : MonoBehaviour, ITooltip
     [SerializeField] private TechType techType;
     [SerializeField] private float playerDistance;
     [SerializeField] private bool usePlayerDistance;
+    [SerializeField] private bool bypassPermission;
     public Func<bool> RequestPermission;
     public Func<string> ToolTipStringDelegate;
 
@@ -30,7 +31,7 @@ public class FCSToolTip : MonoBehaviour, ITooltip
         }
         else
         {
-            result = RequestPermission?.Invoke() ?? false;
+            result = RequestPermission?.Invoke() ?? bypassPermission;
         }
 
         if (!result) return;

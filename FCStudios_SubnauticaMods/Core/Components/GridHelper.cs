@@ -87,6 +87,11 @@ public class GridHelper : MonoBehaviour
     {
         return _maxPage;
     }
+
+    public RectTransform GetGrid()
+    {
+        return _itemsGrid.GetComponent<RectTransform>();
+    }
 }
 public struct DisplayData
 {

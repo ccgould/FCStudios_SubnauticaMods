@@ -25,7 +25,7 @@ internal class HomePageController : Page
         _radialMenu.AddEntry(_gui, FCSAssetBundlesService.PublicAPI.GetIconByName("EncyclopediaIcon"), _pageTextLabel, "Encyclopedia", PDAPages.EncyclopediaMain);
         _radialMenu.AddEntry(_gui, FCSAssetBundlesService.PublicAPI.GetIconByName("IconAccount"), _pageTextLabel, "Account", PDAPages.AccountPage);
         _radialMenu.AddEntry(_gui, FCSAssetBundlesService.PublicAPI.GetIconByName("QuantumTeleporterIcon_W"), _pageTextLabel, "Teleportation", PDAPages.Teleportation);
-        _radialMenu.AddEntry(_gui, FCSAssetBundlesService.PublicAPI.GetIconByName("HomeSolutionsIcon_W"), _pageTextLabel, "Base Devices", PDAPages.BaseDevices, false);
+        _radialMenu.AddEntry(_gui, FCSAssetBundlesService.PublicAPI.GetIconByName("AlterraHub_W"), _pageTextLabel, "Base Devices", PDAPages.BaseDevices, false);
     }
 
     private void Update()

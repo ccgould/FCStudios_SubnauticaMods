@@ -9,6 +9,7 @@ using FCS_AlterraHub.ModItems.Buildables.OreCrusher.Mono;
 using FCS_AlterraHub.ModItems.FCSPDA.ScriptableObjects;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.ModItems.Buildables.DeepDrillers.Models;
+using FCS_ProductionSolutions.ModItems.Buildables.DeepDrillers.Mono.Base.Interface;
 using FCSCommon.Utilities;
 using FMOD;
 using Nautilus.Handlers;
@@ -20,11 +21,11 @@ using UnityEngine;
 
 namespace FCS_ProductionSolutions.ModItems.Buildables.DeepDrillers.Mono.Base;
 
-internal abstract class DrillSystem : FCSDevice
+internal abstract class DrillSystem : FCSDevice , IDrillSystem
 {
     [SerializeField] private GroundDetector groundDetector;
     [SerializeField] private FMOD_CustomLoopingEmitter _customLoopingEmitter;
-
+    public GameObject GameObject => gameObject;
 
     private DeviceErrorModel _notEnoughPowerError;
     private DeviceErrorModel _noOilError;
@@ -51,7 +52,6 @@ internal abstract class DrillSystem : FCSDevice
     private bool canOperate = true;
     private bool _errorsInitialize;
     internal Action<PowercellData> OnBatteryLevelChange { get; set; }
-    internal Action<float> OnOilLevelChange { get; set; }
     internal bool IsBeingDeleted { get; set; }
     internal FCSPowerManager PowerManager { get; private protected set; }
     internal abstract bool UseOnScreenUi { get; }
@@ -288,7 +288,7 @@ internal abstract class DrillSystem : FCSDevice
         IsInitialized = true;
     }
 
-    internal bool IsBreakSet()
+    public bool IsBreakSet()
     {
         return _isBreakSet;
     }
@@ -433,5 +433,26 @@ internal abstract class DrillSystem : FCSDevice
     {
         errorHandler.TriggerError(errorSo);
         canOperate = false;
+    }
+
+    public string GetOilLevel()
+    {
+        return string.Empty;
+    }
+
+    public void NotifyInventoryChanged(TechType techType, bool addition)
+    {
+        QuickLogger.Debug($"NotifyInventoryChanged DrillSystem: {techType} | Addition = {addition}",true);
+        //throw new NotImplementedException();
+    }
+
+    public void AddItemToContainer(TechType techType)
+    {
+        QuickLogger.Debug($"NotifyInventoryChanged DrillSystem: {techType} | Addition = true", true);
+    }
+
+    public void RemoveItemFromContainer(TechType techType)
+    {
+        QuickLogger.Debug($"NotifyInventoryChanged DrillSystem: {techType} | Addition = false", true);
     }
 }

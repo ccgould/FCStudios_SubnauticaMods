@@ -157,13 +157,13 @@ public class HabitatService : MonoBehaviour
         knownBases.Remove(baseManager);
     }
 
-    internal void RegisterDevice(FCSDevice device,Action callBack = null )
+    internal void RegisterDevice(FCSDevice device,Action callBack = null,bool force = false)
     {
         var prefabID = device.GetPrefabID();
 
         QuickLogger.Debug($"Attempting to Register: {prefabID} : Constructed {device.IsConstructed}");
 
-        if (string.IsNullOrWhiteSpace(prefabID) || !device.IsConstructed) return;
+        if (string.IsNullOrWhiteSpace(prefabID) || (!device.IsConstructed && !force)) return;
 
         if (knownDevices.Any(x => x.PrefabID.Equals(prefabID)))
         {
@@ -191,6 +191,21 @@ public class HabitatService : MonoBehaviour
         QuickLogger.Debug($"Registering Device: {device.UnitID}");
 
         callBack?.Invoke();
+    }
+
+    internal void ForceRegisterDevice(FCSDevice device, Action callBack = null)
+    {
+        RegisterDevice(device, callBack,true);
+    }
+
+    public FCSDevice FindDevice(string unitID)
+    {
+        return _globalFCSDevices.FirstOrDefault(x => x.GetPrefabID().Equals(unitID, StringComparison.OrdinalIgnoreCase));
+    }
+
+    public FCSDevice FindDeviceWithPreFabID(string prefabID)
+    {
+        return _globalFCSDevices.FirstOrDefault(x => x.GetPrefabID().Equals(prefabID, StringComparison.OrdinalIgnoreCase));
     }
 
     internal void UnRegisterDevice(FCSDevice device)

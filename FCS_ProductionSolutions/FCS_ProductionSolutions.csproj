@@ -15,9 +15,10 @@
  
     <Configurations>Debug;Release;SN_Stable;BZ_Stable</Configurations> 
  
-    <AssemblyVersion>1.0.135.0</AssemblyVersion> 
+    <AssemblyVersion>1.0.463.0</AssemblyVersion> 
  
-    <FileVersion>1.0.135.0</FileVersion> 
+    <FileVersion>1.0.463.0</FileVersion>
+	  <BepInExPluginGuid>com.fcstudios.ProductionSolutions</BepInExPluginGuid>
   </PropertyGroup> 
  
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SN_Stable|AnyCPU'"> 
@@ -34,12 +35,15 @@
     <PackageReference Include="BepInEx.PluginInfoProps" Version="1.1.0" /> 
     <PackageReference Include="UnityEngine.Modules" Version="2019.4.36" IncludeAssets="compile" /> 
     <PackageReference Include="Subnautica.GameLibs" Version="71288.0.0-r.0" /> 
-    <PackageReference Include="PolySharp" Version="1.13.1" /> 
+    <PackageReference Include="PolySharp" Version="1.14.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference> 
     <PackageReference Include="Subnautica.Nautilus" Version="1.*-*" PrivateAssets="all" /> 
   </ItemGroup> 
  
   <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'"> 
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" /> 
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" /> 
   </ItemGroup> 
  
   <ItemGroup> 
@@ -48,6 +52,18 @@
  
   <ItemGroup>
     <Folder Include="ModItems\Buildables\DeepDrillers\Models\Upgrades\" />
+    <Folder Include="ModItems\Buildables\DeepDrillers\Mono\Heavy\Models\" />
+    <Folder Include="ModItems\Buildables\DeepDrillers\Mono\Light\" />
+    <Folder Include="Libs\" />
+  </ItemGroup> 
+ 
+  <ItemGroup>
+    <Reference Include="Mono.Data.Sqlite">
+      <HintPath>Libs\Mono.Data.Sqlite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.SQLite">
+      <HintPath>Libs\sqlite3.dll</HintPath>
+    </Reference>
   </ItemGroup> 
  
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" /> 

@@ -6,6 +6,7 @@ using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.ModItems.FCSPDA.Enums;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.ModItems.Buildables.DeepDrillers.Buildables;
+using FCS_ProductionSolutions.ModItems.Buildables.DeepDrillers.Spawnables;
 using FCS_ProductionSolutions.ModItems.Buildables.HydroponicHarvester.Buildable;
 using FCS_ProductionSolutions.ModItems.Buildables.HydroponicHarvester.Mono.FMod;
 using FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Buildable;
@@ -18,12 +19,15 @@ using Nautilus.Handlers;
 using Nautilus.Utility;
 using System.Reflection;
 using UnityEngine;
+using Mono.Data.Sqlite;
+using System.Data;
+
 
 namespace FCS_ProductionSolutions;
 
 [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
 [BepInDependency("com.snmodding.nautilus")]
-[BepInDependency("FCS_AlterraHub")]
+[BepInDependency("com.fcstudios.AlterraHub")]
 public class Plugin : BaseUnityPlugin
 {
     public new static ManualLogSource Logger { get; private set; }
@@ -39,6 +43,12 @@ public class Plugin : BaseUnityPlugin
 
     private void Awake()
     {
+
+
+        //string connection = "URI=file:" + Application.persistentDataPath + "/" + "My_Database";
+        //IDbConnection dbcon = new SqliteConnection(connection);
+        //dbcon.Open();
+
         // set project-scoped logger instance
         Logger = base.Logger;
         MaterialHelpers.GetIngameObjects();
@@ -47,7 +57,7 @@ public class Plugin : BaseUnityPlugin
 
         //Register mod pack
         FCSModsAPI.PublicAPI.RegisterModPack(PluginInfo.PLUGIN_NAME, Assembly.GetExecutingAssembly(), ModSettings.AssetBundleName, ModSaveManager.Save, ModSaveManager.LoadData);
-        FCSModsAPI.PublicAPI.AddStoreCategory(PluginInfo.PLUGIN_GUID, "ProductionSolutionsIcon_W", "Production Solutions", PDAPages.ProductionSolutions);
+        FCSModsAPI.PublicAPI.AddStoreCategory(PluginInfo.PLUGIN_NAME, "ProductionSolutionsIcon_W", "Production Solutions", PDAPages.ProductionSolutions);
         StartCoroutine(MaterialHelpers.GetGameBaseMaterial(() =>
         {
             QuickLogger.Info($"Started patching [{PluginInfo.PLUGIN_NAME}]. Version: {QuickLogger.GetAssemblyVersion(Assembly)}");
@@ -65,7 +75,10 @@ public class Plugin : BaseUnityPlugin
         //Add mod and patch.
         FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "IC", new IonCubeGeneratorBuildable());
         FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "LDD", new DeepDrillerLightDutyBuildable());
+        FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "HDD", new DeepDrillerHeavyDutySpawnable());
+        FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "DDO", new DeepDrillerOperatorBuildable());
         FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "HH", new HydroponicHarvesterBuildable());
+        FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "HHII", new HydroponicHarvesterMKIIBuildable());
 
 
         //Add mod and patch.

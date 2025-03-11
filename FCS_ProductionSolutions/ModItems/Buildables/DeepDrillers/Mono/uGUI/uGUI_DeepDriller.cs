@@ -33,7 +33,7 @@ internal class uGUI_DeepDriller : Page, IuGUIAdditionalPage
             _sender = obj as DrillSystem;
 
             _sender.OnBatteryLevelChange += OnBatteryLevelChange;
-            _sender.OnOilLevelChange += OnOilLevelChange;
+            _sender.GetOilHandler().OnOilLevelChange += OnOilLevelChange;
             _sender.GetDDContainer().OnContainerUpdate += RefreshInventory;
             FCSPDAController.Main.GetGUI().GetNavigationController().SetErrorButtonDevice(_sender);
         }
@@ -63,7 +63,7 @@ internal class uGUI_DeepDriller : Page, IuGUIAdditionalPage
         base.Exit();
 
         _sender.OnBatteryLevelChange -= OnBatteryLevelChange;
-        _sender.OnOilLevelChange -= OnOilLevelChange;
+        _sender.GetOilHandler().OnOilLevelChange -= OnOilLevelChange;
         _sender.GetDDContainer().OnContainerUpdate -= RefreshInventory;
     }
 

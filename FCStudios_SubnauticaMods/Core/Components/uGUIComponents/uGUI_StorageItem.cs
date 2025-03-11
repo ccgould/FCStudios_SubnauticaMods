@@ -66,4 +66,18 @@ public class uGUI_StorageItem : MonoBehaviour
     {
         return techType;
     }
+
+    public void Refresh(int amount)
+    {
+        if(amount == 0)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        if (_amount is not null)
+        {
+            _amount.text = amount.ToString();
+        }
+    }
 }

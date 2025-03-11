@@ -41,7 +41,7 @@ public abstract class FCSDevice : MonoBehaviour, IFCSObject, IProtoEventListener
     protected ColorManager _colorManager;
     private string _prefabID;
     protected PowerRelay powerRelay;
-    [SerializeField] [Range(0f,1f)] protected float energyPerSecond = 0f;
+    [SerializeField] [Range(0.0f,20)] protected float energyPerSecond = 0f;
     protected FCSDeviceErrorHandler errorHandler;
 
 
@@ -231,8 +231,6 @@ public abstract class FCSDevice : MonoBehaviour, IFCSObject, IProtoEventListener
         }
     }
 
-
-
     public virtual void OnProtoDeserialize(ProtobufSerializer serializer)
     {
         QuickLogger.Debug($"In OnProtoDeserialize: {GetPrefabID()}", false);
@@ -333,7 +331,7 @@ public abstract class FCSDevice : MonoBehaviour, IFCSObject, IProtoEventListener
     public virtual bool IsOperational()
     {       
 
-        return IsRegisteredToBaseManager() && IsConstructed;
+        return /*IsRegisteredToBaseManager() && */IsConstructed;
     }
 
     public virtual float GetPowerUsage()

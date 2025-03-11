@@ -4,6 +4,7 @@ using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.ModItems.Buildables.DeepDrillers.Mono.Base;
+using FCS_ProductionSolutions.ModItems.Buildables.DeepDrillers.Mono.Base.Interface;
 using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
@@ -12,17 +13,23 @@ using UnityEngine;
 namespace FCS_ProductionSolutions.ModItems.Buildables.DeepDrillers.Mono;
 internal class FCSDeepDrillerOilHandler : MonoBehaviour, IFCSStorage
 {
-    [SerializeField] private DrillSystem drillSystem;
+    private IDrillSystem drillSystem;
     public int GetContainerFreeSpace { get; }
     public Action<int, int> OnContainerUpdate { get; set; }
     public Action<FCSDevice, TechType> OnContainerAddItem { get; set; }
     public Action<FCSDevice, TechType> OnContainerRemoveItem { get; set; }
+    public Action<float> OnOilLevelChange { get; set; }
     public bool IsFull { get; }
     private const float KDayInSeconds = 1200f;
     private readonly float _setOilTime = KDayInSeconds * Plugin.Configuration.DDOilTimePeriodInDays;
     private readonly float _lubricantRefillAmount = KDayInSeconds * Plugin.Configuration.DDOilRestoresInDays;
     private float _oil;
     private float _elapsed;
+
+    internal void SetDrillSystem(IDrillSystem system)
+    {
+        drillSystem = system;
+    }
 
     private void Update()
     {
@@ -40,15 +47,8 @@ internal class FCSDeepDrillerOilHandler : MonoBehaviour, IFCSStorage
             }
 
             _elapsed %= 1f;
-            drillSystem.OnOilLevelChange?.Invoke(GetOilPercent());
+            OnOilLevelChange?.Invoke(GetOilPercent());
         }
-    }
-
-    internal void Initialize(DrillSystem mono)
-    {
-        drillSystem = mono;
-        _oil = 0f;
-
     }
 
     internal void SetOilTimeLeft(float amount)
@@ -97,7 +97,7 @@ internal class FCSDeepDrillerOilHandler : MonoBehaviour, IFCSStorage
             return false;
         }
 
-        if (!CanBeStored(drillSystem.GetOilDumpContainter().GetCount(), TechType.Lubricant))
+        if (!CanBeStored(1, TechType.Lubricant))
         {
             QuickLogger.Message(AuxPatchers.OilTankNotFormatEmpty(TimeTilRefuel()), true);
             return false;

@@ -17,7 +17,7 @@ namespace FCS_StorageSolutions;
 
 [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
 [BepInDependency("com.snmodding.nautilus")]
-[BepInDependency("FCS_AlterraHub")]
+[BepInDependency("com.fcstudios.AlterraHub")]
 public class Plugin : BaseUnityPlugin
 {
     public new static ManualLogSource Logger { get; private set; }
@@ -43,7 +43,7 @@ public class Plugin : BaseUnityPlugin
 
         //Register mod pack
         FCSModsAPI.PublicAPI.RegisterModPack(PluginInfo.PLUGIN_NAME, Assembly.GetExecutingAssembly(), ModSettings.AssetBundleName, ModSaveManager.Save, ModSaveManager.LoadData);
-        FCSModsAPI.PublicAPI.AddStoreCategory(PluginInfo.PLUGIN_GUID, "StoreSolutionsIcon_W", "Storage Solutions", PDAPages.StorageSolutions);
+        FCSModsAPI.PublicAPI.AddStoreCategory(PluginInfo.PLUGIN_NAME, "StoreSolutionsIcon_W", "Storage Solutions", PDAPages.StorageSolutions);
         StartCoroutine(MaterialHelpers.GetGameBaseMaterial(() =>
         {
             QuickLogger.Info($"Started patching [{PluginInfo.PLUGIN_NAME}]. Version: {QuickLogger.GetAssemblyVersion(Assembly)}");

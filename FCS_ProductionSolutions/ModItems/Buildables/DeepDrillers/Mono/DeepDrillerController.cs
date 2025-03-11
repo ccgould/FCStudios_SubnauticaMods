@@ -1,4 +1,5 @@
-﻿using FCS_ProductionSolutions.Configuration;
+﻿using FCS_AlterraHub.Models.Structs;
+using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.ModItems.Buildables.DeepDrillers.Mono.Base;
 using System;
 
@@ -22,5 +23,10 @@ internal class DeepDrillerController : DrillSystem
 
     internal override void LoadSave()
     {
+    }
+
+    internal void SetPosition(Vec3 position)
+    {
+        
     }
 }

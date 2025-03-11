@@ -1,4 +1,5 @@
 ﻿using FCS_AlterraHub.Core.Extensions;
+using FCS_AlterraHub.Core.Services;
 using FCSCommon.Utilities;
 using Nautilus.Json;
 using Nautilus.Options;
@@ -44,6 +45,9 @@ public class Config : ConfigFile
     [Toggle("[Hydroponic Harvester] Enable/Disable Light Trigger")]
     public bool HHIsLightTriggerEnabled = true;
 
+    [Toggle("[Hydroponic Harvester] Enable/Disable Keyboard Sound Effects"), OnChange(nameof(HHKeyboardSFXToggleEvent))]
+    public bool HHKeyboardSFX = true;
+
     [Slider("[Hydroponic Harvester] Light Trigger Range", 0, 20)]
     public int HHLightTriggerRange = 4;
 
@@ -61,8 +65,6 @@ public class Config : ConfigFile
     public float MasterDeepDrillerVolume { get; set; } = 0.1f;
 
     internal float DDEnergyPerOre = 0.1064f;
-
-
     internal float DDDefaultOrePerDay = 25.0f;
     internal float DDDefaultOperationalPowerUsage = 2.00f;
     public float DDOrePowerUsageBelowDefault = 0.0264f;
@@ -74,6 +76,7 @@ public class Config : ConfigFile
     public float DDInternalBatteryCapacity = 1000f;
     public float DDDrillAlterraStorageRange = 30f;
     public float DDSolarCapacity = 125;
+    public int DDStorageSize = 300;
 
     [Toggle("[Auto Crafter]] Is Mod Enabled", Tooltip = "Enables/Disables Auto Crafter from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
     public bool IsAutocrafterEnabled = true;
@@ -125,6 +128,18 @@ public class Config : ConfigFile
         {
             QuickLogger.DebugLogsEnabled = false;
             QuickLogger.Info("Debug logs disabled");
+        }
+    }
+
+    private void HHKeyboardSFXToggleEvent(ToggleChangedEventArgs e)
+    {
+       if(e.Value)
+        {
+            HabitatService.main?.GlobalNotifyByID(string.Empty, "HHSFXOn");
+        }
+       else
+        {
+            HabitatService.main?.GlobalNotifyByID(string.Empty, "HHSFXOff");
         }
     }
 }

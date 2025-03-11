@@ -35,7 +35,7 @@ public interface IFCSModsAPIPublic
     bool IsInOreBuildMode();
     string GetModBundleName(string modName, string classID);
     Dictionary<TechType, FCSStoreEntry> GetRegisteredKits();
-    void RegisterDevice(FCSDevice fCSDevice, Action callback = null);
+    void RegisterDevice(FCSDevice fCSDevice, Action callback = null, bool force = false);
     void UnRegisterDevice(FCSDevice fCSDevice);
     void CreateStoreEntry(TechType parentTechType, TechType receiveTechType,int returnAmount, decimal cost, StoreCategory energy,bool forceUnlock = false);
     string GetModID(TechType techType);
@@ -45,7 +45,8 @@ public interface IFCSModsAPIPublic
     void AddStoreCategory(string pLUGIN_GUID, string iconName, string pageName, PDAPages pdaPage);
     bool IsRegisteredInBase(string prefabID, out HabitatManager manager);
     HabitatManager GetPlayerHabitat();
-
+    FCSDevice FindDeviceWithPreFabID(string prefabID);
+    FCSDevice FindDeviceWithDeviceID(string deviceID);
     TechType GetDssInterationTechType();
     void RegisterBaseManagerModule(string pluginName, string classID, string friendlyName, string description, decimal itemCost, StoreCategory storeCategory);
     HashSet<FCSDevice> GetRegisteredDevicesOfId(string modID);
@@ -139,10 +140,29 @@ public class FCSModsAPI : IFCSModsAPIPublic, IFCSModsAPIInternal
         return StoreInventoryService.GetRegisteredKits();
     }
 
-    public void RegisterDevice(FCSDevice fcsDevice, Action callback = null)
+    public void RegisterDevice(FCSDevice fcsDevice, Action callback = null,bool force = false)
     {
-        HabitatService.main.RegisterDevice(fcsDevice,callback);
+        if (!force)
+        {
+            HabitatService.main.RegisterDevice(fcsDevice, callback);
+        }
+        else
+        {
+            HabitatService.main.RegisterDevice(fcsDevice, callback,true);
+        }
     }
+
+
+    public FCSDevice FindDeviceWithDeviceID(string deviceID) 
+    {
+        return HabitatService.main.FindDevice(deviceID);
+    }
+
+    public FCSDevice FindDeviceWithPreFabID(string prefabID)
+    {
+        return HabitatService.main.FindDeviceWithPreFabID(prefabID);
+    }
+
 
     public void UnRegisterDevice(FCSDevice fcsDevice)
     {

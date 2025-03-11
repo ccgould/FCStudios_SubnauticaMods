@@ -1,10 +1,10 @@
-﻿using FCS_EnergySolutions.ModItems.Buildables.JetStream.Buildables;
+﻿using FCS_HomeSolutions.ModItems.Buildables.UniversalCharger.Buildables;
 using FCSCommon.Utilities;
 using HarmonyLib;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace FCS_EnergySolutions.Patches;
+namespace FCS_HomeSolutions.Patches;
 [HarmonyPatch]
 public static class uGUI_Equipment_Patches
 {
@@ -15,12 +15,12 @@ public static class uGUI_Equipment_Patches
         QuickLogger.Debug("uGUI_Equipment Awake UC", true);
 
 
-        CreateSlots(__instance, __instance.gameObject.transform,5,2,200, UniversalChargerBuildable.ucPowercellSlots);
-        
-        CreateSlots(__instance, __instance.gameObject.transform,5,2, 200, UniversalChargerBuildable.ucBatterySlots);
+        CreateSlots(__instance, __instance.gameObject.transform, 5, 2, 200, UniversalChargerBuildable.ucPowercellSlots);
+
+        CreateSlots(__instance, __instance.gameObject.transform, 5, 2, 200, UniversalChargerBuildable.ucBatterySlots);
     }
 
-    private static void CreateSlots(uGUI_Equipment __instance, Transform grid,int sizeY,int sizeX,int spacing, List<string> slots)
+    private static void CreateSlots(uGUI_Equipment __instance, Transform grid, int sizeY, int sizeX, int spacing, List<string> slots)
     {
         QuickLogger.Debug($"==================================== [Create Slots] ====================================");
         var modulePrefab = __instance.gameObject.FindChild($"CyclopsModule1").gameObject;
@@ -50,14 +50,14 @@ public static class uGUI_Equipment_Patches
 
                 QuickLogger.Debug($"Slot Name : {slotName}");
 
-                var f = GameObject.Instantiate(modulePrefab, grid, false);
+                var f = Object.Instantiate(modulePrefab, grid, false);
                 var slot = f.GetComponent<uGUI_EquipmentSlot>();
                 slot.active = false;
                 slot.slot = slotName;
                 slot.name = slotName;
 
                 slot.gameObject.transform.localPosition = new Vector3(currentRow, currentRowh, 0);
-                GameObject.Destroy(f.transform.GetChild(0).gameObject);
+                Object.Destroy(f.transform.GetChild(0).gameObject);
                 __instance.allSlots.Add(slotName, slot);
                 i++;
                 currentRow += size;

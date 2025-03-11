@@ -14,6 +14,7 @@ public class SlerpHelper : MonoBehaviour
 
     [SerializeField] private Vector3 openRotEuler;
     [SerializeField] private Vector3 closedRotEuler;
+    public bool playSFX = true;
 
     private Quaternion openRot;
     private Quaternion closedRot;
@@ -39,7 +40,10 @@ public class SlerpHelper : MonoBehaviour
             if (!_notTransitioning)
             {
                 StartCoroutine(Transition(true, openRot,openingCurve));
-                openSound.Play();
+                if(playSFX)
+                {
+                    openSound.Play();
+                }
             }
         }
         
@@ -48,7 +52,10 @@ public class SlerpHelper : MonoBehaviour
             if (!_notTransitioning)
             {
                 StartCoroutine(Transition(false, closedRot, closingingCurve));
-                closeSound.Play();
+                if(playSFX)
+                {
+                    closeSound.Play();
+                }
             }
         }
     }

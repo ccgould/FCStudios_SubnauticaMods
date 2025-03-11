@@ -4,6 +4,7 @@ using FCS_ProductionSolutions.ModItems.Buildables.HydroponicHarvester.Mono;
 using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using UnityEngine;
 
@@ -36,7 +37,11 @@ internal class PlantSlot : MonoBehaviour
     private bool pauseUpdates;
     private bool IsFull => _count >= maxCapacity;
     private int _count;
+    private float cachedProgress;
+    private string cachedProgressString;
+    private float progress;
 
+    public float GenerationPercent => Mathf.Max(0f, GenerationProgress / energyConsumption);
 
     private void Start()
     {
@@ -118,6 +123,10 @@ internal class PlantSlot : MonoBehaviour
     {
         if (controller is null || planter is null || validBigSlots is null || validBigSlots == null) return;
         GenerateClone();
+        foreach (Transform item in planter.grownPlantsRoot)
+        {
+
+        }
     }
 
     private void GenerateClone()
@@ -220,6 +229,7 @@ internal class PlantSlot : MonoBehaviour
 
         planter.AddItem(component, avaliableSlot);
         _storageContainer.container.UnsafeAdd(plant);
+        TryStartingNextClone();
     }
 
     internal bool TryClear(bool forceClear = false, bool clearContainer = false)
@@ -383,8 +393,30 @@ internal class PlantSlot : MonoBehaviour
 
     internal void Load(SlotData slot1Data)
     {
+        if (slot1Data == null) return;
         _count = slot1Data.Amount;
         GenerationProgress = slot1Data.GenerationProgress;
+    }
+
+    internal string GetGrowthPercentage()
+    {
+        this.progress = Mathf.Clamp01(_activePlantSlot?.plantable?.growingPlant?.GetProgress() ?? 0);
+
+        if (this.cachedProgress == this.progress)
+        {
+            return string.IsNullOrWhiteSpace(cachedProgressString) ? "0%" : cachedProgressString;
+        }
+
+        this.cachedProgress = this.progress;
+
+        cachedProgressString = Language.main.GetFormat<float>("HandReticleProgressPercentFormat", this.progress);
+
+        return cachedProgressString;
+    }
+
+    internal string GetGenerationPercentage()
+    {
+        return String.Format("{0:P0}.", GenerationPercent);
     }
 }
 

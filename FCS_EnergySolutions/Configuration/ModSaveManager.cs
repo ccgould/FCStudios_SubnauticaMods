@@ -35,6 +35,8 @@ internal static class ModSaveManager
                 }
             }
 
+           var f =  TechGroup.InteriorModules;
+            var g = TechCategory.InteriorModule;
             SaveLoadDataService.instance.SaveData(PluginInfo.PLUGIN_NAME, _saveData, false, OnSaveComplete);
 
             QuickLogger.Debug($"=================== Saved {PluginInfo.PLUGIN_NAME} ===================");
@@ -99,4 +101,5 @@ internal static class ModSaveManager
         }
         return new T();
     }
+       
 }

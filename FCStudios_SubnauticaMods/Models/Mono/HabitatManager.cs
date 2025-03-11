@@ -361,7 +361,7 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
         _baseID = id;
     }
 
-    internal bool HasEnoughPower(float power)
+    public bool HasEnoughPower(float power)
     {
         if (_habitat.powerRelay == null)
         {
@@ -430,9 +430,14 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
         return _connectedDevices;
     }
 
-    public IEnumerable<FCSDevice> GetCount<T>() where T : new()
+    public IEnumerable<FCSDevice> GetDevicesOfType<T>() where T : new()
     {
         return _registeredDevices.Where(x => x is T);
+    }
+
+    public int GetCountDevicesOfType<T>() where T : new()
+    {
+        return _registeredDevices.Count(x => x is T);
     }
 
     private bool IsInWorkGroup(string prefabID)
@@ -631,17 +636,32 @@ public partial class HabitatManager : MonoBehaviour, IFCSDumpContainer
 
     private void PowerConsumption()
     {
-        if (_registeredDevices == null) return;
-        //Take power from the base
-        for (int i = _registeredDevices.Count - 1; i >= 0; i--)
-        {
-            var device = _registeredDevices.ElementAt(i);
+        //if (_registeredDevices == null) return;
 
-            if (device.IsOperational() && _habitat.powerRelay != null)
+        ////Take power from the base
+        //for (int i = _registeredDevices.Count - 1; i >= 0; i--)
+        //{
+        //    var device = _registeredDevices.ElementAt(i);
+
+        //    if (device.IsOperational() && _habitat.powerRelay != null)
+        //    {
+        //        _habitat.powerRelay.ConsumeEnergy(device.GetPowerUsage(), out float amountConsumed);
+        //    }
+        //}
+    }
+
+    public bool ConsumePower(FCSDevice device)
+    {
+        if (device.IsOperational() && _habitat.powerRelay != null)
+        {
+            if(_habitat.powerRelay.GetPower() > device.GetPowerUsage())
             {
                 _habitat.powerRelay.ConsumeEnergy(device.GetPowerUsage(), out float amountConsumed);
+                return true;
             }
         }
+
+        return false;   
     }
 }
 

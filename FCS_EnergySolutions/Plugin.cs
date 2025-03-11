@@ -18,7 +18,7 @@ using static FCS_EnergySolutions.Configuration.SaveData;
 namespace FCS_EnergySolutions;
 [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
 [BepInDependency("com.snmodding.nautilus")]
-[BepInDependency("FCS_AlterraHub")]
+[BepInDependency("com.fcstudios.AlterraHub")]
 public class Plugin : BaseUnityPlugin
 {
     public new static ManualLogSource Logger { get; private set; }
@@ -42,7 +42,7 @@ public class Plugin : BaseUnityPlugin
 
         //Register mod pack
         FCSModsAPI.PublicAPI.RegisterModPack(PluginInfo.PLUGIN_NAME, Assembly.GetExecutingAssembly(), ModSettings.AssetBundleName, ModSaveManager.Save, ModSaveManager.LoadData);
-        FCSModsAPI.PublicAPI.AddStoreCategory(PluginInfo.PLUGIN_GUID, "EnergySolutionsIcon_W", "Energy Solutions", PDAPages.EnergySolutions);
+        FCSModsAPI.PublicAPI.AddStoreCategory(PluginInfo.PLUGIN_NAME, "EnergySolutionsIcon_W", "Energy Solutions", PDAPages.EnergySolutions);
         StartCoroutine(MaterialHelpers.GetGameBaseMaterial(() =>
         {
             QuickLogger.Info($"Started patching [{PluginInfo.PLUGIN_NAME}]. Version: {QuickLogger.GetAssemblyVersion(Assembly)}");
@@ -73,7 +73,5 @@ public class Plugin : BaseUnityPlugin
         FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "JS", new JetStreamT242Buildable());
         FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "AG", new AlterraGenBuildable());
         FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "TP", new TelepowerPylonBuildable());
-        FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "UC", new UniversalChargerBuildable());
-
     }
 }

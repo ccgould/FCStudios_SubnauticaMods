@@ -12,7 +12,8 @@ internal class uGUI_HarvesterSlot : MonoBehaviour
     [SerializeField] private uGUI_Icon _icon;
     [SerializeField] private int id;
     [SerializeField] private Text _amount;
-    [SerializeField] private Text _timeLeft;
+    [SerializeField] private Text _generationPercentage;
+    [SerializeField] private Text _growthPercentage;
 
     private PlantSlot _slot;
     private uGUI_HydroponicHarvester _ui;
@@ -22,6 +23,15 @@ internal class uGUI_HarvesterSlot : MonoBehaviour
     {
         _icon.sprite = SpriteManager.defaultSprite;
         _ui = gameObject.GetComponentInParent<uGUI_HydroponicHarvester>();
+    }
+
+    private void Update()
+    {
+        if(_slot is not null)
+        {
+            _growthPercentage.text = _slot.GetGrowthPercentage();
+            _generationPercentage.text = _slot.GetGenerationPercentage();
+        }
     }
 
     private void OnLongPress()

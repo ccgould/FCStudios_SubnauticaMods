@@ -5,37 +5,36 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
-namespace FCSCommon.Helpers
+namespace FCSCommon.Helpers;
+
+internal static class FileSystemHelper
 {
-    internal static class FileSystemHelper
+    public static string ModDirLocation { get; } = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+    
+    public static string ModAssetDirLocation { get; } = Path.Combine(ModDirLocation,"Assets");
+
+    public static string ModSettings { get; } = Path.Combine(ModAssetDirLocation,"ModSettings.bin");
+
+    internal static Dictionary<string, FCSModItemSettings> DeseriaizeSettings(string path)
     {
-        public static string ModDirLocation { get; } = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        
-        public static string ModAssetDirLocation { get; } = Path.Combine(ModDirLocation,"Assets");
+        Dictionary<string, FCSModItemSettings> obj = null;
 
-        public static string ModSettings { get; } = Path.Combine(ModAssetDirLocation,"ModSettings.bin");
+        var modSettings = Path.Combine(path,"Assets", "ModSettings.bin");
 
-        internal static Dictionary<string, FCSModItemSettings> DeseriaizeSettings(string path)
+        if (File.Exists(modSettings))
         {
-            Dictionary<string, FCSModItemSettings> obj = null;
-
-            var modSettings = Path.Combine(path,"Assets", "ModSettings.bin");
-
-            if (File.Exists(modSettings))
+            // deserialize JSON directly from a file
+            using (StreamReader file = File.OpenText(modSettings))
             {
-                // deserialize JSON directly from a file
-                using (StreamReader file = File.OpenText(modSettings))
-                {
-                    JsonSerializer serializer = new JsonSerializer();
-                    obj = (Dictionary<string, FCSModItemSettings>)serializer.Deserialize(file, typeof(Dictionary<string, FCSModItemSettings>));
-                }
+                JsonSerializer serializer = new JsonSerializer();
+                obj = (Dictionary<string, FCSModItemSettings>)serializer.Deserialize(file, typeof(Dictionary<string, FCSModItemSettings>));
             }
-            else
-            {
-                QuickLogger.Error("Mod Settings were not found!");
-            }
-
-            return obj;
         }
+        else
+        {
+            QuickLogger.Error("Mod Settings were not found!");
+        }
+
+        return obj;
     }
 }
