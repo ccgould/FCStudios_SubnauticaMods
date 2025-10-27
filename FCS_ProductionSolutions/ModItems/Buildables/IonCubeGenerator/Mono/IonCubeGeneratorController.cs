@@ -18,7 +18,7 @@ using static FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Mono.S
 
 namespace FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Mono;
 
-internal class IonCubeGeneratorController : FCSDevice, IFCSSave<SaveData>, IWorkUnit
+internal class IonCubeGeneratorController : FCSDevice, IFCSSave, IWorkUnit
 {
     private const float CUBE_ENERGY_COST = 1500f;
 
@@ -149,11 +149,11 @@ internal class IonCubeGeneratorController : FCSDevice, IFCSSave<SaveData>, IWork
     public override void ReadySaveData()
     {
         string id = (base.GetComponentInParent<PrefabIdentifier>() ?? base.GetComponent<PrefabIdentifier>()).Id;
-        _savedData = ModSaveManager.GetSaveData<CubeGeneratorSaveData>(id);
+        _savedData = FCSModsAPI.PublicAPI.GetSaveData<CubeGeneratorSaveData>(id);
         QuickLogger.Debug($"Prefab Id : {GetPrefabID()} || SaveData Is Null: {_savedData is null}");
     }
 
-    public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)
+    public void SaveDevice()
     {
         QuickLogger.Debug("Saving Cube Gen", true);
 
@@ -175,8 +175,11 @@ internal class IonCubeGeneratorController : FCSDevice, IFCSSave<SaveData>, IWork
         save.State = cubeGeneratorStateManager.GetCurrentStateIndex();
         save.CurrentSpeedMode = CurrentSpeedMode();
 
-        newSaveData.Data.Add(save);
-        QuickLogger.Debug($"Saves Cube Gen {newSaveData.Data.Count}", true);
+        //newSaveData.Data.Add(save);
+
+        SaveLoadDataService.instance.Save(save, PluginInfo.PLUGIN_NAME);
+
+       // QuickLogger.Debug($"Saves Cube Gen {newSaveData.Data.Count}", true);
     }
 
     #region IWorkUnit

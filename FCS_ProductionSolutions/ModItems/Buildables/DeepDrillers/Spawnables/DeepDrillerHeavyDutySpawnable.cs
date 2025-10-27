@@ -13,7 +13,7 @@ internal class DeepDrillerHeavyDutySpawnable : FCSSpawnableModBase
 {
     public static TechType PatchedTechType { get; set; }
 
-    public DeepDrillerHeavyDutySpawnable() : base(PluginInfo.PLUGIN_NAME, "DeepDrillerHeavyDuty", FileSystemHelper.ModDirLocation, "DeepDrillerHeavyDuty", "Deep Driller Heavy Duty")
+    public DeepDrillerHeavyDutySpawnable() : base(PluginInfo.PLUGIN_NAME, "DeepDrillerHeavyDuty2", FileSystemHelper.ModDirLocation, "DeepDrillerHeavyDuty", "Deep Driller Heavy Duty")
     {
         OnFinishRegister += () =>
         {

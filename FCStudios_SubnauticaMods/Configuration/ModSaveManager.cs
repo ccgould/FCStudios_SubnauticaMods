@@ -1,4 +1,5 @@
 ﻿using FCS_AlterraHub.API;
+using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.Models.Mono;
@@ -7,6 +8,7 @@ using Newtonsoft.Json.Linq;
 using System.Collections;
 using UnityEngine;
 using UWE;
+using static FCS_AlterraHub.Core.Services.SaveLoadDataService;
 
 namespace FCS_AlterraHub.Configuation;
 
@@ -21,26 +23,32 @@ internal static class ModSaveManager
             QuickLogger.Debug($"=================== Saving {PluginInfo.PLUGIN_NAME} ===================");
             _saveObject = new GameObject().AddComponent<ModSaver>();
 
-            _saveData = new SaveData();
-
             foreach (var controller in FCSModsAPI.PublicAPI.GetRegisteredDevices())
             {
 
                 QuickLogger.Debug($"ModID: {FCSModsAPI.PublicAPI.GetModPackID(controller.GetTechType())} || Target: {PluginInfo.PLUGIN_NAME}");
 
-                if (FCSModsAPI.PublicAPI.GetModPackID(controller.GetTechType()) == PluginInfo.PLUGIN_NAME)
+                //if (FCSModsAPI.PublicAPI.GetModPackID(controller.GetTechType()) == PluginInfo.PLUGIN_NAME)
+                //{
+                //    QuickLogger.Debug($"Saving device: {controller.UnitID}");
+                //    ((IFCSSave<SaveData>)controller).Save(_saveData);
+                //}
+
+                QuickLogger.Debug($"Saving device: {controller.UnitID}");
+                if(controller is IFCSSave)
                 {
-                    QuickLogger.Debug($"Saving device: {controller.UnitID}");
-                    ((IFCSSave<SaveData>)controller).Save(_saveData);
+                    ((IFCSSave)controller).SaveDevice();
                 }
             }
 
+            OnSaveComplete();
+            /*
             _saveData.StoreManagerSaveData = StoreManager.main.Save();
             _saveData.AccountDetails = AccountService.main.SaveDetails();
             FCSPDAController.Main.Save();
             _saveData.GamePlayService = GamePlayService.Main.Save();
             SaveLoadDataService.instance.SaveData(PluginInfo.PLUGIN_NAME, _saveData, false, OnSaveComplete);
-
+            */
             QuickLogger.Debug($"=================== Saved {PluginInfo.PLUGIN_NAME} ===================");
         }
     }
@@ -73,7 +81,11 @@ internal static class ModSaveManager
 
     internal static void LoadData()
     {
-        QuickLogger.Info("Loading Save Data...");
+        //QuickLogger.Info("Loading Save Data...");
+        //var data = SaveLoadDataService.instance.Load<GameData>(1, PluginInfo.PLUGIN_NAME);
+        //QuickLogger.Info($"Save Data Loaded : ID-{data.} Data-{data.Points}");
+
+        /*
         SaveLoadDataService.instance.LoadData<SaveData>(PluginInfo.PLUGIN_NAME, false, (data) =>
         {
             _saveData = data;
@@ -89,6 +101,8 @@ internal static class ModSaveManager
             StoreManager.main.LoadSave(_saveData.StoreManagerSaveData);
             FCSPDAController.Main.LoadFromSave();
         });
+
+        */
     }
 
     internal static T GetSaveData<T>(string id) where T : new()
@@ -112,5 +126,22 @@ internal static class ModSaveManager
             }
         }
         return new T();
+    }
+
+    internal static T GetSaveDataV2<T>(string id) where T : IDBEntity, new()
+    {
+        var data = instance.Load<T>(id, PluginInfo.PLUGIN_NAME);
+
+        if(data is not null)
+        {
+           return data;
+        }
+
+        return new T();
+    }
+
+    internal static void SaveData<T>(T save) where T : IDBEntity, new()
+    {
+        instance.Save(save, PluginInfo.PLUGIN_NAME);
     }
 }

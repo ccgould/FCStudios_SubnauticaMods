@@ -91,7 +91,7 @@ internal class AlterraGenPowerManager : FCSPowerManager
     {
         var multiplier = 0f;
 
-        var size = CraftData.GetItemSize(techType);
+        var size = TechData.GetItemSize(techType);
 
         if (size.x > 1 || size.y > 1)
         {

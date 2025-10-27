@@ -15,7 +15,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace FCS_StorageSolutions.ModItems.Buildables.RemoteStorage.Mono;
-internal class RemoteStorageController : FCSDevice, IFCSSave<SaveData>
+internal class RemoteStorageController : FCSDevice, IFCSSave
 {
     [SerializeField] private List<uGUI_RemoteStorageItem> _inventoryButtons  = new();
     [SerializeField] private Text storageAmountLbl;
@@ -165,11 +165,11 @@ internal class RemoteStorageController : FCSDevice, IFCSSave<SaveData>
     public override void ReadySaveData()
     {
         string id = (base.GetComponentInParent<PrefabIdentifier>() ?? base.GetComponent<PrefabIdentifier>()).Id;
-        _savedData = ModSaveManager.GetSaveData<BaseSaveData>(id);
+        _savedData = FCSModsAPI.PublicAPI.GetSaveData<BaseSaveData>(id);//ModSaveManager.GetSaveData<BaseSaveData>(id);
         QuickLogger.Debug($"Prefab Id : {GetPrefabID()} || SaveData Is Null: {_savedData is null}");
     }
 
-    public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)
+    public void SaveDevice()
     {
         QuickLogger.Debug("Saving Cube Gen", true);
 
@@ -186,8 +186,9 @@ internal class RemoteStorageController : FCSDevice, IFCSSave<SaveData>
         save.BaseId = FCSModsAPI.PublicAPI.GetHabitat(this)?.GetBasePrefabID();
         save.ColorTemplate = _colorManager.SaveTemplate();
 
-        newSaveData.Data.Add(save);
-        QuickLogger.Debug($"Saves Cube Gen {newSaveData.Data.Count}", true);
+        //newSaveData.Data.Add(save);
+        FCSModsAPI.PublicAPI.PushSaveData(save);
+        //QuickLogger.Debug($"Saves Cube Gen {newSaveData.Data.Count}", true);
     }
 
     public override string[] GetDeviceStats()

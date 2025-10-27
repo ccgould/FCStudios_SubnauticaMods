@@ -1,4 +1,5 @@
-﻿using FCS_AlterraHub.Core.Components;
+﻿using FCS_AlterraHub.API;
+using FCS_AlterraHub.Core.Components;
 using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Interfaces;
@@ -10,7 +11,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace FCS_LifeSupportSolutions.ModItems.Buildables.BaseUtilityUnit.Mono;
-internal class BaseUtilityUnitController : FCSDevice, IFCSSave<SaveData>
+internal class BaseUtilityUnitController : FCSDevice, IFCSSave
 {
     [SerializeField] private GameObject _canvas;
     [SerializeField] private ParticleSystem[] _bubbles;
@@ -190,7 +191,7 @@ internal class BaseUtilityUnitController : FCSDevice, IFCSSave<SaveData>
     public override void ReadySaveData()
     {
         string id = (base.GetComponentInParent<PrefabIdentifier>() ?? base.GetComponent<PrefabIdentifier>()).Id;
-        _savedData = ModSaveManager.GetSaveData<BaseUtilityEntry>(id);
+        _savedData = FCSModsAPI.PublicAPI.GetSaveData<BaseUtilityEntry>(id);//ModSaveManager.GetSaveData<BaseUtilityEntry>(id);
         QuickLogger.Debug($"Prefab Id : {GetPrefabID()} || SaveData Is Null: {_savedData is null}");
     }
 

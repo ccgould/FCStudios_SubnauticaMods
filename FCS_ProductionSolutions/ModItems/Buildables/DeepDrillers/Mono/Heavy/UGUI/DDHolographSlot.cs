@@ -11,6 +11,8 @@ internal class DDHolographSlot : MonoBehaviour
     //TODO Replace the GetComponentfromparent
 {
     public Transform Target { get; set; }
+
+
     //internal DeepDrillerOperatorController DeepDrillerOperatorController
     //{
     //    get

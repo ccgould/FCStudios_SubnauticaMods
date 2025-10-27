@@ -16,7 +16,7 @@ internal class StatusInfo : MonoBehaviour
 
     private float timeLeft;
 
-    internal void Initialize(Atlas.Sprite icon, Func<string> func)
+    internal void Initialize(Sprite icon, Func<string> func)
     {
         image.sprite = icon;
         CallBack = func;

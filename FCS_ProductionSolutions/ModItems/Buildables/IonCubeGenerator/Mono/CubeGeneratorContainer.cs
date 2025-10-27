@@ -9,11 +9,8 @@ namespace FCS_ProductionSolutions.ModItems.Buildables.IonCubeGenerator.Mono;
 
 internal class CubeGeneratorContainer : ICubeContainer
 {
-#if SUBNAUTICA
-    private static readonly Vector2int CubeSize = CraftData.GetItemSize(TechType.PrecursorIonCrystal);
-#elif BELOWZERO
     private static readonly Vector2int CubeSize = TechData.GetItemSize(TechType.PrecursorIonCrystal);
-#endif
+
     internal GameObject CubePrefab;
 
     private const int ContainerHeight = 2;

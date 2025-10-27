@@ -11,9 +11,6 @@ using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-#if SUBNAUTICA
-using TechData = CraftData;
-#endif
 
 namespace FCS_AlterraHub.ModItems.FCSPDA.Mono.Dialogs;
 

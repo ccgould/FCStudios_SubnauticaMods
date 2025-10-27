@@ -15,7 +15,7 @@ using System.Linq;
 using FCS_StorageSolutions.Configuration;
 
 namespace FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Mono.Base;
-internal class RackBase : FCSDevice, IFCSSave<SaveData>
+internal class RackBase : FCSDevice, IFCSSave
 {
     protected private FCSStorage _fcsStorage;
     private DumpContainer _dumpContainer;
@@ -329,11 +329,11 @@ internal class RackBase : FCSDevice, IFCSSave<SaveData>
     public override void ReadySaveData()
     {
         string id = (GetComponentInParent<PrefabIdentifier>() ?? GetComponent<PrefabIdentifier>()).Id;
-        _savedData = ModSaveManager.GetSaveData<DSSRackSaveData>(id);
+        _savedData = FCSModsAPI.PublicAPI.GetSaveData<DSSRackSaveData>(id); //ModSaveManager.GetSaveData<DSSRackSaveData>(id);
         QuickLogger.Debug($"Prefab Id : {GetPrefabID()} || SaveData Is Null: {_savedData is null}");
     }
 
-    public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)
+    public void SaveDevice()
     {
         QuickLogger.Debug("Saving Server Rack", true);
 
@@ -360,9 +360,9 @@ internal class RackBase : FCSDevice, IFCSSave<SaveData>
             }
         }
 
-        newSaveData.Data.Add(save);
-
-        QuickLogger.Debug($"Saves Server Rack {newSaveData.Data.Count}", true);
+        //newSaveData.Data.Add(save);
+        FCSModsAPI.PublicAPI.PushSaveData(save);
+        //QuickLogger.Debug($"Saves Server Rack {newSaveData.Data.Count}", true);
     }
 
     public override string[] GetDeviceStats()

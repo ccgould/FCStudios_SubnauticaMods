@@ -1,4 +1,5 @@
 ﻿using FCSCommon.Utilities;
+using Nautilus.Handlers;
 using Nautilus.Json;
 using Nautilus.Options;
 using Nautilus.Options.Attributes;
@@ -20,11 +21,6 @@ internal class Config : ConfigFile
 
     internal UnityAction<int> onGameModeChanged;
 
-    [Keybind("Open/Reset FCS PDA"), OnChange(nameof(PDAKeyCodeChangedEvent))]
-    public KeyCode FCSPDAKeyCode = KeyCode.F2;
-
-    [Keybind("FCS PDA Information Button"), OnChange(nameof(PDAKeyCodeChangedEvent))]
-    public KeyCode PDAInfoKeyCode = KeyCode.I;
 
     [Slider("Ore Payout Difficulty", 0.1f, 1.9f, DefaultValue = 1, Step = 0.1f, Format = "{0}", Tooltip = "The higher the value the more payout per ore.")]
     public float OrePayoutMultiplier = 1f;
@@ -37,17 +33,7 @@ internal class Config : ConfigFile
     [Toggle("[Paint Tool] Is Mod Enabled", Order = 4, Tooltip = "Enables/Disables Paint Tool from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
     public bool IsPaintToolEnabled = true;
 
-    [Keybind("[Paint Tool] Select Color Forward", Order = 4, Tooltip = "Selects the next color on the paint tool")]
-    public KeyCode PaintToolSelectColorForwardKeyCode = KeyCode.RightArrow;
-
-    [Keybind("[Paint Tool] Select Color Back", Order = 4, Tooltip = "Selects the previous color on the paint tool")]
-    public KeyCode PaintToolSelectColorBackKeyCode = KeyCode.LeftArrow;
-
-    [Keybind("[Paint Tool] Sample Color Template", Order = 4, Tooltip = "Gets the color template from the object in view.")]
-    public KeyCode PaintToolColorSampleKeyCode = KeyCode.P;
-
     #endregion
-
 
     private void PlaySoundToggleEvent(ToggleChangedEventArgs e)
     {
@@ -58,9 +44,6 @@ internal class Config : ConfigFile
 
     [Toggle("[Ore Crusher] Camera Shake", Order = 1, Tooltip = "Enables/Disables the camera shaking for ore crusher when in use.")]
     public bool OreCrusherCameraShake { get;  set; }
-
-    [Keybind("FCS DevicePage Interface Information Button")]
-    public KeyCode PDASettingsKeyCode = KeyCode.F2;
 
     [Toggle("[Alterra Transport Drone] Enable Drone Audio", Order = 1, Tooltip = "Enables/Disables the sound effects on the drone.")]
     public bool AlterraTransportDroneFxAllowed = true;
@@ -77,11 +60,6 @@ internal class Config : ConfigFile
     [Toggle("Ore Mode", Tooltip = "Removes the need for credit to build items. (Game restart required!)")]
     public bool OreBuildMode = false;
 
-
-    private void PDAKeyCodeChangedEvent(KeybindChangedEventArgs e)
-    {
-
-    }
 
 
     private void EnableDebugsToggleEvent(ToggleChangedEventArgs e)

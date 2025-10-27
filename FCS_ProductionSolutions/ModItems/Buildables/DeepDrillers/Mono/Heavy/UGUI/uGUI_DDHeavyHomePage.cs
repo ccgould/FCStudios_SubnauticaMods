@@ -7,10 +7,12 @@ using FCS_AlterraHub.ModItems.FCSPDA.Interfaces;
 using FCS_ProductionSolutions.ModItems.Buildables.DeepDrillers.Mono.Heavy.Struct;
 using FCS_ProductionSolutions.ModItems.Buildables.DeepDrillers.Spawnables;
 using FCSCommon.Utilities;
+using Nautilus.Handlers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -54,18 +56,18 @@ internal class uGUI_DDHeavyHomePage : Page, IuGUIAdditionalPage
 
             foreach (var drill in _sender.GetConnectedDrills())
             {
-                if (_sender.GetItemWithId(drill.Key, out GameObject result))
+                if (drill.Value is not null)
                 {
-                    var platformController = result.GetComponentInChildren<DDPlatformController>();
+                    var platformController = drill.Value.GetPlatformController();
                     var holoGraphControl = CreateHoloGraph(platformController);
                     holoGraphControl.transform.SetParent(HologramsGrid.transform, true);
                     holoGraphControl.transform.localPosition = Vector3.zero;
                     holoGraphControl.transform.localRotation = Quaternion.identity;
                     holoGraphControl.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-                    holoGraphControl.gameObject.name = $"{drill.Value.HoloGraphPosition} {holoGraphControl.gameObject.name}";
-                    _sender.Grid.Add(holoGraphControl, drill.Value.HoloGraphPosition);
+                    holoGraphControl.gameObject.name = $"{drill.Value.GetPlatformController().ConnectionData.HoloGraphPosition} {holoGraphControl.gameObject.name}";
+                    _sender.Grid.Add(holoGraphControl, drill.Value.GetPlatformController().ConnectionData.HoloGraphPosition);
 
-                    QuickLogger.Debug($"Added Drill to slot {drill.Value.Slot}");
+                    QuickLogger.Debug($"Added Drill to slot {drill.Value.GetPlatformController().ConnectionData.Slot}");
                 }
                 else
                 {
@@ -85,7 +87,7 @@ internal class uGUI_DDHeavyHomePage : Page, IuGUIAdditionalPage
     {
         foreach (var drill in _sender.GetConnectedDrills())
         {
-            var parentHologram = findHoloWithID(drill.Value.ParentTurbineUnitID);
+            var parentHologram = findHoloWithID(drill.Value.GetPlatformController().ConnectionData.ParentTurbineUnitID);
             var currentHologram = findHoloWithID(drill.Key);
 
             if(parentHologram is null || currentHologram is null)
@@ -94,7 +96,7 @@ internal class uGUI_DDHeavyHomePage : Page, IuGUIAdditionalPage
                 return;
             }
 
-            currentHologram.MoveIntoPosition(HologramsGrid.transform,parentHologram, drill.Value.Slot);
+            currentHologram.MoveIntoPosition(HologramsGrid.transform,parentHologram, drill.Value.GetPlatformController().ConnectionData.Slot);
         }
     }
 
@@ -191,68 +193,49 @@ internal class uGUI_DDHeavyHomePage : Page, IuGUIAdditionalPage
 
         QuickLogger.Debug("2");
 
-        QuickLogger.Debug($"Adding Drill to Port: {slot.Target.name}|{slot.GetSlotID()}");
-
-        var go = CraftData.GetPrefabForTechTypeAsync(DeepDrillerHeavyDutySpawnable.PatchedTechType, false);
-
-        yield return go;
-
-        var drill = GameObject.Instantiate(go.GetResult());
-
-        if (drill != null)
-        {
-            slot.GetPlatformController().AddNewPlatForm(slot.Target, _sender, drill);
-
-            if (drill == null)
-            {
-                result.Set(false);
-                yield break;
-            }
-
-            foreach (Collider builtCollider in drill.GetComponentsInChildren<Collider>() ?? new Collider[0])
-            {
-                foreach (Collider collider in gameObject.GetComponentsInChildren<Collider>() ?? new Collider[0])
-                {
-                    Physics.IgnoreCollision(collider, builtCollider);
-                }
-            }
+        // QuickLogger.Debug($"Adding Drill to Port: {slot.Target.name}|{slot.GetSlotID()}");
 
 
-            var drillController = drill.GetComponent<DDPlatformController>();
+        // Adds a Reaper Leviathan to the lava lakes
+        //  QuickLogger.Debug($"Spawning Drill at positon: {slot.Target.position}");
 
-            var device = drill.GetComponentInParent<FCSDevice>();
+        _sender.Grid.Add(AddNewHolograph(slot, position), position);
 
-            slot.GetPlatformController().ConnectionData = new ConnectedDrillData
-            {
-                Slot = slot.GetSlotID(),
-                ParentTurbineUnitID = slot.Target.GetComponentInParent<FCSDevice>().GetPrefabID(),
-                HoloGraphPosition = position,
-                Position = new FCS_AlterraHub.Models.Structs.Vec3(drill.transform.localPosition),
-                /*UnitID = device.GetPrefabID()*/
-            };
 
-            _sender.Grid.Add(AddNewHolograph(slot, drill, position), position);
-
-            drill.name = $"{position} {drill.name}";
-            _sender.GetConnectedDrills().Add(drillController.GetMountedDevice().GetPrefabID(), slot.GetPlatformController().ConnectionData);
-            _sender.AddPlatformBase(drillController.GetMountedDevice().GetPrefabID(), drillController);
-            result.Set(true);
-
-            UpdateDrillCount();
-
-            QuickLogger.Debug("=================================== Add Platform ===============================================");
-            yield break;
-        }
-
-            // Fetch the prefab:
-         //   CoroutineTask<GameObject> task = CraftData.GetPrefabForTechTypeAsync(DeepDrillerHeavyDutySpawnable.PatchedTechType);
+        // Fetch the prefab:
+        CoroutineTask<GameObject> task = CraftData.GetPrefabForTechTypeAsync(DeepDrillerHeavyDutySpawnable.PatchedTechType);
         // Wait for the prefab task to complete:
-       // yield return task;
+        yield return task;
         // Get the prefab:
-      //  GameObject drill = task.GetResult();
+        GameObject prefab = task.GetResult();
 
-        
+        // Instantiate the prefab with a random rotation 2 meters in front of the player camera:
+        var drill =  Instantiate(prefab, slot.Target.position, slot.Target.rotation);
+        var ddController = drill.GetComponent<DeepDrillerHeavyDutyController>();
+
+
+        ddController.GetPlatformController().ConnectionData = new ConnectedDrillData
+        {
+            Slot = slot.GetSlotID(),
+            ParentTurbineUnitID = slot.Target.GetComponentInParent<FCSDevice>().GetPrefabID(),
+            HoloGraphPosition = position,
+        };
+
+        QuickLogger.Debug($"Spawned Drill at positon: {slot.Target.position}");
+
+
+
+
+        drill.name = $"{position} {drill.name}";
+        _sender.GetConnectedDrills().Add(ddController.GetPrefabID(), ddController);
+        result.Set(true);
+
+        UpdateDrillCount();
+
+        QuickLogger.Debug("=================================== Add Platform ===============================================");
+        yield break;
     }
+
 
     private bool CheckForKit()
     {
@@ -290,10 +273,10 @@ internal class uGUI_DDHeavyHomePage : Page, IuGUIAdditionalPage
         return holoGraphControl;
     }
 
-    public uGUI_DDHoloGraphControl AddNewHolograph(DDHolographSlot slot, GameObject go,Vector2Int position)
+    public uGUI_DDHoloGraphControl AddNewHolograph(DDHolographSlot slot,Vector2Int position)
     {
-        QuickLogger.Debug($"Slot: {slot} | GameObject: {go}");
-        var platformController = go.GetComponent<DDPlatformController>();
+
+        var platformController = slot.GetPlatformController();
         var holoGraphControl = CreateHoloGraph(platformController);
         holoGraphControl.SetIcon(platformController.GetPlatformType());
         holoGraphControl.transform.SetParent(slot.transform);

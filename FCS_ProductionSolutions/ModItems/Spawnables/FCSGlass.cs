@@ -50,9 +50,9 @@ public class FCSGlass
         return new RecipeData
         {
             craftAmount = 1,
-            Ingredients = new List<CraftData.Ingredient>
+            Ingredients = new List<Ingredient>
             {
-                new CraftData.Ingredient(SandBagSpawnable.PatchedTechType,1)
+                new Ingredient(SandBagSpawnable.PatchedTechType,1)
             }
         };
     }

@@ -283,11 +283,7 @@ internal class StoreManager : MonoBehaviour
         {
             for (int i = 0; i < cartItem.ReturnAmount; i++)
             {
-#if SUBNAUTICA
-                items.Add(CraftData.GetItemSize(cartItem.TechType));
-#else
                 items.Add(TechData.GetItemSize(cartItem.TechType));
-#endif
             }
         }
 

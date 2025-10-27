@@ -61,7 +61,7 @@ public class HoverInteraction : HandTarget, IHandTarget
 
             HandHoverPDAHelper(_controller);
 
-            if (Input.GetKeyDown(Plugin.Configuration.PDAInfoKeyCode))
+            if (GameInput.GetButtonDown(Plugin.PDAInfoKeyCode))
             {
                 EncyclopediaService.OpenEncyclopedia(_controller);
             }

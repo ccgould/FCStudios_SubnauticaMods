@@ -21,6 +21,7 @@ using System.Reflection;
 using UnityEngine;
 using Mono.Data.Sqlite;
 using System.Data;
+using static VehicleUpgradeConsoleInput;
 
 
 namespace FCS_ProductionSolutions;
@@ -56,7 +57,7 @@ public class Plugin : BaseUnityPlugin
         LanguageHandler.RegisterLocalizationFolder();
 
         //Register mod pack
-        FCSModsAPI.PublicAPI.RegisterModPack(PluginInfo.PLUGIN_NAME, Assembly.GetExecutingAssembly(), ModSettings.AssetBundleName, ModSaveManager.Save, ModSaveManager.LoadData);
+        FCSModsAPI.PublicAPI.RegisterModPack(PluginInfo.PLUGIN_NAME, Assembly.GetExecutingAssembly(), ModSettings.AssetBundleName, null, null);
         FCSModsAPI.PublicAPI.AddStoreCategory(PluginInfo.PLUGIN_NAME, "ProductionSolutionsIcon_W", "Production Solutions", PDAPages.ProductionSolutions);
         StartCoroutine(MaterialHelpers.GetGameBaseMaterial(() =>
         {
@@ -79,8 +80,7 @@ public class Plugin : BaseUnityPlugin
         FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "DDO", new DeepDrillerOperatorBuildable());
         FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "HH", new HydroponicHarvesterBuildable());
         FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "HHII", new HydroponicHarvesterMKIIBuildable());
-
-
+    
         //Add mod and patch.
         FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "SB", new SandBagSpawnable());
         FCSGlass.Register();

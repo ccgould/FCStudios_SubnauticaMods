@@ -370,7 +370,7 @@ internal abstract class DrillSystem : FCSDevice , IDrillSystem
 
     //#region IProtoEventListener
 
-    public abstract void Save(SaveData saveDataList, ProtobufSerializer serializer = null);
+    public abstract void SaveDevice();
 
     public float GetPowerCharge()
     {

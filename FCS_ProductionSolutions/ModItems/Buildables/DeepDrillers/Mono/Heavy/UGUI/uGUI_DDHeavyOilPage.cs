@@ -58,7 +58,7 @@ internal class uGUI_DDHeavyOilPage : Page, IuGUIAdditionalPage
         {
             QuickLogger.Debug($"Sender: {arg}", true); 
 
-            var drills = _sender.GetConnectedDrillPlatforms();
+            var drills = _sender.GetConnectedDrills();
 
             QuickLogger.Debug($"Drills : {drills?.Count() ?? -1}", true);
 
@@ -70,8 +70,8 @@ internal class uGUI_DDHeavyOilPage : Page, IuGUIAdditionalPage
             foreach (var drill in drills)
             {
                 QuickLogger.Debug($"Adding Oil Meter ",true);
-                var oilHandler = drill.Value.GetMountedDevice().GameObject.GetComponent<FCSDeepDrillerOilHandler>();
-                var drillController = drill.Value.GetMountedDevice().GameObject.GetComponent<DeepDrillerHeavyDutyController>();
+                var oilHandler = drill.Value.GameObject.GetComponent<FCSDeepDrillerOilHandler>();
+                var drillController = drill.Value.GameObject.GetComponent<DeepDrillerHeavyDutyController>();
 
                 AddNewOilMeter(drillController, oilHandler);
                 QuickLogger.Debug($"Added Oil Meter ", true);

@@ -14,7 +14,7 @@ using UnityEngine.UI;
 
 namespace FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Mono;
 
-internal class DSSItemDisplayController : FCSDevice, IFCSSave<SaveData>
+internal class DSSItemDisplayController : FCSDevice
 {
     [SerializeField] private Text itemCountLBL;
     [SerializeField] private uGUI_Icon itemIcon;
@@ -187,11 +187,11 @@ internal class DSSItemDisplayController : FCSDevice, IFCSSave<SaveData>
     public override void ReadySaveData()
     {
         string id = (base.GetComponentInParent<PrefabIdentifier>() ?? base.GetComponent<PrefabIdentifier>()).Id;
-        _savedData = ModSaveManager.GetSaveData<DSSItemDisplaySaveData>(id);
+        _savedData = FCSModsAPI.PublicAPI.GetSaveData<DSSItemDisplaySaveData>(id);//ModSaveManager.GetSaveData<DSSItemDisplaySaveData>(id);
         QuickLogger.Debug($"Prefab Id : {GetPrefabID()} || SaveData Is Null: {_savedData is null}");
     }
 
-    public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)
+    public void SaveDevice()
     {
         QuickLogger.Debug("Saving DSS S24", true);
 
@@ -208,8 +208,9 @@ internal class DSSItemDisplayController : FCSDevice, IFCSSave<SaveData>
         save.BaseId = FCSModsAPI.PublicAPI.GetHabitat(this)?.GetBasePrefabID();
         save.ColorTemplate = _colorManager.SaveTemplate();
         save.CurrentTechType = currentItem;
-        newSaveData.Data.Add(save);
-        QuickLogger.Debug($"Saves DSS S24 {newSaveData.Data.Count}", true);
+        //newSaveData.Data.Add(save);
+        FCSModsAPI.PublicAPI.PushSaveData(save);
+        //QuickLogger.Debug($"Saves DSS S24 {newSaveData.Data.Count}", true);
     }
 
     public override string[] GetDeviceStats()

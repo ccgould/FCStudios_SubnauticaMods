@@ -11,7 +11,7 @@ using TMPro;
 using UnityEngine;
 
 namespace FCS_AlterraHub.ModItems.Buildables.BaseManager.Mono;
-internal class BaseManagerController : FCSDevice, IFCSSave<SaveData>
+internal class BaseManagerController : FCSDevice, IFCSSave
 {
     [SerializeField]
     private GameObject statusInfoPrefab;
@@ -262,7 +262,7 @@ internal class BaseManagerController : FCSDevice, IFCSSave<SaveData>
 
     }
 
-    public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)
+    public void SaveDevice()
     {
         
     }

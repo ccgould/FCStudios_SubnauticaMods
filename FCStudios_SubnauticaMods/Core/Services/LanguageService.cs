@@ -342,7 +342,7 @@ public static class LanguageService
 
     public static string ViewInPDA()
     {
-        return string.Format(GetLanguage("PDAButtonPressFormat"), Plugin.Configuration.PDAInfoKeyCode.ToString());
+        return string.Format(GetLanguage("PDAButtonPressFormat"), Plugin.PDAInfoKeyCode.ToString());
     }
 
     public static string IsDeviceOn(bool value)

@@ -1,4 +1,5 @@
-﻿using FCS_AlterraHub.Models.Abstract;
+﻿using FCS_AlterraHub.API;
+using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.Models.Mono;
 using FCS_LifeSupportSolutions.Configuration;
@@ -7,7 +8,7 @@ using System;
 using System.Text;
 
 namespace FCS_LifeSupportSolutions.ModItems.Buildables.BaseOxygenTank.Mono;
-internal class BaseOxygenTankController : FCSDevice, IFCSSave<SaveData>
+internal class BaseOxygenTankController : FCSDevice, IFCSSave
 {
     private bool _runStartUpOnEnable;
     private bool _isFromSave;
@@ -113,7 +114,7 @@ internal class BaseOxygenTankController : FCSDevice, IFCSSave<SaveData>
 
     }
 
-    public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)
+    public void SaveDevice()
     {
         if (!IsInitialized || !IsConstructed) return;
 
@@ -127,7 +128,8 @@ internal class BaseOxygenTankController : FCSDevice, IFCSSave<SaveData>
         save.Id = GetPrefabID();
         save.ColorTemplate = _colorManager.SaveTemplate();
         save.ParentID = _oxygenAttachPoint.parentPipeUID;
+        FCSModsAPI.PublicAPI.PushSaveData(save);
         QuickLogger.Debug($"Saving ID {save.Id}");
-        newSaveData.Data.Add(_savedData);
+        //newSaveData.Data.Add(_savedData);
     }
 }

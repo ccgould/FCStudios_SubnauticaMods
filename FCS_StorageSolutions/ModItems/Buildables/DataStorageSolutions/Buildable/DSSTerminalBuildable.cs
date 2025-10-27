@@ -12,8 +12,6 @@ using Nautilus.Crafting;
 using Nautilus.Utility;
 using System.Collections;
 using UnityEngine;
-using static CraftData;
-
 namespace FCS_StorageSolutions.ModItems.Buildables.DataStorageSolutions.Buildable;
 internal class DSSTerminalBuildable : FCSBuildableModBase
 {

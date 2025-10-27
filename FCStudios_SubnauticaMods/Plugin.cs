@@ -22,6 +22,7 @@ using Nautilus.Assets;
 using Nautilus.Assets.Gadgets;
 using Nautilus.Handlers;
 using Nautilus.Json;
+using Nautilus.Options.Attributes;
 using Nautilus.Utility;
 using System.Drawing.Drawing2D;
 using System.IO;
@@ -138,6 +139,42 @@ public class Plugin : BaseUnityPlugin
         FCSModsAPI.PublicAPI.RegisterMod(PluginInfo.PLUGIN_NAME, "TO", new TestBuildable());
 
     }
+
+     public static GameInput.Button PDAInfoKeyCode = EnumHandler.AddEntry<GameInput.Button>("PDAInfoButton")
+    .CreateInput("FCS PDA Information Button")
+    .WithKeyboardBinding(GameInputHandler.Paths.Keyboard.I)
+    .SetBindable()
+    .WithCategory("PDA Bindings");
+
+    public static GameInput.Button FCSPDAKeyCode = EnumHandler.AddEntry<GameInput.Button>("PDAOpenButton")
+   .CreateInput("Open/Reset FCS PDA")
+   .WithKeyboardBinding(GameInputHandler.Paths.Keyboard.F2)
+   .SetBindable()
+   .WithCategory("PDA Bindings");
+
+    public static GameInput.Button PDASettingsKeyCode = EnumHandler.AddEntry<GameInput.Button>("PDADevicePageButton")
+   .CreateInput("FCS DevicePage Interface Information Button")
+   .WithKeyboardBinding(GameInputHandler.Paths.Keyboard.F2)
+   .SetBindable()
+   .WithCategory("PDA Bindings");
+
+    public static GameInput.Button PaintToolSelectColorForwardKeyCode = EnumHandler.AddEntry<GameInput.Button>("PaintToolSelectColorButton")
+    .CreateInput("[Paint Tool] Select Color Back")
+    .WithKeyboardBinding(GameInputHandler.Paths.Keyboard.RightArrow)
+    .SetBindable()
+    .WithCategory("Paint Tool Bindings");
+
+    public static GameInput.Button PaintToolSelectColorBackKeyCode = EnumHandler.AddEntry<GameInput.Button>("PaintToolSelectColorBackButton")
+    .CreateInput("[Paint Tool] Select Color Back")
+    .WithKeyboardBinding(GameInputHandler.Paths.Keyboard.LeftArrow)
+    .SetBindable()
+    .WithCategory("Paint Tool Bindings");
+
+    public static GameInput.Button PaintToolColorSampleKeyCode = EnumHandler.AddEntry<GameInput.Button>("SampleButton")
+    .CreateInput("[Paint Tool] Sample Color Template")
+    .WithKeyboardBinding(GameInputHandler.Paths.Keyboard.P)
+    .SetBindable()
+    .WithCategory("Paint Tool Bindings");
 
     private static void RegisterCommands()
     {

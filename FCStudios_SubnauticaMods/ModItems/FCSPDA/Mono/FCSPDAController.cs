@@ -122,7 +122,7 @@ public class FCSPDAController : MonoBehaviour
         Player.main.playerAnimator.updateMode = (flag3 ? AnimatorUpdateMode.UnscaledTime : AnimatorUpdateMode.Normal);
         this.sequence.Update(deltaTime);
         Player main = Player.main;
-        if (this.isInUse && this.isFocused && (GameInput.GetButtonDown(GameInput.Button.PDA) || Input.GetKeyDown(Plugin.Configuration.FCSPDAKeyCode)))
+        if (this.isInUse && this.isFocused && (GameInput.GetButtonDown(GameInput.Button.PDA) || GameInput.GetButtonDown(Plugin.FCSPDAKeyCode)))
         {
 
             this.Close();

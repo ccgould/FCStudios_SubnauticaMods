@@ -1,5 +1,6 @@
 ﻿using FCS_AlterraHub.API;
 using FCS_AlterraHub.Core.Components;
+using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Interfaces;
@@ -7,6 +8,7 @@ using FCS_AlterraHub.Models.Structs;
 using FCS_AlterraHub.ModItems.Buildables.OreCrusher.Mono;
 using FCS_ProductionSolutions.ModItems.Buildables.DeepDrillers.Models;
 using FCS_ProductionSolutions.ModItems.Buildables.DeepDrillers.Mono.Base.Interface;
+using FCS_ProductionSolutions.ModItems.Buildables.DeepDrillers.Services;
 using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
@@ -14,7 +16,7 @@ using UnityEngine;
 using UWE;
 
 namespace FCS_ProductionSolutions.ModItems.Buildables.DeepDrillers.Mono.Heavy;
-internal class DeepDrillerHeavyDutyController : FCSDevice, IDrillSystem
+internal class DeepDrillerHeavyDutyController : MonoBehaviour, IDrillSystem
 {
     private DeepDrillerOperatorController _controller;
     [SerializeField] FCSDeepDrillerOilHandler oilHandler;
@@ -25,53 +27,23 @@ internal class DeepDrillerHeavyDutyController : FCSDevice, IDrillSystem
     [SerializeField] PistonBobbing[] pistons;
     [SerializeField] StorageContainer storageContainer;
     [SerializeField] PrefabIdentifier prefabIden;
+    [SerializeField] DDPlatformController platformController;
 
-    public GameObject GameObject => gameObject;
 
     public string UnitID => "DD0001";
+
+    public GameObject GameObject => gameObject;
 
     public DeepDrillerHeavyDutyController()
     {
         
     }
 
-    public override void Awake()
+
+    public void OnEnable()
     {
-        base.Awake();
-
-        QuickLogger.Debug("DD Awake Called");
-    }
-
-    public override void OnEnable()
-    {
-        base.OnEnable();
-
-        QuickLogger.Debug("DD OnEnable Called");
-    }
-
-
-
-
-    public override void Start()
-    {
-        base.Start();
-
-        FCSModsAPI.PublicAPI.RegisterDevice(this,null,true);
-        
-        var dOperator = GameObject.GetComponentInParent<DeepDrillerOperatorController>();
-
-        if (dOperator.GetPosition(this, out Vector3 result))
-        {
-            if (result != Vector3.zero)
-            {
-                SetPosition(result);
-            }
-        }
-
-        var pickupable = GetComponent<Pickupable>();
-        pickupable.isPickupable = false;
-
-        QuickLogger.Debug("DD Start Called");
+        MaterialHelpers.ApplyGlassShaderTemplate(gameObject, "_glass", Plugin.ModSettings.ModPackID);
+        DeepDrillerManager.main.RegisterDrill(this);
     }
 
     private void Update()
@@ -104,7 +76,6 @@ internal class DeepDrillerHeavyDutyController : FCSDevice, IDrillSystem
         oilHandler.SetDrillSystem(this);
         oreGenerator.Initialize(this);
         storageContainer.enabled = false;
-
     }
 
     internal FCSDeepDrillerContainer GetStorage()
@@ -158,14 +129,8 @@ internal class DeepDrillerHeavyDutyController : FCSDevice, IDrillSystem
         
     }
 
-    internal void SetPosition(Vector3 position)
+    public DDPlatformController GetPlatformController()
     {
-        QuickLogger.Debug($"Setting Drill Positon to : {position}",true);
-        transform.localPosition = position;
-    }
-
-    public override void ReadySaveData()
-    {
-
+        return platformController;
     }
 }

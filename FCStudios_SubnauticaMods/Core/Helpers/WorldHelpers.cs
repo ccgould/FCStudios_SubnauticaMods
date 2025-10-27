@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using FCS_AlterraHub.API;
 using FCS_AlterraHub.Models;
@@ -392,7 +393,7 @@ public static class WorldHelpers
         return Vector3.Distance(mainGameObject.transform.position, gameObject.transform.position) <= range;
     }
 
-    public static PingType CreatePingType(string id, string pingName, Atlas.Sprite pingSprite)
+    public static PingType CreatePingType(string id, string pingName, Sprite pingSprite)
     {
         SpriteHandler.RegisterSprite(SpriteManager.Group.Pings, id, pingSprite);
 
@@ -515,11 +516,11 @@ public static class WorldHelpers
             if (!BepInEx.Bootstrap.Chainloader.PluginInfos.Values.Any(x => x.Metadata.Name.Equals("UITweaks")))
             {
                 
-                CraftData.TechData data = GetData(techType);
-                int ingredientCount = data?.ingredientCount ?? 0;
+                var data = GetData(techType);
+                int ingredientCount = data?.Count() ?? 0;
                 for (int i = 0; i < ingredientCount; i++)
                 {
-                    CraftData.Ingredient ingredient = data._ingredients[i];
+                    Ingredient ingredient = data[i];
                     if (!BlackList.Contains(techType) && !CrafterLogic.IsCraftRecipeUnlocked(ingredient.techType))
                     {
 #if DEBUG
@@ -532,12 +533,13 @@ public static class WorldHelpers
             else
             {
 #if SUBNAUTICA
-                if (CraftData.techData.TryGetValue(techType, out CraftData.TechData data))
+
+                var ingredients = TechData.GetIngredients(techType);
+
+                if (ingredients is not null)
                 {
-                    int ingredientCount = data?.ingredientCount ?? 0;
-                    for (int i = 0; i < ingredientCount; i++)
+                    foreach (var ingredient in ingredients)
                     {
-                        IIngredient ingredient = data.GetIngredient(i);
                         if (!BlackList.Contains(techType) &&
                             !CrafterLogic.IsCraftRecipeUnlocked(ingredient.techType))
                         {
@@ -559,9 +561,9 @@ public static class WorldHelpers
         return true;
     }
 
-    internal static CraftData.TechData GetData(TechType techType)
+    internal static ReadOnlyCollection<Ingredient> GetData(TechType techType)
     {
-        return CraftData.techData[techType];
+        return TechData.GetIngredients(techType);
     }
 
     public static bool IsNear(Vector3 a, Vector3 b)

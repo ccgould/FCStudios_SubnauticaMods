@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace FCS_AlterraHub.ModItems.Buildables.DroneDepotPort.Mono;
 
-internal class DroneDepotPortController : FCSDevice, IFCSSave<SaveData>
+internal class DroneDepotPortController : FCSDevice, IFCSSave
 {
     [SerializeField]
     private DoorController _doorController;
@@ -78,7 +78,7 @@ internal class DroneDepotPortController : FCSDevice, IFCSSave<SaveData>
         
     }
 
-    public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)
+    public void SaveDevice()
     {
         
     }

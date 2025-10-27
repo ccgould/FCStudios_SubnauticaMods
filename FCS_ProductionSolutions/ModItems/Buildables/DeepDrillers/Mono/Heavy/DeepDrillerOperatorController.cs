@@ -27,38 +27,23 @@ using static VehicleUpgradeConsoleInput;
 
 namespace FCS_ProductionSolutions.ModItems.Buildables.DeepDrillers.Mono.Heavy;
 
-internal class DeepDrillerOperatorController : FCSDevice, IFCSSave<SaveData>,IDrillSystem
+internal class DeepDrillerOperatorController : FCSDevice, IFCSSave,IDrillSystem
 {
     public GameObject DrillsGroupLocation;
-    private readonly SortedDictionary<string, ConnectedDrillData> _connectedDrills = new();
+    private readonly SortedDictionary<string, DeepDrillerHeavyDutyController> _connectedDrills = new();
 
     [SerializeField] private GameObject holoGramPrefab;
-
-
     internal bool HasRootHolo;
-
-
-    private SortedDictionary<string, DDPlatformController> _connectedDeepDrillerPlatformBase = new();
-
-
     private Graph<uGUI_DDHoloGraphControl> _graph;
-
-
     private List<Graph<uGUI_DDHoloGraphControl>.Edge> _neighbours;
-
-
-
-
     private const int BUILDING_COMPACITY = 15;
     internal Dictionary<TechType, int> _trackedItems = new();
     internal Action<int> OnStorageCountUpdated;
     private FCSStorage _fcsStorage;
     [SerializeField] private HoverInteraction hoverInteraction;
     [SerializeField] private FCSStorage storage;
+    [SerializeField] private DDPlatformController platformController;
     string db_name = "URI=file:data.db";
-
-    //[SerializeField] private FCSDeepDrillerContainer _deepDrillerContainer;
-
     [HideInInspector] public Grid2<uGUI_DDHoloGraphControl> Grid { get; private set; }
     public GameObject GameObject => gameObject;
 
@@ -67,27 +52,6 @@ internal class DeepDrillerOperatorController : FCSDevice, IFCSSave<SaveData>,IDr
         base.Start();
         InitialiseGrid();
         hoverInteraction.onSettingsKeyPressed += HoverInteraction_onSettingsKeyPressed;        
-    }
-
-    internal bool GetItemWithId(string prefabID,out GameObject result)
-    {
-        var childObjects = GetComponentsInChildren<PrefabIdentifier>();
-
-        QuickLogger.Debug($"Child Count: {childObjects.Length}");
-
-        foreach (var prefabIdentifier in childObjects)
-        {
-            QuickLogger.Debug($"Checking if id: {prefabIdentifier.Id} matches {prefabID}. Result = {prefabIdentifier.id.Equals(prefabID)}");
-
-            if(prefabIdentifier.id.Equals(prefabID))
-            {
-                result = prefabIdentifier.gameObject;
-                return true;
-            }
-        }
-
-        result = null;
-        return false;
     }
 
     internal Graph<uGUI_DDHoloGraphControl> GetGraph()
@@ -158,29 +122,14 @@ internal class DeepDrillerOperatorController : FCSDevice, IFCSSave<SaveData>,IDr
 
 
         //_fcsStorage.container.onRemoveItem += UnDockServer;
-        _fcsStorage.AddAllowedTech(DeepDrillerHeavyDutySpawnable.PatchedTechType);
+        //_fcsStorage.AddAllowedTech(DeepDrillerHeavyDutySpawnable.PatchedTechType);
 
         CoroutineHost.StartCoroutine(LoadDrills());
         base.Initialize();
     }
 
-    private void DockDrill(InventoryItem item)
-    {
-        var go = item.item;
-        var prefabId = item.item.gameObject.GetComponent<PrefabIdentifier>().id;
-       QuickLogger.Debug($"Added drill {prefabId}",true);
-        
-        //using(SqliteConnection connection = new SqliteConnection(db_name))
-        //{
-        //    connection.Open();
-        //    using (var command = connection.CreateCommand())
-        //    {
-        //        command.CommandText = $"INSERT INTO tbl_drills (id,x,y,z) VALUES ('{prefabId}',{go.transform.localPosition.x},{go.transform.localPosition.y},{go.transform.localPosition.z})";
-        //        command.ExecuteNonQuery();
-        //    }
-        //}
-    }
 
+    #region Grid
     private void HoverInteraction_onSettingsKeyPressed(TechType techType)
     {
         if (techType != GetTechType()) return;
@@ -197,6 +146,8 @@ internal class DeepDrillerOperatorController : FCSDevice, IFCSSave<SaveData>,IDr
     {
         _graph = Grid.ToGraph();
     }
+    #endregion
+
 
     internal bool CanRemovePlatform(uGUI_DDHoloGraphControl holoGraphControl)
     {
@@ -220,37 +171,14 @@ internal class DeepDrillerOperatorController : FCSDevice, IFCSSave<SaveData>,IDr
     /// Get all the drills connected to this operator.
     /// </summary>
     /// <returns><see cref="SortedDictionary{TKey, TValue}"/> of <see cref="ConnectedDrillData"/></returns>
-    internal SortedDictionary<string, ConnectedDrillData> GetConnectedDrills()
+    internal SortedDictionary<string, DeepDrillerHeavyDutyController> GetConnectedDrills()
     {
         return _connectedDrills;
-    }
-
-    internal SortedDictionary<string, DDPlatformController> GetConnectedDrillPlatforms()
-    {
-        return _connectedDeepDrillerPlatformBase;
     }
 
     internal int BuildingCapacity()
     {
         return BUILDING_COMPACITY;
-    }
-
-    internal void AddPlatformBase(string id, DDPlatformController plateformController)
-    {
-        _connectedDeepDrillerPlatformBase.Add(id, plateformController);
-
-        var deepDriller = plateformController.GetMountedDevice().GameObject.GetComponent<DeepDrillerHeavyDutyController>();
-
-        var f = deepDriller.GetComponent<Pickupable>();
-
-        storage.container.UnsafeAdd(f.inventoryItem);
-
-        deepDriller.GetStorage().OnContainerAddItem += Subscribe;
-    }
-
-    private void Subscribe(FCSDevice device, TechType type)
-    {
-        QuickLogger.Debug("It Works", true);
     }
 
     public bool IsBreakSet()
@@ -273,7 +201,7 @@ internal class DeepDrillerOperatorController : FCSDevice, IFCSSave<SaveData>,IDr
         return string.Empty;
     }
 
-    public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)
+    public void SaveDevice()
     {
        
             QuickLogger.Debug("Saving Deep Driller", true);
@@ -289,20 +217,20 @@ internal class DeepDrillerOperatorController : FCSDevice, IFCSSave<SaveData>,IDr
 
             save.Id = GetPrefabID();
             save.Items = _trackedItems;
+            save.ConnectedDrills = new();
 
-        foreach (var item in GetConnectedDrillPlatforms())
+
+        foreach (var item in _connectedDrills) 
         {
-            var drill = item.Value.gameObject.GetComponent<FCSDeepDrillerOilHandler>();
-            //var j = _connectedDrills.FirstOrDefault(x => x.Value);
-        }   
-
-            save.Drills = _connectedDrills;
+            save.ConnectedDrills.Add(item.Value.GetPrefabID());
+        }
+                  
         
         
-            QuickLogger.Debug($"Saving ID {save.Id}", true);
-            //save.ColorTemplate = _colorManager.SaveTemplate();
-
-            newSaveData.Data.Add(save);
+        QuickLogger.Debug($"Saving ID {save.Id}", true);
+        //save.ColorTemplate = _colorManager.SaveTemplate();
+        FCSModsAPI.PublicAPI.PushSaveData(save);
+        //newSaveData.Data.Add(save);
     }
 
     private IEnumerator LoadDrills()
@@ -313,7 +241,7 @@ internal class DeepDrillerOperatorController : FCSDevice, IFCSSave<SaveData>,IDr
 
         if (save != null) 
         {
-            if(save.Drills is null)
+            if(save.ConnectedDrills is null)
             {
                 QuickLogger.DebugError("Save Data Drills Returned Null");
 
@@ -321,37 +249,44 @@ internal class DeepDrillerOperatorController : FCSDevice, IFCSSave<SaveData>,IDr
             }
             else
             {
-                QuickLogger.Debug($"Load drills Count: {save.Drills.Count}");
+                QuickLogger.Debug($"Load drills Count: {save.ConnectedDrills.Count}");
 
 
-                while (_connectedDrills.Count != save.Drills.Count)
+                foreach (var drill in save.ConnectedDrills) 
                 {
-                    foreach (KeyValuePair<string, ConnectedDrillData> drillSaveData in save.Drills)
-                    {
-                        if (_connectedDrills.ContainsKey(drillSaveData.Key)) continue;
-                        var parentTurbine = FCSModsAPI.PublicAPI.FindDeviceWithPreFabID(drillSaveData.Value.ParentTurbineUnitID);
-                        var currentTurbine = FCSModsAPI.PublicAPI.FindDeviceWithPreFabID(drillSaveData.Key);
-
-
-
-                        if (parentTurbine != null && currentTurbine != null)
-                        {
-                            MaterialHelpers.ApplyGlassShaderTemplate(currentTurbine.gameObject, "_glass", Plugin.ModSettings.ModPackID);
-                            var parentPlatformController = parentTurbine.GetComponentInChildren<DDPlatformController>();
-                            var turbinePlatformController = currentTurbine.GetComponentInChildren<DDPlatformController>();
-                            currentTurbine.GetComponentInChildren<DDPlatformController>().LoadFromSave(drillSaveData);
-                            QuickLogger.Debug($"Adding From Save Drill {turbinePlatformController.GetMountedDevice().GetPrefabID()} with connection to {parentPlatformController.GetMountedDevice().GetPrefabID()} on port {drillSaveData.Value.Slot}");
-
-                            var result = AddPlatformFromSave(drillSaveData.Value.Slot, parentPlatformController, turbinePlatformController, drillSaveData.Value.HoloGraphPosition);
-                            QuickLogger.Debug($"LoadDrills Count: {save.Drills.Count} | {_connectedDrills.Count}");
-                        }
-                        else
-                        {
-                            QuickLogger.DebugError($"Failed to find device with ID: {drillSaveData.Key}");
-                        }
-                    }
-                    yield return null;
+                    //platformController.EnableSlot(drill.Value.Slot - 1);
+                    yield return drill; 
                 }
+
+
+                //while (_connectedDrills.Count != save.Drills.Count)
+                //{
+                //    foreach (KeyValuePair<string, ConnectedDrillData> drillSaveData in save.Drills)
+                //    {
+                //        if (_connectedDrills.ContainsKey(drillSaveData.Key)) continue;
+                //        var parentTurbine = FCSModsAPI.PublicAPI.FindDeviceWithPreFabID(drillSaveData.Value.ParentTurbineUnitID);
+                //        var currentTurbine = FCSModsAPI.PublicAPI.FindDeviceWithPreFabID(drillSaveData.Key);
+
+
+
+                //        if (parentTurbine != null && currentTurbine != null)
+                //        {
+                //            MaterialHelpers.ApplyGlassShaderTemplate(currentTurbine.gameObject, "_glass", Plugin.ModSettings.ModPackID);
+                //            var parentPlatformController = parentTurbine.GetComponentInChildren<DDPlatformController>();
+                //            var turbinePlatformController = currentTurbine.GetComponentInChildren<DDPlatformController>();
+                //            currentTurbine.GetComponentInChildren<DDPlatformController>().LoadFromSave(drillSaveData);
+                //            QuickLogger.Debug($"Adding From Save Drill {turbinePlatformController.GetMountedDevice().GetPrefabID()} with connection to {parentPlatformController.GetMountedDevice().GetPrefabID()} on port {drillSaveData.Value.Slot}");
+
+                //            var result = AddPlatformFromSave(drillSaveData.Value.Slot, parentPlatformController, turbinePlatformController, drillSaveData.Value.HoloGraphPosition);
+                //            QuickLogger.Debug($"LoadDrills Count: {save.Drills.Count} | {_connectedDrills.Count}");
+                //        }
+                //        else
+                //        {
+                //            //QuickLogger.DebugError($"Failed to find device with ID: {drillSaveData.Key}");
+                //        }
+                //    }
+                //    yield return null;
+                //}
             }
         }
         else
@@ -402,10 +337,10 @@ internal class DeepDrillerOperatorController : FCSDevice, IFCSSave<SaveData>,IDr
         platform.name = $"{position} {platform.name}";
         QuickLogger.Debug("AddPlatformFromSave : 6");
 
-        _connectedDrills.Add(platform.GetMountedDevice().GetPrefabID(), platform.ConnectionData);
+        //_connectedDrills.Add(platform.GetMountedDevice().GetPrefabID(), platform.ConnectionData);
         QuickLogger.Debug("AddPlatformFromSave : 7");
 
-        _connectedDeepDrillerPlatformBase.Add(platform.GetMountedDevice().GetPrefabID(), platform);
+        //_connectedDeepDrillerPlatformBase.Add(platform.GetMountedDevice().GetPrefabID(), platform);
         QuickLogger.Debug("AddPlatformFromSave : 8");
 
         return true;
@@ -414,7 +349,7 @@ internal class DeepDrillerOperatorController : FCSDevice, IFCSSave<SaveData>,IDr
     public override void ReadySaveData()
     {
         string id = (GetComponentInParent<PrefabIdentifier>() ?? GetComponent<PrefabIdentifier>()).Id;
-        _savedData = ModSaveManager.GetSaveData<DeepDrillerOperatorSaveDataEntry>(id);
+        _savedData = FCSModsAPI.PublicAPI.GetSaveData<DeepDrillerOperatorSaveDataEntry>(id);
         QuickLogger.Debug($"Prefab Id : {GetPrefabID()} || SaveData Is Null: {_savedData is null}");
     }
 
@@ -479,24 +414,9 @@ internal class DeepDrillerOperatorController : FCSDevice, IFCSSave<SaveData>,IDr
 
         return amount;
     }
- 
-    internal bool GetPosition(DeepDrillerHeavyDutyController dDrill,out Vector3 result)
+
+    public DDPlatformController GetPlatformController()
     {
-        QuickLogger.Debug($"Controller ID: {dDrill.GetPrefabID()}");
-
-        result = new();
-
-        var drill = ((DeepDrillerOperatorSaveDataEntry)_savedData)?.Drills?.FirstOrDefault(x => x.Key == dDrill.GetPrefabID());
-
-        if (drill is null) return false;
-
-        QuickLogger.Debug($"Is dril null: {drill is null}");
-
-        var data = drill.Value.Value;
-
-        QuickLogger.Debug($"Result: {new Vector3(data.Position.X, data.Position.Y, data.Position.Z)}");
-
-        result = new Vector3(data.Position.X, data.Position.Y, data.Position.Z);
-        return true;
+        return platformController;
     }
 }

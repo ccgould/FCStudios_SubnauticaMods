@@ -1,5 +1,7 @@
-﻿using FCS_AlterraHub.Core.Components;
+﻿using FCS_AlterraHub.API;
+using FCS_AlterraHub.Core.Components;
 using FCS_AlterraHub.Core.Extensions;
+using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.Models.Mono;
@@ -15,7 +17,7 @@ using PlantSlot = FCS_ProductionSolutions.ModItems.Buildables.HydroponicHarveste
 
 namespace FCS_ProductionSolutions.ModItems.Buildables.HydroponicHarvester.Mono;
 
-internal class HydroponicHarvesterController : FCSDevice, IFCSSave<SaveData>, IProtoTreeEventListener, IFCSDumpContainer
+internal class HydroponicHarvesterController : FCSDevice, IFCSSave, IProtoTreeEventListener, IFCSDumpContainer
 {
     [SerializeField] private HoverInteraction _hoverInteraction;
     [SerializeField] private Planter __plantable;
@@ -143,7 +145,7 @@ internal class HydroponicHarvesterController : FCSDevice, IFCSSave<SaveData>, IP
     public override void ReadySaveData()
     {
         string id = (base.GetComponentInParent<PrefabIdentifier>() ?? base.GetComponent<PrefabIdentifier>()).Id;
-        _savedData = ModSaveManager.GetSaveData<HarvesterSaveDataEntry>(id);
+        _savedData = FCSModsAPI.PublicAPI.GetSaveData<HarvesterSaveDataEntry>(id);
         QuickLogger.Debug($"Prefab Id : {GetPrefabID()} || SaveData Is Null: {_savedData is null}");
     }
 
@@ -200,7 +202,7 @@ internal class HydroponicHarvesterController : FCSDevice, IFCSSave<SaveData>, IP
         return IsAllowedToAdd(pickupable, false);
     }
 
-    public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)
+    public void SaveDevice()
     {
         QuickLogger.Info("================================ Saving Harvester ============================");
 
@@ -229,7 +231,9 @@ internal class HydroponicHarvesterController : FCSDevice, IFCSSave<SaveData>, IP
 
         save.SpeedMode = _currentSpeedMode;
 
-        newSaveData.Data.Add(save);
+        //newSaveData.Data.Add(save);
+        //FCSModsAPI.PublicAPI.PushSaveData(save);
+        SaveLoadDataService.instance.Save(save, PluginInfo.PLUGIN_NAME);
 
         QuickLogger.Info("================================ Saved Harvester ============================");
     }

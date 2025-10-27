@@ -303,7 +303,7 @@ internal class PlantSlot : MonoBehaviour
     {  
         if(_activePlantSlot is not null)
         {
-            return CraftData.GetHarvestOutputData(_activePlantSlot.plantable.plantTechType);
+            return TechData.GetHarvestOutput(_activePlantSlot.plantable.plantTechType);
         }
 
         return TechType.None;

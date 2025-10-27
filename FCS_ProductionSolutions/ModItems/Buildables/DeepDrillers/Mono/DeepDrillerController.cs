@@ -16,7 +16,7 @@ internal class DeepDrillerController : DrillSystem
 
     }
 
-    public override void Save(SaveData saveDataList, ProtobufSerializer serializer = null)
+    public override void SaveDevice()
     {
         
     }

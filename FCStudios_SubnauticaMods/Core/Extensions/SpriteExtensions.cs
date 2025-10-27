@@ -9,8 +9,8 @@ public static class SpriteExtensions
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    public static Atlas.Sprite ToAtlasSprite(this Sprite sprite)
+    public static Sprite ToAtlasSprite(this Sprite sprite)
     {
-        return new Atlas.Sprite(sprite);
+        return null;//new Sprite(sprite);
     }
 }

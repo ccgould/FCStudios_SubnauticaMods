@@ -84,7 +84,7 @@ public static class ModPrefabService
             if (applyShaders)
             {
                 //Lets apply the material shader
-                MaterialUtils.ApplySNShaders(prefab, 8, 1, 1,new NoMaterial());
+                MaterialUtils.ApplySNShaders(prefab, 8, 1, 1, new NoMaterial());
 
                 //ReplaceShadersV2(prefab);
             }
@@ -107,7 +107,7 @@ public static class ModPrefabService
 
         if (_v2MaterialsLoaded) return;
 
-        if(MaterialUtils.IsReady)
+        if (MaterialUtils.IsReady)
         {
             QuickLogger.Debug("Shader Is Ready");
         }
@@ -218,7 +218,7 @@ public static class ModPrefabService
 
         var bundleName = ModRegistrationService.GetModPackData(modPackName).GetBundleName();
         var g = FCSAssetBundlesService.PublicAPI.GetAssetBundleByName(bundleName);
-        var result =  g.LoadAsset<Sprite>(iconName);
+        var result = g.LoadAsset<Sprite>(iconName);
 
         return result;
     }
@@ -253,41 +253,18 @@ public static class ModPrefabService
     }
 #endif
 
-#if SUBNAUTICA
-    public static Atlas.Sprite GetIconByNameFromFile(string iconName, string modPackName)
+    internal class NoMaterial : MaterialModifier
     {
-        if (loadedIcons.TryGetValue(iconName, out Sprite preLoadedBundle))
+        public override void EditMaterial(Material material, Renderer renderer, int materialIndex, MaterialUtils.MaterialType materialType)
         {
-            return new Atlas.Sprite(preLoadedBundle);
-        }
-        return ImageUtils.LoadSpriteFromFile(Path.Combine(ModRegistrationService.GetModPackData(modPackName).GetAssetPath(), $"{iconName}.png"));
-    }
 
-#else
-    public static Sprite GetIconByNameFromFile(string iconName, string modPackName)
-    {
-
-        if (loadedIcons.TryGetValue(iconName, out Sprite preLoadedBundle))
-        {
-            return preLoadedBundle;
         }
 
-        return ImageUtils.LoadSpriteFromFile(Path.Combine(ModRegistrationService.GetModPackData(modPackName).GetAssetPath(), $"{iconName}.png"));
-    }
-#endif
-}
+        public override bool BlockShaderConversion(Material material, Renderer renderer, MaterialUtils.MaterialType materialType)
+        {
+            var particle = renderer.gameObject.GetComponent<ParticleSystem>();
 
-internal class NoMaterial : MaterialModifier
-{
-    public override void EditMaterial(Material material, Renderer renderer, int materialIndex, MaterialUtils.MaterialType materialType)
-    {
-
-    }
-
-    public override bool BlockShaderConversion(Material material, Renderer renderer, MaterialUtils.MaterialType materialType)
-    {
-        var particle = renderer.gameObject.GetComponent<ParticleSystem>();
-
-        return particle is not null;
+            return particle is not null;
+        }
     }
 }

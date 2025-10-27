@@ -55,4 +55,19 @@ internal class DDPlatformController : MonoBehaviour
     {
         QuickLogger.Debug($"Loading Drill: {drillSaveData.Key}");
     }
+
+    internal void EnableSlot(int slot)
+    {
+        Ports[slot].SetActive(true);
+    }
+
+    internal void DisableSlot(int slot)
+    {
+        Ports[slot].SetActive(false);
+    }
+
+    internal DDPlatformController GetPlatformAtSlot(int slot)
+    {
+       return Ports[slot].GetComponentInChildren<DDPlatformController>();
+    }
 }

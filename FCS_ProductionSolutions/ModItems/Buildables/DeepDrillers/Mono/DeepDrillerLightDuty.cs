@@ -1,4 +1,5 @@
-﻿using FCS_AlterraHub.Core.Components;
+﻿using FCS_AlterraHub.API;
+using FCS_AlterraHub.Core.Components;
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.ModItems.Buildables.DeepDrillers.Mono.Base;
@@ -9,7 +10,7 @@ using static FCS_ProductionSolutions.Configuration.SaveData;
 
 namespace FCS_ProductionSolutions.ModItems.Buildables.DeepDrillers.Mono;
 
-internal class DeepDrillerLightDuty : DrillSystem, IFCSSave<SaveData>
+internal class DeepDrillerLightDuty : DrillSystem, IFCSSave
 {
     internal override bool UseOnScreenUi => throw new NotImplementedException();
     
@@ -28,7 +29,7 @@ internal class DeepDrillerLightDuty : DrillSystem, IFCSSave<SaveData>
     public override void ReadySaveData()
     {
         string id = (base.GetComponentInParent<PrefabIdentifier>() ?? base.GetComponent<PrefabIdentifier>()).Id;
-        _savedData = ModSaveManager.GetSaveData<DeepDrillerLightDutySaveDataEntry>(id);
+        _savedData = FCSModsAPI.PublicAPI.GetSaveData<DeepDrillerLightDutySaveDataEntry>(id); //ModSaveManager.GetSaveData<DeepDrillerLightDutySaveDataEntry>(id);
         QuickLogger.Debug($"Prefab Id : {GetPrefabID()} || SaveData Is Null: {_savedData is null}");
     }
 
@@ -81,7 +82,7 @@ internal class DeepDrillerLightDuty : DrillSystem, IFCSSave<SaveData>
 
     }
 
-    public override void Save(SaveData saveDataList, ProtobufSerializer serializer = null)
+    public override void SaveDevice()
     {
         QuickLogger.Info("================================ Saving Drill ============================");
         
@@ -109,8 +110,8 @@ internal class DeepDrillerLightDuty : DrillSystem, IFCSSave<SaveData>
         save.OilTimeLeft = GetOilHandler().GetOilTimeLeft();
         save.BeaconName = _ping.GetLabel();
         save.IsPingVisible = _ping.visible;
-        saveDataList.Data.Add(save);
-
+        //saveDataList.Data.Add(save);
+        FCSModsAPI.PublicAPI.PushSaveData(save);
         QuickLogger.Info("================================ Saved Drill ============================");
     }
 }

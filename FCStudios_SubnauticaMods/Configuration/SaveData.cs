@@ -2,14 +2,16 @@
 using FCS_AlterraHub.Models;
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_AlterraHub.Models.Structs;
-using Nautilus.Json.Attributes;
-using Nautilus.Json;
-using Newtonsoft.Json;
-using System.Collections.Generic;
-using UnityEngine;
 using FCS_AlterraHub.ModItems.Buildables.OreCrusher.Enums;
-using System.Security.Policy;
+using Nautilus.Json;
+using Nautilus.Json.Attributes;
+using Newtonsoft.Json;
+using SQLite;
 using System;
+using System.Collections.Generic;
+using System.Security.Policy;
+using UnityEngine;
+using static FCS_AlterraHub.Core.Services.SaveLoadDataService;
 
 namespace FCS_AlterraHub.Configuation;
 
@@ -27,9 +29,21 @@ internal class SaveData
 
     }
 
+    [Table("OreConsumer")]
     public class OreConsumerDataEntry : BaseSaveData
     {
-        public Queue<TechType> OreQueue { get;  set; }
+        // Serialized queue
+        public string OreQueueJson { get; set; }
+
+        [Ignore]
+        public Queue<TechType> OreQueue
+        {
+            get => string.IsNullOrEmpty(OreQueueJson)
+                ? new Queue<TechType>()
+                : JsonConvert.DeserializeObject<Queue<TechType>>(OreQueueJson);
+            set => OreQueueJson = JsonConvert.SerializeObject(value);
+        }
+
         public float TimeLeft { get;  set; }
         public float RPM { get; set; }
         public bool IsBreakerTripped { get;  set; }
@@ -97,9 +111,22 @@ internal class SaveData
     }
 }
 
-public class BaseSaveData : ISaveDataEntry
+
+public class BaseSaveData : ISaveDataEntry, IDBEntity
 {
+    private ColorTemplateSave colorTemplate;
+
+    [Unique]
+    [PrimaryKey]
     public string Id { get; set; }
     public string BaseId { get; set; }
-    public ColorTemplateSave ColorTemplate { get; set; }
+    public string ColorTemplateJson { get; set; }
+
+    [Ignore]
+    public ColorTemplateSave ColorTemplate {
+        get => string.IsNullOrEmpty(ColorTemplateJson)
+            ? new ColorTemplateSave()
+            : JsonConvert.DeserializeObject<ColorTemplateSave>(ColorTemplateJson);
+        set => ColorTemplateJson = JsonConvert.SerializeObject(value);
+    }
 }

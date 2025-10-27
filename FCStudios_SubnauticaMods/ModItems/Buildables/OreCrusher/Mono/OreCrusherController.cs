@@ -1,4 +1,5 @@
 ﻿using FCS_AlterraHub.Configuation;
+using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Core.Components;
 using FCS_AlterraHub.Core.Helpers;
 using FCS_AlterraHub.Core.Services;
@@ -22,7 +23,7 @@ using static RootMotion.FinalIK.InteractionTrigger.Range;
 
 namespace FCS_AlterraHub.ModItems.Buildables.OreCrusher.Mono;
 
-internal class OreCrusherController : FCSDevice, IFCSSave<SaveData>
+internal class OreCrusherController : FCSDevice, IFCSSave
 {
 
     private const int MAXITEMLIMIT = 10;
@@ -364,11 +365,11 @@ internal class OreCrusherController : FCSDevice, IFCSSave<SaveData>
     public override void ReadySaveData()
     {
         string id = (base.GetComponentInParent<PrefabIdentifier>() ?? base.GetComponent<PrefabIdentifier>()).Id;
-        _savedData = ModSaveManager.GetSaveData<OreConsumerDataEntry>(id);
+        _savedData = ModSaveManager.GetSaveDataV2<OreConsumerDataEntry>(id);
         QuickLogger.Debug($"Prefab Id : {GetPrefabID()} || SaveData Is Null: {_savedData is null}");
     }
 
-    public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)
+    public void SaveDevice()
     {
         if (!IsInitialized || !IsConstructed) return;
 
@@ -390,7 +391,10 @@ internal class OreCrusherController : FCSDevice, IFCSSave<SaveData>
         save.CurrentSpeedMode = _currentSpeedMode;
         save.PendingSpeedMode = _pendingSpeedMode;
         QuickLogger.Debug($"Saving ID {save.Id}", true);
-        newSaveData.Data.Add(_savedData);
+
+        SaveLoadDataService.instance.Save(save, PluginInfo.PLUGIN_NAME);
+
+        //newSaveData.Data.Add(_savedData);
     }
 
     public void Test()

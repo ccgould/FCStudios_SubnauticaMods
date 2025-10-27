@@ -48,9 +48,9 @@ public abstract class ModBase
         return new RecipeData
         {
             craftAmount = 1,
-            Ingredients = new List<CraftData.Ingredient>
+            Ingredients = new List<Ingredient>
             {
-                new CraftData.Ingredient(_kitTechType == TechType.None ? TechType.Titanium : _kitTechType)
+                new Ingredient(_kitTechType == TechType.None ? TechType.Titanium : _kitTechType,1)
             }
         };
     }

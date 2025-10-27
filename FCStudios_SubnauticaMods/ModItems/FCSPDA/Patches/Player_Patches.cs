@@ -41,7 +41,7 @@ public static class Player_Patches
         //    }
         //}
 
-        if ((Input.GetKeyDown(Plugin.Configuration.FCSPDAKeyCode) || ForceOpenPDA))
+        if ((GameInput.GetButtonDown(Plugin.FCSPDAKeyCode) || ForceOpenPDA))
         {
             if (!FCSPDA.isOpen)
             {

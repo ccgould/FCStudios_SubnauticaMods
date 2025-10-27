@@ -4,7 +4,6 @@ using Nautilus.Assets.PrefabTemplates;
 using Nautilus.Crafting;
 using Nautilus.Extensions;
 using UnityEngine;
-using Ingredient = CraftData.Ingredient;
 
 namespace FCS_LifeSupportSolutions.Items.Equipment;
 public static class YeetKnifePrefab

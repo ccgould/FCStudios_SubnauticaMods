@@ -11,7 +11,7 @@ public static class TechDataHelpers
     private static HashSet<TechType> batteryTech;
     private static HashSet<TechType> powercellTech;
     private static HashSet<TechType> cellConcatTech;
-    private static List<CraftData.Ingredient> _ingredients = new List<CraftData.Ingredient>();
+    private static List<Ingredient> _ingredients = new List<Ingredient>();
 
     public static HashSet<TechType> CellConcatTech
     {
@@ -55,23 +55,25 @@ public static class TechDataHelpers
     public static bool ContainsValidCraftData(TechType techType)
     {
         
-        var data = CraftData.techData[techType];
-        if (data == null || data.craftAmount > 1)
+        var data = TechData.GetCraftAmount(techType);
+        if (data > 1)
         {
             QuickLogger.Debug($"techType '{techType}' has no valid recipe for recycling.");
             return false;
         }
 
-        if (data.linkedItemCount > 0)
+        var linkedItems = TechData.GetLinkedItems(techType);
+
+        if (linkedItems is not null && linkedItems.Count > 0)
         {
             Dictionary<TechType, int> pairs = new Dictionary<TechType, int>();
-            for (int i = 0; i < data.linkedItemCount; i++)
+
+            foreach (var item in linkedItems)
             {
-                TechType techType2 = data.GetLinkedItem(i);
-                if (pairs.ContainsKey(techType2))
-                    pairs[techType2] += 1;
+                if (pairs.ContainsKey(item))
+                    pairs[item] += 1;
                 else
-                    pairs[techType2] = 1;
+                    pairs[item] = 1;
             }
 
             ItemsContainer inventory = Inventory.main?.container;
@@ -105,16 +107,16 @@ public static class TechDataHelpers
         if (!_knownIngredientCounts.ContainsKey(techType))
         {
             _knownIngredientCounts.Add(techType,
-                CalculateIngredientCount(GetIngredients(techType)));
+                CalculateIngredientCount(TechData.GetIngredients(techType).ToList()));
         }
 
         return _knownIngredientCounts[techType];
     }
 
-    private static int CalculateIngredientCount(List<CraftData.Ingredient> ingredients)
+    private static int CalculateIngredientCount(List<Ingredient> ingredients)
     {
         int total = 0;
-        foreach (CraftData.Ingredient ingredient in ingredients)
+        foreach (Ingredient ingredient in ingredients)
         {
             total += ingredient.amount;
         }
@@ -122,47 +124,15 @@ public static class TechDataHelpers
         return total;
     }
 
-    public static List<CraftData.Ingredient> GetIngredientsWithOutBatteries(TechType techType)
+    public static List<Ingredient> GetIngredientsWithOutBatteries(TechType techType)
     {
         _ingredients.Clear();
 
-        var it = CraftData.techData[techType];
+        List<Ingredient> readOnlyCollection = TechData.GetIngredients(techType).ToList();
 
-        if (it != null)
+        foreach (Ingredient ingredient in readOnlyCollection)
         {
-            List<CraftData.Ingredient> readOnlyCollection = new List<CraftData.Ingredient>();
-            for (int i = 0; i < it.ingredientCount; i++)
-            {
-                readOnlyCollection.Add((CraftData.Ingredient)it.GetIngredient(i));
-            }
-
-            foreach (CraftData.Ingredient ingredient in readOnlyCollection)
-            {
-                if (CellConcatTech.Contains(techType) || !CellConcatTech.Contains(ingredient.techType))
-                {
-                    _ingredients.Add(ingredient);
-                }
-            }
-        }
-
-        return _ingredients;
-    }
-
-    public static List<CraftData.Ingredient> GetIngredients(TechType techType)
-    {
-        _ingredients.Clear();
-
-        var it = CraftData.techData[techType];
-
-        if (it != null)
-        {
-            List<CraftData.Ingredient> readOnlyCollection = new List<CraftData.Ingredient>();
-            for (int i = 0; i < it.ingredientCount; i++)
-            {
-                readOnlyCollection.Add((CraftData.Ingredient)it.GetIngredient(i));
-            }
-
-            foreach (CraftData.Ingredient ingredient in readOnlyCollection)
+            if (CellConcatTech.Contains(techType) || !CellConcatTech.Contains(ingredient.techType))
             {
                 _ingredients.Add(ingredient);
             }
@@ -179,11 +149,7 @@ public static class TechDataHelpers
 
     public static Vector2int GetItemSize(TechType techType)
     {
-#if SUBNAUTICA
-        var size = CraftData.GetItemSize(techType);
-#else
         var size = TechData.GetItemSize(techType);
-#endif
         return size;
     }
 }

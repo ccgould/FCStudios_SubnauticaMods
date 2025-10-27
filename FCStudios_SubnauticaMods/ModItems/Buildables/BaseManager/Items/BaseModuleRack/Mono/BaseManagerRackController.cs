@@ -12,7 +12,7 @@ using UWE;
 using static FCS_AlterraHub.Configuation.SaveData;
 
 namespace FCS_AlterraHub.ModItems.Buildables.BaseManager.Items.BaseModuleRack.Mono;
-internal class BaseManagerRackController : FCSDevice, IFCSSave<SaveData>
+internal class BaseManagerRackController : FCSDevice, IFCSSave
 {
     [SerializeField]
     private Transform _storageRoot;
@@ -331,7 +331,7 @@ internal class BaseManagerRackController : FCSDevice, IFCSSave<SaveData>
         return slotsFilled;
     }
 
-    public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)
+    public void SaveDevice()
     {
     }
 

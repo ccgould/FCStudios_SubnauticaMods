@@ -24,11 +24,7 @@ public class RadialMenuEntry : MonoBehaviour, IPointerEnterHandler, IPointerExit
 
     internal void Initialize(FCSAlterraHubGUI controller, Text pLabel, Sprite pIcon, Text pageLabel, string buttonName, PDAPages page)
     {
-#if SUBNAUTICA
-        Icon.sprite = new Atlas.Sprite(pIcon);
-#else
         Icon.sprite = pIcon;
-#endif
 
         _controller = controller;
 

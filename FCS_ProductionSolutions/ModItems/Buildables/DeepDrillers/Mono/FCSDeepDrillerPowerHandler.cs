@@ -418,11 +418,8 @@ internal class FCSDeepDrillerPowerHandler : FCSPowerManager, IFCSStorage, IPower
 
     public bool CanBeStored(int amount, TechType techType)
     {
-#if SUBNAUTICA
-        var equipType = CraftData.GetEquipmentType(techType);
-#elif BELOWZERO
-    var equipType = TechData.GetEquipmentType(techType);
-#endif
+        var equipType = TechData.GetEquipmentType(techType);
+
 
         return equipType == EquipmentType.PowerCellCharger || techType == TechType.PowerCell ||
                techType == TechType.PrecursorIonPowerCell;

@@ -48,11 +48,8 @@ internal class MiniMedBayContainer : MonoBehaviour
 
     internal void RemoveSingleKit()
     {
-#if SUBNAUTICA
-            var size = CraftData.GetItemSize(TechType.FirstAidKit);
-#elif BELOWZERO
-            var size = TechData.GetItemSize(TechType.FirstAidKit);
-#endif
+        var size = TechData.GetItemSize(TechType.FirstAidKit);
+
         if (Inventory.main.HasRoomFor(size.x, size.y))
         {
             if (_medKits > 0)

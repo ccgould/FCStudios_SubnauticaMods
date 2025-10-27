@@ -5,7 +5,7 @@ using FCS_AlterraHub.ModItems.Buildables.BaseManager.Buildable;
 using FCSCommon.Utilities;
 
 namespace FCS_AlterraHub.ModItems.Buildables.BaseManager.Items.BaseTransmitter.Mono;
-internal class ConnectedGridExtensionController : FCSDevice, IFCSSave<SaveData>
+internal class ConnectedGridExtensionController : FCSDevice, IFCSSave
 {
     private bool _isBaseManagerBuilt;
 
@@ -40,7 +40,7 @@ internal class ConnectedGridExtensionController : FCSDevice, IFCSSave<SaveData>
 
     }
 
-    public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)
+    public void SaveDevice()
     {
         QuickLogger.Debug("Saves Connection Grid Extension", true);
 
@@ -65,7 +65,7 @@ internal class ConnectedGridExtensionController : FCSDevice, IFCSSave<SaveData>
 
         //newSaveData.Data.Add(save);
 
-        QuickLogger.Debug($"Saves Connection Grid Extension {newSaveData.Data.Count}", true);
+        //QuickLogger.Debug($"Saves Connection Grid Extension {newSaveData.Data.Count}", true);
     }
 
     public override string[] GetDeviceStats()

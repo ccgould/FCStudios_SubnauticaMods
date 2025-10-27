@@ -15,9 +15,9 @@
 
         <Configurations>Debug;Release;SN_Stable;BZ_Stable</Configurations>
 
-        <AssemblyVersion>1.0.395.0</AssemblyVersion>
+        <AssemblyVersion>1.0.406.0</AssemblyVersion>
 
-        <FileVersion>1.0.395.0</FileVersion>
+        <FileVersion>1.0.406.0</FileVersion>
 	  <BepInExPluginGuid>com.fcstudios.EnergySolutions</BepInExPluginGuid>
   </PropertyGroup>
 
@@ -34,7 +34,7 @@
     <PackageReference Include="BepInEx.Core" Version="5.4.21" />
     <PackageReference Include="BepInEx.PluginInfoProps" Version="1.1.0" />
     <PackageReference Include="UnityEngine.Modules" Version="2019.4.36" IncludeAssets="compile" />
-    <PackageReference Include="Subnautica.GameLibs" Version="71288.0.0-r.0" />
+    <PackageReference Include="Subnautica.GameLibs" Version="82304.0.0-r.0" />
     <PackageReference Include="PolySharp" Version="1.14.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

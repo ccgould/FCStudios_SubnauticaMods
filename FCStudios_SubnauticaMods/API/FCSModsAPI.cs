@@ -1,4 +1,5 @@
-﻿using FCS_AlterraHub.Core.Extensions;
+﻿using FCS_AlterraHub.Configuation;
+using FCS_AlterraHub.Core.Extensions;
 using FCS_AlterraHub.Core.Services;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Enumerators;
@@ -12,6 +13,7 @@ using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using static FCS_AlterraHub.Core.Services.SaveLoadDataService;
 
 namespace FCS_AlterraHub.API;
 
@@ -51,6 +53,8 @@ public interface IFCSModsAPIPublic
     void RegisterBaseManagerModule(string pluginName, string classID, string friendlyName, string description, decimal itemCost, StoreCategory storeCategory);
     HashSet<FCSDevice> GetRegisteredDevicesOfId(string modID);
     void ShowMessageInPDA(string message, FCSMessageButton button = FCSMessageButton.OK, Action<FCSMessageResult> result = null);
+    T GetSaveData<T>(string id) where T : IDBEntity, new();
+    void PushSaveData<T>(T save) where T : IDBEntity, new();
 }
 public interface IFCSModsAPIInternal
 {
@@ -231,5 +235,15 @@ public class FCSModsAPI : IFCSModsAPIPublic, IFCSModsAPIInternal
     public void ShowMessageInPDA(string message,FCSMessageButton button = FCSMessageButton.OK,Action<FCSMessageResult> result = null)
     {
         uGUI_MessageBoxHandler.Instance.ShowMessage(message, button, result);
+    }
+
+    public T GetSaveData<T>(string id) where T : IDBEntity, new()
+    {
+        return ModSaveManager.GetSaveDataV2<T>(id);
+    }
+
+    public void PushSaveData<T>(T save) where T : IDBEntity, new()
+    {
+        ModSaveManager.SaveData(save);
     }
 }

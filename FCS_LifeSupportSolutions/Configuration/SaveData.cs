@@ -2,6 +2,8 @@
 using FCS_AlterraHub.Models;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using FCS_AlterraHub.Configuation;
+using SQLite;
 
 namespace FCS_LifeSupportSolutions.Configuration;
 
@@ -11,31 +13,22 @@ internal class SaveData
     public HashSet<object> Data { get; set; } = new();
 }
 
-internal class MiniMedBayDataEntry : ISaveDataEntry
+[Table("MiniMedBay")]
+internal class MiniMedBayDataEntry : BaseSaveData
 {
-    public string Id { get; set; }
-    [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
-    public ColorTemplateSave ColorTemplate { get; set; }
-    public string BaseId { get; set; }
     [JsonProperty] internal int FirstAidCount { get; set; }
     [JsonProperty] internal float TimeToSpawn { get; set; }
 }
 
-internal class BaseUtilityEntry : ISaveDataEntry
+[Table("BaseUtility")]
+internal class BaseUtilityEntry : BaseSaveData
 {
-    public string Id { get; set; }
-    public string BaseId { get; set; }
-    [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
-    public ColorTemplateSave ColorTemplate { get; set; }
     [JsonProperty] internal float O2Level { get; set; }
 }
 
-internal class BaseOxygenTankEntry : ISaveDataEntry
+[Table("BaseOxygen")]
+internal class BaseOxygenTankEntry : BaseSaveData
 {
-    public string Id { get; set; }
-    public string BaseId { get; set; }
-    [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
-    public ColorTemplateSave ColorTemplate { get; set; }
     [JsonProperty] internal float O2Level { get; set; }
     [JsonProperty] internal string ParentID { get; set; }
 }

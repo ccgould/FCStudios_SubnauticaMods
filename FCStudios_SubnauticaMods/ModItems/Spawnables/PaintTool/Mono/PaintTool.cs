@@ -115,7 +115,7 @@ internal class PaintToolController : PlayerTool, IFCSObject
     private void Update()
     {
         //TODO use the % operator to replace this watch unity videoplayer  tut in your youTube lib
-        if (isDrawn && Input.GetKeyDown(Plugin.Configuration.PaintToolSelectColorForwardKeyCode))
+        if (isDrawn && GameInput.GetButtonDown(Plugin.PaintToolSelectColorForwardKeyCode))
         {
             _currentTemplateIndex += 1;
 
@@ -126,7 +126,7 @@ internal class PaintToolController : PlayerTool, IFCSObject
 
             ChangeColor(_currentTemplates.ElementAt(_currentTemplateIndex));
         }
-        else if (isDrawn && Input.GetKeyDown(Plugin.Configuration.PaintToolSelectColorBackKeyCode))
+        else if (isDrawn && GameInput.GetButtonDown(Plugin.PaintToolSelectColorBackKeyCode))
         {
             _currentTemplateIndex -= 1;
 
@@ -137,7 +137,7 @@ internal class PaintToolController : PlayerTool, IFCSObject
 
             ChangeColor(_currentTemplates.ElementAt(_currentTemplateIndex));
         }
-        else if (isDrawn && Input.GetKeyDown(Plugin.Configuration.PaintToolColorSampleKeyCode))
+        else if (isDrawn && GameInput.GetButtonDown(Plugin.PaintToolColorSampleKeyCode))
         {
             var device = GetFCSDeviceFromTarget();
             if (device != null)
@@ -274,9 +274,9 @@ internal class PaintToolController : PlayerTool, IFCSObject
     {
         if (string.IsNullOrWhiteSpace(message))
         {
-            message = $"Change Template: {GameInput.GetBindingName(GameInput.Button.AltTool, GameInput.BindingSet.Primary)} | Color Sample {Plugin.Configuration.PaintToolColorSampleKeyCode}";
+            message = $"Change Template: {GameInput.Button.AltTool.AsString()} | Color Sample {Plugin.PaintToolColorSampleKeyCode}";
         }
-        return $"Press Change Colors ({Plugin.Configuration.PaintToolSelectColorBackKeyCode})/({Plugin.Configuration.PaintToolSelectColorForwardKeyCode}) | Use Paint Can: {GameInput.GetBindingName(GameInput.Button.Reload, GameInput.BindingSet.Primary)} | {message}";
+        return $"Press Change Colors ({Plugin.PaintToolSelectColorBackKeyCode})/({Plugin.PaintToolSelectColorForwardKeyCode}) | Use Paint Can: {GameInput.Button.Reload.AsString()} | {message}";
     }
 
     public List<ColorTemplate> GetTemplates()
