@@ -195,7 +195,7 @@ internal class BaseUtilityUnitController : FCSDevice, IFCSSave
         QuickLogger.Debug($"Prefab Id : {GetPrefabID()} || SaveData Is Null: {_savedData is null}");
     }
 
-    public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)
+    public void SaveDevice()
     {
         if (!IsInitialized || !IsConstructed) return;
 
@@ -211,7 +211,8 @@ internal class BaseUtilityUnitController : FCSDevice, IFCSSave
         save.O2Level = oxygenManager.GetO2Level();
         save.ColorTemplate = _colorManager.SaveTemplate();
         QuickLogger.Debug($"Saving ID {save.Id}");
-        newSaveData.Data.Add(save);
+        //newSaveData.Data.Add(save);
+        FCSModsAPI.PublicAPI.PushSaveData(save);
     }
 
     internal BaseUtilityOxygenManager GetOxygenManager()

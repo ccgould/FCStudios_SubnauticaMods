@@ -14,8 +14,8 @@
     </RestoreAdditionalProjectSources>
 	  <Configurations>Debug;Release;SN_Stable;BZ_Stable</Configurations>
 	  <BepInExPluginGuid>com.fcstudios.LifeSupportSolutions</BepInExPluginGuid>
-    <AssemblyVersion>1.0.133.0</AssemblyVersion>
-    <FileVersion>1.0.133.0</FileVersion>
+    <AssemblyVersion>1.0.136.0</AssemblyVersion>
+    <FileVersion>1.0.136.0</FileVersion>
   </PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" />
 

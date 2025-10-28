@@ -42,7 +42,7 @@ public class Plugin : BaseUnityPlugin
         MaterialHelpers.GetIngameObjects();
         
         //Register mod pack
-        FCSModsAPI.PublicAPI.RegisterModPack(PluginInfo.PLUGIN_NAME, Assembly.GetExecutingAssembly(), ModSettings.AssetBundleName, ModSaveManager.Save, ModSaveManager.LoadData);
+        FCSModsAPI.PublicAPI.RegisterModPack(PluginInfo.PLUGIN_NAME, Assembly.GetExecutingAssembly(), ModSettings.AssetBundleName, null, null);
         FCSModsAPI.PublicAPI.AddStoreCategory(PluginInfo.PLUGIN_NAME, "LifeSupportIcon_W", "Life Support Solutions", PDAPages.LifeSolutions);
         StartCoroutine(MaterialHelpers.GetGameBaseMaterial(() =>
         {

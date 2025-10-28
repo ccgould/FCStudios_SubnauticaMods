@@ -1,4 +1,5 @@
-﻿using FCS_AlterraHub.Core.Interfaces;
+﻿using FCS_AlterraHub.API;
+using FCS_AlterraHub.Core.Interfaces;
 using FCS_AlterraHub.Models.Abstract;
 using FCS_AlterraHub.Models.Interfaces;
 using FCS_LifeSupportSolutions.Configuration;
@@ -8,7 +9,7 @@ using UnityEngine;
 
 
 namespace FCS_LifeSupportSolutions.ModItems.Buildables.MiniMedBay.Mono;
-internal class MiniMedBayController : FCSDevice, IFCSSave<SaveData>
+internal class MiniMedBayController : FCSDevice, IFCSSave
 {
     private MiniMedBayBedManager _bedManager;
     private MiniMedBayContainer _container;
@@ -75,10 +76,10 @@ internal class MiniMedBayController : FCSDevice, IFCSSave<SaveData>
 
     public override void ReadySaveData()
     {
-        _savedData = ModSaveManager.GetSaveData<MiniMedBayDataEntry>(GetPrefabID());
+        _savedData = FCSModsAPI.PublicAPI.GetSaveData<MiniMedBayDataEntry>(GetPrefabID()); //ModSaveManager.GetSaveData<MiniMedBayDataEntry>(GetPrefabID());
     }
 
-    public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)
+    public void SaveDevice()
     {
         QuickLogger.Debug("Saving Server Rack", true);
 
@@ -97,7 +98,8 @@ internal class MiniMedBayController : FCSDevice, IFCSSave<SaveData>
         //save.ColorTemplate = _colorManager.SaveTemplate();
         save.FirstAidCount = _container.NumberOfFirstAids;
         save.TimeToSpawn = _container.GetTimeToSpawn();
-        newSaveData.Data.Add(save);
+        //newSaveData.Data.Add(save);
+        FCSModsAPI.PublicAPI.PushSaveData(save); 
     }
     public override float GetPowerUsage()
     {
